@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Santuário</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icone.png">
+    <meta name="apple-mobile-web-app-title" content="Santuário">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+    <div id="app-shell">
+        <main id="conteudo-principal">
+            
+            <section id="home" class="tela ativo">
+                <div class="cartao-vidro" style="text-align: center;">
+                    <h2 style="color: var(--cor-primaria); font-weight: 300;">Santuário</h2>
+                    <p style="opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">Conexão Vital Estabelecida há:</p>
+                    <div id="timer-principal" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace;">
+                        00d 00h 00m 00s
+                    </div>
+                </div>
+
+                <div class="cartao-vidro" id="frase-do-dia">
+                    <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
+                </div>
+
+                <div class="area-pulso" style="position: relative;">
+                    <button id="btn-pulso" onclick="enviarPulso()">
+                        <span id="icone-semente" class="icone-pulso">🌱</span>
+                    </button>
+                    <p id="contador-pulso">Você pensou nele hoje?</p>
+                    <span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
+                </div>
+
+                <div id="container-notificacoes" class="container-notificacoes">
+                    <div id="streak-jardim" class="badge-home escondido">
+                        <span class="icone-badge">🌱</span>
+                        <span id="texto-streak">0 dias de florescimento</span>
+                    </div>
+
+                    <div id="atalho-cofre" class="badge-home badge-especial escondido" onclick="document.querySelector('[data-alvo=\'cofre\']').click()">
+                        <span class="icone-badge">✨</span>
+                        <span>Uma nova memória te espera no Cofre!</span>
+                    </div>
+                </div>
+
+                <div class="container-clima">
+                    <div class="mini-card-clima">
+                        <span class="cidade">João</span>
+                        <div class="dados-clima">
+                            <span id="temp-usuario">--°C</span>
+                        </div>
+                    </div>
+                    <div class="mini-card-clima">
+                        <span class="cidade">Você</span>
+                        <div class="dados-clima">
+                            <span id="temp-thamiris">--°C</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- NOVO: Botão de Mensagem Surpresa -->
+                    <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
+                        <button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 12px 20px;">✨ Mensagem Surpresa</button>
+                        <p id="texto-surpresa" style="font-style: italic; margin-top: 15px; font-size: 1rem; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
+                    </div>
+            </section> 
+
+            <section id="leis" class="tela escondido">
+                <div class="cartao-vidro header-leis" style="text-align: center;">
+                    <h3 style="color: var(--cor-primaria);">⚖️ Vade Mecum do Afeto</h3>
+                    <p class="subtitulo-lei" style="font-size: 12px; opacity: 0.8; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase;">Edição Especial: João & Thamiris</p>
+                </div>
+                <div class="lista-leis"></div>
+            </section>
+
+            <section id="jogos" class="tela escondido">
+                <div id="header-jogos-main" class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Oásis de Conexão</h3>
+                    <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Sincronize mentes e corações</p>
+                </div>
+
+                <div id="menu-jogos" class="grade-jogos">
+                    <div class="item-jogo" onclick="abrirJogo('termo')">
+                        <span class="icone-jogo">🎮</span>
+                        <p>Termo</p>
+                    </div>
+                    <div class="item-jogo" onclick="abrirJogo('sincronia')">
+                        <span class="icone-jogo">✨</span>
+                        <p>Sincronia</p>
+                    </div>
+                    <div class="item-jogo" onclick="abrirJogo('jardim')">
+                        <span class="icone-jogo">🌱</span>
+                        <p>Solo Fértil</p>
+                    </div>
+                </div>
+
+                <div id="container-termo" class="escondido">
+                    <div class="cartao-vidro">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+                            <button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
+                        </div>
+                        <h3 style="color: var(--cor-primaria); margin-bottom: 15px; text-align: center;">🎮 Termo do Santuário</h3>
+                        
+                        <div id="instrucoes-termo" class="escondido cartao-instrucoes">
+                            <h4>Como Jogar</h4>
+                            <ul>
+                                <li>Adivinhe a palavra secreta em 6 tentativas.</li>
+                                <li><span style="background:var(--cor-agronomia); padding:2px 5px; border-radius:3px; color:white; font-size:10px;">VERDE</span> Letra e posição certas.</li>
+                                <li><span style="background:#c9b458; padding:2px 5px; border-radius:3px; color:white; font-size:10px;">AMARELO</span> Letra certa, posição errada.</li>
+                                <li>Vença para liberar as relíquias de hoje!</li>
+                            </ul>
+                        </div>
+
+                        <div id="tabuleiro-termo"></div>
+                        <div id="teclado-termo"></div>
+                        <button id="btn-verificar" class="btn-acao">Verificar</button>
+                    </div>
+                </div>
+
+                <div id="termo-reset-container" class="escondido" style="text-align: center; margin-top: 20px;">
+                    <button onclick="resetarTermo()" class="btn-refresh">
+                        <span style="font-size: 1.5rem;">↻</span>
+                        <p style="font-size: 10px; text-transform: uppercase; margin-top: 5px;">Tentar Novamente</p>
+                    </button>
+                </div>
+
+                <div id="container-sincronia" class="escondido" style="padding-top: 10px; text-align: center;">
+                    <div class="cartao-vidro">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+                            <button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
+                        </div>
+                        <div class="header-jogos" style="margin-bottom: 20px;">
+                            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0;">Match de Sincronia</h3>
+                            <p class="subtitulo-lei" style="letter-spacing: 2px; margin-top: 5px; font-size: 0.7rem;">UMA PERGUNTA, DOIS MUNDOS</p>
+                        </div>
+
+                        <div id="instrucoes-sincronia" class="escondido cartao-instrucoes">
+                            <h4>Como Jogar</h4>
+                            <ul>
+                                <li>Este é um teste de telepatia amorosa.</li>
+                                <li>Leia a reflexão gerada na tela.</li>
+                                <li>Ambos devem enviar a resposta ao mesmo tempo no WhatsApp.</li>
+                                <li>Veja se os corações estão em sintonia!</li>
+                            </ul>
+                        </div>
+
+                        <div class="cartao-vidro" style="min-height: 180px; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.2);">
+                            <div id="area-pergunta">
+                                <p id="texto-pergunta" class="texto-itálico" style="font-size: 1.2rem; padding: 0 10px; line-height: 1.6;">Carregando...</p>
+                            </div>
+                        </div>
+                        <button class="btn-acao" onclick="gerarNovaPergunta()">Nova Reflexão</button>
+                    </div>
+                </div>
+
+                <div id="container-jardim" class="escondido" style="padding-top: 10px; text-align: center;">
+                    <div class="cartao-vidro">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+                            <button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
+                        </div>
+                        <h3 style="color: var(--cor-primaria);">🌱 Nosso Solo Fértil</h3>
+
+                        <div id="instrucoes-jardim" class="escondido cartao-instrucoes">
+                            <h4>Como Cuidar</h4>
+                            <ul>
+                                <li>Nosso amor precisa de cuidados diários.</li>
+                                <li>Clique em <b>REGAR</b> uma vez por dia.</li>
+                                <li>Ficar 2 dias sem regar fará a planta murchar e perder vida.</li>
+                                <li>Mantenha a sequência viva para o jardim florescer!</li>
+                            </ul>
+                        </div>
+
+                        <div id="emoji-planta" style="font-size: 6rem; margin: 20px 0; transition: transform 0.3s ease;">🌱</div>
+                        <div class="barra-vida" style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 12px; margin: 10px 20px; overflow: hidden;">
+                            <div id="progresso-crescimento" class="progresso" style="background: var(--cor-primaria); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+                        </div>
+                        <p id="status-texto" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
+                        <p id="aviso-regada" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 15px;"></p>
+                        <button id="btn-regar" class="btn-acao" onclick="regarPlanta()">💦 REGAR</button>
+                        <p id="contador-ciclos" style="font-size: 0.8rem; margin-top: 10px; color: var(--cor-primaria);">🌱 Ciclos completados: 0</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cofre" class="tela escondido">
+                <div class="cartao-vidro" style="text-align: center; margin-bottom: 5px;">
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Relíquias do Santuário</h3>
+                    <p id="msg-cofre" style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">
+                        Vença o desafio diário para desbloquear
+                    </p>
+                </div>
+
+                <div class="grade-cofre" id="grade-reliquias">
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia('musica')">
+                        <span class="icone-reliquia">🎵</span>
+                        <p>Nossa Trilha</p>
+                        <small class="status-reliquia">Trancado</small>
+                    </div>
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia('ceu')">
+                        <span class="icone-reliquia">🌌</span>
+                        <p>Mesmo Céu</p>
+                        <small class="status-reliquia">Trancado</small>
+                    </div>
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia('cartas')">
+                        <span class="icone-reliquia">✉️</span>
+                        <p>Sementes</p>
+                        <small class="status-reliquia">Trancado</small>
+                    </div>
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia('encontro')">
+                        <span class="icone-reliquia">🎟️</span>
+                        <p>O Futuro</p>
+                        <small class="status-reliquia">Trancado</small>
+                    </div>
+                </div>
+
+                <div id="modal-reliquia" class="modal escondido">
+                    <div class="conteudo-modal cartao-vidro">
+                        <span class="fechar-modal" onclick="fecharModal()">&times;</span>
+                        <div id="corpo-modal"></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="menu-inferior">
+            <a href="#" class="item-menu ativo" data-alvo="home">
+                <span class="icone-menu">🏛️</span>
+                <span>Home</span>
+            </a>
+            <a href="#" class="item-menu" data-alvo="leis">
+                <span class="icone-menu">⚖️</span>
+                <span>Leis</span>
+            </a>
+            <a href="#" class="item-menu" data-alvo="jogos">
+                <span class="icone-menu">🎮</span>
+                <span>Jogos</span>
+            </a>
+            <a href="#" class="item-menu" data-alvo="cofre">
+                <span class="icone-menu">🎙️</span>
+                <span>Cofre</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+
+    <div id="toast-mensagem" class="toast escondido"></div>
+    
+</body>
+</html>

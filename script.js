@@ -811,36 +811,7 @@ function voltarMenuJogos() {
 }
 
 const perguntasSincronia = [
-    "Qual é a memória mais vívida que você tem de nós dois no início?",
-    "Se pudéssemos projetar nossa casa ideal hoje, qual detalhe não poderia faltar?",
-    "O que eu faço que, sem eu saber, faz você se sentir mais amada?",
-    "Qual característica minha você acha que mais combina com a sua?",
-    "Qual foi o momento em que você sentiu mais orgulho de nós como um time?",
-    "Se pudéssemos viajar para qualquer lugar do mundo amanhã, para onde iríamos?",
-    "Qual cheiro te lembra de mim?",
-    "Se a nossa história fosse um filme, qual seria o título?",
-    "O que você gostaria de aprender a fazer comigo?",
-    "Qual música te faz pensar em mim instantaneamente?",
-    "Se você pudesse me dar um superpoder, qual seria?",
-    "Qual foi a maior loucura que já fez por amor (e se arrependeu ou não)?",
-    "Se o nosso amor fosse uma comida, qual seria?",
-    "Que lugarzinho secreto na sua cidade você sonha em me mostrar?",
-    "Qual foi o momento em que você pensou 'é com essa pessoa que quero passar o resto da vida'?",
-    "Se você pudesse reviver um dia nosso, qual escolheria?",
-    "O que você acha que eu ainda não descobri sobre você?",
-    "Qual a sua tradição favorita que já criamos juntos?",
-    "Se a gente pudesse ter um animal de estimação agora, qual seria e por quê?",
-    "Que medo você já superou por minha causa?",
-    "Qual foi o presente mais significativo que já trocamos (não precisa ser material)?",
-    "Se você pudesse me dar um apelido novo hoje, qual seria?",
-    "Qual a data (além do aniversário) que mais marca a nossa história?",
-    "O que você mais admira na forma como eu trato as pessoas?",
-    "Se a gente fosse escrever um livro juntos, sobre o que seria?",
-    "Qual defeito meu você acha que, na verdade, é uma qualidade?",
-    "Que sonho seu eu ainda não conheço?",
-    "Se pudéssemos fazer uma doação para uma causa juntos, qual escolheríamos?",
-    "Qual a piada interna mais boba que só a gente entende?",
-    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?"
+    "Oi"
 ];
 
 function gerarNovaPergunta() {
@@ -1053,3 +1024,4 @@ if (btnSurpresa) {
 }
 
 });
+

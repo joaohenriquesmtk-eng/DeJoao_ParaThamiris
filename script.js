@@ -266,35 +266,36 @@ function resetarTermo() {
     }
 }
 function restaurarEstadoTermo() {
-const estadoSalvo = sessionStorage.getItem('termo_estado');
-if (estadoSalvo) {
-    try {
-        const estado = JSON.parse(estadoSalvo);
-        tentativaAtual = estado.tentativaAtual;
-        letraAtual = estado.letraAtual;
-        grade = estado.grade;
-        // ... resto do código (preenchimento do tabuleiro)
-        for (let i = 0; i <= tentativaAtual; i++) {
-            for (let j = 0; j < 5; j++) {
-                const quadrado = document.getElementById(`q-${i}-${j}`);
-                if (quadrado && grade[i] && grade[i][j]) {
-                    quadrado.innerText = grade[i][j];
-                    if (i < tentativaAtual) {
-                        const letra = grade[i][j];
-                        const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-                        if (letra === palavraFinal[j]) quadrado.classList.add("correta");
-                        else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
-                        else quadrado.classList.add("ausente");
+    const estadoSalvo = sessionStorage.getItem('termo_estado');
+    if (estadoSalvo) {
+        try {
+            const estado = JSON.parse(estadoSalvo);
+            tentativaAtual = estado.tentativaAtual;
+            letraAtual = estado.letraAtual;
+            grade = estado.grade;
+
+            // Preenche o tabuleiro com as letras já inseridas
+            for (let i = 0; i <= tentativaAtual; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const quadrado = document.getElementById(`q-${i}-${j}`);
+                    if (quadrado && grade[i] && grade[i][j]) {
+                        quadrado.innerText = grade[i][j];
+                        if (i < tentativaAtual) {
+                            const letra = grade[i][j];
+                            const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+                            if (letra === palavraFinal[j]) quadrado.classList.add("correta");
+                            else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
+                            else quadrado.classList.add("ausente");
+                        }
                     }
                 }
             }
+        } catch (e) {
+            console.warn('Estado do Termo corrompido. Ignorando...');
+            sessionStorage.removeItem('termo_estado');
+            // Não faz nada, o jogo começará do zero
         }
-    } catch (e) {
-        console.warn('Estado do Termo corrompido. Ignorando...');
-        sessionStorage.removeItem('termo_estado');
-        // Não faz nada, o jogo começará do zero
     }
-}
 }
 
 function liberarCofreVisual() {
@@ -1115,6 +1116,7 @@ if (btnSurpresa) {
 }
 
 });
+
 
 
 

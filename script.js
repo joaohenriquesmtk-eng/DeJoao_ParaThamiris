@@ -813,6 +813,11 @@ function voltarMenuJogos() {
 const perguntasSincronia = [
     "Qual é a memória mais vívida que você tem de nós dois no início?",
     "Se pudéssemos projetar nossa casa ideal hoje, qual detalhe não poderia faltar?",
+    "Qual é a nossa melhor memória juntos?",
+    "O que você mais admira em mim?",
+    "Qual é o nosso maior sonho como casal?",
+    "Como você descreveria nós como um time?",
+    "Se pudéssemos viajar para qualquer lugar do mundo amanhã, para onde iríamos?",
     "O que eu faço que, sem eu saber, faz você se sentir mais amada?",
     "Qual característica minha você acha que mais combina com a sua?",
     "Qual foi o momento em que você sentiu mais orgulho de nós como um time?",
@@ -827,19 +832,46 @@ const perguntasSincronia = [
     "Que lugarzinho secreto na sua cidade você sonha em me mostrar?",
     "Qual foi o momento em que você pensou 'é com essa pessoa que quero passar o resto da vida'?",
     "Se você pudesse reviver um dia nosso, qual escolheria?",
+    "Qual foi o momento exato em que você percebeu que éramos um 'caso julgado'?",
+    "Se nosso amor fosse uma semente, qual seria o fruto da nossa colheita?",
+    "Qual é a 'cláusula pétrea' (que nunca muda) do nosso relacionamento?",
+    "Qual viagem para o interior você mais quer fazer comigo?",
+    "Qual é o nosso prato favorito para dividir em um domingo de sol?",
+    "Qual música do Flamengo mais faz você lembrar da nossa energia juntos?",
+    "Quem é mais provável de ganhar uma discussão: a lógica do engenheiro ou os argumentos da advogada?",
+    "Qual 'safra' da nossa história você mais gosta de recordar?",
+    "Se tivéssemos que escrever o nosso próprio código de leis, qual seria a Lei nº 1?",
+    "Qual é o nosso refúgio favorito quando o mundo parece barulhento demais?",
+    "Qual característica minha você acha que 'germinou' em você ao longo do tempo?",
+    "No tribunal do nosso amor, qual é a sentença para quem fica com saudade demais?",
+    "Qual é o cheiro que mais te faz lembrar de mim?",
+    "Qual é o nosso maior 'projeto de vida' para os próximos 5 anos?",
+    "Praia com o sol de Goiânia ou serra com o frio de Colombo?",
+    "Quem de nós é mais provável de se perder no meio de uma lavoura?",
+    "Qual é o segredo para a nossa produtividade de felicidade ser sempre alta?",
+    "Qual é a mania do outro que você secretamente acha fofa?",
+    "Se nosso relacionamento fosse um time, quem seria o capitão e quem seria o camisa 10?",
+    "Qual filme ou série define perfeitamente o nosso enredo?",
+    "Qual 'recurso' você usaria para adiar o fim de um final de semana juntos?",
+    "Qual semente de sonho nós plantamos recentemente e você quer ver crescer?",
+    "Qual é a palavra que melhor resume o que sentimos quando estamos em silêncio?",
+    "Quem é mais provável de esquecer onde estacionou o carro no shopping?",
+    "Qual é a nossa 'jurisprudência': um erro que nos ensinou a sermos melhores hoje?",
+    "Se pudéssemos criar um feriado nacional para o nosso dia, como ele seria?",
+    "Qual é a característica que faz de nós o solo perfeito para o par ideal?",
     "O que você acha que eu ainda não descobri sobre você?",
     "Qual a sua tradição favorita que já criamos juntos?",
     "Se a gente pudesse ter um animal de estimação agora, qual seria e por quê?",
     "Que medo você já superou por minha causa?",
-    "Qual foi o presente mais significativo que já trocamos (não precisa ser material)?",
+    "Qual foi a primeira impressão (a petição inicial) que você teve de mim?",
     "Se você pudesse me dar um apelido novo hoje, qual seria?",
-    "Qual a data (além do aniversário) que mais marca a nossa história?",
+    "O que você diria para o seu 'eu' do passado no dia em que nos conhecemos?"
     "O que você mais admira na forma como eu trato as pessoas?",
     "Se a gente fosse escrever um livro juntos, sobre o que seria?",
     "Qual defeito meu você acha que, na verdade, é uma qualidade?",
     "Que sonho seu eu ainda não conheço?",
     "Se pudéssemos fazer uma doação para uma causa juntos, qual escolheríamos?",
-    "Qual a piada interna mais boba que só a gente entende?",
+    "Qual é a primeira coisa que faremos quando a distância entre Colombo e Goiânia for zero?",
     "Se você tivesse que descrever nosso amor em três palavras, quais seriam?"
 ];
 
@@ -1053,5 +1085,6 @@ if (btnSurpresa) {
 }
 
 });
+
 
 

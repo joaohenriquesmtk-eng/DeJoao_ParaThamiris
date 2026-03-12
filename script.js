@@ -985,33 +985,38 @@ function mostrarToast(mensagem) {
 const STORAGE_SURPRESA = 'santuario_surpresa_diaria';
 
 function inicializarSurpresaDiaria() {
-    const hoje = new Date().toLocaleDateString('pt-BR'); // formato dd/mm/aaaa
+    const hoje = new Date().toLocaleDateString('pt-BR');
     const dadosSalvos = localStorage.getItem(STORAGE_SURPRESA);
     const btn = document.getElementById('btn-surpresa');
     const paragrafo = document.getElementById('texto-surpresa');
 
-    if (!btn || !paragrafo) return; // segurança
+    if (!btn || !paragrafo) return;
 
     if (dadosSalvos) {
-        const { data, mensagem } = JSON.parse(dadosSalvos);
-        
-        // Se a data salva for igual a hoje, já usou hoje
-        if (data === hoje) {
-            // Exibe a mensagem salva
-            paragrafo.innerText = `"${mensagem}"`;
-            // Desabilita o botão
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-        } else {
-            // Data diferente: pode usar novamente
-            paragrafo.innerText = ''; // limpa mensagem antiga
+        try {
+            const { data, mensagem } = JSON.parse(dadosSalvos);
+            
+            if (data === hoje) {
+                paragrafo.innerText = `"${mensagem}"`;
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            } else {
+                paragrafo.innerText = '';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            }
+        } catch (e) {
+            // Dados corrompidos: limpa e reseta
+            console.warn('Dados da mensagem surpresa corrompidos. Resetando...');
+            localStorage.removeItem(STORAGE_SURPRESA);
+            paragrafo.innerText = '';
             btn.disabled = false;
             btn.style.opacity = '1';
             btn.style.cursor = 'pointer';
         }
     } else {
-        // Nunca usou: botão habilitado, mensagem vazia
         paragrafo.innerText = '';
         btn.disabled = false;
         btn.style.opacity = '1';
@@ -1085,6 +1090,7 @@ if (btnSurpresa) {
 }
 
 });
+
 
 
 

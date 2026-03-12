@@ -865,14 +865,14 @@ const perguntasSincronia = [
     "Que medo você já superou por minha causa?",
     "Qual foi a primeira impressão (a petição inicial) que você teve de mim?",
     "Se você pudesse me dar um apelido novo hoje, qual seria?",
-    "O que você diria para o seu 'eu' do passado no dia em que nos conhecemos?"
+    "O que você diria para o seu 'eu' do passado no dia em que nos conhecemos?",
     "O que você mais admira na forma como eu trato as pessoas?",
     "Se a gente fosse escrever um livro juntos, sobre o que seria?",
     "Qual defeito meu você acha que, na verdade, é uma qualidade?",
     "Que sonho seu eu ainda não conheço?",
     "Se pudéssemos fazer uma doação para uma causa juntos, qual escolheríamos?",
     "Qual é a primeira coisa que faremos quando a distância entre Colombo e Goiânia for zero?",
-    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?"
+    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?",
 ];
 
 function gerarNovaPergunta() {
@@ -1085,6 +1085,7 @@ if (btnSurpresa) {
 }
 
 });
+
 
 
 

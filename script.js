@@ -266,20 +266,19 @@ function resetarTermo() {
     }
 }
 function restaurarEstadoTermo() {
-    const estadoSalvo = sessionStorage.getItem('termo_estado');
-    if (estadoSalvo) {
+const estadoSalvo = sessionStorage.getItem('termo_estado');
+if (estadoSalvo) {
+    try {
         const estado = JSON.parse(estadoSalvo);
         tentativaAtual = estado.tentativaAtual;
         letraAtual = estado.letraAtual;
         grade = estado.grade;
-
-        // Preenche o tabuleiro com as letras já inseridas
+        // ... resto do código (preenchimento do tabuleiro)
         for (let i = 0; i <= tentativaAtual; i++) {
             for (let j = 0; j < 5; j++) {
                 const quadrado = document.getElementById(`q-${i}-${j}`);
                 if (quadrado && grade[i] && grade[i][j]) {
                     quadrado.innerText = grade[i][j];
-                    // Se a linha já foi verificada (i < tentativaAtual), aplica as cores
                     if (i < tentativaAtual) {
                         const letra = grade[i][j];
                         const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
@@ -290,6 +289,10 @@ function restaurarEstadoTermo() {
                 }
             }
         }
+    } catch (e) {
+        console.warn('Estado do Termo corrompido. Ignorando...');
+        sessionStorage.removeItem('termo_estado');
+        // Não faz nada, o jogo começará do zero
     }
 }
 
@@ -381,18 +384,25 @@ async function enviarPulso() {
 
 // 6. SOLO FÉRTIL (JARDIM)
 function atualizarJardim() {
-    const salvo = JSON.parse(localStorage.getItem('statusPlanta_v2'));
-    if (salvo) {
-        // Se o objeto salvo não tiver o campo 'ultimaVerificacao', adiciona com a data atual
-        if (salvo.ultimaVerificacao === undefined) {
-            salvo.ultimaVerificacao = Date.now();
-        }
-        statusPlanta = salvo;
-    } else {
-        // Primeira vez que o app é aberto
-        statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
-        localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
+let salvo = null;
+try {
+    salvo = JSON.parse(localStorage.getItem('statusPlanta_v2'));
+} catch (e) {
+    console.warn('Dados da planta corrompidos. Resetando...');
+    localStorage.removeItem('statusPlanta_v2');
+}
+
+if (salvo) {
+    // Se o objeto salvo não tiver o campo 'ultimaVerificacao', adiciona com a data atual
+    if (salvo.ultimaVerificacao === undefined) {
+        salvo.ultimaVerificacao = Date.now();
     }
+    statusPlanta = salvo;
+} else {
+    // Primeira vez que o app é aberto ou dados corrompidos
+    statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
+    localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
+}
     
     const agora = Date.now();
     const umDia = 24 * 60 * 60 * 1000; // milissegundos em um dia
@@ -929,9 +939,17 @@ function atualizarDinamicaHome() {
     const hoje = new Date().toLocaleDateString('pt-BR');
 
     // Recupera dados frescos
-    let dadosPlanta = { sequencia: 0 };
-    const dadosSalvos = localStorage.getItem('statusPlanta_v2');
-    if (dadosSalvos) dadosPlanta = JSON.parse(dadosSalvos);
+let dadosPlanta = { sequencia: 0 };
+const dadosSalvos = localStorage.getItem('statusPlanta_v2');
+if (dadosSalvos) {
+    try {
+        dadosPlanta = JSON.parse(dadosSalvos);
+    } catch (e) {
+        console.warn('Dados da planta corrompidos ao atualizar home. Ignorando...');
+        localStorage.removeItem('statusPlanta_v2');
+        // dadosPlanta permanece com o valor padrão
+    }
+}
 
     // Remove ou adiciona a classe Escondido com base na realidade
     if (elStreak) {
@@ -1033,14 +1051,20 @@ function mostrarMensagemSurpresa() {
     if (!btn || !paragrafo) return;
 
     // Verifica se já usou hoje
-    if (dadosSalvos) {
+if (dadosSalvos) {
+    try {
         const { data } = JSON.parse(dadosSalvos);
         if (data === hoje) {
-            // Já usou hoje: avisa com toast
             mostrarToast("✨ Você já recebeu sua mensagem de hoje! Volte amanhã.");
             return;
         }
+    } catch (e) {
+        // Dados corrompidos: remove e permite gerar nova mensagem
+        console.warn('Dados da mensagem surpresa corrompidos. Resetando...');
+        localStorage.removeItem(STORAGE_SURPRESA);
+        // Não retorna, continua para gerar nova mensagem
     }
+}
 
     // Se chegou aqui, pode gerar nova mensagem
     // Junta todas as mensagens das relíquias (exceto futuros, que são objetos)
@@ -1090,6 +1114,7 @@ if (btnSurpresa) {
 }
 
 });
+
 
 
 

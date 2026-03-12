@@ -19,7 +19,7 @@ function atualizarMotorDoTempo() {
     const minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
     const segundos = Math.floor((diferenca % (1000 * 60)) / 1000);
     const formatar = (n) => n < 10 ? "0" + n : n;
-    
+
     const timerElemento = document.getElementById("timer-principal");
     if (timerElemento) {
         timerElemento.innerHTML = `${dias}d ${formatar(horas)}h ${formatar(minutos)}m ${formatar(segundos)}s`;
@@ -33,7 +33,7 @@ async function carregarDadosExternos() {
     try {
         const resposta = await fetch(URL_PLANILHA);
         const dadosTexto = await resposta.text();
-        const linhas = dadosTexto.split(/\r?\n/).slice(1); 
+        const linhas = dadosTexto.split(/\r?\n/).slice(1);
         const dadosDoDia = linhas.map(linha => {
             if (!linha.trim()) return null;
             const colunas = linha.split(",");
@@ -55,21 +55,23 @@ async function carregarDadosExternos() {
             }
             window.PALAVRA_DO_DIA = configHoje.palavra;
             if (localStorage.getItem('santuario_vitoria_dia') === hojeFormatado) {
-                setTimeout(liberarCofreVisual, 500); 
+                setTimeout(liberarCofreVisual, 500);
             }
         }
-    } catch (e) { console.error("Erro planilha:", e); }
+    } catch (e) {
+        console.error("Erro planilha:", e);
+    }
 }
 
-// 3. NAVEGAÇÃO SPA (Alteração 2: Conserto da Persistência)
+// 3. NAVEGAÇÃO SPA
 function configurarNavegacao() {
     const botoesMenu = document.querySelectorAll('.item-menu');
     const todasAsTelas = document.querySelectorAll('.tela');
 
     botoesMenu.forEach(botao => {
         botao.addEventListener('click', (evento) => {
-            evento.preventDefault(); 
-            const telaAlvo = botao.getAttribute('data-alvo'); 
+            evento.preventDefault();
+            const telaAlvo = botao.getAttribute('data-alvo');
 
             botoesMenu.forEach(b => b.classList.remove('ativo'));
             botao.classList.add('ativo');
@@ -77,14 +79,14 @@ function configurarNavegacao() {
             todasAsTelas.forEach(tela => tela.classList.add('escondido'));
             const elementoTela = document.getElementById(telaAlvo);
             if (elementoTela) elementoTela.classList.remove('escondido');
-            
+
             // Força sempre a checagem dos badges ao navegar para não sumirem
             atualizarDinamicaHome();
         });
     });
 }
 
-// 4. JOGO: TERMO (Alteração 1: Tela Estática após Ganhar)
+// 4. JOGO: TERMO
 let tentativaAtual = 0;
 let letraAtual = 0;
 let grade = ["", "", "", "", "", ""];
@@ -100,41 +102,41 @@ function salvarEstadoTermo() {
 
 function inicializarTermo() {
     const tabuleiro = document.getElementById("tabuleiro-termo");
-    if (!tabuleiro) return; 
+    if (!tabuleiro) return;
     tabuleiro.innerHTML = ""; // Limpa antes de montar
-    
+
     const hoje = new Date().toLocaleDateString('pt-BR');
     const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
 
     // Se já ganhou hoje, trava a tela com a palavra correta
     if (ganhouHoje) {
-    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-    // Cria as 6 linhas
-    for (let i = 0; i < 6; i++) {
-        let linha = document.createElement("div");
-        linha.className = "linha-termo";
-        for (let j = 0; j < 5; j++) {
-            let quadrado = document.createElement("div");
-            quadrado.className = "letra-quadrado correta";
-            quadrado.innerText = palavraFinal[j];
-            linha.appendChild(quadrado);
+        const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+        // Cria as 6 linhas
+        for (let i = 0; i < 6; i++) {
+            let linha = document.createElement("div");
+            linha.className = "linha-termo";
+            for (let j = 0; j < 5; j++) {
+                let quadrado = document.createElement("div");
+                quadrado.className = "letra-quadrado correta";
+                quadrado.innerText = palavraFinal[j];
+                linha.appendChild(quadrado);
+            }
+            tabuleiro.appendChild(linha);
         }
-        tabuleiro.appendChild(linha);
+
+        // Esconde teclado e botão
+        document.getElementById("teclado-termo").innerHTML = "";
+        document.getElementById("btn-verificar").classList.add("escondido");
+
+        // Modifica as instruções para mensagem de vitória
+        const inst = document.getElementById('instrucoes-termo');
+        inst.innerHTML = `<h4 style="text-align:center; color: var(--cor-agronomia);">Vitória Colhida! 🌱</h4>
+                          <p style="text-align:center;">Volte amanhã para colher uma nova palavra e liberar mais relíquias.</p>`;
+        inst.classList.remove('escondido');
+
+        tentativaAtual = 6; // Trava o jogo
+        return;
     }
-
-    // Esconde teclado e botão
-    document.getElementById("teclado-termo").innerHTML = "";
-    document.getElementById("btn-verificar").classList.add("escondido");
-
-    // Modifica as instruções para mensagem de vitória
-    const inst = document.getElementById('instrucoes-termo');
-    inst.innerHTML = `<h4 style="text-align:center; color: var(--cor-agronomia);">Vitória Colhida! 🌱</h4>
-                      <p style="text-align:center;">Volte amanhã para colher uma nova palavra e liberar mais relíquias.</p>`;
-    inst.classList.remove('escondido');
-
-    tentativaAtual = 6; // Trava o jogo
-    return;
-}
 
     // Fluxo normal se ainda não jogou/ganhou hoje
     tentativaAtual = 0;
@@ -152,7 +154,7 @@ function inicializarTermo() {
             quadrado.id = `q-${i}-${j}`;
             linha.appendChild(quadrado);
         }
-        tabuleiro.appendChild(linha)
+        tabuleiro.appendChild(linha);
     }
     restaurarEstadoTermo();
 
@@ -162,7 +164,11 @@ function inicializarTermo() {
 function gerarTeclado() {
     const tecladoContainer = document.getElementById("teclado-termo");
     if (!tecladoContainer) return;
-    const layout = [["Q","W","E","R","T","Y","U","I","O","P"],["A","S","D","F","G","H","J","K","L"],["⌫","Z","X","C","V","B","N","M","ENTER"]];
+    const layout = [
+        ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+        ["⌫", "Z", "X", "C", "V", "B", "N", "M", "ENTER"]
+    ];
     layout.forEach(linha => {
         const divLinha = document.createElement("div");
         divLinha.className = "linha-teclado";
@@ -187,11 +193,11 @@ function processarEntrada(tecla) {
 function adicionarLetra(letra) {
     if (letraAtual < 5) {
         const quadrado = document.getElementById(`q-${tentativaAtual}-${letraAtual}`);
-        if(quadrado) {
+        if (quadrado) {
             quadrado.innerText = letra;
             grade[tentativaAtual] += letra;
             letraAtual++;
-        salvarEstadoTermo()
+            salvarEstadoTermo();
         }
     }
 }
@@ -200,20 +206,20 @@ function apagarLetra() {
     if (letraAtual > 0) {
         letraAtual--;
         const quadrado = document.getElementById(`q-${tentativaAtual}-${letraAtual}`);
-        if(quadrado) {
+        if (quadrado) {
             quadrado.innerText = "";
             grade[tentativaAtual] = grade[tentativaAtual].slice(0, -1);
-        salvarEstadoTermo()
+            salvarEstadoTermo();
         }
     }
 }
 
 function verificarPalavra() {
     const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-    salvarEstadoTermo() 
+    salvarEstadoTermo();
     const palpite = grade[tentativaAtual];
     if (palpite.length < 5) return;
-    
+
     for (let i = 0; i < 5; i++) {
         const quadrado = document.getElementById(`q-${tentativaAtual}-${i}`);
         const letra = palpite[i];
@@ -221,7 +227,7 @@ function verificarPalavra() {
         else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
         else quadrado.classList.add("ausente");
     }
-    
+
     if (palpite === palavraFinal) finalizarVitoria();
     else {
         tentativaAtual++;
@@ -238,7 +244,7 @@ function finalizarVitoria() {
     localStorage.setItem('santuario_vitoria_dia', hoje);
     mostrarToast("Incrível! Você colheu a vitória! 🌱");
     inicializarTermo(); // Chama a função para travar a tela
-    liberarCofreVisual(); 
+    liberarCofreVisual();
     atualizarDinamicaHome();
 }
 
@@ -265,6 +271,7 @@ function resetarTermo() {
         resetContainer.classList.add('escondido');
     }
 }
+
 function restaurarEstadoTermo() {
     const estadoSalvo = sessionStorage.getItem('termo_estado');
     if (estadoSalvo) {
@@ -300,13 +307,13 @@ function restaurarEstadoTermo() {
 
 function liberarCofreVisual() {
     const botaoCofre = document.querySelector('[data-alvo="cofre"]');
-    if(botaoCofre) {
+    if (botaoCofre) {
         botaoCofre.style.animation = "pulse-gold 2s infinite";
         botaoCofre.classList.remove('bloqueado');
     }
     const msg = document.getElementById('msg-cofre');
     if (msg) msg.innerText = "Acesso Concedido para Hoje";
-    
+
     document.querySelectorAll('.item-cofre').forEach(item => {
         item.classList.remove('bloqueado');
         const status = item.querySelector('.status-reliquia');
@@ -314,9 +321,15 @@ function liberarCofreVisual() {
     });
 }
 
-function toggleInstrucoesTermo() { document.getElementById('instrucoes-termo').classList.toggle('escondido'); }
-function toggleInstrucoesSincronia() { document.getElementById('instrucoes-sincronia').classList.toggle('escondido'); }
-function toggleInstrucoesJardim() { document.getElementById('instrucoes-jardim').classList.toggle('escondido'); }
+function toggleInstrucoesTermo() {
+    document.getElementById('instrucoes-termo').classList.toggle('escondido');
+}
+function toggleInstrucoesSincronia() {
+    document.getElementById('instrucoes-sincronia').classList.toggle('escondido');
+}
+function toggleInstrucoesJardim() {
+    document.getElementById('instrucoes-jardim').classList.toggle('escondido');
+}
 
 // 5. CLIMA & PULSOS
 const API_KEY = "da54b3d1f91b3ca0850de8cb7890e572";
@@ -324,23 +337,28 @@ const API_KEY = "da54b3d1f91b3ca0850de8cb7890e572";
 function obterEmojiClima(condicao, sunrise, sunset) {
     const agora = Math.floor(Date.now() / 1000);
     const eNoite = agora < sunrise || agora > sunset;
-    const emojis = { 'Clear': eNoite ? '🌙' : '☀️', 'Clouds': '☁️', 'Rain': '🌧️', 'Thunderstorm': '⛈️' };
+    const emojis = {
+        'Clear': eNoite ? '🌙' : '☀️',
+        'Clouds': '☁️',
+        'Rain': '🌧️',
+        'Thunderstorm': '⛈️'
+    };
     return emojis[condicao] || '🌡️';
 }
 
 async function atualizarClima() {
     const elJoão = document.getElementById("temp-usuario");
     const elThamiris = document.getElementById("temp-thamiris");
-    
+
     try {
         const resJ = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Colombo,BR&units=metric&appid=${API_KEY}`);
         const resT = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Goiania,BR&units=metric&appid=${API_KEY}`);
-        
+
         if (!resJ.ok || !resT.ok) throw new Error('Erro na API');
-        
+
         const dJ = await resJ.json();
         const dT = await resT.json();
-        
+
         if (dJ.main && elJoão) elJoão.innerHTML = `${Math.round(dJ.main.temp)}°C ${obterEmojiClima(dJ.weather[0].main, dJ.sys.sunrise, dJ.sys.sunset)}`;
         if (dT.main && elThamiris) elThamiris.innerHTML = `${Math.round(dT.main.temp)}°C ${obterEmojiClima(dT.weather[0].main, dT.sys.sunrise, dT.sys.sunset)}`;
     } catch (e) {
@@ -348,7 +366,7 @@ async function atualizarClima() {
         if (elThamiris) elThamiris.innerHTML = "❌ Indisponível";
     }
 }
-    
+
 const URL_SCRIPT_PULSO = "https://script.google.com/macros/s/AKfycbye-Um7962qfQhHyg4T-FlERkiKAHK3UmJKViGlRVcNFgyOfIyJxHYK82RqwHjhcSr5Hw/exec";
 
 async function atualizarContadorVisual() {
@@ -372,43 +390,50 @@ async function enviarPulso() {
     const feedback = document.getElementById("msg-feedback");
     const quemEnvia = souJoao ? "colunaA" : "colunaB";
     try {
-        if(icone) icone.innerText = "🌸"; 
-        if(btn) btn.classList.add("germinar");
-        if(feedback) feedback.classList.add("visivel");
+        if (icone) icone.innerText = "🌸";
+        if (btn) btn.classList.add("germinar");
+        if (feedback) feedback.classList.add("visivel");
         fetch(`${URL_SCRIPT_PULSO}?quem=${quemEnvia}`, { mode: 'no-cors' });
         setTimeout(() => {
-            if(icone) icone.innerText = "🌱";
-            if(btn) btn.classList.remove("germinar");
-            if(feedback) feedback.classList.remove("visivel");
+            if (icone) icone.innerText = "🌱";
+            if (btn) btn.classList.remove("germinar");
+            if (feedback) feedback.classList.remove("visivel");
         }, 2000);
     } catch (e) { }
 }
 
 // 6. SOLO FÉRTIL (JARDIM)
 function atualizarJardim() {
-let salvo = null;
-try {
-    salvo = JSON.parse(localStorage.getItem('statusPlanta_v2'));
-} catch (e) {
-    console.warn('Dados da planta corrompidos. Resetando...');
-    localStorage.removeItem('statusPlanta_v2');
-}
-
-if (salvo) {
-    // Se o objeto salvo não tiver o campo 'ultimaVerificacao', adiciona com a data atual
-    if (salvo.ultimaVerificacao === undefined) {
-        salvo.ultimaVerificacao = Date.now();
+    let salvo = null;
+    try {
+        salvo = JSON.parse(localStorage.getItem('statusPlanta_v2'));
+    } catch (e) {
+        console.warn('Dados da planta corrompidos. Resetando...');
+        localStorage.removeItem('statusPlanta_v2');
     }
-    statusPlanta = salvo;
-} else {
-    // Primeira vez que o app é aberto ou dados corrompidos
-    statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
-    localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
-}
-    
+
+    if (salvo) {
+        // Se o objeto salvo não tiver o campo 'ultimaVerificacao', adiciona com a data atual
+        if (salvo.ultimaVerificacao === undefined) {
+            salvo.ultimaVerificacao = Date.now();
+        }
+        statusPlanta = salvo;
+    } else {
+        // Primeira vez que o app é aberto ou dados corrompidos
+        statusPlanta = {
+            nivel: 0,
+            ultimaRegada: 0,
+            diaUltimaRegada: "",
+            ultimaVerificacao: Date.now(),
+            sequencia: 0,
+            ciclos: 0
+        };
+        localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
+    }
+
     const agora = Date.now();
     const umDia = 24 * 60 * 60 * 1000; // milissegundos em um dia
-    
+
     // Se já regou alguma vez, verifica quantos dias se passaram desde a última verificação
     if (statusPlanta.ultimaRegada > 0) {
         const diasDesdeUltimaVerificacao = Math.floor((agora - statusPlanta.ultimaVerificacao) / umDia);
@@ -423,10 +448,10 @@ if (salvo) {
         // Nunca regou, apenas atualiza a verificação
         statusPlanta.ultimaVerificacao = agora;
     }
-    
+
     // Salva as alterações no localStorage
     localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
-    
+
     // Atualiza a tela
     renderizarPlanta();
     atualizarDinamicaHome();
@@ -443,80 +468,80 @@ if (salvo) {
 function regarPlanta() {
     const agora = new Date();
     const hoje = agora.toLocaleDateString('pt-BR');
-    
+
     // Verifica se já regou hoje
     if (statusPlanta.diaUltimaRegada === hoje) {
         mostrarToast("O solo já está úmido o suficiente por hoje! Volte amanhã. 🌱");
         return;
     }
-    
+
     // Calcula a sequência (streak) de dias seguidos
     const ontem = new Date();
     ontem.setDate(agora.getDate() - 1);
     const ontemStr = ontem.toLocaleDateString('pt-BR');
-    
+
     if (statusPlanta.diaUltimaRegada === ontemStr) {
         statusPlanta.sequencia = (statusPlanta.sequencia || 0) + 1;
     } else {
         statusPlanta.sequencia = 1;
     }
-    
+
     // Aumenta o nível em 10%, limitado a 100
     const nivelAntes = statusPlanta.nivel;
     let novoNivel = statusPlanta.nivel + 10;
-    
+
     // Verifica se ultrapassou 100% (para garantir que não passe)
     if (novoNivel > 100) {
         novoNivel = 100;
     }
-    
+
     // Define o novo nível
     statusPlanta.nivel = novoNivel;
-    
+
     // Atualiza timestamps
     statusPlanta.ultimaRegada = agora.getTime();
     statusPlanta.diaUltimaRegada = hoje;
     statusPlanta.ultimaVerificacao = agora.getTime(); // importante para resetar a contagem de perda
-    
+
     // Salva no localStorage
     localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
-    
+
     // Animação do emoji
     const emoji = document.getElementById("emoji-planta");
     if (emoji) {
         emoji.style.transform = "scale(1.2)";
         setTimeout(() => emoji.style.transform = "scale(1)", 300);
     }
-    
+
     // Verifica se acabou de atingir 100% (nivelAntes < 100 e nivel agora é 100)
-if (statusPlanta.nivel === 100 && nivelAntes < 100) {
-    // Incrementa o contador de ciclos
-    statusPlanta.ciclos = (statusPlanta.ciclos || 0) + 1;
-    
-    mostrarToast(`🎉 PARABÉNS! Você completou ${statusPlanta.ciclos} ciclo(s)! A planta vai renascer.`);
-    
-    // Aplica efeito visual de renascimento
-    if (emoji) {
-        emoji.classList.add("renascer");
+    if (statusPlanta.nivel === 100 && nivelAntes < 100) {
+        // Incrementa o contador de ciclos
+        statusPlanta.ciclos = (statusPlanta.ciclos || 0) + 1;
+
+        mostrarToast(`🎉 PARABÉNS! Você completou ${statusPlanta.ciclos} ciclo(s)! A planta vai renascer.`);
+
+        // Aplica efeito visual de renascimento
+        if (emoji) {
+            emoji.classList.add("renascer");
+            setTimeout(() => {
+                emoji.classList.remove("renascer");
+            }, 1000);
+        }
+
+        // Reinicia a planta
+        statusPlanta.nivel = 0;
+
+        // Salva novamente após reiniciar
+        localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
+
+        renderizarPlanta();
+        atualizarDinamicaHome();
+
         setTimeout(() => {
-            emoji.classList.remove("renascer");
-        }, 1000);
+            mostrarToast("🌱 Nova planta começou! Continue regando.");
+        }, 500);
     }
-    
-    // Reinicia a planta
-    statusPlanta.nivel = 0;
-    
-    // Salva novamente após reiniciar
-    localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
-    
-    renderizarPlanta();
-    atualizarDinamicaHome();
-    
-    setTimeout(() => {
-        mostrarToast("🌱 Nova planta começou! Continue regando.");
-    }, 500);
-}
-    
+
     // Atualiza a tela (sempre, mesmo se não reiniciou)
     renderizarPlanta();
     atualizarDinamicaHome();
@@ -530,22 +555,35 @@ function renderizarPlanta() {
     const btn = document.getElementById("btn-regar");
     const contadorCiclos = document.getElementById('contador-ciclos');
     if (contadorCiclos) {
-            contadorCiclos.innerText = `🌱 Ciclos completados: ${statusPlanta.ciclos || 0}`;
+        contadorCiclos.innerText = `🌱 Ciclos completados: ${statusPlanta.ciclos || 0}`;
     }
 
     if (!barra || !emoji || !texto) return;
     barra.style.width = statusPlanta.nivel + "%";
-    
-    if (statusPlanta.nivel <= 0) { emoji.innerText = "🥀"; texto.innerText = "A planta murchou por falta de cuidado."; } 
-    else if (statusPlanta.nivel < 30) { emoji.innerText = "🌱"; texto.innerText = "Um broto esperançoso."; } 
-    else if (statusPlanta.nivel < 60) { emoji.innerText = "🌿"; texto.innerText = "Crescendo com vigor!"; } 
-    else if (statusPlanta.nivel < 90) { emoji.innerText = "🌳"; texto.innerText = "Quase lá, falta pouco para florescer."; } 
-    else { emoji.innerText = "🌸"; texto.innerText = "Flor desabrochada! O Santuário brilha."; }
+
+    if (statusPlanta.nivel <= 0) {
+        emoji.innerText = "🥀";
+        texto.innerText = "A planta murchou por falta de cuidado.";
+    } else if (statusPlanta.nivel < 30) {
+        emoji.innerText = "🌱";
+        texto.innerText = "Um broto esperançoso.";
+    } else if (statusPlanta.nivel < 60) {
+        emoji.innerText = "🌿";
+        texto.innerText = "Crescendo com vigor!";
+    } else if (statusPlanta.nivel < 90) {
+        emoji.innerText = "🌳";
+        texto.innerText = "Quase lá, falta pouco para florescer.";
+    } else {
+        emoji.innerText = "🌸";
+        texto.innerText = "Flor desabrochada! O Santuário brilha.";
+    }
 
     if (statusPlanta.diaUltimaRegada === new Date().toLocaleDateString('pt-BR')) {
-        if(btn) btn.style.opacity = "0.5"; if(aviso) aviso.innerText = "Próxima regada disponível amanhã.";
+        if (btn) btn.style.opacity = "0.5";
+        if (aviso) aviso.innerText = "Próxima regada disponível amanhã.";
     } else {
-        if(btn) btn.style.opacity = "1"; if(aviso) aviso.innerText = "O solo precisa de você hoje.";
+        if (btn) btn.style.opacity = "1";
+        if (aviso) aviso.innerText = "O solo precisa de você hoje.";
     }
 }
 
@@ -728,33 +766,33 @@ const BIBLIOTECA_RELIQUIAS = {
         { t: "VALE-PRIMEIRO BEIJO", d: "Válido para o momento em que nossos lábios se encontram pela primeira vez, sem pressa e com todo o amor do mundo.", c: "FIRST-KISS-55" },
         { t: "VALE-ABRAÇO DE DESPEDIDA", d: "Válido para o instante em que nos despedirmos novamente, seja no aeroporto ou na porta de casa. Porque cada despedida é um 'até logo'.", c: "GOODBYE-56" },
         { t: "VALE-ENCONTRO INESPERADO", d: "Válido para um dia em que eu apareço sem avisar, só para te lembrar o quanto você é amada.", c: "SURPRISE-57" }
-    ],
+    ]
 };
 
 function abrirReliquia(tipo) {
     if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
-        mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!"); return;
+        mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
+        return;
     }
     const modal = document.getElementById('modal-reliquia');
     const corpo = document.getElementById('corpo-modal');
-    if(!modal || !corpo) return;
-    
+    if (!modal || !corpo) return;
+
     // LÓGICA DE ESCALABILIDADE 2026
     // Usamos o dia do ano para garantir que cada dia tenha uma combinação diferente
     const agora = new Date();
     const inicioAno = new Date(agora.getFullYear(), 0, 0);
     const diff = agora - inicioAno;
     const diaDoAno = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
-    corpo.innerHTML = ''; 
+
+    corpo.innerHTML = '';
 
     if (tipo === 'musica') {
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 5px; font-family: 'Playfair Display', serif;">Nossa Trilha</h3>
             <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Sincronia de Almas</p>
             <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-    } 
-    else if (tipo === 'ceu') {
+    } else if (tipo === 'ceu') {
         const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
@@ -762,8 +800,7 @@ function abrirReliquia(tipo) {
                 <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
                 <p>"${textoCeu}"</p>
             </div>`;
-    }
-    else if (tipo === 'cartas') {
+    } else if (tipo === 'cartas') {
         const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Semente Exclusiva</h3>
@@ -774,8 +811,7 @@ function abrirReliquia(tipo) {
                     <p style="font-family: 'Playfair Display', serif; color: var(--cor-primaria);">Com amor,<br>${NOME_PARCEIRO}</p>
                 </div>
             </div>`;
-    }
-    else if (tipo === 'encontro') {
+    } else if (tipo === 'encontro') {
         const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
         corpo.innerHTML = `
             <div class="bilhete-dourado">
@@ -792,13 +828,13 @@ function abrirReliquia(tipo) {
                 </div>
             </div>`;
     }
-    
+
     modal.classList.remove('escondido');
 }
 
 function fecharModal() {
     document.getElementById('modal-reliquia').classList.add('escondido');
-    document.getElementById('corpo-modal').innerHTML = ''; 
+    document.getElementById('corpo-modal').innerHTML = '';
 }
 
 // 8. HUB DE JOGOS & SINCRONIA
@@ -806,12 +842,12 @@ function abrirJogo(tipo) {
     document.getElementById('menu-jogos').classList.add('escondido');
     document.getElementById('header-jogos-main').classList.add('escondido'); // Esconde o Header ao entrar no jogo
     document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
-    
+
     const container = document.getElementById(`container-${tipo}`);
-    if(container) {
+    if (container) {
         container.classList.remove('escondido');
-        if(tipo === 'termo') inicializarTermo();
-        if(tipo === 'sincronia') gerarNovaPergunta(); 
+        if (tipo === 'termo') inicializarTermo();
+        if (tipo === 'sincronia') gerarNovaPergunta();
     }
 }
 
@@ -884,7 +920,7 @@ const perguntasSincronia = [
     "Que sonho seu eu ainda não conheço?",
     "Se pudéssemos fazer uma doação para uma causa juntos, qual escolheríamos?",
     "Qual é a primeira coisa que faremos quando a distância entre Colombo e Goiânia for zero?",
-    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?",
+    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?"
 ];
 
 function gerarNovaPergunta() {
@@ -892,11 +928,14 @@ function gerarNovaPergunta() {
     const textoElemento = document.getElementById('texto-pergunta');
     if (textoElemento) {
         textoElemento.style.opacity = 0;
-        setTimeout(() => { textoElemento.innerText = perguntasSincronia[indiceAleatorio]; textoElemento.style.opacity = 1; }, 300);
+        setTimeout(() => {
+            textoElemento.innerText = perguntasSincronia[indiceAleatorio];
+            textoElemento.style.opacity = 1;
+        }, 300);
     }
 }
 
-// 9. LEIS (Alteração 4: Divisões e Títulos de Volta)
+// 9. LEIS
 const URL_LEIS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?gid=1219842239&single=true&output=csv";
 
 async function carregarLeis() {
@@ -906,15 +945,15 @@ async function carregarLeis() {
         const linhas = txt.split(/\r?\n/).filter(l => l.trim()).slice(1);
         const container = document.querySelector(".lista-leis");
         if (!container) return;
-        
-        container.innerHTML = ""; 
+
+        container.innerHTML = "";
         linhas.forEach(linha => {
             const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (colunas.length >= 2) {
                 const art = colunas[0].replace(/"/g, '').trim();
                 const cont = colunas[1].replace(/"/g, '').trim();
                 const par = colunas[2] ? colunas[2].replace(/"/g, '').trim() : "";
-                
+
                 // Inserção das Divisões (Títulos)
                 if (art.includes("Art. 1º") || art.includes("Art. 1°")) {
                     container.innerHTML += `<div class="titulo-divisao">TÍTULO I<small>Dos Direitos Fundamentais</small></div>`;
@@ -933,7 +972,7 @@ async function carregarLeis() {
     } catch (e) { }
 }
 
-// 10. DINÂMICA DA HOME E INICIALIZAÇÃO (Alteração 2: Conserto do Sumiço dos Badges)
+// 10. DINÂMICA DA HOME E INICIALIZAÇÃO
 function atualizarDinamicaHome() {
     const elStreak = document.getElementById("streak-jardim");
     const elAtalhoCofre = document.getElementById("atalho-cofre");
@@ -941,17 +980,17 @@ function atualizarDinamicaHome() {
     const hoje = new Date().toLocaleDateString('pt-BR');
 
     // Recupera dados frescos
-let dadosPlanta = { sequencia: 0 };
-const dadosSalvos = localStorage.getItem('statusPlanta_v2');
-if (dadosSalvos) {
-    try {
-        dadosPlanta = JSON.parse(dadosSalvos);
-    } catch (e) {
-        console.warn('Dados da planta corrompidos ao atualizar home. Ignorando...');
-        localStorage.removeItem('statusPlanta_v2');
-        // dadosPlanta permanece com o valor padrão
+    let dadosPlanta = { sequencia: 0 };
+    const dadosSalvos = localStorage.getItem('statusPlanta_v2');
+    if (dadosSalvos) {
+        try {
+            dadosPlanta = JSON.parse(dadosSalvos);
+        } catch (e) {
+            console.warn('Dados da planta corrompidos ao atualizar home. Ignorando...');
+            localStorage.removeItem('statusPlanta_v2');
+            // dadosPlanta permanece com o valor padrão
+        }
     }
-}
 
     // Remove ou adiciona a classe Escondido com base na realidade
     if (elStreak) {
@@ -970,7 +1009,7 @@ if (dadosSalvos) {
     }
 
     const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
-    
+
     if (elAtalhoCofre) {
         if (ganhouHoje) elAtalhoCofre.classList.remove("escondido");
         else elAtalhoCofre.classList.add("escondido");
@@ -981,10 +1020,18 @@ if (dadosSalvos) {
 
     if (ganhouHoje) {
         if (msgCofre) msgCofre.innerText = "Acesso Concedido para Hoje";
-        itensCofre.forEach(item => { item.classList.remove('bloqueado'); const s = item.querySelector('.status-reliquia'); if (s) s.innerText = "Disponível"; });
+        itensCofre.forEach(item => {
+            item.classList.remove('bloqueado');
+            const s = item.querySelector('.status-reliquia');
+            if (s) s.innerText = "Disponível";
+        });
     } else {
         if (msgCofre) msgCofre.innerText = "Vença o desafio diário para desbloquear";
-        itensCofre.forEach(item => { item.classList.add('bloqueado'); const s = item.querySelector('.status-reliquia'); if (s) s.innerText = "Trancado"; });
+        itensCofre.forEach(item => {
+            item.classList.add('bloqueado');
+            const s = item.querySelector('.status-reliquia');
+            if (s) s.innerText = "Trancado";
+        });
     }
 }
 
@@ -1001,7 +1048,6 @@ function mostrarToast(mensagem) {
 // 11. MENSAGEM SURPRESA DIÁRIA
 // ==========================================
 
-// Chave para o localStorage
 const STORAGE_SURPRESA = 'santuario_surpresa_diaria';
 
 function inicializarSurpresaDiaria() {
@@ -1015,7 +1061,7 @@ function inicializarSurpresaDiaria() {
     if (dadosSalvos) {
         try {
             const { data, mensagem } = JSON.parse(dadosSalvos);
-            
+
             if (data === hoje) {
                 paragrafo.innerText = `"${mensagem}"`;
                 btn.disabled = true;
@@ -1053,43 +1099,38 @@ function mostrarMensagemSurpresa() {
     if (!btn || !paragrafo) return;
 
     // Verifica se já usou hoje
-if (dadosSalvos) {
-    try {
-        const { data } = JSON.parse(dadosSalvos);
-        if (data === hoje) {
-            mostrarToast("✨ Você já recebeu sua mensagem de hoje! Volte amanhã.");
-            return;
+    if (dadosSalvos) {
+        try {
+            const { data } = JSON.parse(dadosSalvos);
+            if (data === hoje) {
+                mostrarToast("✨ Você já recebeu sua mensagem de hoje! Volte amanhã.");
+                return;
+            }
+        } catch (e) {
+            // Dados corrompidos: remove e permite gerar nova mensagem
+            console.warn('Dados da mensagem surpresa corrompidos. Resetando...');
+            localStorage.removeItem(STORAGE_SURPRESA);
+            // Não retorna, continua para gerar nova mensagem
         }
-    } catch (e) {
-        // Dados corrompidos: remove e permite gerar nova mensagem
-        console.warn('Dados da mensagem surpresa corrompidos. Resetando...');
-        localStorage.removeItem(STORAGE_SURPRESA);
-        // Não retorna, continua para gerar nova mensagem
     }
-}
 
     // Se chegou aqui, pode gerar nova mensagem
-    // Junta todas as mensagens das relíquias (exceto futuros, que são objetos)
     const todasMensagens = [
         ...BIBLIOTECA_RELIQUIAS.ceu,
         ...BIBLIOTECA_RELIQUIAS.sementes
     ];
-    
-    // Escolhe uma mensagem aleatória
+
     const indiceAleatorio = Math.floor(Math.random() * todasMensagens.length);
     const mensagemEscolhida = todasMensagens[indiceAleatorio];
-    
-    // Exibe no parágrafo
+
     paragrafo.innerText = `"${mensagemEscolhida}"`;
-    
-    // Salva no localStorage
+
     const dadosParaSalvar = {
         data: hoje,
         mensagem: mensagemEscolhida
     };
     localStorage.setItem(STORAGE_SURPRESA, JSON.stringify(dadosParaSalvar));
-    
-    // Desabilita o botão
+
     btn.disabled = true;
     btn.style.opacity = '0.5';
     btn.style.cursor = 'not-allowed';
@@ -1103,24 +1144,16 @@ window.addEventListener('DOMContentLoaded', () => {
     atualizarDinamicaHome();
     configurarNavegacao();
     carregarDadosExternos();
-    carregarLeis(); 
+    carregarLeis();
     atualizarClima();
-    atualizarContadorVisual(); 
-// Inicializa a mensagem surpresa diária
+    atualizarContadorVisual();
+
+    // Inicializa a mensagem surpresa diária
     inicializarSurpresaDiaria();
 
-// Configura o botão de mensagem surpresa
-const btnSurpresa = document.getElementById("btn-surpresa");
-if (btnSurpresa) {
-    btnSurpresa.onclick = mostrarMensagemSurpresa;
-}
-
+    // Configura o botão de mensagem surpresa
+    const btnSurpresa = document.getElementById("btn-surpresa");
+    if (btnSurpresa) {
+        btnSurpresa.onclick = mostrarMensagemSurpresa;
+    }
 });
-
-
-
-
-
-
-
-

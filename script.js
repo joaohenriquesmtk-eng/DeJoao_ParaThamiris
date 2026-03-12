@@ -295,6 +295,7 @@ if (estadoSalvo) {
         // Não faz nada, o jogo começará do zero
     }
 }
+}
 
 function liberarCofreVisual() {
     const botaoCofre = document.querySelector('[data-alvo="cofre"]');
@@ -1114,6 +1115,7 @@ if (btnSurpresa) {
 }
 
 });
+
 
 
 

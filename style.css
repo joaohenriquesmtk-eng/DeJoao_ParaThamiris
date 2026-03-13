@@ -1,209 +1,750 @@
-/* 1. CONFIGURAÇÕES TÉCNICAS (O alicerce) */
+/* ==========================================
+   CONFIGURAÇÕES GLOBAIS
+========================================== */
 :root {
-    --cor-fundo: #090909;         
-    --cor-primaria: #D4AF37;      
-    --cor-agronomia: #2ecc71;     
-    --cor-vidro: rgba(255, 255, 255, 0.05); 
+    --cor-fundo: #090909;
+    --cor-primaria: #D4AF37;
+    --cor-agronomia: #2ecc71;
+    --cor-vidro: rgba(255, 255, 255, 0.05);
     --fonte-padrao: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-    background-color: var(--cor-fundo); color: #ffffff;
-    font-family: var(--fonte-padrao); line-height: 1.6;
-    overflow: hidden; height: 100vh;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* 2. O CONTAINER PRINCIPAL */
+body {
+    background-color: var(--cor-fundo);
+    color: #ffffff;
+    font-family: var(--fonte-padrao);
+    line-height: 1.6;
+    overflow: hidden;
+    height: 100vh;
+}
+
 #app-shell {
-    display: flex; flex-direction: column; height: 100vh;
-    padding-top: env(safe-area-inset-top); 
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 3. O EFEITO VIDRO */
+/* Efeito vidro */
 .cartao-vidro {
     background: var(--cor-vidro);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px; padding: 20px; margin: 15px;
+    border-radius: 24px;
+    padding: 20px;
+    margin: 15px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
-/* 4. MENU INFERIOR */
+/* Menu inferior */
 .menu-inferior {
-    position: fixed; bottom: 0; width: 100%; height: 85px;
-    background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(10px);
-    display: flex; justify-content: space-around; align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 85px;
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 20px; z-index: 999;
+    padding-bottom: 20px;
+    z-index: 999;
 }
 
 .item-menu {
-    display: flex; flex-direction: column; align-items: center;
-    color: #666; font-size: 10px; text-decoration: none; transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    font-size: 10px;
+    text-decoration: none;
+    transition: 0.3s;
 }
-.item-menu.ativo { color: var(--cor-primaria); }
-.icone-menu { font-size: 24px; margin-bottom: 4px; }
 
-/* 5. SISTEMA DE TELAS */
-.escondido { display: none !important; }
-.tela { animation: surgirSuave 0.4s ease-out; height: calc(100vh - 85px); overflow-y: auto; padding-bottom: 20px; }
+.item-menu.ativo {
+    color: var(--cor-primaria);
+}
+
+.icone-menu {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+/* Sistema de telas */
+.escondido {
+    display: none !important;
+}
+
+.tela {
+    animation: surgirSuave 0.4s ease-out;
+    height: calc(100vh - 85px);
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
 
 @keyframes surgirSuave {
-    from { opacity: 0; transform: translateY(15px); }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   JOGO TERMO - VISUAL MODERNO E RESPONSIVO
+========================================== */
+#tabuleiro-termo {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 8px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.linha-termo {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.letra-quadrado {
+    width: min(56px, 10vw);
+    height: min(56px, 10vw);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s, border-color 0.3s;
+    animation: surgirLetra 0.3s ease-out;
+}
+
+@keyframes surgirLetra {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.letra-quadrado.correta {
+    background: linear-gradient(145deg, #2ecc71, #27ae60);
+    border-color: #f1c40f;
+    box-shadow: 0 0 15px #2ecc71, 0 4px 8px rgba(0, 0, 0, 0.5);
+    animation: acertou 0.5s ease;
+}
+
+.letra-quadrado.presente {
+    background: linear-gradient(145deg, #f39c12, #e67e22);
+    border-color: #f1c40f;
+    box-shadow: 0 0 15px #f39c12, 0 4px 8px rgba(0, 0, 0, 0.5);
+    animation: presente 0.5s ease;
+}
+
+.letra-quadrado.ausente {
+    background: linear-gradient(145deg, #3a3a3c, #2c2c2e);
+    border-color: #5a5a5c;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+    opacity: 0.8;
+}
+
+@keyframes acertou {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); background: #2ecc71; box-shadow: 0 0 25px #2ecc71; }
+    100% { transform: scale(1); }
+}
+
+@keyframes presente {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); background: #f39c12; box-shadow: 0 0 20px #f39c12; }
+    100% { transform: scale(1); }
+}
+
+/* Teclado - totalmente responsivo */
+#teclado-termo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 5px;
+}
+
+.linha-teclado {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.tecla {
+    background: linear-gradient(145deg, #3a2a1a, #5d3a1a);
+    border: 2px solid #d4af37;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 600;
+    font-size: clamp(0.75rem, 3.5vw, 1rem);
+    padding: 10px 0;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+    transition: all 0.1s ease;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    flex: 1 1 0px;
+    min-width: 28px;
+    max-width: 48px;
+    white-space: nowrap;
+}
+
+.tecla-larga {
+    flex: 1.8 1 0px;
+    min-width: 45px;
+    max-width: 70px;
+}
+
+.tecla:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Responsividade extrema */
+@media (max-width: 380px) {
+    .tecla {
+        font-size: 0.7rem;
+        padding: 8px 0;
+        min-width: 24px;
+    }
+    .tecla-larga {
+        min-width: 38px;
+    }
+    .linha-teclado {
+        gap: 3px;
+    }
+}
+
+/* Efeito de vitória no tabuleiro */
+#tabuleiro-termo.vitoria .letra-quadrado {
+    animation: vitoriaPulse 0.8s infinite alternate;
+}
+
+@keyframes vitoriaPulse {
+    from { box-shadow: 0 0 10px #d4af37, 0 4px 8px rgba(0,0,0,0.5); }
+    to { box-shadow: 0 0 25px #d4af37, 0 4px 12px rgba(0,0,0,0.8); }
+}
+
+/* Instruções dos jogos */
+.cartao-instrucoes {
+    font-size: 0.85rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.cartao-instrucoes h4 {
+    color: var(--cor-primaria);
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.cartao-instrucoes ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.cartao-instrucoes li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+    color: #ddd;
+}
+
+.cartao-instrucoes li::before {
+    content: "✦";
+    color: var(--cor-primaria);
+    position: absolute;
+    left: 0;
+}
+
+/* ==========================================
+   FRASE DO DIA, CLIMA, PULSO, BADGES (mantidos)
+========================================== */
+#frase-do-dia {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-frase {
+    position: relative;
+    padding: 20px 40px;
+}
+
+.aspas-decorativa {
+    font-family: 'Playfair Display', serif;
+    font-size: 60px;
+    color: var(--cor-primaria);
+    opacity: 0.4;
+    position: absolute;
+    line-height: 1;
+}
+
+.aspas-decorativa:first-child {
+    top: -10px;
+    left: 0;
+}
+
+.aspas-decorativa:last-child {
+    bottom: -40px;
+    right: 0;
+}
+
+.texto-itálico {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.container-clima {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 15px;
+    gap: 10px;
+}
+
+.mini-card-clima {
+    background: var(--cor-vidro);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 12px;
+    flex: 1;
+    text-align: center;
+}
+
+.mini-card-clima .cidade {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.dados-clima {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.area-pulso {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+}
+
+#btn-pulso {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+    border: 2px solid var(--cor-primaria);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    font-size: 30px;
+    color: var(--cor-primaria);
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    transition: 0.3s;
+}
+
+#btn-pulso:active {
+    transform: scale(0.9);
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+.feedback-pulso {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--cor-primaria);
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.feedback-pulso.visivel {
+    opacity: 1;
+    bottom: -35px;
+}
+
+/* Solo Fértil */
+.barra-status {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    margin: 10px 0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+#progresso-crescimento {
+    height: 100%;
+    background: linear-gradient(90deg, #2ecc71, #d4af37);
+    border-radius: 20px;
+    transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+/* Badges */
+.container-notificacoes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.badge-home {
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    color: var(--cor-primaria);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.badge-especial {
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.15), rgba(184, 134, 11, 0.15));
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Leis */
+#leis {
+    background: #fdfbf7;
+    color: #2c3e50;
+    padding: 30px 20px;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://www.transparenttextures.com/patterns/paper.png');
+    border: 10px double #d4af37;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.header-leis h3 {
+    font-family: 'Playfair Display', serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #d4af37;
+    display: inline-block;
+    padding-bottom: 5px;
+    color: #1a1a1a !important;
+}
+
+.item-lei {
+    background: transparent !important;
+    border-left: 2px solid #d4af37 !important;
+    padding: 15px;
+    margin-bottom: 25px;
+}
+
+.num-artigo {
+    color: #8b0000 !important;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+.titulo-divisao {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: #8b0000;
+    font-weight: bold;
+    margin: 35px 0 15px;
+    font-size: 1.3rem;
+    border-bottom: 1px dashed rgba(139, 0, 0, 0.3);
+    padding-bottom: 5px;
+}
+
+.titulo-divisao small {
+    display: block;
+    font-size: 0.85rem;
+    color: #555;
+    font-style: italic;
+    font-family: var(--fonte-padrao);
+    margin-top: 3px;
+    font-weight: normal;
+}
+
+/* Hub de jogos */
+.grade-jogos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 10px;
+}
+
+.item-jogo {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+}
+
+.icone-jogo {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Cofre */
+.grade-cofre {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 15px;
+}
+
+.item-cofre {
+    position: relative;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px 10px;
+    text-align: center;
+    transition: all 0.5s;
+    overflow: hidden;
+}
+
+.item-cofre.bloqueado {
+    filter: grayscale(1) blur(1px);
+    opacity: 0.4;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+}
+
+.item-cofre:not(.bloqueado)::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -150%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: 0.8s;
+}
+
+.item-cofre:not(.bloqueado):hover::after {
+    left: 100%;
+}
+
+.status-reliquia {
+    display: block;
+    font-size: 8px;
+    text-transform: uppercase;
+    margin-top: 8px;
+    opacity: 0.5;
+    letter-spacing: 1px;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.conteudo-modal {
+    width: 100%;
+    max-width: 350px;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 30px 20px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.fechar-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: var(--cor-primaria);
+    cursor: pointer;
+    line-height: 1;
+}
+
+#corpo-modal iframe {
+    width: 100%;
+    height: 400px;
+    margin-top: 15px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cor-primaria);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); border-color: var(--cor-primaria); }
+    70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); border-color: var(--cor-primaria); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* 6. JOGO TERMO */
-#tabuleiro-termo { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; margin-bottom: 20px; justify-content: center; }
-.linha-termo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
-.letra-quadrado {
-    width: min(42px, 8vw); height: min(42px, 8vw); border: 2px solid #3e3e3e; display: flex; align-items: center;
-    justify-content: center; font-size: 1.2rem; font-weight: bold; text-transform: uppercase;
-    border-radius: 8px; background: rgba(255, 255, 255, 0.05); transition: 0.3s;
+.btn-acao {
+    background: var(--cor-primaria);
+    color: #000;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+    cursor: pointer;
 }
-.correta { background-color: var(--cor-agronomia) !important; border-color: var(--cor-agronomia) !important; color: white; }
-.presente { background-color: #c9b458 !important; border-color: #c9b458 !important; color: white; }
-.ausente { background-color: #3a3a3c !important; border-color: #3a3a3c !important; color: white; }
-
-#teclado-termo { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; user-select: none; }
-.linha-teclado { display: flex; justify-content: center; gap: 5px; }
-.tecla {
-    background: rgba(255, 255, 255, 0.15); border: none; color: white; padding: 15px 10px;
-    border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; min-width: 32px;
-}
-.tecla:active { background: var(--cor-primaria); transform: scale(0.95); color: #000; }
-.tecla-larga { min-width: 50px; background: rgba(255, 255, 255, 0.3); }
-
-/* Alteração 5: INSTRUÇÕES BONITAS DOS JOGOS */
-.cartao-instrucoes {
-    font-size: 0.85rem; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px;
-    border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px; text-align: left;
-}
-.cartao-instrucoes h4 { color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; text-align: center; font-size: 1.1rem; }
-.cartao-instrucoes ul { list-style-type: none; padding: 0; }
-.cartao-instrucoes li { margin-bottom: 8px; padding-left: 20px; position: relative; color: #ddd; }
-.cartao-instrucoes li::before { content: "✦"; color: var(--cor-primaria); position: absolute; left: 0; }
-
-/* 7. FRASE DO DIA */
-#frase-do-dia { padding: 20px; text-align: center; position: relative; min-height: 120px; display: flex; align-items: center; justify-content: center; }
-.container-frase { position: relative; padding: 20px 40px; }
-.aspas-decorativa { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--cor-primaria); opacity: 0.4; position: absolute; line-height: 1; }
-.aspas-decorativa:first-child { top: -10px; left: 0; }
-.aspas-decorativa:last-child { bottom: -40px; right: 0; }
-.texto-itálico { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: #e0e0e0; line-height: 1.6; margin: 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-
-/* 8. CLIMA & PULSO */
-.container-clima { display: flex; justify-content: space-between; margin: 0 15px; gap: 10px; }
-.mini-card-clima { background: var(--cor-vidro); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; padding: 12px; flex: 1; text-align: center; }
-.mini-card-clima .cidade { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; display: block; margin-bottom: 5px; }
-.dados-clima { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: bold; font-size: 1.1rem; }
-
-.area-pulso { text-align: center; margin: 30px 0; position: relative; }
-#btn-pulso {
-    background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, rgba(0,0,0,0) 70%); border: 2px solid var(--cor-primaria);
-    width: 80px; height: 80px; border-radius: 50%; font-size: 30px; color: var(--cor-primaria);
-    cursor: pointer; box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); transition: 0.3s;
-}
-#btn-pulso:active { transform: scale(0.9); background: var(--cor-primaria); color: #000; }
-.feedback-pulso { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--cor-primaria); opacity: 0; transition: 0.5s; }
-.feedback-pulso.visivel { opacity: 1; bottom: -35px; }
-
-/* 9. SOLO FÉRTIL / JARDIM */
-.barra-status { width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; margin: 10px 0; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; }
-#progresso-crescimento { height: 100%; background: linear-gradient(90deg, #2ecc71, #d4af37); border-radius: 20px; transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-
-/* 10. DINÂMICA DA HOME / BADGES */
-.container-notificacoes { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 15px 0; }
-.badge-home {
-    background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2);
-    padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; color: var(--cor-primaria);
-    display: flex; align-items: center; gap: 10px; animation: fadeIn 0.8s ease-out;
-}
-.badge-especial { background: linear-gradient(45deg, rgba(212, 175, 55, 0.15), rgba(184, 134, 11, 0.15)); border-color: var(--cor-primaria); box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* 11. LEIS & DIVISÕES (Papel Antigo) */
-#leis {
-    background: #fdfbf7; color: #2c3e50; padding: 30px 20px;
-    background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('https://www.transparenttextures.com/patterns/paper.png');
-    border: 10px double #d4af37; margin: 10px; border-radius: 5px;
-}
-.header-leis h3 { font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #d4af37; display: inline-block; padding-bottom: 5px; color: #1a1a1a !important; }
-.item-lei { background: transparent !important; border-left: 2px solid #d4af37 !important; padding: 15px; margin-bottom: 25px; }
-.num-artigo { color: #8b0000 !important; font-weight: bold; font-variant: small-caps; }
-
-/* Alteração 4: Estilo das Divisões (Títulos) */
-.titulo-divisao {
-    text-align: center; font-family: 'Playfair Display', serif; color: #8b0000;
-    font-weight: bold; margin: 35px 0 15px; font-size: 1.3rem;
-    border-bottom: 1px dashed rgba(139, 0, 0, 0.3); padding-bottom: 5px;
-}
-.titulo-divisao small { display: block; font-size: 0.85rem; color: #555; font-style: italic; font-family: var(--fonte-padrao); margin-top: 3px; font-weight: normal; }
 
 
-/* 12. HUB DE JOGOS */
-.grade-jogos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 10px; }
-.item-jogo { background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; }
-.icone-jogo { font-size: 2rem; display: block; margin-bottom: 10px; }
-
-/* 13. COFRE & RELIQUIAS */
-.grade-cofre { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
-.item-cofre { position: relative; background: var(--cor-vidro); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 25px 10px; text-align: center; transition: all 0.5s; overflow: hidden; }
-.item-cofre.bloqueado { filter: grayscale(1) blur(1px); opacity: 0.4; border: 1px dashed rgba(255, 255, 255, 0.2); pointer-events: none; }
-.item-cofre:not(.bloqueado)::after {
-    content: ""; position: absolute; top: -50%; left: -150%; width: 200%; height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
-    transform: rotate(45deg); transition: 0.8s;
-}
-.item-cofre:not(.bloqueado):hover::after { left: 100%; }
-.status-reliquia { display: block; font-size: 8px; text-transform: uppercase; margin-top: 8px; opacity: 0.5; letter-spacing: 1px; }
-
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-.conteudo-modal { width: 100%; max-width: 350px; background: var(--cor-vidro); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 28px; padding: 30px 20px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
-.fechar-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; color: var(--cor-primaria); cursor: pointer; line-height: 1; }
-#corpo-modal iframe { width: 100%; height: 400px; margin-top: 15px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--cor-primaria); animation: slideUp 0.5s ease-out; }
-
-@keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); border-color: var(--cor-primaria); } 70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); border-color: var(--cor-primaria); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.btn-acao { background: var(--cor-primaria); color: #000; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; }
-
-/* ==========================================
-   ESTILOS EXCLUSIVOS DO COFRE (MODAL)
-========================================== */
+/* Estilos exclusivos do cofre */
 .modal-ceu {
     background: linear-gradient(180deg, #020111 0%, #20124d 100%);
-    border-radius: 15px; padding: 25px 15px; text-align: center;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-    position: relative; overflow: hidden;
+    border-radius: 15px;
+    padding: 25px 15px;
+    text-align: center;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
 }
+
 .modal-ceu::before {
     content: "✨ . * . ✨ * . * ✨";
-    position: absolute; top: 10px; left: 0; width: 100%;
-    color: white; opacity: 0.3; letter-spacing: 5px; animation: piscar 4s infinite alternate;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    color: white;
+    opacity: 0.3;
+    letter-spacing: 5px;
+    animation: piscar 4s infinite alternate;
 }
-.modal-ceu p { position: relative; z-index: 2; font-style: italic; color: #e0e0e0; margin-top: 15px; line-height: 1.8; }
+
+.modal-ceu p {
+    position: relative;
+    z-index: 2;
+    font-style: italic;
+    color: #e0e0e0;
+    margin-top: 15px;
+    line-height: 1.8;
+}
 
 .bilhete-dourado {
     background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-    border-radius: 10px; padding: 2px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 2px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
     transform: perspective(500px) rotateX(5deg);
 }
+
 .bilhete-dourado-inner {
-    background: #111; border: 1px dashed #d4af37; border-radius: 8px;
-    padding: 25px 15px; text-align: center; color: #d4af37;
+    background: #111;
+    border: 1px dashed #d4af37;
+    border-radius: 8px;
+    padding: 25px 15px;
+    text-align: center;
+    color: #d4af37;
 }
-.bilhete-header { font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-bottom: 15px; }
-.bilhete-corpo { font-size: 0.9rem; color: #ddd; line-height: 1.6; }
-.bilhete-destaque { font-size: 1.2rem; color: #fff; font-weight: bold; margin: 15px 0; text-transform: uppercase; letter-spacing: 1px; }
 
-@keyframes piscar { 0% { opacity: 0.1; } 100% { opacity: 0.6; } }
+.bilhete-header {
+    font-family: 'Playfair Display', serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
 
-/* Botão Refresh Termo */
+.bilhete-corpo {
+    font-size: 0.9rem;
+    color: #ddd;
+    line-height: 1.6;
+}
+
+.bilhete-destaque {
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: bold;
+    margin: 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes piscar {
+    0% { opacity: 0.1; }
+    100% { opacity: 0.6; }
+}
+
+/* Botão Refresh */
 .btn-refresh {
     background: var(--cor-vidro);
     border: 1px solid var(--cor-primaria);
@@ -221,6 +762,7 @@ body {
     background: rgba(212, 175, 55, 0.2);
 }
 
+/* Toast */
 .toast {
     position: fixed;
     bottom: 100px;
@@ -270,20 +812,18 @@ body {
     padding-top: 15px;
 }
 
-/* Botão Mensagem Surpresa - estado desabilitado */
 #btn-surpresa:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    pointer-events: none; /* impede qualquer clique */
+    pointer-events: none;
     filter: grayscale(0.5);
 }
 
-/* Mantém o estilo original quando habilitado */
 #btn-surpresa {
     transition: opacity 0.3s, filter 0.3s;
 }
 
-/* Animação de renascimento da planta */
+/* Animações */
 .renascer {
     animation: brilhoRenascimento 1s ease-in-out;
 }
@@ -297,8 +837,1347 @@ body {
 .germinar {
     animation: germinar 0.5s ease;
 }
+
 @keyframes germinar {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+/* ==========================================
+   MINI FAZENDA - ESTILOS CORRIGIDOS
+========================================== */
+#container-minifazenda .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+/* Painel de recursos com gradiente animado */
+#container-minifazenda .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 100px); /* Ajuste para caber melhor */
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+/* Grade da fazenda com tamanho controlado */
+#mf-grade {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    max-width: 400px; /* Limita a largura máxima */
+    margin: 0 auto; /* Centraliza */
+}
+
+@keyframes gradienteMovel {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+.cerca {
+    border: 10px double #8B5A2B;
+    border-radius: 30px;
+    padding: 12px;
+    background: #5D3A1A;
+    box-shadow: inset 0 0 0 3px #FFD700, 0 6px 0 #3D2A0A;
+    margin-bottom: 15px;
+}
+
+#mf-grade {
+    display: grid;
+    /* O JS injetará as colunas aqui, mas nós reduzimos o espaçamento */
+    gap: 4px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ==========================================
+   MINI FAZENDA - SLOTS COM EFEITO 3D
+========================================== */
+.slot-fazenda {
+    background: #8B5A2B;
+    background-image: radial-gradient(circle at 30% 30%, #A56B3A 10%, transparent 15%),
+                      linear-gradient(135deg, #7B4A2A 20%, #9B6B3A 80%);
+    border: 4px solid #5D3A1A;
+    border-radius: 16px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 6vw, 2rem); /* Ajuste responsivo */
+    min-width: 0;
+    min-height: 0;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s, filter 0.2s;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(212, 175, 55, 0.3);
+    color: #fff;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+    animation: brilhoSlot 3s infinite alternate;
+}
+
+/* Brilho suave nos slots */
+@keyframes brilhoSlot {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.15); }
+}
+
+/* Efeito ao passar o mouse (hover) */
+.slot-fazenda:hover {
+    transform: perspective(500px) rotateX(2deg) rotateY(2deg) scale(1.02);
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 6px 12px rgba(0,0,0,0.6), 0 0 0 3px #D4AF37;
+    border-color: #D4AF37;
+}
+
+/* Classe para planta crescendo (opacidade e animação) */
+.slot-fazenda.crescendo {
+    opacity: 0.7;
+    animation: respiracao-crescimento 3s infinite ease-in-out;
+}
+
+/* Planta pronta para colheita */
+.slot-fazenda.pronto {
+    animation: pulsar-pronto 1.5s infinite alternate ease-in-out;
+    cursor: grab;
+    filter: none;
+    opacity: 1;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 12px rgba(46,204,113,0.6), 0 0 0 3px #2ecc71;
+}
+
+/* Animações existentes (já estão no seu CSS, mas vou reforçar) */
+@keyframes pulsar-pronto {
+    0% { transform: scale(1); box-shadow: inset 0 -4px 0 #3D2A0A, 0 0 10px rgba(46,204,113,0.4); }
+    100% { transform: scale(1.08); box-shadow: inset 0 -4px 0 #3D2A0A, 0 0 20px rgba(46,204,113,0.8), 0 0 15px #D4AF37; }
+}
+
+@keyframes respiracao-crescimento {
+    0% { transform: scale(0.98); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(0.98); }
+}
+
+/* Animação de plantio */
+.animacao-plantar {
+    animation: pop-plantio 0.3s ease-out forwards;
+}
+
+@keyframes pop-plantio {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.8); background-color: #4A2E15; }
+    100% { transform: scale(1); }
+}
+
+/* Animação de colheita */
+.colhendo {
+    animation: voar-colheita 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    pointer-events: none;
+}
+
+@keyframes voar-colheita {
+    0% { transform: scale(1.1) translateY(0); opacity: 1; }
+    100% { transform: scale(1.5) translateY(-30px); opacity: 0; filter: blur(2px); }
+}
+
+/* Erro ao plantar (tremer) */
+.erro-plantio {
+    animation: tremer-erro 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #e74c3c !important;
+}
+
+@keyframes tremer-erro {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(3px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+/* ==========================================
+   ANIMAÇÕES DA MINI FAZENDA (A NATA)
+========================================== */
+
+/* Planta pronta para colheita: Brilho pulsante e salto suave */
+.slot-fazenda.pronto {
+    animation: pulsar-pronto 1.5s infinite alternate ease-in-out;
+    cursor: grab;
+    filter: none !important; /* Remove a escala de cinza do crescimento */
+    opacity: 1 !important;
+}
+
+@keyframes pulsar-pronto {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(46, 204, 113, 0.4) inset; }
+    100% { transform: scale(1.08); box-shadow: 0 0 20px rgba(46, 204, 113, 0.8) inset, 0 0 15px rgba(212, 175, 55, 0.5); }
+}
+
+/* Animação de negação: Quando tenta plantar sem semente */
+.erro-plantio {
+    animation: tremer-erro 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #e74c3c !important;
+}
+
+@keyframes tremer-erro {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(3px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+/* Efeito ao jogar a semente na terra */
+.animacao-plantar {
+    animation: pop-plantio 0.3s ease-out forwards;
+}
+
+@keyframes pop-plantio {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.8); background-color: #4A2E15; }
+    100% { transform: scale(1); }
+}
+
+/* Efeito de colheita: A planta voa para cima e desaparece */
+.colhendo {
+    animation: voar-colheita 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    pointer-events: none;
+}
+
+@keyframes voar-colheita {
+    0% { transform: scale(1.1) translateY(0); opacity: 1; }
+    100% { transform: scale(1.5) translateY(-30px); opacity: 0; filter: blur(2px); }
+}
+
+/* Ajuste na semente crescendo (estágio intermediário) */
+.slot-fazenda[style*="opacity: 0.6"] {
+    animation: respiracao-crescimento 3s infinite ease-in-out;
+}
+
+@keyframes respiracao-crescimento {
+    0% { transform: scale(0.98); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(0.98); }
+}
+
+/* ==========================================
+   BOTÕES DE SELEÇÃO DE SEMENTE - VISUAL IMPECÁVEL
+========================================== */
+.botoes-sementes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 15px 0;
+    padding: 0 5px;
+}
+
+.btn-tipo-semente {
+    width: 100%;
+    padding: 14px 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: linear-gradient(145deg, #3a2a1a, #5d3a1a);
+    border: 2px solid #d4af37;
+    border-radius: 40px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-tipo-semente:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #3d2a0a, 0 10px 15px rgba(0,0,0,0.4);
+    background: linear-gradient(145deg, #4e351f, #7b4f2a);
+    border-color: #ffd700;
+}
+
+.btn-tipo-semente:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Botão selecionado - destaque dourado */
+.btn-tipo-semente.selecionado {
+    background: linear-gradient(145deg, #d4af37, #b38b2c);
+    border-color: #ffd700;
+    color: #1a0f00;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 4px 0 #8b691f, 0 0 15px #ffd700;
+    transform: scale(1.05);
+    font-weight: 700;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 450px) {
+    .btn-tipo-semente {
+        padding: 12px 5px;
+        font-size: 1rem;
+        gap: 5px;
+    }
+    .botoes-sementes {
+        gap: 8px;
+    }
+}
+
+/* Efeito de brilho ao passar o mouse sobre selecionado */
+.btn-tipo-semente.selecionado:hover {
+    box-shadow: 0 4px 0 #8b691f, 0 0 20px #ffaa00;
+}
+
+/* ==========================================
+   TRIBUNAL DO AFETO - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-tribunal .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 100px); /* Ajuste para caber melhor */
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+/* ==========================================
+   TRIBUNAL DO AFETO - PAINEL DE RECURSOS (IGUAL AO JULGAMENTO)
+========================================== */
+#container-tribunal .painel-recursos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a) !important;
+    background-size: 200% 200% !important;
+    animation: gradienteMovel 8s infinite alternate !important;
+    border: 3px solid #d4af37 !important;
+    border-radius: 50px !important;
+    padding: 10px 15px !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    color: #FFD700 !important;
+    font-weight: bold !important;
+    text-shadow: 2px 2px 0 #3D2A0A !important;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A !important;
+    margin-bottom: 15px !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    font-size: 0.9rem !important;
+}
+
+.carta-tribunal {
+    background: #fdf5e6;
+    background-image: linear-gradient(145deg, #f0e6d2, #fff0d0);
+    border: 3px solid #d4af37;
+    border-radius: 12px;
+    padding: 10px;
+    width: 100px;
+    min-width: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 0 #8b691f, 0 6px 10px rgba(0,0,0,0.2);
+    color: #2c3e50;
+}
+
+.carta-tribunal.selecionada {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px #ffd700, 0 4px 0 #8b691f, 0 8px 15px rgba(0,0,0,0.3);
+}
+
+.carta-icone {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.carta-nome {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.carta-valor {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d4af37;
+    background: #2c3e50;
+    border-radius: 20px;
+    padding: 2px 10px;
+    margin-bottom: 3px;
+}
+
+.carta-tipo {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+#tribunal-mao {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    min-height: 140px;
+}
+
+/* Responsividade */
+@media (max-width: 450px) {
+    .carta-tribunal {
+        width: 80px;
+        min-width: 70px;
+        padding: 5px;
+    }
+    .carta-icone {
+        font-size: 1.5rem;
+    }
+    .carta-nome {
+        font-size: 0.8rem;
+    }
+    .carta-valor {
+        font-size: 1rem;
+    }
+}
+
+/* ==========================================
+   TRIBUNAL DO AMOR - ESTÉTICA E ANIMAÇÕES 4x2
+========================================== */
+
+/* Container das cartas */
+#tribunal-mao { 
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* Força 4 colunas */
+    gap: 6px !important;
+    padding: 10px;
+    justify-items: center;
+}
+
+/* Ajuste individual da carta */
+.carta-tribunal {
+    width: 100% !important;      /* Ocupa o espaço da coluna da grade */
+    min-width: 0 !important;      /* Remove a restrição de largura anterior */
+    height: auto;
+    padding: 6px 4px !important;  /* Reduz espaço interno */
+    border-radius: 8px !important;
+}
+
+/* Ajuste dos elementos internos para caberem no tamanho reduzido */
+.carta-icone {
+    font-size: 1.2rem !important; /* Ícones menores */
+    margin-bottom: 2px !important;
+}
+
+.carta-nome {
+    font-size: 0.65rem !important; /* Texto pequeno para não quebrar */
+    line-height: 1.1;
+    margin-bottom: 2px !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limita a duas linhas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.carta-valor {
+    font-size: 0.7rem !important;
+    font-weight: bold;
+}
+
+#btn-verificar {
+    margin-top: 20px;
+    width: calc(100% - 30px);
+    margin-left: 15px;
+    margin-right: 15px;
+    box-sizing: border-box;
+    transition: transform 0.1s;
+}
+#btn-verificar:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================
+   SINCRONIA - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-sincronia .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+#container-sincronia .header-jogos h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cor-primaria);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+#container-sincronia .subtitulo-lei {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+#area-pergunta {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 25px 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#texto-pergunta {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: #f0f0f0;
+    line-height: 1.6;
+    text-align: center;
+    transition: opacity 0.3s ease;
+    margin: 0;
+}
+
+#container-sincronia .btn-acao {
+    background: linear-gradient(145deg, #d4af37, #b38b2c);
+    color: #1a0f00;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #8b691f, 0 6px 10px rgba(0,0,0,0.3);
+    transition: all 0.1s ease;
+    width: 100%;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#container-sincronia .btn-acao:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #8b691f, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Botões de navegação e informação */
+#container-sincronia .btn-voltar,
+#container-sincronia .btn-info {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 30px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+#container-sincronia .btn-info {
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+#container-sincronia .btn-voltar:active,
+#container-sincronia .btn-info:active {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+/* Instruções */
+#container-sincronia .cartao-instrucoes {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+#container-sincronia .cartao-instrucoes h4 {
+    color: var(--cor-primaria);
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#container-sincronia .cartao-instrucoes ul {
+    list-style: none;
+    padding: 0;
+}
+
+#container-sincronia .cartao-instrucoes li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+#container-sincronia .cartao-instrucoes li::before {
+    content: "✨";
+    position: absolute;
+    left: 0;
+    color: var(--cor-primaria);
+}
+
+/* ==========================================
+   SOLO FÉRTIL - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-jardim .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 100px); /* Ajuste para caber melhor */
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+#container-jardim h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cor-primaria);
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* Área da planta */
+#emoji-planta {
+    font-size: 8rem;
+    line-height: 1.2;
+    text-align: center;
+    filter: drop-shadow(0 10px 8px rgba(0,0,0,0.6));
+    transition: transform 0.3s ease, filter 0.3s;
+    animation: flutuar 4s infinite alternate ease-in-out;
+}
+
+@keyframes flutuar {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+}
+
+/* Barra de vida (crescimento) */
+.barra-vida {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 40px;
+    height: 16px;
+    margin: 20px 0 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+#progresso-crescimento {
+    height: 100%;
+    background: linear-gradient(90deg, #8B5A2B, #D4AF37, #2ecc71);
+    border-radius: 40px;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 10px #D4AF37;
+    width: 0%;
+}
+
+/* Status e avisos */
+#status-texto {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #f0f0f0;
+    text-align: center;
+    margin: 10px 0 5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+}
+
+#aviso-regada {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Botão regar */
+#btn-regar {
+    background: linear-gradient(145deg, #5D3A1A, #8B5A2B);
+    border: 2px solid #D4AF37;
+    border-radius: 60px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.4rem;
+    padding: 16px 20px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #3D2A0A, 0 12px 20px rgba(0,0,0,0.4);
+    transition: all 0.1s ease;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+#btn-regar:active {
+    transform: translateY(5px);
+    box-shadow: 0 3px 0 #3D2A0A, 0 12px 20px rgba(0,0,0,0.4);
+}
+
+#btn-regar:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+/* ==========================================
+   SOLO FÉRTIL - PAINEL DE CICLOS (IGUAL AOS DEMAIS)
+========================================== */
+#contador-ciclos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a);
+    background-size: 200% 200%;
+    animation: gradienteMovel 8s infinite alternate;
+    border: 3px solid #d4af37;
+    border-radius: 50px;
+    padding: 10px 15px;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #3D2A0A;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A;
+    display: inline-block;       /* Para que o fundo se ajuste ao conteúdo */
+    margin-top: 15px;            /* Espaçamento superior */
+    font-size: 1rem;             /* Ajuste do tamanho da fonte */
+    text-align: center;
+    width: auto;                 /* Largura automática */
+    align-self: center;          /* Centraliza no container flex */
+}
+
+/* Animações existentes (já usadas no JS) */
+.renascer {
+    animation: brilhoRenascimento 1s ease-in-out !important;
+}
+
+@keyframes brilhoRenascimento {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.3); filter: brightness(1.5) drop-shadow(0 0 15px gold); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+.germinar {
+    animation: germinar 0.5s ease !important;
+}
+
+@keyframes germinar {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); filter: brightness(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Responsividade */
+@media (max-width: 450px) {
+    #emoji-planta {
+        font-size: 6rem;
+    }
+    #btn-regar {
+        font-size: 1.2rem;
+        padding: 14px 16px;
+    }
+    #container-jardim h3 {
+        font-size: 1.6rem;
+    }
+}
+
+/* ==========================================
+   ESTILO PADRÃO PARA BOTÕES DE NAVEGAÇÃO E INFORMAÇÃO EM TODOS OS JOGOS
+========================================== */
+[id^="container-"] .btn-voltar,
+[id^="container-"] .btn-info {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 30px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Botão "?" (instruções) em formato circular */
+[id^="container-"] .btn-info {
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+/* Efeito ao clicar (ativo) */
+[id^="container-"] .btn-voltar:active,
+[id^="container-"] .btn-info:active {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+/* ==========================================
+   JULGAMENTO DA SAFRA - VISUAL 3D E ANIMAÇÕES
+========================================== */
+#container-julgamento .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+}
+
+#julgamento-grade {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* Peças do jogo */
+.peca-julgamento {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #5D3A1A, #8B5A2B);
+    border: 3px solid #d4af37;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5);
+    transition: all 0.1s ease;
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+    animation: brilhoPeca 2s infinite alternate;
+}
+
+.peca-julgamento:hover {
+    transform: perspective(500px) rotateX(5deg) rotateY(5deg) scale(1.05);
+    box-shadow: 0 8px 0 #3D2A0A, 0 15px 20px rgba(0,0,0,0.6);
+    border-color: #ffd700;
+}
+
+.peca-julgamento:active {
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg) scale(0.95);
+    box-shadow: 0 2px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5);
+}
+
+/* Animação de brilho suave */
+@keyframes brilhoPeca {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.2); text-shadow: 0 0 5px gold; }
+}
+
+/* Efeito quando a peça é selecionada para troca */
+.peca-julgamento.selecionada {
+    border-color: #2ecc71;
+    box-shadow: 0 0 20px #2ecc71, 0 5px 0 #3D2A0A;
+    transform: scale(1.1);
+}
+
+/* Animação de desaparecimento */
+.peca-julgamento.removendo {
+    animation: sumir 0.3s ease forwards;
+    pointer-events: none;
+}
+
+@keyframes sumir {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; filter: blur(2px); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+/* Animação de queda */
+@keyframes cair {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.peca-julgamento.nova {
+    animation: cair 0.3s ease-out;
+}
+
+/* Responsividade */
+@media (max-width: 450px) {
+    .peca-julgamento {
+        font-size: 1.5rem;
+    }
+}
+
+/* ==========================================
+   JULGAMENTO DA SAFRA - ANIMAÇÕES EXTRAS
+========================================== */
+
+/* Brilho mais intenso nas peças prontas para combinar (quando já há combinação) */
+.peca-julgamento.combinavel {
+    animation: combinavelPulse 1s infinite alternate;
+}
+
+@keyframes combinavelPulse {
+    from { box-shadow: 0 5px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5), 0 0 10px gold; }
+    to { box-shadow: 0 5px 0 #3D2A0A, 0 8px 25px rgba(255,215,0,0.8), 0 0 25px gold; transform: scale(1.02); }
+}
+
+/* Animação de "pulo" ao selecionar uma peça */
+.peca-julgamento.selecionada {
+    animation: selecionadaPulo 0.3s ease;
+}
+
+@keyframes selecionadaPulo {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1.1); } /* Mantém o scale da classe .selecionada */
+}
+
+/* Efeito de onda ao combinar (aplicado via JS na classe .combinando) */
+.peca-julgamento.combinando {
+    animation: combinarOnda 0.4s ease-out;
+}
+
+@keyframes combinarOnda {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.3); filter: brightness(1.5) drop-shadow(0 0 15px gold); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+/* Nova peça caindo com efeito de "mola" */
+.peca-julgamento.nova {
+    animation: cairMola 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cairMola {
+    0% { transform: translateY(-100%) scale(0.8); opacity: 0; }
+    70% { transform: translateY(5%) scale(1.05); opacity: 1; }
+    100% { transform: translateY(0) scale(1); }
+}
+
+/* Painel de recursos com gradiente animado */
+#container-julgamento .painel-recursos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a);
+    background-size: 200% 200%;
+    animation: gradienteMovel 8s infinite alternate;
+    border: 3px solid #d4af37;
+    border-radius: 50px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #3D2A0A;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+@keyframes gradienteMovel {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Botões com efeito de brilho ao passar o mouse */
+#julgamento-btn-novo, #julgamento-btn-reiniciar {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#julgamento-btn-novo::after, #julgamento-btn-reiniciar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#julgamento-btn-novo:hover::after, #julgamento-btn-reiniciar:hover::after {
+    left: 100%;
+}
+
+/* Efeito de brilho sutil nas bordas da grade */
+#julgamento-grade {
+    position: relative;
+    overflow: hidden;
+}
+
+#julgamento-grade::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,215,0,0.1), transparent 70%);
+    pointer-events: none;
+    animation: brilhoFundo 5s infinite alternate;
+}
+
+@keyframes brilhoFundo {
+    from { opacity: 0.3; }
+    to { opacity: 0.8; }
+}
+
+/* Efeito de "vidro" mais pronunciado no cartão principal */
+#container-julgamento .cartao-vidro {
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+}
+
+/* Ícones personalizados dos jogos */
+.icone-jogo-img {
+    width: 64px;        /* Ajuste conforme necessário */
+    height: 64px;       /* Mantém a proporção quadrada */
+    display: block;
+    margin: 0 auto 10px auto; /* Centraliza e dá espaçamento inferior */
+    object-fit: contain; /* Garante que a imagem não distorça */
+}
+
+/* Em telas pequenas, reduz um pouco */
+@media (max-width: 450px) {
+    .icone-jogo-img {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@keyframes piscarDica {
+    0% { opacity: 1; background: #ffd700; }
+    50% { opacity: 0.5; background: #ffaa00; }
+    100% { opacity: 1; background: #ffd700; }
+}
+
+/* ==========================================
+   JULGAMENTO DA SAFRA - ANIMAÇÕES EXTRAS
+========================================== */
+
+.peca-julgamento.caindo {
+    animation: cair 0.3s ease-out;
+}
+
+.peca-julgamento.removendo {
+    animation: sumir 0.3s ease forwards;
+    pointer-events: none;
+}
+
+@keyframes sumir {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; filter: blur(2px); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes cair {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsividade da grade */
+#julgamento-grade {
+    display: grid;
+    gap: 5px;
+    padding: 5px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.peca-julgamento {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #5D3A1A, #8B5A2B);
+    border: 3px solid #d4af37;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 5vw, 2.5rem);
+    cursor: pointer;
+    box-shadow: 0 5px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5);
+    transition: all 0.1s ease;
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+    animation: brilhoPeca 2s infinite alternate;
+}
+
+@media (max-width: 450px) {
+    .peca-julgamento {
+        font-size: 1.2rem;
+        border-width: 2px;
+    }
+    #julgamento-grade {
+        gap: 3px;
+    }
+}
+
+/* Botões de ação */
+#mf-btn-comprar-semente, #mf-btn-reiniciar {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#mf-btn-comprar-semente::after, #mf-btn-reiniciar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#mf-btn-comprar-semente:hover::after, #mf-btn-reiniciar:hover::after {
+    left: 100%;
+}
+
+#mf-btn-comprar-semente:active, #mf-btn-reiniciar:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #3D2A0A;
+}
+
+/* ==========================================
+   MINI FAZENDA - PAINEL DE RECURSOS (IGUAL AO JULGAMENTO)
+========================================== */
+#container-minifazenda .painel-recursos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a);
+    background-size: 200% 200%;
+    animation: gradienteMovel 8s infinite alternate;
+    border: 3px solid #d4af37;
+    border-radius: 50px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #3D2A0A;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+/* Aproveita a animação que já existe no Julgamento */
+@keyframes gradienteMovel {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Ajuste da cerca (grade) */
+#container-minifazenda .cerca {
+    margin-bottom: 8px; /* antes era 15px, reduzido */
+}
+
+/* Espaço entre a grade e o texto "Suas sementes" */
+#container-minifazenda div[style*="margin: 15px 0 10px"] {
+    margin: 5px 0 5px !important; /* reduzido de 15px para 5px */
+}
+
+/* Depósito de sementes */
+#mf-deposito {
+    margin-bottom: 5px !important; /* reduzir espaço abaixo do depósito */
+}
+
+/* Espaço entre o depósito e o texto "Escolha a semente" */
+#container-minifazenda div[style*="margin: 10px 0"] {
+    margin: 5px 0 5px !important; /* reduzido de 10px para 5px */
+}
+
+/* Botões de sementes */
+.botoes-sementes {
+    margin-top: 0 !important; /* elimina margem superior extra */
+    margin-bottom: 10px; /* um pequeno espaçamento antes dos botões de ação */
+}
+
+/* ==========================================
+   SOLO FÉRTIL - BOTÃO REGAR COM EFEITO DE BRILHO
+========================================== */
+#btn-regar {
+    position: relative;
+    overflow: hidden;
+}
+
+#btn-regar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#btn-regar:hover::after {
+    left: 100%;
+}
+
+#container-sincronia #area-pergunta {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    padding: 25px 15px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* ==========================================
+   SINCRONIA - BOTÃO NOVA REFLEXÃO COM BRILHO
+========================================== */
+#container-sincronia .btn-acao {
+    position: relative;
+    overflow: hidden;
+}
+
+#container-sincronia .btn-acao::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#container-sincronia .btn-acao:hover::after {
+    left: 100%;
+}
+
+/* ==========================================
+   TERMO - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-termo .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+/* ==========================================
+   TERMO - BOTÃO VERIFICAR COM BRILHO
+========================================== */
+#container-termo .btn-acao {
+    position: relative;
+    overflow: hidden;
+}
+
+#container-termo .btn-acao::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#container-termo .btn-acao:hover::after {
+    left: 100%;
+}
+
+#termo-reset-container .btn-refresh {
+    position: relative;
+    overflow: hidden;
+}
+
+#termo-reset-container .btn-refresh::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#termo-reset-container .btn-refresh:hover::after {
+    left: 100%;
+}
+
+#tabuleiro-termo {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 15px;
+    margin: 10px 0;
 }

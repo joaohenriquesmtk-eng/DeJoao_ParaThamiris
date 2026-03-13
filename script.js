@@ -159,6 +159,15 @@ function inicializarTermo() {
     restaurarEstadoTermo();
 
     gerarTeclado();
+
+    // Configura o botão Verificar
+    const btnVerificar = document.getElementById('btn-verificar');
+    if (btnVerificar) {
+        // Remove listeners antigos para não duplicar
+        const novoBtn = btnVerificar.cloneNode(true);
+        btnVerificar.parentNode.replaceChild(novoBtn, btnVerificar);
+        novoBtn.addEventListener('click', verificarPalavra);
+    }
 }
 
 function gerarTeclado() {
@@ -167,7 +176,7 @@ function gerarTeclado() {
     const layout = [
         ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
         ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-        ["⌫", "Z", "X", "C", "V", "B", "N", "M", "ENTER"]
+        ["⌫", "Z", "X", "C", "V", "B", "N", "M"]
     ];
     layout.forEach(linha => {
         const divLinha = document.createElement("div");
@@ -185,7 +194,6 @@ function gerarTeclado() {
 
 function processarEntrada(tecla) {
     if (tentativaAtual >= 6) return;
-    if (tecla === "ENTER") verificarPalavra();
     else if (tecla === "⌫") apagarLetra();
     else adicionarLetra(tecla);
 }
@@ -246,6 +254,7 @@ function finalizarVitoria() {
     inicializarTermo(); // Chama a função para travar a tela
     liberarCofreVisual();
     atualizarDinamicaHome();
+    document.getElementById('tabuleiro-termo').classList.add('vitoria');
 }
 
 // Reinicia o jogo Termo para uma nova tentativa (quando o jogador perdeu)
@@ -839,8 +848,9 @@ function fecharModal() {
 
 // 8. HUB DE JOGOS & SINCRONIA
 function abrirJogo(tipo) {
+    document.querySelector('nav.menu-inferior').classList.add('escondido');
     document.getElementById('menu-jogos').classList.add('escondido');
-    document.getElementById('header-jogos-main').classList.add('escondido'); // Esconde o Header ao entrar no jogo
+    document.getElementById('header-jogos-main').classList.add('escondido');
     document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
 
     const container = document.getElementById(`container-${tipo}`);
@@ -848,12 +858,28 @@ function abrirJogo(tipo) {
         container.classList.remove('escondido');
         if (tipo === 'termo') inicializarTermo();
         if (tipo === 'sincronia') gerarNovaPergunta();
+        if (tipo === 'minifazenda') {
+            if (typeof window.iniciarMiniFazenda === 'function') {
+                window.iniciarMiniFazenda();
+            }
+        }
+        if (tipo === 'tribunal') {
+            if (typeof window.iniciarTribunal === 'function') {
+                window.iniciarTribunal();
+            }
+        }
+        if (tipo === 'julgamento') {
+            if (typeof window.iniciarJulgamento === 'function') {
+                window.iniciarJulgamento();
+            }
+        }
     }
 }
 
 function voltarMenuJogos() {
     document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
     document.getElementById('menu-jogos').classList.remove('escondido');
+    document.querySelector('nav.menu-inferior').classList.remove('escondido');
     document.getElementById('header-jogos-main').classList.remove('escondido'); // Volta o Header Jogos
     atualizarDinamicaHome(); // Fix da persistência dos badges
 }

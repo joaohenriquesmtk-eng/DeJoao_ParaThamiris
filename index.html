@@ -73,7 +73,7 @@
 
             <section id="leis" class="tela escondido">
                 <div class="cartao-vidro header-leis" style="text-align: center;">
-                    <h3 style="color: var(--cor-primaria);">⚖️ Vade Mecum do Afeto</h3>
+                    <h3 style="color: var(--cor-primaria);">Vade Mecum do Afeto</h3>
                     <p class="subtitulo-lei" style="font-size: 12px; opacity: 0.8; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase;">Edição Especial: João & Thamiris</p>
                 </div>
                 <div class="lista-leis"></div>
@@ -85,20 +85,91 @@
                     <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Sincronize mentes e corações</p>
                 </div>
 
-                <div id="menu-jogos" class="grade-jogos">
-                    <div class="item-jogo" onclick="abrirJogo('termo')">
-                        <span class="icone-jogo">🎮</span>
-                        <p>Termo</p>
-                    </div>
-                    <div class="item-jogo" onclick="abrirJogo('sincronia')">
-                        <span class="icone-jogo">✨</span>
-                        <p>Sincronia</p>
-                    </div>
-                    <div class="item-jogo" onclick="abrirJogo('jardim')">
-                        <span class="icone-jogo">🌱</span>
-                        <p>Solo Fértil</p>
-                    </div>
-                </div>
+<div id="menu-jogos" class="grade-jogos">
+    <div class="item-jogo" onclick="abrirJogo('termo')">
+        <img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
+        <p>Termo do Santuário</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('tribunal')">
+        <img src="assets/icones-jogos/tribunal.png" alt="Tribunal do Afeto" class="icone-jogo-img">
+        <p>Tribunal do Afeto</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('sincronia')">
+        <img src="assets/icones-jogos/sincronia.png" alt="Sincronia" class="icone-jogo-img">
+        <p>Match de Sincronia</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('minifazenda')">
+        <img src="assets/icones-jogos/minifazenda.png" alt="Mini Fazenda" class="icone-jogo-img">
+        <p>Mini Fazenda</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('jardim')">
+        <img src="assets/icones-jogos/jardim.png" alt="Solo Fértil" class="icone-jogo-img">
+        <p>Nosso Solo Fértil</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('julgamento')">
+        <img src="assets/icones-jogos/julgamento.png" alt="Julgamento da Safra" class="icone-jogo-img">
+        <p>Julgamento da Safra</p>
+    </div>
+</div>
+
+<!-- TRIBUNAL DO AFETO -->
+<div id="container-tribunal" class="escondido">
+    <div class="cartao-vidro" style="padding: 15px;">
+        <!-- Cabeçalho com botão voltar e instruções -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
+</div>
+<h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Tribunal do Afeto</h2>
+
+        <!-- Instruções do Tribunal -->
+        <div id="instrucoes-tribunal" class="escondido cartao-instrucoes">
+            <h4>Como Julgar</h4>
+            <ul>
+                <li>Você recebe 8 cartas com valores numéricos.</li>
+                <li>O caso exige uma soma <b>exata</b> (meta).</li>
+                <li>Clique nas cartas para somar até atingir a meta.</li>
+                <li><span style="color: #2ecc71; font-weight: bold;">Se acertar</span> → ganha estrelas e avança.</li>
+                <li><span style="color: #e74c3c; font-weight: bold;">Se ultrapassar</span> → perde uma estrela e o caso.</li>
+                <li>A cada 3 casos vencidos, o nível sobe.</li>
+            </ul>
+        </div>
+
+        <!-- Painel de status -->
+<div class="painel-recursos">
+    <span>📊 Nível <span id="tribunal-nivel">1</span></span>
+    <span>⭐ Estrelas <span id="tribunal-estrelas">2</span></span>
+    <span>📚 Resolvidos <span id="tribunal-casos">0</span></span>
+    <span>💔 Perdidos <span id="tribunal-perdidos">0</span></span>
+</div>
+
+        <!-- Caso atual -->
+<div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
+    <h3 id="tribunal-titulo-caso" style="color: #FFD700; margin-bottom: 5px;">⚖️ Caso #<span id="tribunal-numero-caso">1</span></h3>
+    <p id="tribunal-descricao-caso" style="font-style: italic; margin-bottom: 10px;"></p>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px;">
+        <span>🎯 Meta: <span id="tribunal-meta">0</span> pts</span>
+        <span>📊 Máx: <span id="tribunal-max">0</span> pts</span>
+        <span>🏆 Sua: <span id="tribunal-pontos">0</span> pts</span>
+    </div>
+</div>
+
+        <!-- Mão de cartas -->
+        <div style="margin: 15px 0 5px; text-align: center;">
+            <span style="color: #FFD700; font-weight: bold;">🃏 Suas cartas:</span>
+        </div>
+        <div id="tribunal-mao" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; min-height: 140px;">
+            <!-- Cartas serão inseridas aqui -->
+        </div>
+
+        <!-- Botões de ação -->
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+    <button id="tribunal-btn-julgar" class="btn-acao" style="flex:1;">⚖️ Julgar</button>
+    <button id="tribunal-btn-dica" class="btn-acao" style="flex:1;">💡 Dica</button>
+    <button id="tribunal-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+</div>
+    </div>
+</div>
 
                 <div id="container-termo" class="escondido">
                     <div class="cartao-vidro">
@@ -106,7 +177,7 @@
                             <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
                             <button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
                         </div>
-                        <h3 style="color: var(--cor-primaria); margin-bottom: 15px; text-align: center;">🎮 Termo do Santuário</h3>
+                        <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin-bottom: 15px; text-align: center;">Termo do Santuário</h3>
                         
                         <div id="instrucoes-termo" class="escondido cartao-instrucoes">
                             <h4>Como Jogar</h4>
@@ -138,7 +209,7 @@
                             <button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
                         </div>
                         <div class="header-jogos" style="margin-bottom: 20px;">
-                            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0;">Match de Sincronia</h3>
+                            <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; font-size: 1.5rem; margin: 0;">Match de Sincronia</h3>
                             <p class="subtitulo-lei" style="letter-spacing: 2px; margin-top: 5px; font-size: 0.7rem;">UMA PERGUNTA, DOIS MUNDOS</p>
                         </div>
 
@@ -161,13 +232,80 @@
                     </div>
                 </div>
 
+<!-- MINI FAZENDA -->
+<div id="container-minifazenda" class="escondido">
+    <div class="cartao-vidro" style="padding: 15px;">
+        <!-- Cabeçalho com botão voltar e instruções -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <button class="btn-info" onclick="window.toggleInstrucoesMiniFazenda()">❓</button>
+</div>
+<h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Mini Fazenda</h2>
+
+        <!-- Instruções da Mini Fazenda (CORRIGIDAS) -->
+        <div id="instrucoes-minifazenda" class="escondido cartao-instrucoes">
+            <h4>Como Cuidar da Fazenda</h4>
+            <ul>
+                <li>Compre sementes com o dinheiro disponível (💰).</li>
+                <li>Plante nos quadrados vazios clicando no símbolo <b>➕</b>.</li>
+                <li>Cada planta tem um tempo de crescimento (2 a 3 minutos).</li>
+                <li>Quando a planta estiver pronta (brilhando), clique para colher.</li>
+                <li>Ao colher, você ganha dinheiro e experiência (⭐).</li>
+                <li>Acumule experiência para subir de nível.</li>
+                <li>A cada nível, sua fazenda pode expandir, ganhando mais espaços para plantar.</li>
+                <li>Continue cuidando para fazer a fazenda crescer!</li>
+            </ul>
+        </div>
+
+        <!-- Painel de recursos -->
+        <div class="painel-recursos">
+            <span>💰 <span id="mf-dinheiro">50</span></span>
+            <span>📊 Nível <span id="mf-nivel">1</span></span>
+            <span>⭐ EXP <span id="mf-exp">0</span>/<span id="mf-exp-prox">50</span></span>
+        </div>
+
+        <!-- A grade (dentro da cerca) -->
+        <div class="cerca">
+            <div id="mf-grade" style="display: grid; gap: 5px;"></div>
+        </div>
+
+        <!-- Depósito de sementes (mostra apenas as que você tem) -->
+        <div style="margin: 15px 0 10px; text-align: center;">
+            <span style="color: #FFD700; font-weight: bold;">🌱 Suas sementes:</span>
+        </div>
+        <div id="mf-deposito" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 15px; min-height: 40px;">
+            <!-- Será preenchido pelo JavaScript -->
+        </div>
+
+        <!-- Seleção de semente para plantio -->
+        <div style="margin: 10px 0; text-align: center;">
+            <span style="color: #FFD700; font-weight: bold;">🌱 Escolha a semente para plantar:</span>
+        </div>
+        <div class="botoes-sementes" style="display: flex; gap: 5px; justify-content: center; margin-bottom: 15px;">
+            <button class="btn-tipo-semente" data-tipo="0">🌽 Milho</button>
+            <button class="btn-tipo-semente" data-tipo="1">🥕 Cenoura</button>
+            <button class="btn-tipo-semente" data-tipo="2">🍅 Tomate</button>
+            <button class="btn-tipo-semente" data-tipo="3">🎃 Abóbora</button>
+        </div>
+
+        <!-- Botões de ação -->
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button id="mf-btn-comprar-semente" class="btn-acao" style="flex:1; display: flex; flex-direction: column; align-items: center; line-height: 1.2;">
+                <span>Comprar Semente</span>
+                <span id="mf-preco-semente" style="font-size: 0.8rem; opacity: 0.9;">(10💰)</span>
+            </button>
+            <button id="mf-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+        </div>
+    </div>
+</div>
+
                 <div id="container-jardim" class="escondido" style="padding-top: 10px; text-align: center;">
                     <div class="cartao-vidro">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
                             <button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
                         </div>
-                        <h3 style="color: var(--cor-primaria);">🌱 Nosso Solo Fértil</h3>
+                        <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A;">Nosso Solo Fértil</h3>
 
                         <div id="instrucoes-jardim" class="escondido cartao-instrucoes">
                             <h4>Como Cuidar</h4>
@@ -186,9 +324,47 @@
                         <p id="status-texto" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
                         <p id="aviso-regada" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 15px;"></p>
                         <button id="btn-regar" class="btn-acao" onclick="regarPlanta()">💦 REGAR</button>
-                        <p id="contador-ciclos" style="font-size: 0.8rem; margin-top: 10px; color: var(--cor-primaria);">🌱 Ciclos completados: 0</p>
+                        <p id="contador-ciclos">🌱 Ciclos completados: 0</p>
                     </div>
                 </div>
+                <div id="container-julgamento" class="escondido">
+    <div class="cartao-vidro">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <button class="btn-info" onclick="toggleInstrucoesJulgamento()">❓</button>
+</div>
+<h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Julgamento da Safra</h2>
+
+        <!-- Instruções -->
+        <div id="instrucoes-julgamento" class="escondido cartao-instrucoes">
+            <h4>Como Jogar</h4>
+            <ul>
+                <li>Combine 3 ou mais peças iguais para coletar provas.</li>
+                <li>Cada combinação vale pontos e ajuda a resolver o caso.</li>
+                <li>Complete a barra de objetivo para avançar de nível.</li>
+                <li>Novos ícones aparecem conforme você progride.</li>
+            </ul>
+        </div>
+
+        <!-- Painel de status -->
+        <div class="painel-recursos" style="background: #2c3e50; border-color: #d4af37;">
+            <span>📊 Nível <span id="julgamento-nivel">1</span></span>
+            <span>⭐ Pontos <span id="julgamento-pontos">0</span></span>
+            <span>🎯 Meta <span id="julgamento-meta">100</span></span>
+        </div>
+
+        <!-- Grade do jogo -->
+        <div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
+            <div id="julgamento-grade" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; padding: 10px;"></div>
+        </div>
+
+        <!-- Botões -->
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="julgamento-btn-novo" class="btn-acao" style="flex:1;">Novo Caso</button>
+            <button id="julgamento-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+        </div>
+    </div>
+</div>
             </section>
 
             <section id="cofre" class="tela escondido">
@@ -256,6 +432,12 @@
 
     <div id="toast-mensagem" class="toast escondido"></div>
     
+    <script src="minifazenda_novo.js"></script>
+
+    <script src="tribunal.js"></script>
+
+    <script src="julgamento.js"></script>
+
 </body>
 
 </html>

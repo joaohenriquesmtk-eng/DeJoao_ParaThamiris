@@ -21,10 +21,8 @@ if (userParam) {
 }
 
 // Recupera a identidade. Se não houver, assume que é o celular da Thamiris
-const usuarioLogado = localStorage.getItem('santuario_user_id') || 'thamiris';
-const souJoao = usuarioLogado === 'joao';
-const MEU_NOME = souJoao ? "João" : "Thamiris";
-const NOME_PARCEIRO = souJoao ? "Thamiris" : "João";
+
+//
 
 // --- PREPARAÇÃO PARA O FIREBASE (META-ATUALIZAÇÕES FUTURAS) ---
 window.SantuarioDB = {

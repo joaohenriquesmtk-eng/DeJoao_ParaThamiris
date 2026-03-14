@@ -50,76 +50,124 @@ const tiposSementes = [
         }
     }
 
-    function salvarFazenda() {
-        localStorage.setItem('santuario_fazenda_nova', JSON.stringify(fazenda));
-    }
+    // --- NOVA LÓGICA DE SINCRONIZAÇÃO COM FIREBASE ---
 
-    function carregarFazenda() {
-        const salvo = localStorage.getItem('santuario_fazenda_nova');
-        if (salvo) {
-            try {
-                const dados = JSON.parse(salvo);
-                fazenda.tamanho = dados.tamanho || 1;
-                fazenda.dinheiro = dados.dinheiro || 50;
-                fazenda.nivel = dados.nivel || 1;
-                fazenda.experiencia = dados.experiencia || 0;
-                fazenda.expProximoNivel = dados.expProximoNivel || 50;
-                fazenda.sementes = dados.sementes || [0,0,0,0];
-                fazenda.slots = dados.slots || [];
-                if (fazenda.slots.length !== fazenda.tamanho) inicializarGrade();
-            } catch (e) {
-                resetarFazenda();
+function salvarFazenda() {
+    // 1. Salva no navegador (backup rápido)
+    localStorage.setItem('minifazenda_dados', JSON.stringify(fazenda));
+
+    // 2. Salva na nuvem (Firebase)
+    if (window.SantuarioDB && window.SantuarioDB_Functions) {
+        const userId = localStorage.getItem('santuario_user_id') || 'desconhecido';
+        const { ref, set } = window.SantuarioDB_Functions;
+        
+        set(ref(window.SantuarioDB, 'fazenda/' + userId), fazenda)
+            .catch((error) => console.error("Erro ao salvar nuvem:", error));
+    }
+}
+
+function carregarFazenda() {
+    const userId = localStorage.getItem('santuario_user_id') || 'desconhecido';
+    
+    // Tenta puxar da nuvem primeiro para ter o dado mais atual
+    if (window.SantuarioDB && window.SantuarioDB_Functions) {
+        const { ref, get } = window.SantuarioDB_Functions;
+        
+        get(ref(window.SantuarioDB, 'fazenda/' + userId)).then((snapshot) => {
+            if (snapshot.exists()) {
+                fazenda = snapshot.val();
+                console.log("Dados da nuvem carregados!");
+            } else {
+                console.log("Nenhum dado na nuvem. Iniciando nova fazenda.");
+                inicializarNovaFazenda();
             }
-        } else {
-            resetarFazenda();
+            renderizarGrade();
+        }).catch((err) => {
+            console.error("Erro ao buscar nuvem, usando local:", err);
+            tentarCarregarLocal();
+        });
+    } else {
+        tentarCarregarLocal();
+    }
+}
+
+function tentarCarregarLocal() {
+    const salvoLocal = localStorage.getItem('minifazenda_dados');
+    if (salvoLocal) {
+        try {
+            fazenda = JSON.parse(salvoLocal);
+            // Garantir que a estrutura de slots seja compatível com o tamanho atual
+            if (!fazenda.slots || fazenda.slots.length !== fazenda.tamanho) {
+                inicializarGrade();
+            }
+        } catch (e) {
+            console.error('Erro ao carregar dados locais, resetando', e);
+            inicializarNovaFazenda();
         }
-        verificarCrescimentoOffline();
-        atualizarInterface();
-        renderizarDeposito();
-        renderizarGrade();
-        atualizarPrecoBotao();
+    } else {
+        inicializarNovaFazenda();
+    }
+    renderizarGrade();
+}
+
+function inicializarNovaFazenda() {
+    fazenda = {
+        tamanho: 1,
+        slots: [],
+        sementes: [0, 0, 0, 0],
+        dinheiro: 50,
+        nivel: 1,
+        experiencia: 0,
+        expProximoNivel: 50
+    };
+    inicializarGrade(); // Isso preenche os slots corretamente
+}
+
+function verificarCrescimentoOffline() {
+    // TRAVA DE SEGURANÇA: Se a fazenda ou os slots não existirem, para aqui e não dá erro
+    if (!fazenda || !fazenda.slots) {
+        console.warn("Aguardando carregamento dos slots da fazenda...");
+        return; 
     }
 
-    function resetarFazenda() {
-        fazenda = {
-            tamanho: 1,
-            slots: [],
-            sementes: [0, 0, 0, 0],
-            dinheiro: 50,
-            nivel: 1,
-            experiencia: 0,
-            expProximoNivel: 50
-        };
-        inicializarGrade();
+    const agora = Date.now();
+    let mudou = false;
+
+    fazenda.slots.forEach(slot => {
+        // Verifica se o slot existe antes de ler a propriedade [0]
+        if (slot && slot.plantada) {
+            const tempoPassado = agora - slot.timestamp;
+            const tempoNecessario = tiposSementes[slot.tipo].tempo;
+
+            if (slot.estagio < 2 && tempoPassado >= tempoNecessario) {
+                slot.estagio = 2;
+                mudou = true;
+            } else if (slot.estagio < 1 && tempoPassado >= tempoNecessario / 2) {
+                slot.estagio = 1;
+                mudou = true;
+            }
+        }
+    });
+
+    if (mudou) {
+        renderizarFazenda();
         salvarFazenda();
     }
+}
 
-    function verificarCrescimentoOffline() {
-        let atualizou = false;
-        const agora = Date.now();
-        for (let i = 0; i < fazenda.tamanho; i++) {
-            for (let j = 0; j < fazenda.tamanho; j++) {
-                const slot = fazenda.slots[i][j];
-                if (slot && slot.estado === 'plantado' && slot.plantadoEm) {
-                    const tempoTotal = tiposSementes[slot.tipoSemente].tempo;
-                    if (agora - slot.plantadoEm >= tempoTotal) {
-                        slot.estado = 'pronto';
-                        slot.plantadoEm = null;
-                        atualizou = true;
-                    }
-                }
-            }
-        }
-        return atualizou;
+function loopCrescimento() {
+    // TRAVA DE SEGURANÇA: Só executa se a fazenda estiver pronta
+    if (fazenda && fazenda.slots && fazenda.slots.length > 0) {
+        verificarCrescimentoOffline();
     }
+}
 
-    function loopCrescimento() {
-        if (verificarCrescimentoOffline()) {
-            salvarFazenda();
-            renderizarGrade();
-            mostrarToast("🌾 Colheita pronta!");
-        }
-    }
+// Função unificada para atualizar toda a parte visual da fazenda de uma vez
+function renderizarFazenda() {
+    renderizarGrade();
+    renderizarDeposito();
+    atualizarInterface();
+}
 
 function renderizarGrade() {
     const gradeDiv = document.getElementById('mf-grade');

@@ -32,41 +32,25 @@ self.addEventListener('activate', event => {
 
 // Estratégia de cache: Stale-while-revalidate (com tratamento de erro)
 self.addEventListener('fetch', event => {
+  // Ignora requisições que não sejam do próprio site (evita erro de extensões e Firebase)
+  if (!event.request.url.startsWith(self.location.origin)) return;
+  
+  // Ignora métodos que não sejam GET (como o POST do login)
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
-      // Se encontrou no cache, já retorna e atualiza em segundo plano
-      if (cachedResponse) {
-        // Atualiza o cache em segundo plano (sem bloquear)
-        fetch(event.request)
-          .then(networkResponse => {
-            // Só atualiza se a resposta for válida e clonável
-            if (networkResponse && networkResponse.ok) {
-              const responseToCache = networkResponse.clone();
-              caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            }
-          })
-          .catch(() => { /* falha silenciosa */ });
-        return cachedResponse;
-      }
-
-      // Se não está no cache, busca da rede
-      return fetch(event.request)
-        .then(networkResponse => {
-          // Só armazena se for uma resposta válida
-          if (networkResponse && networkResponse.ok) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          // Se tudo falhar, retorna uma resposta de fallback (opcional)
-          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-        });
+      if (cachedResponse) return cachedResponse;
+      return fetch(event.request).then(networkResponse => {
+        // Só armazena se for status 200 (OK) e se for do tipo básico (não 206)
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      }).catch(() => new Response('Offline', { status: 503 }));
     })
   );
 });

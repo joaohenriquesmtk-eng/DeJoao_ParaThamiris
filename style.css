@@ -22,15 +22,16 @@ body {
     font-family: var(--fonte-padrao);
     line-height: 1.6;
     overflow: hidden;
-    height: 100vh;
+    /* CORREÇÃO: 100dvh garante a leitura da tela real do iPhone, ignorando as barras do navegador */
+    height: 100dvh; 
 }
 
 #app-shell {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    /* CORREÇÃO: Usando a medida dinâmica */
+    height: 100dvh; 
     padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Efeito vidro */
@@ -50,14 +51,16 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 85px;
+    /* CORREÇÃO: Altura do menu + a medida exata da barra de gestos do iPhone dela */
+    height: calc(70px + env(safe-area-inset-bottom)); 
     background: rgba(15, 15, 15, 0.8);
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 20px;
+    /* CORREÇÃO: Empurra os ícones para cima, longe da linha do iPhone */
+    padding-bottom: env(safe-area-inset-bottom); 
     z-index: 999;
 }
 
@@ -87,13 +90,16 @@ body {
 
 .tela {
     animation: surgirSuave 0.4s ease-out;
-    height: calc(100vh - 85px);
-    overflow-y: auto;
-    padding-bottom: 20px;
+    /* CORREÇÃO: A tela ocupa tudo, mas o conteúdo ganha uma margem extra no final */
+    height: 100dvh; 
+    overflow-y: auto !important;
+    /* CORREÇÃO: Impede que o menu transparente tampe o final das páginas */
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
 }
 
-.tela {
-    overflow-y: auto !important;
+/* CORREÇÃO: Quando um jogo abrir e esconder o menu, precisamos ajustar o fundo */
+body.modo-jogo-ativo .tela {
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 @keyframes surgirSuave {

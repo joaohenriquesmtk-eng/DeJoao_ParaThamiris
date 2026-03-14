@@ -374,6 +374,8 @@ function obterEmojiClima(condicao, sunrise, sunset) {
 async function atualizarClima() {
     const elJoão = document.getElementById("temp-usuario");
     const elThamiris = document.getElementById("temp-thamiris");
+    const elMensagem = document.getElementById("texto-mensagem-clima");
+    const elIconeClima = document.getElementById("icone-clima");
 
     try {
         const resJ = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Colombo,BR&units=metric&appid=${API_KEY}`);
@@ -384,12 +386,108 @@ async function atualizarClima() {
         const dJ = await resJ.json();
         const dT = await resT.json();
 
-        if (dJ.main && elJoão) elJoão.innerHTML = `${Math.round(dJ.main.temp)}°C ${obterEmojiClima(dJ.weather[0].main, dJ.sys.sunrise, dJ.sys.sunset)}`;
-        if (dT.main && elThamiris) elThamiris.innerHTML = `${Math.round(dT.main.temp)}°C ${obterEmojiClima(dT.weather[0].main, dT.sys.sunrise, dT.sys.sunset)}`;
+        // Atualiza temperaturas com emojis animados
+        if (dJ.main && elJoão) {
+            elJoão.innerHTML = `${Math.round(dJ.main.temp)}°C ${obterEmojiClima(dJ.weather[0].main, dJ.sys.sunrise, dJ.sys.sunset)}`;
+        }
+        if (dT.main && elThamiris) {
+            elThamiris.innerHTML = `${Math.round(dT.main.temp)}°C ${obterEmojiClima(dT.weather[0].main, dT.sys.sunrise, dT.sys.sunset)}`;
+        }
+
+        // Gera mensagem personalizada para Thamiris (Goiânia)
+        if (dT.main && elMensagem) {
+            const condicao = dT.weather[0].main;
+            const temp = Math.round(dT.main.temp);
+            elMensagem.innerText = gerarMensagemClima(condicao, temp);
+        }
+
+        // Atualiza o ícone decorativo conforme o clima
+        if (dT.main && elIconeClima) {
+            const condicao = dT.weather[0].main;
+            let icone = '⛅'; // padrão
+
+            switch (condicao) {
+                case 'Clear':
+                    icone = '☀️';
+                    break;
+                case 'Clouds':
+                    icone = '☁️';
+                    break;
+                case 'Rain':
+                    icone = '🌧️';
+                    break;
+                case 'Thunderstorm':
+                    icone = '⛈️';
+                    break;
+                case 'Snow':
+                    icone = '❄️';
+                    break;
+                case 'Mist':
+                case 'Fog':
+                case 'Haze':
+                    icone = '🌫️';
+                    break;
+                default:
+                    icone = '⛅';
+            }
+            elIconeClima.innerText = icone;
+        }
+
     } catch (e) {
         if (elJoão) elJoão.innerHTML = "❌ Indisponível";
         if (elThamiris) elThamiris.innerHTML = "❌ Indisponível";
+        if (elMensagem) elMensagem.innerText = "❌ Clima indisponível no momento";
+        if (elIconeClima) elIconeClima.innerText = '❓';
     }
+}
+
+// ==========================================
+// MENSAGEM PERSONALIZADA BASEADA NO CLIMA
+// ==========================================
+function gerarMensagemClima(condicao, temperatura) {
+    const mensagens = {
+        Clear: [
+            "O céu de Goiânia está lindo hoje, igual você! 🌞",
+            "Solzinho aí? Aproveita e manda um raio de luz pra mim! ☀️",
+            "Céu limpo em Goiânia – combina com a transparência do meu amor por você."
+        ],
+        Clouds: [
+            "O dia em Goiânia está nublado, mas você continua sendo meu sol ☁️💛",
+            "Nublado? Perfeito para um café e uma conversa comigo.",
+            "Até as nuvens sabem que você é a parte mais bonita do céu."
+        ],
+        Rain: [
+            "Tá chovendo em Goiânia? Leva guarda-chuva, meu amor! 🌧️☔",
+            "Chuva aí? Isso é a natureza regando a saudade que eu tenho de você.",
+            "Cada gota dessa chuva é um pensamento meu caindo em você."
+        ],
+        Thunderstorm: [
+            "Tempestade aí? Fica segura e me avisa quando passar! ⛈️❤️",
+            "Trovões? Fica calma, estou aqui (mesmo longe). Depois me conta se tá tudo bem.",
+            "A força da tempestade não chega aos pés da força do que sinto por você."
+        ],
+        Snow: [
+            "Neve em Goiânia? Isso sim é raro! Se proteger do frio, viu? ❄️",
+            "Frio extremo? Hora de me ligar e pedir um abraço virtual."
+        ],
+        Mist: [
+            "Névoa em Goiânia? Parece cenário de filme romântico. Sinto sua falta.",
+            "Visibilidade baixa? Não deixa baixar a nossa conexão!"
+        ]
+    };
+
+    // Fallback para outras condições (como Drizzle, Fog, etc.)
+    const padrao = [
+        "O clima em Goiânia está imprevisível, mas meu amor por você é constante! 🌡️",
+        "Seja qual for o tempo, meu pensamento em você não muda.",
+        `${temperatura}°C em Goiânia – mas o que esquenta mesmo é meu coração por você.`
+    ];
+
+    // Escolhe uma lista baseada na condição, ou usa a padrão
+    const lista = mensagens[condicao] || padrao;
+    
+    // Retorna uma mensagem aleatória da lista
+    return lista[Math.floor(Math.random() * lista.length)];
 }
 
 const URL_SCRIPT_PULSO = "https://script.google.com/macros/s/AKfycbye-Um7962qfQhHyg4T-FlERkiKAHK3UmJKViGlRVcNFgyOfIyJxHYK82RqwHjhcSr5Hw/exec";
@@ -599,7 +697,7 @@ function atualizarSaudacao() {
     } else if (hora >= 18 && hora < 24) {
         saudacao = 'Boa noite, meu céu! 🌙';
     } else {
-        saudacao = 'Já é madrugada... sonhando com você? 🌜';
+        saudacao = 'Já é madrugada... sonhando com você! 🌜';
     }
 
     const elSaudacao = document.getElementById('saudacao-personalizada');
@@ -1265,16 +1363,22 @@ function registrarServiceWorker() {
     }
 }
 
+// ========== VERIFICAÇÃO DE ATUALIZAÇÃO ==========
 function verificarAtualizacao() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(reg => {
             reg.update();
             mostrarToast('🔍 Verificando atualizações...');
+            console.log('Verificação de atualização solicitada.');
+        }).catch(err => {
+            console.error('Erro ao verificar atualização:', err);
+            mostrarToast('❌ Erro ao verificar.');
         });
     } else {
         mostrarToast('❌ Service Worker não suportado.');
     }
 }
+
 
 // ==========================================
 // BOOT DO SISTEMA

@@ -88,13 +88,13 @@ body {
     display: none !important;
 }
 
+/* Atualize este bloco que já existe */
 .tela {
     animation: surgirSuave 0.4s ease-out;
-    /* CORREÇÃO: A tela ocupa tudo, mas o conteúdo ganha uma margem extra no final */
     height: 100dvh; 
     overflow-y: auto !important;
-    /* CORREÇÃO: Impede que o menu transparente tampe o final das páginas */
-    padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
+    /* CORREÇÃO: Aumentamos o respiro final para garantir que nada fique atrás da barra */
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
 }
 
 /* CORREÇÃO: Quando um jogo abrir e esconder o menu, precisamos ajustar o fundo */
@@ -864,7 +864,7 @@ body.modo-jogo-ativo .tela {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100dvh - 120px);
     overflow-y: auto;
 }
 
@@ -875,7 +875,7 @@ body.modo-jogo-ativo .tela {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 30px); /* Ajuste para caber melhor */
+    max-height: calc(100dvh - 30px); /* Ajuste para caber melhor */
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -1160,7 +1160,7 @@ body.modo-jogo-ativo .tela {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 100px); /* Ajuste para caber melhor */
+    max-height: calc(100dvh - 20px) !important; /* antes era 100px */
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -1333,7 +1333,7 @@ body.modo-jogo-ativo .tela {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100dvh - 100px);
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -1479,7 +1479,7 @@ body.modo-jogo-ativo .tela {
     padding: 25px 20px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 100px); /* Ajuste para caber melhor */
+    max-height: calc(100dvh - 100px); /* Ajuste para caber melhor */
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -2131,7 +2131,7 @@ body.modo-jogo-ativo .tela {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100dvh - 100px);
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -2319,7 +2319,7 @@ body.modo-jogo-ativo .tela {
         transform: translateY(0) translateX(0);
     }
     100% {
-        transform: translateY(-100vh) translateX(20px);
+        transform: translateY(-100dvh) translateX(20px);
     }
 }
 
@@ -2481,7 +2481,7 @@ body.modo-jogo-ativo .tela {
 
 /* Modo jogo ativo: tela ocupa toda a altura e botão mute mais abaixo */
 body.modo-jogo-ativo .tela {
-    height: 100vh;
+    height: 100dvh;
 }
 body.modo-jogo-ativo .btn-mute {
     bottom: 20px; /* você pode mudar para 30px se quiser mais acima */
@@ -2516,4 +2516,193 @@ body:not(.jogo-aberto) #btn-mute-jogos {
 }
 body.jogo-aberto #btn-mute-jogos {
     display: none;
+}
+
+/* Adicione este bloco novo ao final do arquivo */
+#btn-mute-jogos-tela {
+    position: fixed;
+    bottom: calc(85px + env(safe-area-inset-bottom)); /* Fica logo acima da barra de menu */
+    right: 20px;
+    z-index: 1001;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Ajuste para que o conteúdo da tela Leis não fique atrás do menu inferior */
+#leis {
+    padding-bottom: calc(85px + 20px); /* 85px do menu + 20px extra */
+}
+
+/* Botão de mute na tela Jogos (menu) */
+#btn-mute-jogos-tela {
+    position: fixed;
+    bottom: calc(85px + env(safe-area-inset-bottom) + 10px); /* acima do menu */
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Esconde o botão quando um jogo estiver aberto */
+body.jogo-aberto #btn-mute-jogos-tela {
+    display: none;
+}
+
+/* ==========================================
+   CARTÃO DA SAUDAÇÃO - DESTAQUE ESPECIAL
+========================================== */
+.cartao-saudacao {
+    position: relative;
+    background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: brilhoSaudacao 3s infinite alternate ease-in-out;
+}
+
+/* Efeito de borda gradiente animada */
+.cartao-saudacao::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #D4AF37, #f9e076, #D4AF37, #b38b2c);
+    background-size: 300% 300%;
+    border-radius: 26px; /* Ajuste para coincidir com o border-radius do cartao-vidro (24px) + 2px */
+    z-index: -1;
+    animation: bordaGradiente 6s ease infinite;
+}
+
+/* Animação de brilho pulsante */
+@keyframes brilhoSaudacao {
+    0% {
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.8), 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Animação do gradiente na borda */
+@keyframes bordaGradiente {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Pequeno detalhe: uma estrela ou brilho no canto (opcional) */
+.cartao-saudacao::after {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -5px;
+    font-size: 20px;
+    color: #D4AF37;
+    opacity: 0.7;
+    animation: girarEstrela 4s linear infinite;
+    filter: drop-shadow(0 0 5px gold);
+}
+
+@keyframes girarEstrela {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#mensagem-clima {
+    font-style: italic;
+    border-left: 3px solid var(--cor-primaria);
+}
+
+/* ==========================================
+   CARTÃO DO CLIMA - COM ANIMAÇÃO ESPECIAL
+========================================== */
+.cartao-clima {
+    position: relative;
+    background: linear-gradient(145deg, rgba(52, 152, 219, 0.1), rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: brilhoClima 3s infinite alternate ease-in-out;
+}
+
+/* Borda gradiente com cores que remetem ao clima (azul, dourado, branco) */
+.cartao-clima::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #3498db, #f1c40f, #3498db, #b0e0e6);
+    background-size: 300% 300%;
+    border-radius: 26px;
+    z-index: -1;
+    animation: bordaClima 6s ease infinite;
+}
+
+/* Animação de brilho pulsante */
+@keyframes brilhoClima {
+    0% {
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(52, 152, 219, 0.6), 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Animação do gradiente na borda */
+@keyframes bordaClima {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Ícone decorativo (agora um elemento real) */
+.icone-clima {
+    position: absolute;
+    top: -12px;
+    left: -8px;
+    font-size: 26px;
+    color: #f1c40f;
+    opacity: 0.9;
+    animation: flutuarClima 4s infinite alternate ease-in-out;
+    filter: drop-shadow(0 0 5px #f1c40f);
+    z-index: 2;
+    pointer-events: none; /* para não interferir em cliques */
+}
+
+@keyframes flutuarClima {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+        transform: translate(5px, 5px) rotate(10deg);
+    }
+}
+
+/* Garantir que a mensagem fique em preto */
+.cartao-clima #texto-mensagem-clima {
+    color: #000000;
+    position: relative;
+    z-index: 1;
 }

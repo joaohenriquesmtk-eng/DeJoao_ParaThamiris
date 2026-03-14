@@ -26,9 +26,11 @@
                         00d 00h 00m 00s
                     </div>
                 </div>
-                <div class="cartao-vidro" style="text-align: center; margin-top: 5px;">
-    <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: var(--cor-primaria);"></p>
+
+<div class="cartao-vidro cartao-saudacao" style="text-align: center; margin-top: 5px;">
+    <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: #000000;"></p>
 </div>
+
                 <div class="particulas">
     <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
     <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
@@ -92,6 +94,13 @@
                         </div>
                     </div>
                 </div>
+
+<!-- Mensagem personalizada baseada no clima de Goiânia -->
+<div class="cartao-vidro cartao-clima" id="mensagem-clima" style="text-align: center; margin-top: 15px;">
+    <span class="icone-clima" id="icone-clima">⛅</span>
+    <p id="texto-mensagem-clima">🌤️ Carregando mensagem do clima...</p>
+</div>
+
                 <!-- NOVO: Botão de Mensagem Surpresa -->
                     <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
                         <button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 12px 20px;">✨ Mensagem Surpresa</button>
@@ -121,7 +130,6 @@
                 <!-- Áudio ambiente -->
 <audio id="audio-jogos" loop preload="auto">
     <source src="assets/ambient.mp3" type="audio/mpeg">
-    Seu navegador não suporta áudio.
 </audio>
 
 <!-- Botão de mute -->
@@ -155,6 +163,10 @@
         <p>Julgamento da Safra</p>
     </div>
 </div>
+
+<!-- Botão de mute na tela Jogos (fora dos jogos) -->
+                <button id="btn-mute-jogos-tela" class="btn-mute-jogo" onclick="toggleMuteJogos()" title="Ativar/desativar música">🔊</button>
+
 
 <!-- TRIBUNAL DO AFETO -->
 <div id="container-tribunal" class="escondido">

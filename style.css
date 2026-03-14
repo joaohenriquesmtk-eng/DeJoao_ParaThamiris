@@ -777,8 +777,11 @@ body.modo-jogo-ativo .tela {
 .toast {
     position: fixed;
     bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: fit-content;
+    max-width: 90vw;
     background: rgba(0, 0, 0, 0.8);
     color: var(--cor-primaria);
     padding: 12px 24px;
@@ -795,10 +798,22 @@ body.modo-jogo-ativo .tela {
 }
 
 @keyframes fadeInOut {
-    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-    85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    15% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    85% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
 }
 
 /* Botão Mensagem Surpresa */

@@ -7,14 +7,6 @@ const urlsParaCache = [
   '/style.css',
   '/script.js',
   '/manifest.json',
-  '/minifazenda_novo.js',
-  '/tribunal.js',
-  '/julgamento.js',
-  // Adicione aqui outros arquivos importantes (imagens, ícones, sons)
-  // '/assets/icone.png',
-  // '/assets/ambient.mp3',
-  // '/assets/sons/acerto.mp3',
-  // '/assets/sons/nivel.mp3',
 ];
 
 // Instalação: faz cache dos arquivos essenciais
@@ -77,4 +69,10 @@ self.addEventListener('fetch', event => {
         });
     })
   );
+});
+
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });

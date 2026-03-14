@@ -1412,37 +1412,73 @@ function registrarServiceWorker() {
         navigator.serviceWorker.register('./sw.js')
             .then(reg => {
                 console.log('Service Worker registrado!', reg);
+                mostrarToast('✅ Service Worker ativo!'); // Feedback visual
 
                 reg.addEventListener('updatefound', () => {
                     const novoSW = reg.installing;
                     console.log('Nova versão do Service Worker encontrada!');
-
                     novoSW.addEventListener('statechange', () => {
                         if (novoSW.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('Nova versão instalada. Atualize a página para usar.');
                             mostrarToast('🔄 Nova versão disponível! Feche e abra o app novamente.');
                         }
                     });
                 });
             })
-            .catch(err => console.log('Erro ao registrar Service Worker:', err));
+            .catch(err => {
+                console.error('Erro ao registrar Service Worker:', err);
+                mostrarToast('❌ Erro ao registrar Service Worker: ' + err.message);
+            });
+    } else {
+        mostrarToast('❌ Service Worker não suportado neste navegador.');
     }
 }
 
-// ========== VERIFICAÇÃO DE ATUALIZAÇÃO ==========
+// ========== VERIFICAÇÃO DE ATUALIZAÇÃO (VERSÃO ROBUSTA) ==========
 function verificarAtualizacao() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(reg => {
-            reg.update();
-            mostrarToast('🔍 Verificando atualizações...');
-            console.log('Verificação de atualização solicitada.');
-        }).catch(err => {
-            console.error('Erro ao verificar atualização:', err);
-            mostrarToast('❌ Erro ao verificar.');
-        });
-    } else {
-        mostrarToast('❌ Service Worker não suportado.');
+    mostrarToast('🔍 Verificando atualizações...');
+
+    if (!('serviceWorker' in navigator)) {
+        mostrarToast('❌ Service Worker não suportado neste navegador.');
+        return;
     }
+
+    navigator.serviceWorker.getRegistration().then(reg => {
+        if (!reg) {
+            // Não há Service Worker registrado – tenta registrar agora
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => {
+                    mostrarToast('✅ Service Worker registrado. Recarregue a página.');
+                })
+                .catch(err => {
+                    console.error('Erro ao registrar:', err);
+                    mostrarToast('❌ Erro ao registrar: ' + err.message);
+                });
+            return;
+        }
+
+        // Força a verificação de atualização
+        reg.update()
+            .then(() => {
+                if (reg.installing) {
+                    reg.installing.addEventListener('statechange', function () {
+                        if (this.state === 'installed' && navigator.serviceWorker.controller) {
+                            mostrarToast('🔄 Nova versão disponível! Feche e reabra o app.');
+                        }
+                    });
+                } else if (reg.waiting) {
+                    // Ativa o novo Service Worker imediatamente
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    mostrarToast('🔄 Nova versão disponível! Aplicando...');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    mostrarToast('✅ Você já está na versão mais recente.');
+                }
+            })
+            .catch(err => {
+                console.error('Erro ao atualizar:', err);
+                mostrarToast('❌ Erro ao verificar atualização.');
+            });
+    });
 }
 
 
@@ -1471,5 +1507,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     registrarServiceWorker();
+    // Dentro do window.addEventListener('DOMContentLoaded', () => { ... });
+
+const btnVerificar = document.getElementById('btn-verificar-atualizacao');
+if (btnVerificar) {
+    btnVerificar.addEventListener('click', verificarAtualizacao);
+}
 });
 }

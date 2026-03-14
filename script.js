@@ -2,10 +2,8 @@
 // SANTUÁRIO - O MOTOR DIGITAL
 // ==========================================
 
-// Proteção contra múltiplas execuções (caso ainda haja duplicata)
 if (window.__SANTUARIO_SCRIPT_CARREGADO) {
   console.warn('Script já carregado. Ignorando segunda execução.');
-  // Não faz nada
 } else {
   window.__SANTUARIO_SCRIPT_CARREGADO = true;
 
@@ -13,31 +11,60 @@ const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
 // --- SISTEMA DE IDENTIDADE PERSISTENTE ---
 const urlParams = new URLSearchParams(window.location.search);
-let userParam = urlParams.get('user');
-
-// Se acessou com ?user=, salva na memória profunda do celular
-if (userParam) {
+let userParam = urlParams.get('user');if (userParam) {
     localStorage.setItem('santuario_user_id', userParam);
 }
 
-// Recupera a identidade. Se não houver, assume que é o celular da Thamiris
+const usuarioLogado = localStorage.getItem('santuario_user_id') || 'thamiris';
+const souJoao = usuarioLogado === 'joao';
+const MEU_NOME = souJoao ? "João" : "Thamiris";
+const NOME_PARCEIRO = souJoao ? "Thamiris" : "João";
 
-//
-
-// --- PREPARAÇÃO PARA O FIREBASE (META-ATUALIZAÇÕES FUTURAS) ---
-window.SantuarioDB = {
+// ==========================================
+// SISTEMA PARA O PULSO (usa Firebase)
+// ==========================================
+window.SantuarioApp = {
     inicializado: false,
+    modulos: null,
     conectar: function() {
-        // O código de conexão em tempo real entrará aqui futuramente
-        console.log("Infraestrutura de nuvem pronta para ativação.");
+        if (!this.inicializado || !this.modulos) return;
+        const { db, ref, onValue } = this.modulos;
+        console.log("Satélite do Santuário Conectado!");
+
+        const refPulsoParceiro = ref(db, 'pulsos/' + NOME_PARCEIRO.toLowerCase());
+        onValue(refPulsoParceiro, (snapshot) => {
+            const dados = snapshot.val();
+            if (dados && dados.timestamp > window.ultimoPulsoRecebido) {
+                window.ultimoPulsoRecebido = dados.timestamp;
+                receberPulsoVisual();
+            }
+        });
+
+        const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+        const refContadorParceiro = ref(db, 'pulsosContador/' + NOME_PARCEIRO.toLowerCase() + '/' + hoje);
+        onValue(refContadorParceiro, (snapshot) => {
+            const contador = snapshot.val() || 0;
+            atualizarContadorInterface(contador);
+        });
+
+        const refJardim = ref(db, 'jardim_global');
+        onValue(refJardim, (snapshot) => {
+            if (snapshot.exists()) {
+                statusPlanta = snapshot.val();
+                renderizarPlanta();
+            } else {
+                statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
+                renderizarPlanta();
+            }
+        });
     }
 };
 // ==========================================
 
 let statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
-let audioJogosMuted = localStorage.getItem('audio_jogos_muted') === 'true'; // false por padrão
-let telaAtual = 'home'; // começa na home
+let audioJogosMuted = localStorage.getItem('audio_jogos_muted') === 'true';
+let telaAtual = 'home';
 
 // 1. MOTOR DO TEMPO
 function atualizarMotorDoTempo() {
@@ -521,69 +548,25 @@ const URL_SCRIPT_PULSO = "https://script.google.com/macros/s/AKfycbye-Um7962qfQh
 // ==========================================
 // MOTOR DE CONEXÃO EM TEMPO REAL (FIREBASE)
 // ==========================================
-window.ultimoPulsoRecebido = Date.now(); // Impede que vibre com pulsos velhos ao abrir o app
-
-window.SantuarioDB.conectar = function() {
-    if (!window.SantuarioDB.inicializado) return;
-    const { db, ref, onValue } = window.SantuarioDB.modulos;
-
-    console.log("Satélite do Santuário Conectado!");
-
-    // 1. ESCUTAR O TOQUE À DISTÂNCIA DO PARCEIRO
-    const refPulsoParceiro = ref(db, 'pulsos/' + NOME_PARCEIRO.toLowerCase());
-    onValue(refPulsoParceiro, (snapshot) => {
-        const dados = snapshot.val();
-        if (dados && dados.timestamp > window.ultimoPulsoRecebido) {
-            window.ultimoPulsoRecebido = dados.timestamp;
-            receberPulsoVisual();
-        }
-    });
-
-    // 2. ESCUTAR O CONTADOR DIÁRIO DO PARCEIRO
-    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-    const refContadorParceiro = ref(db, 'pulsosContador/' + NOME_PARCEIRO.toLowerCase() + '/' + hoje);
-    onValue(refContadorParceiro, (snapshot) => {
-        const contador = snapshot.val() || 0;
-        atualizarContadorInterface(contador);
-    });
-
-    // 3. ESCUTAR O SOLO FÉRTIL GLOBAL
-    const refJardim = ref(db, 'jardim_global');
-    onValue(refJardim, (snapshot) => {
-        if (snapshot.exists()) {
-            statusPlanta = snapshot.val();
-            renderizarPlanta();
-        } else {
-            statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
-            renderizarPlanta();
-        }
-    });
-};
-
 // ==========================================
-// FUNÇÃO 1: ENVIAR O TOQUE À DISTÂNCIA
+// FUNÇÕES DO PULSO E JARDIM (CORRIGIDAS)
 // ==========================================
+window.ultimoPulsoRecebido = Date.now();
+
 function enviarPulso() {
-    if (!window.SantuarioDB.inicializado) {
+    if (!window.SantuarioApp.inicializado) {
         mostrarToast("Conectando ao satélite... tente novamente em instantes.");
         return;
     }
-    const { db, ref, set, runTransaction } = window.SantuarioDB.modulos;
+    const { db, ref, set, runTransaction } = window.SantuarioApp.modulos;
     
-    // 1. Registra o timestamp (para a vibração/toast do outro)
     const refMeuPulso = ref(db, 'pulsos/' + MEU_NOME.toLowerCase());
     set(refMeuPulso, { timestamp: Date.now() });
 
-    // 2. Incrementa o contador diário (para a contagem visual)
-    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-'); // formato DD-MM-YYYY
+    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     const refMeuContador = ref(db, 'pulsosContador/' + MEU_NOME.toLowerCase() + '/' + hoje);
+    runTransaction(refMeuContador, (valorAtual) => (valorAtual || 0) + 1);
 
-    // Usa transação para garantir que o contador seja incrementado com segurança
-    runTransaction(refMeuContador, (valorAtual) => {
-        return (valorAtual || 0) + 1;
-    });
-
-    // Efeito visual no seu próprio celular
     const btn = document.getElementById("btn-pulso");
     const icone = document.getElementById("icone-semente");
     const feedback = document.getElementById("msg-feedback");
@@ -601,19 +584,16 @@ function enviarPulso() {
         if (icone) icone.innerText = "🌱";
         if (btn) btn.classList.remove("germinar");
         if (feedback) feedback.classList.remove("visivel");
-        // Não resetamos o txtContador aqui, pois ele será atualizado pelo listener
     }, 2500);
 }
 
 function receberPulsoVisual() {
-    // A API de Vibração faz o celular pulsar (Curto, Pausa, Longo) = Batimento Cardíaco
     if (navigator.vibrate) {
         navigator.vibrate([100, 50, 400]);
     }
 
     mostrarToast(`💓 ${NOME_PARCEIRO} está pensando em você agora!`);
 
-    // Faz o botão da home dela brilhar intensamente em vermelho/dourado
     const btn = document.getElementById("btn-pulso");
     if (btn) {
         btn.style.transition = "all 0.3s";
@@ -623,13 +603,10 @@ function receberPulsoVisual() {
         setTimeout(() => {
             btn.style.boxShadow = "";
             btn.style.borderColor = "";
-        }, 4000); // Fica brilhando por 4 segundos
+        }, 4000);
     }
 }
 
-// ==========================================
-// ATUALIZAR CONTADOR VISUAL DE PULSOS
-// ==========================================
 function atualizarContadorInterface(quantidade) {
     const elemento = document.getElementById("contador-pulso");
     if (!elemento) return;
@@ -639,40 +616,34 @@ function atualizarContadorInterface(quantidade) {
         ? `💖 ${nome} pensou em você ${quantidade} ${quantidade === 1 ? 'vez' : 'vezes'} hoje`
         : `💭 ${nome} ainda não enviou um sinal hoje`;
 
-    // Se o texto mudou, aplica uma animação suave
     if (elemento.innerText !== texto) {
         elemento.style.transition = 'transform 0.2s, color 0.2s';
         elemento.style.transform = 'scale(1.05)';
-        elemento.style.color = '#e84342'; // um vermelho suave/romântico
+        elemento.style.color = '#e84342';
         setTimeout(() => {
             elemento.style.transform = 'scale(1)';
-            elemento.style.color = ''; // volta à cor original do CSS
+            elemento.style.color = '';
         }, 200);
     }
 
     elemento.innerText = texto;
 }
 
-// ==========================================
-// FUNÇÃO 2: SOLO FÉRTIL SINCRONIZADO
-// ==========================================
 function regarPlanta() {
-    if (!window.SantuarioDB.inicializado) {
+    if (!window.SantuarioApp.inicializado) {
         mostrarToast("Aguardando conexão com a nuvem...");
         return;
     }
 
-    const { db, ref, get, set } = window.SantuarioDB.modulos;
+    const { db, ref, get, set } = window.SantuarioApp.modulos;
     const refJardim = ref(db, 'jardim_global');
 
-    // Vai na nuvem, pega o status atual da planta, atualiza e devolve pra nuvem
     get(refJardim).then((snapshot) => {
         let dados = snapshot.val() || { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
         
         const agora = new Date();
         const hoje = agora.toLocaleDateString('pt-BR');
 
-        // Impede que a mesma pessoa (ou a outra) regue no mesmo dia
         if (dados.diaUltimaRegada === hoje) {
             mostrarToast("A terra já está úmida hoje. Voltem amanhã! 🌱");
             return;
@@ -685,14 +656,13 @@ function regarPlanta() {
         if (dados.diaUltimaRegada === ontemStr) {
             dados.sequencia += 1;
         } else {
-            dados.sequencia = 1; // Quebrou a corrente, volta pro dia 1
+            dados.sequencia = 1;
         }
 
-        // REGRA DE PROGRESSO MAIS LONGO: Aumenta apenas 4% (Leva 25 dias para florescer)
-        dados.nivel += 4; 
+        dados.nivel += 4;
         if (dados.nivel >= 100) {
             dados.ciclos += 1;
-            dados.nivel = 0; // Renasce
+            dados.nivel = 0;
             mostrarToast(`🌸 CICLO COMPLETO! O amor de vocês atingiu um novo nível!`);
         } else {
             mostrarToast(`💦 Planta regada por ${MEU_NOME}!`);
@@ -701,7 +671,6 @@ function regarPlanta() {
         dados.diaUltimaRegada = hoje;
         dados.ultimaRegada = agora.getTime();
 
-        // Envia os novos dados para a nuvem (o celular do outro atualizará instantaneamente)
         set(refJardim, dados);
     });
 }
@@ -1035,7 +1004,9 @@ function fecharModal() {
     document.getElementById('corpo-modal').innerHTML = '';
 }
 
+// ==========================================
 // 8. HUB DE JOGOS & SINCRONIA
+// ==========================================
 function abrirJogo(tipo) {
     document.querySelector('nav.menu-inferior').classList.add('escondido');
     document.getElementById('menu-jogos').classList.add('escondido');
@@ -1214,7 +1185,7 @@ const assinatura = document.createElement('div');
     }
 }
 
-// 10. DINÂMICA DA HOME E INICIALIZAÇÃO
+// 10. DINÂMICA DA HOME
 function atualizarDinamicaHome() {
     const elStreak = document.getElementById("streak-jardim");
     const elAtalhoCofre = document.getElementById("atalho-cofre");
@@ -1410,7 +1381,7 @@ function registrarServiceWorker() {
         navigator.serviceWorker.register('./sw.js')
             .then(reg => {
                 console.log('Service Worker registrado!', reg);
-                mostrarToast('✅ Service Worker ativo!'); // Feedback visual
+                mostrarToast('✅ Service Worker ativo!');
 
                 reg.addEventListener('updatefound', () => {
                     const novoSW = reg.installing;
@@ -1431,7 +1402,7 @@ function registrarServiceWorker() {
     }
 }
 
-// ========== VERIFICAÇÃO DE ATUALIZAÇÃO (VERSÃO ROBUSTA) ==========
+// ========== VERIFICAÇÃO DE ATUALIZAÇÃO ==========
 function verificarAtualizacao() {
     mostrarToast('🔍 Verificando atualizações...');
 
@@ -1442,7 +1413,6 @@ function verificarAtualizacao() {
 
     navigator.serviceWorker.getRegistration().then(reg => {
         if (!reg) {
-            // Não há Service Worker registrado – tenta registrar agora
             navigator.serviceWorker.register('./sw.js')
                 .then(() => {
                     mostrarToast('✅ Service Worker registrado. Recarregue a página.');
@@ -1454,7 +1424,6 @@ function verificarAtualizacao() {
             return;
         }
 
-        // Força a verificação de atualização
         reg.update()
             .then(() => {
                 if (reg.installing) {
@@ -1464,7 +1433,6 @@ function verificarAtualizacao() {
                         }
                     });
                 } else if (reg.waiting) {
-                    // Ativa o novo Service Worker imediatamente
                     reg.waiting.postMessage({ type: 'SKIP_WAITING' });
                     mostrarToast('🔄 Nova versão disponível! Aplicando...');
                     setTimeout(() => window.location.reload(), 1000);
@@ -1505,11 +1473,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     registrarServiceWorker();
-    // Dentro do window.addEventListener('DOMContentLoaded', () => { ... });
 
-const btnVerificar = document.getElementById('btn-verificar-atualizacao');
-if (btnVerificar) {
-    btnVerificar.addEventListener('click', verificarAtualizacao);
-}
+    const btnVerificar = document.getElementById('btn-verificar-atualizacao');
+    if (btnVerificar) {
+        btnVerificar.addEventListener('click', verificarAtualizacao);
+    }
 });
 }

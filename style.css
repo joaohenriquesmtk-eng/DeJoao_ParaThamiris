@@ -794,7 +794,9 @@ body.modo-jogo-ativo .tela {
     animation: fadeInOut 2s ease forwards;
     pointer-events: none;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;      /* ← permite quebrar linha */
+    word-wrap: break-word;    /* ← quebra palavras longas */
+    line-height: 1.4;         /* ← espaçamento entre linhas */
 }
 
 @keyframes fadeInOut {

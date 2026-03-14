@@ -643,11 +643,11 @@ function atualizarSaudacao() {
     const hora = agora.getHours();
     let saudacao = '';
 
-    if (hora >= 5 && hora < 12) {
+    if (hora >= 6 && hora < 12) {
         saudacao = 'Bom dia, meu amor! 🌞';
     } else if (hora >= 12 && hora < 18) {
         saudacao = 'Boa tarde, princesa! ☀️';
-    } else if (hora >= 18 && hora < 22) {
+    } else if (hora >= 18 && hora < 24) {
         saudacao = 'Boa noite, meu céu! 🌙';
     } else {
         saudacao = 'Já é madrugada... sonhando com você? 🌜';
@@ -959,15 +959,17 @@ function abrirJogo(tipo) {
         }
     }
     document.body.classList.add('modo-jogo-ativo');
+    document.body.classList.add('jogo-aberto'); // <-- NOVA LINHA
 }
 
 function voltarMenuJogos() {
     document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
     document.getElementById('menu-jogos').classList.remove('escondido');
     document.querySelector('nav.menu-inferior').classList.remove('escondido');
-    document.getElementById('header-jogos-main').classList.remove('escondido'); // Volta o Header Jogos
-    atualizarDinamicaHome(); // Fix da persistência dos badges
+    document.getElementById('header-jogos-main').classList.remove('escondido');
+    atualizarDinamicaHome();
     document.body.classList.remove('modo-jogo-ativo');
+    document.body.classList.remove('jogo-aberto'); // <-- NOVA LINHA
 }
 
 const perguntasSincronia = [
@@ -1289,15 +1291,8 @@ function playAudioJogos() {
         audioJogos.volume = 0.2;
         audioJogos.muted = audioJogosMuted;
     }
-    // Só toca se estiver pausado
     if (audioJogos.paused) {
         audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));
-    }
-    // Mostra o botão de mute
-    const btn = document.getElementById('btn-mute-jogos');
-    if (btn) {
-        btn.classList.remove('escondido');
-        btn.innerText = audioJogosMuted ? '🔇' : '🔊';
     }
 }
 
@@ -1305,9 +1300,6 @@ function pauseAudioJogos() {
     if (audioJogos && !audioJogos.paused) {
         audioJogos.pause();
     }
-    // Esconde o botão de mute
-    const btn = document.getElementById('btn-mute-jogos');
-    if (btn) btn.classList.add('escondido');
 }
 
 // Boot do Sistema
@@ -1324,6 +1316,8 @@ window.addEventListener('DOMContentLoaded', () => {
     atualizarSaudacao();
     setInterval(atualizarSaudacao, 60000); // atualiza a cada minuto
     document.getElementById('btn-mute-jogos')?.addEventListener('click', toggleMuteJogos);
+    atualizarBotoesMute();
+
 
     // Inicializa a mensagem surpresa diária
     inicializarSurpresaDiaria();

@@ -869,7 +869,7 @@ body {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 75px); /* Ajuste para caber melhor */
+    max-height: calc(100vh - 30px); /* Ajuste para caber melhor */
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -2479,4 +2479,35 @@ body.modo-jogo-ativo .tela {
 }
 body.modo-jogo-ativo .btn-mute {
     bottom: 20px; /* você pode mudar para 30px se quiser mais acima */
+}
+
+/* Botão de mute dentro dos jogos (igual ao botão de informação) */
+.btn-mute-jogo {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.btn-mute-jogo:active {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+/* Botão global de mute visível apenas fora dos jogos */
+body:not(.jogo-aberto) #btn-mute-jogos {
+    display: flex;
+}
+body.jogo-aberto #btn-mute-jogos {
+    display: none;
 }

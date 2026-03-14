@@ -76,33 +76,25 @@ function configurarNavegacao() {
             evento.preventDefault();
             const telaAlvo = botao.getAttribute('data-alvo');
             
-            // Se a tela alvo for a mesma que a atual, não faz nada (opcional)
             if (telaAlvo === telaAtual) return;
 
-            // Guarda a tela anterior
             const telaAnterior = telaAtual;
 
-            // Atualiza o menu ativo
             botoesMenu.forEach(b => b.classList.remove('ativo'));
             botao.classList.add('ativo');
 
-            // Esconde todas as telas e mostra a nova
             todasAsTelas.forEach(tela => tela.classList.add('escondido'));
             const elementoTela = document.getElementById(telaAlvo);
             if (elementoTela) elementoTela.classList.remove('escondido');
 
-            // Atualiza a tela atual
             telaAtual = telaAlvo;
 
-            // Controle da música ambiente
-            // Controle da música ambiente
-if (telaAlvo === 'jogos') {
-    playAudioJogos();        // entrou na tela de jogos → toca música
-} else if (telaAnterior === 'jogos') {
-    pauseAudioJogos();       // saiu da tela de jogos → para música
-}
+            if (telaAlvo === 'jogos') {
+                playAudioJogos();
+            } else if (telaAnterior === 'jogos') {
+                pauseAudioJogos();
+            }
 
-            // Força a atualização dos badges na home (já existia)
             atualizarDinamicaHome();
         });
     });
@@ -125,15 +117,13 @@ function salvarEstadoTermo() {
 function inicializarTermo() {
     const tabuleiro = document.getElementById("tabuleiro-termo");
     if (!tabuleiro) return;
-    tabuleiro.innerHTML = ""; // Limpa antes de montar
+    tabuleiro.innerHTML = "";
 
     const hoje = new Date().toLocaleDateString('pt-BR');
     const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
 
-    // Se já ganhou hoje, trava a tela com a palavra correta
     if (ganhouHoje) {
         const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-        // Cria as 6 linhas
         for (let i = 0; i < 6; i++) {
             let linha = document.createElement("div");
             linha.className = "linha-termo";
@@ -146,21 +136,18 @@ function inicializarTermo() {
             tabuleiro.appendChild(linha);
         }
 
-        // Esconde teclado e botão
         document.getElementById("teclado-termo").innerHTML = "";
         document.getElementById("btn-verificar").classList.add("escondido");
 
-        // Modifica as instruções para mensagem de vitória
         const inst = document.getElementById('instrucoes-termo');
         inst.innerHTML = `<h4 style="text-align:center; color: var(--cor-agronomia);">Vitória Colhida! 🌱</h4>
                           <p style="text-align:center;">Volte amanhã para colher uma nova palavra e liberar mais relíquias.</p>`;
         inst.classList.remove('escondido');
 
-        tentativaAtual = 6; // Trava o jogo
+        tentativaAtual = 6;
         return;
     }
 
-    // Fluxo normal se ainda não jogou/ganhou hoje
     tentativaAtual = 0;
     letraAtual = 0;
     grade = ["", "", "", "", "", ""];
@@ -182,10 +169,8 @@ function inicializarTermo() {
 
     gerarTeclado();
 
-    // Configura o botão Verificar
     const btnVerificar = document.getElementById('btn-verificar');
     if (btnVerificar) {
-        // Remove listeners antigos para não duplicar
         const novoBtn = btnVerificar.cloneNode(true);
         btnVerificar.parentNode.replaceChild(novoBtn, btnVerificar);
         novoBtn.addEventListener('click', verificarPalavra);
@@ -273,30 +258,22 @@ function finalizarVitoria() {
     const hoje = new Date().toLocaleDateString('pt-BR');
     localStorage.setItem('santuario_vitoria_dia', hoje);
     mostrarToast("Incrível! Você colheu a vitória! 🌱");
-    inicializarTermo(); // Chama a função para travar a tela
+    inicializarTermo();
     liberarCofreVisual();
     atualizarDinamicaHome();
     document.getElementById('tabuleiro-termo').classList.add('vitoria');
 }
 
-// Reinicia o jogo Termo para uma nova tentativa (quando o jogador perdeu)
 function resetarTermo() {
-    // Se já venceu hoje, não permite reset (o botão não deveria estar visível, mas segurança)
     const hoje = new Date().toLocaleDateString('pt-BR');
     sessionStorage.removeItem('termo_estado');
     if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
         return;
     }
-
-    // Reinicia as variáveis de controle
     tentativaAtual = 0;
     letraAtual = 0;
     grade = ["", "", "", "", "", ""];
-
-    // Reconstrói o tabuleiro do zero
     inicializarTermo();
-
-    // Esconde o botão de reset novamente
     const resetContainer = document.getElementById('termo-reset-container');
     if (resetContainer) {
         resetContainer.classList.add('escondido');
@@ -312,7 +289,6 @@ function restaurarEstadoTermo() {
             letraAtual = estado.letraAtual;
             grade = estado.grade;
 
-            // Preenche o tabuleiro com as letras já inseridas
             for (let i = 0; i <= tentativaAtual; i++) {
                 for (let j = 0; j < 5; j++) {
                     const quadrado = document.getElementById(`q-${i}-${j}`);
@@ -331,7 +307,6 @@ function restaurarEstadoTermo() {
         } catch (e) {
             console.warn('Estado do Termo corrompido. Ignorando...');
             sessionStorage.removeItem('termo_estado');
-            // Não faz nada, o jogo começará do zero
         }
     }
 }
@@ -386,7 +361,7 @@ function obterEmojiClima(condicao, sunrise, sunset) {
             break;
         case 'Thunderstorm':
             emoji = '⛈️';
-            classe = 'emoji-tempestade'; // pode criar depois
+            classe = 'emoji-tempestade';
             break;
         default:
             emoji = '🌡️';
@@ -463,13 +438,11 @@ function atualizarJardim() {
     }
 
     if (salvo) {
-        // Se o objeto salvo não tiver o campo 'ultimaVerificacao', adiciona com a data atual
         if (salvo.ultimaVerificacao === undefined) {
             salvo.ultimaVerificacao = Date.now();
         }
         statusPlanta = salvo;
     } else {
-        // Primeira vez que o app é aberto ou dados corrompidos
         statusPlanta = {
             nivel: 0,
             ultimaRegada: 0,
@@ -482,31 +455,24 @@ function atualizarJardim() {
     }
 
     const agora = Date.now();
-    const umDia = 24 * 60 * 60 * 1000; // milissegundos em um dia
+    const umDia = 24 * 60 * 60 * 1000;
 
-    // Se já regou alguma vez, verifica quantos dias se passaram desde a última verificação
     if (statusPlanta.ultimaRegada > 0) {
         const diasDesdeUltimaVerificacao = Math.floor((agora - statusPlanta.ultimaVerificacao) / umDia);
         if (diasDesdeUltimaVerificacao >= 1) {
-            // Perde 10% por dia completo sem regar (não pode ficar negativo)
             const perda = diasDesdeUltimaVerificacao * 10;
             statusPlanta.nivel = Math.max(0, statusPlanta.nivel - perda);
-            // Atualiza a última verificação para agora (já contabilizou esses dias)
             statusPlanta.ultimaVerificacao = agora;
         }
     } else {
-        // Nunca regou, apenas atualiza a verificação
         statusPlanta.ultimaVerificacao = agora;
     }
 
-    // Salva as alterações no localStorage
     localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
 
-    // Atualiza a tela
     renderizarPlanta();
     atualizarDinamicaHome();
 
-    // Verifica se já regou hoje e, se não, lembra com um toast
     const hoje = new Date().toLocaleDateString('pt-BR');
     if (statusPlanta.diaUltimaRegada !== hoje) {
         setTimeout(() => {
@@ -519,13 +485,11 @@ function regarPlanta() {
     const agora = new Date();
     const hoje = agora.toLocaleDateString('pt-BR');
 
-    // Verifica se já regou hoje
     if (statusPlanta.diaUltimaRegada === hoje) {
         mostrarToast("O solo já está úmido o suficiente por hoje! Volte amanhã. 🌱");
         return;
     }
 
-    // Calcula a sequência (streak) de dias seguidos
     const ontem = new Date();
     ontem.setDate(agora.getDate() - 1);
     const ontemStr = ontem.toLocaleDateString('pt-BR');
@@ -536,41 +500,30 @@ function regarPlanta() {
         statusPlanta.sequencia = 1;
     }
 
-    // Aumenta o nível em 10%, limitado a 100
     const nivelAntes = statusPlanta.nivel;
     let novoNivel = statusPlanta.nivel + 10;
-
-    // Verifica se ultrapassou 100% (para garantir que não passe)
     if (novoNivel > 100) {
         novoNivel = 100;
     }
-
-    // Define o novo nível
     statusPlanta.nivel = novoNivel;
 
-    // Atualiza timestamps
     statusPlanta.ultimaRegada = agora.getTime();
     statusPlanta.diaUltimaRegada = hoje;
-    statusPlanta.ultimaVerificacao = agora.getTime(); // importante para resetar a contagem de perda
+    statusPlanta.ultimaVerificacao = agora.getTime();
 
-    // Salva no localStorage
     localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
 
-    // Animação do emoji
     const emoji = document.getElementById("emoji-planta");
     if (emoji) {
         emoji.style.transform = "scale(1.2)";
         setTimeout(() => emoji.style.transform = "scale(1)", 300);
     }
 
-    // Verifica se acabou de atingir 100% (nivelAntes < 100 e nivel agora é 100)
     if (statusPlanta.nivel === 100 && nivelAntes < 100) {
-        // Incrementa o contador de ciclos
         statusPlanta.ciclos = (statusPlanta.ciclos || 0) + 1;
 
         mostrarToast(`🎉 PARABÉNS! Você completou ${statusPlanta.ciclos} ciclo(s)! A planta vai renascer.`);
 
-        // Aplica efeito visual de renascimento
         if (emoji) {
             emoji.classList.add("renascer");
             setTimeout(() => {
@@ -578,10 +531,7 @@ function regarPlanta() {
             }, 1000);
         }
 
-        // Reinicia a planta
         statusPlanta.nivel = 0;
-
-        // Salva novamente após reiniciar
         localStorage.setItem('statusPlanta_v2', JSON.stringify(statusPlanta));
 
         renderizarPlanta();
@@ -592,7 +542,6 @@ function regarPlanta() {
         }, 500);
     }
 
-    // Atualiza a tela (sempre, mesmo se não reiniciou)
     renderizarPlanta();
     atualizarDinamicaHome();
 }
@@ -841,26 +790,26 @@ const BIBLIOTECA_RELIQUIAS = {
     ]
 };
 
+// Por economia de espaço, mantive o conteúdo completo no seu código original. 
+// Certifique-se de que as listas estejam intactas. Aqui vou omitir para não repetir, mas você deve manter as listas originais.
+
 function abrirReliquia(event, tipo) {
     if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
         mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
         return;
     }
     event.currentTarget
-    // Adiciona animação de "abrir baú" ao ícone clicado
-const iconeClicado = event.currentTarget.querySelector('.icone-reliquia');
-if (iconeClicado) {
-    iconeClicado.classList.add('abrindo-bau');
-    setTimeout(() => {
-        iconeClicado.classList.remove('abrindo-bau');
-    }, 300);
-}
+    const iconeClicado = event.currentTarget.querySelector('.icone-reliquia');
+    if (iconeClicado) {
+        iconeClicado.classList.add('abrindo-bau');
+        setTimeout(() => {
+            iconeClicado.classList.remove('abrindo-bau');
+        }, 300);
+    }
     const modal = document.getElementById('modal-reliquia');
     const corpo = document.getElementById('corpo-modal');
     if (!modal || !corpo) return;
 
-    // LÓGICA DE ESCALABILIDADE 2026
-    // Usamos o dia do ano para garantir que cada dia tenha uma combinação diferente
     const agora = new Date();
     const inicioAno = new Date(agora.getFullYear(), 0, 0);
     const diff = agora - inicioAno;
@@ -874,25 +823,23 @@ if (iconeClicado) {
             <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Sincronia de Almas</p>
             <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
     } else if (tipo === 'ceu') {
-    const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
-    corpo.innerHTML = `
-        <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
-        <div class="modal-ceu" id="modal-ceu-container">
-            <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
-            <p>"${textoCeu}"</p>
-        </div>`;
-
-    // Adiciona estrelas cadentes AQUI
-    const container = document.getElementById('modal-ceu-container');
-    for (let i = 0; i < 5; i++) {
-        const estrela = document.createElement('div');
-        estrela.className = 'estrela-cadente';
-        estrela.style.top = Math.random() * 100 + '%';
-        estrela.style.left = Math.random() * 100 + '%';
-        estrela.style.animationDelay = Math.random() * 2 + 's';
-        container.appendChild(estrela);
-    }
-} else if (tipo === 'cartas') {
+        const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
+        corpo.innerHTML = `
+            <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
+            <div class="modal-ceu" id="modal-ceu-container">
+                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
+                <p>"${textoCeu}"</p>
+            </div>`;
+        const container = document.getElementById('modal-ceu-container');
+        for (let i = 0; i < 5; i++) {
+            const estrela = document.createElement('div');
+            estrela.className = 'estrela-cadente';
+            estrela.style.top = Math.random() * 100 + '%';
+            estrela.style.left = Math.random() * 100 + '%';
+            estrela.style.animationDelay = Math.random() * 2 + 's';
+            container.appendChild(estrela);
+        }
+    } else if (tipo === 'cartas') {
         const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Semente Exclusiva</h3>
@@ -903,7 +850,7 @@ if (iconeClicado) {
                     <p style="font-family: 'Playfair Display', serif; color: var(--cor-primaria);">Com amor,<br>${NOME_PARCEIRO}</p>
                 </div>
             </div>`;
-} else if (tipo === 'encontro') {
+    } else if (tipo === 'encontro') {
         const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
         corpo.innerHTML = `
             <div class="bilhete-dourado">
@@ -921,7 +868,6 @@ if (iconeClicado) {
             </div>`;
     }
 
-    
     modal.classList.remove('escondido');
 }
 
@@ -959,7 +905,7 @@ function abrirJogo(tipo) {
         }
     }
     document.body.classList.add('modo-jogo-ativo');
-    document.body.classList.add('jogo-aberto'); // <-- NOVA LINHA
+    document.body.classList.add('jogo-aberto');
 }
 
 function voltarMenuJogos() {
@@ -969,7 +915,7 @@ function voltarMenuJogos() {
     document.getElementById('header-jogos-main').classList.remove('escondido');
     atualizarDinamicaHome();
     document.body.classList.remove('modo-jogo-ativo');
-    document.body.classList.remove('jogo-aberto'); // <-- NOVA LINHA
+    document.body.classList.remove('jogo-aberto');
 }
 
 const perguntasSincronia = [
@@ -1069,7 +1015,6 @@ async function carregarLeis() {
                 const cont = colunas[1].replace(/"/g, '').trim();
                 const par = colunas[2] ? colunas[2].replace(/"/g, '').trim() : "";
 
-                // Inserção das Divisões (Títulos)
                 if (art.includes("Art. 1º") || art.includes("Art. 1°")) {
                     container.innerHTML += `<div class="titulo-divisao">TÍTULO I<small>Dos Direitos Fundamentais</small></div>`;
                 } else if (art.includes("Art. 4º") || art.includes("Art. 4°")) {
@@ -1082,14 +1027,12 @@ async function carregarLeis() {
                 item.className = "item-lei";
                 item.innerHTML = `<span class="num-artigo">${art}</span><p>${cont}</p>${par ? `<small>§ Único: ${par}</small>` : ""}`;
                 
-                // Aplica delay baseado no índice (apenas para itens, não para títulos)
                 item.style.animationDelay = (index * 0.1) + 's';
                 
                 container.appendChild(item);
             }
         });
 
-        // Agora, após o loop, adicionamos a assinatura UMA ÚNICA vez
         const dataInicioObj = new Date(dataInicio);
         const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
         const dia = dataInicioObj.getDate();
@@ -1116,7 +1059,6 @@ function atualizarDinamicaHome() {
     const txtStreak = document.getElementById("texto-streak");
     const hoje = new Date().toLocaleDateString('pt-BR');
 
-    // Recupera dados frescos
     let dadosPlanta = { sequencia: 0 };
     const dadosSalvos = localStorage.getItem('statusPlanta_v2');
     if (dadosSalvos) {
@@ -1125,11 +1067,9 @@ function atualizarDinamicaHome() {
         } catch (e) {
             console.warn('Dados da planta corrompidos ao atualizar home. Ignorando...');
             localStorage.removeItem('statusPlanta_v2');
-            // dadosPlanta permanece com o valor padrão
         }
     }
 
-    // Remove ou adiciona a classe Escondido com base na realidade
     if (elStreak) {
         if (dadosPlanta.sequencia > 0) {
             elStreak.classList.remove("escondido");
@@ -1211,7 +1151,6 @@ function inicializarSurpresaDiaria() {
                 btn.style.cursor = 'pointer';
             }
         } catch (e) {
-            // Dados corrompidos: limpa e reseta
             console.warn('Dados da mensagem surpresa corrompidos. Resetando...');
             localStorage.removeItem(STORAGE_SURPRESA);
             paragrafo.innerText = '';
@@ -1235,7 +1174,6 @@ function mostrarMensagemSurpresa() {
 
     if (!btn || !paragrafo) return;
 
-    // Verifica se já usou hoje
     if (dadosSalvos) {
         try {
             const { data } = JSON.parse(dadosSalvos);
@@ -1244,14 +1182,11 @@ function mostrarMensagemSurpresa() {
                 return;
             }
         } catch (e) {
-            // Dados corrompidos: remove e permite gerar nova mensagem
             console.warn('Dados da mensagem surpresa corrompidos. Resetando...');
             localStorage.removeItem(STORAGE_SURPRESA);
-            // Não retorna, continua para gerar nova mensagem
         }
     }
 
-    // Se chegou aqui, pode gerar nova mensagem
     const todasMensagens = [
         ...BIBLIOTECA_RELIQUIAS.ceu,
         ...BIBLIOTECA_RELIQUIAS.sementes
@@ -1273,15 +1208,20 @@ function mostrarMensagemSurpresa() {
     btn.style.cursor = 'not-allowed';
 }
 
+// ========== FUNÇÕES DE ÁUDIO ==========
 function toggleMuteJogos() {
     if (!audioJogos) return;
     audioJogos.muted = !audioJogos.muted;
     audioJogosMuted = audioJogos.muted;
-    const btn = document.getElementById('btn-mute-jogos');
-    if (btn) {
-        btn.innerText = audioJogos.muted ? '🔇' : '🔊';
-    }
     localStorage.setItem('audio_jogos_muted', audioJogos.muted);
+    atualizarBotoesMute();
+}
+
+function atualizarBotoesMute() {
+    const botoes = document.querySelectorAll('#btn-mute-jogos, .btn-mute-jogo');
+    botoes.forEach(btn => {
+        btn.innerText = audioJogosMuted ? '🔇' : '🔊';
+    });
 }
 
 function playAudioJogos() {
@@ -1302,7 +1242,43 @@ function pauseAudioJogos() {
     }
 }
 
-// Boot do Sistema
+// ========== SERVICE WORKER E ATUALIZAÇÕES ==========
+function registrarServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => {
+                console.log('Service Worker registrado!', reg);
+
+                reg.addEventListener('updatefound', () => {
+                    const novoSW = reg.installing;
+                    console.log('Nova versão do Service Worker encontrada!');
+
+                    novoSW.addEventListener('statechange', () => {
+                        if (novoSW.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('Nova versão instalada. Atualize a página para usar.');
+                            mostrarToast('🔄 Nova versão disponível! Feche e abra o app novamente.');
+                        }
+                    });
+                });
+            })
+            .catch(err => console.log('Erro ao registrar Service Worker:', err));
+    }
+}
+
+function verificarAtualizacao() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+            reg.update();
+            mostrarToast('🔍 Verificando atualizações...');
+        });
+    } else {
+        mostrarToast('❌ Service Worker não suportado.');
+    }
+}
+
+// ==========================================
+// BOOT DO SISTEMA
+// ==========================================
 window.addEventListener('DOMContentLoaded', () => {
     atualizarJardim();
     setInterval(atualizarMotorDoTempo, 1000);
@@ -1314,17 +1290,17 @@ window.addEventListener('DOMContentLoaded', () => {
     atualizarClima();
     atualizarContadorVisual();
     atualizarSaudacao();
-    setInterval(atualizarSaudacao, 60000); // atualiza a cada minuto
+    setInterval(atualizarSaudacao, 60000);
+
     document.getElementById('btn-mute-jogos')?.addEventListener('click', toggleMuteJogos);
     atualizarBotoesMute();
 
-
-    // Inicializa a mensagem surpresa diária
     inicializarSurpresaDiaria();
 
-    // Configura o botão de mensagem surpresa
     const btnSurpresa = document.getElementById("btn-surpresa");
     if (btnSurpresa) {
         btnSurpresa.onclick = mostrarMensagemSurpresa;
     }
+
+    registrarServiceWorker();
 });

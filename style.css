@@ -2518,42 +2518,9 @@ body.jogo-aberto #btn-mute-jogos {
     display: none;
 }
 
-/* Adicione este bloco novo ao final do arquivo */
-#btn-mute-jogos-tela {
-    position: fixed;
-    bottom: calc(85px + env(safe-area-inset-bottom)); /* Fica logo acima da barra de menu */
-    right: 20px;
-    z-index: 1001;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: var(--cor-vidro);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--cor-primaria);
-    color: var(--cor-primaria);
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
 /* Ajuste para que o conteúdo da tela Leis não fique atrás do menu inferior */
 #leis {
     padding-bottom: calc(85px + 20px); /* 85px do menu + 20px extra */
-}
-
-/* Botão de mute na tela Jogos (menu) */
-#btn-mute-jogos-tela {
-    position: fixed;
-    bottom: calc(85px + env(safe-area-inset-bottom) + 10px); /* acima do menu */
-    right: 20px;
-    z-index: 1000;
-}
-
-/* Esconde o botão quando um jogo estiver aberto */
-body.jogo-aberto #btn-mute-jogos-tela {
-    display: none;
 }
 
 /* ==========================================
@@ -2705,4 +2672,41 @@ body.jogo-aberto #btn-mute-jogos-tela {
     color: #000000;
     position: relative;
     z-index: 1;
+}
+
+/* Botão de mute na tela Jogos (menu) */
+#btn-mute-jogos-tela {
+    position: fixed;
+    bottom: calc(85px + env(safe-area-inset-bottom) + 10px); /* acima do menu */
+    right: 20px;
+    z-index: 1000;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Esconde o botão quando um jogo estiver aberto */
+body.jogo-aberto #btn-mute-jogos-tela {
+    display: none;
+}
+
+/* Estilo para o contador de pulsos */
+#contador-pulso {
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--cor-primaria);
+    text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+    min-height: 24px; /* evita que a página "pule" quando o texto muda */
 }

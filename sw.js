@@ -1,5 +1,5 @@
-// sw.js - Service Worker do Santuário
-const CACHE_NAME = 'santuario-v2'; // Mude o número (v1, v2, v3) sempre que quiser forçar atualização
+// sw.js - Service Worker do Santuário (v3)
+const CACHE_NAME = 'santuario-v3';
 
 const urlsParaCache = [
   '/',
@@ -11,7 +11,6 @@ const urlsParaCache = [
   '/tribunal.js',
   '/julgamento.js',
   // Adicione aqui outros arquivos importantes (imagens, ícones, sons)
-  // Exemplo:
   // '/assets/icone.png',
   // '/assets/ambient.mp3',
   // '/assets/sons/acerto.mp3',
@@ -23,7 +22,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsParaCache))
-      .then(() => self.skipWaiting()) // Força o Service Worker a ativar imediatamente
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -35,26 +34,47 @@ self.addEventListener('activate', event => {
         keys.filter(key => key !== CACHE_NAME)
           .map(key => caches.delete(key))
       )
-    ).then(() => self.clients.claim()) // Toma controle de todas as abas abertas
+    ).then(() => self.clients.claim())
   );
 });
 
-// Estratégia de cache: Stale-while-revalidate (mostra do cache, mas atualiza em segundo plano)
+// Estratégia de cache: Stale-while-revalidate (com tratamento de erro)
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Retorna o cache imediatamente
-        const fetchPromise = fetch(event.request)
+    caches.match(event.request).then(cachedResponse => {
+      // Se encontrou no cache, já retorna e atualiza em segundo plano
+      if (cachedResponse) {
+        // Atualiza o cache em segundo plano (sem bloquear)
+        fetch(event.request)
           .then(networkResponse => {
-            // Atualiza o cache com a nova resposta
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, networkResponse.clone());
-            });
-            return networkResponse;
+            // Só atualiza se a resposta for válida e clonável
+            if (networkResponse && networkResponse.ok) {
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            }
           })
-          .catch(() => cachedResponse); // Se falhar, mantém o cache
-        return cachedResponse || fetchPromise;
-      })
+          .catch(() => { /* falha silenciosa */ });
+        return cachedResponse;
+      }
+
+      // Se não está no cache, busca da rede
+      return fetch(event.request)
+        .then(networkResponse => {
+          // Só armazena se for uma resposta válida
+          if (networkResponse && networkResponse.ok) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Se tudo falhar, retorna uma resposta de fallback (opcional)
+          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+        });
+    })
   );
 });

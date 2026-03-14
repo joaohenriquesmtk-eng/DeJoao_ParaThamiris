@@ -512,6 +512,27 @@
 
     <script src="julgamento.js"></script>
 
+    <script type="importmap">
+      {
+        "imports": {
+          "@firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+          "@firebase/database": "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"
+        }
+      }
+    </script>
+    <script type="module">
+        import { initializeApp } from '@firebase/app';
+        import { getDatabase, ref, onValue, set } from '@firebase/database';
+        // As chaves do banco de dados serão injetadas aqui na próxima fase
+        window.SantuarioDB.modulos = { initializeApp, getDatabase, ref, onValue, set };
+    </script>
+
+    <script src="script.js"></script>
+    <div id="toast-mensagem" class="toast escondido"></div>
+    <script src="minifazenda_novo.js"></script>
+    <script src="tribunal.js"></script>
+    <script src="julgamento.js"></script>
+
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 // sw.js - Service Worker do Santuário
-const CACHE_NAME = 'santuario-v1'; // Mude o número (v1, v2, v3) sempre que quiser forçar atualização
+const CACHE_NAME = 'santuario-v2'; // Mude o número (v1, v2, v3) sempre que quiser forçar atualização
 
 const urlsParaCache = [
   '/',

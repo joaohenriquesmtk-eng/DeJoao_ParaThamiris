@@ -1,12 +1,33 @@
 // ==========================================
-// SANTUÁRIO - O MOTOR DIGITAL (script.js)
+// SANTUÁRIO - O MOTOR DIGITAL
 // ==========================================
 
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
+
+// --- SISTEMA DE IDENTIDADE PERSISTENTE ---
 const urlParams = new URLSearchParams(window.location.search);
-const souJoao = urlParams.get('user') === 'joao';
+let userParam = urlParams.get('user');
+
+// Se acessou com ?user=, salva na memória profunda do celular
+if (userParam) {
+    localStorage.setItem('santuario_user_id', userParam);
+}
+
+// Recupera a identidade. Se não houver, assume que é o celular da Thamiris
+const usuarioLogado = localStorage.getItem('santuario_user_id') || 'thamiris';
+const souJoao = usuarioLogado === 'joao';
 const MEU_NOME = souJoao ? "João" : "Thamiris";
 const NOME_PARCEIRO = souJoao ? "Thamiris" : "João";
+
+// --- PREPARAÇÃO PARA O FIREBASE (META-ATUALIZAÇÕES FUTURAS) ---
+window.SantuarioDB = {
+    inicializado: false,
+    conectar: function() {
+        // O código de conexão em tempo real entrará aqui futuramente
+        console.log("Infraestrutura de nuvem pronta para ativação.");
+    }
+};
+// ==========================================
 
 let statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
@@ -1137,8 +1158,11 @@ async function carregarLeis() {
         const mes = meses[dataInicioObj.getMonth()];
         const ano = dataInicioObj.getFullYear();
 
-        const assinatura = document.createElement('div');
+const assinatura = document.createElement('div');
         assinatura.className = 'assinatura-leis';
+        // CORREÇÃO: Adicionamos margin-bottom e padding-bottom para a barra do iOS
+        assinatura.style.marginBottom = "80px"; 
+        assinatura.style.paddingBottom = "env(safe-area-inset-bottom)";
         assinatura.innerHTML = `
             <p>Promulgado em nome do amor, por João, em ${dia} de ${mes} de ${ano}.</p>
             <p class="local-data">Santuário, em toda eternidade.</p>

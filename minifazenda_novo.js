@@ -4,7 +4,7 @@
 
 (function() {
     const tiposSementes = [
-        { nome: 'Milho', icone: '🌽', tempo: 120000, preco: 10, recompensa: 15, exp: 6 },
+        { nome: 'Milho', icone: '🌽', tempo: 100000, preco: 10, recompensa: 15, exp: 6 },
         { nome: 'Cenoura', icone: '🥕', tempo: 180000, preco: 12, recompensa: 18, exp: 9 },
         { nome: 'Tomate', icone: '🍅', tempo: 210000, preco: 15, recompensa: 22, exp: 12 },
         { nome: 'Abóbora', icone: '🎃', tempo: 280000, preco: 20, recompensa: 30, exp: 15 }

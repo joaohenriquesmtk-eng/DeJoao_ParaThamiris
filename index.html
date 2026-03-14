@@ -543,34 +543,56 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // Para o jogo Mini Fazenda (código antigo espera window.SantuarioDB e window.SantuarioDB_Functions)
+    // Para o jogo Mini Fazenda
     window.SantuarioDB = db;
     window.SantuarioAuth = auth;
     window.SantuarioDB_Functions = { ref, set, get, onValue };
 
-    // Para o sistema de Pulso (usa window.SantuarioApp)
+    // Para o sistema de Pulso
     window.SantuarioApp = window.SantuarioApp || {};
     window.SantuarioApp.inicializado = true;
     window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction };
-
-    // Chama a função conectar definida no script.js
     if (window.SantuarioApp && typeof window.SantuarioApp.conectar === 'function') {
         window.SantuarioApp.conectar();
     } else {
-        console.error("SantuarioApp.conectar não está definido. Verifique a ordem de carregamento dos scripts.");
+        console.warn("SantuarioApp.conectar será chamado após o script.js carregar.");
     }
 
+    // IDs autorizados
+    const IDS_AUTORIZADOS = {
+        "Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",
+        "meXVetR7D7b8d00Yuw8wjtRlpoi1": "thamiris"
+    };
+
+    // Função para liberar acesso (chamada quando o usuário está autenticado)
     function liberarAcesso(user) {
-        console.log("Usuário autenticado:", user.email);
+        const perfil = IDS_AUTORIZADOS[user.uid];
+        if (!perfil) {
+            console.error("Usuário não autorizado.");
+            auth.signOut();
+            return;
+        }
+
+        // Define as variáveis globais que o script.js espera
+        window.usuarioLogado = perfil;
+        window.souJoao = (perfil === 'joao');
+        window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
+        window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
+
+        // Salva no localStorage para persistência
+        localStorage.setItem('santuario_user_id', perfil);
+
+        // Esconde a tela de login
         const telaLogin = document.getElementById('tela-login');
         if (telaLogin) telaLogin.style.display = 'none';
-        
-        const souJoao = user.email.includes('joao');
-        localStorage.setItem('santuario_user_id', souJoao ? 'joao' : 'thamiris');
-        
-        window.dispatchEvent(new Event('loginSucesso'));
+
+        // Dispara um evento para avisar que o login foi bem-sucedido
+        window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { perfil } }));
+
+        console.log(`Login bem-sucedido: ${window.MEU_NOME}`);
     }
 
+    // Lógica do botão de login
     const btnLogin = document.getElementById('btn-login-confirmar');
     if (btnLogin) {
         btnLogin.onclick = async () => {
@@ -589,11 +611,12 @@
         };
     }
 
+    // Monitora o estado de autenticação
     onAuthStateChanged(auth, (user) => {
+        const telaLogin = document.getElementById('tela-login');
         if (user) {
             liberarAcesso(user);
         } else {
-            const telaLogin = document.getElementById('tela-login');
             if (telaLogin) telaLogin.style.display = 'flex';
         }
     });

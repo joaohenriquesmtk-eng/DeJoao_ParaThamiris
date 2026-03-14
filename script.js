@@ -9,6 +9,9 @@ const MEU_NOME = souJoao ? "João" : "Thamiris";
 const NOME_PARCEIRO = souJoao ? "Thamiris" : "João";
 
 let statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
+let audioJogos = null;
+let audioJogosMuted = localStorage.getItem('audio_jogos_muted') === 'true'; // false por padrão
+let telaAtual = 'home'; // começa na home
 
 // 1. MOTOR DO TEMPO
 function atualizarMotorDoTempo() {
@@ -72,15 +75,34 @@ function configurarNavegacao() {
         botao.addEventListener('click', (evento) => {
             evento.preventDefault();
             const telaAlvo = botao.getAttribute('data-alvo');
+            
+            // Se a tela alvo for a mesma que a atual, não faz nada (opcional)
+            if (telaAlvo === telaAtual) return;
 
+            // Guarda a tela anterior
+            const telaAnterior = telaAtual;
+
+            // Atualiza o menu ativo
             botoesMenu.forEach(b => b.classList.remove('ativo'));
             botao.classList.add('ativo');
 
+            // Esconde todas as telas e mostra a nova
             todasAsTelas.forEach(tela => tela.classList.add('escondido'));
             const elementoTela = document.getElementById(telaAlvo);
             if (elementoTela) elementoTela.classList.remove('escondido');
 
-            // Força sempre a checagem dos badges ao navegar para não sumirem
+            // Atualiza a tela atual
+            telaAtual = telaAlvo;
+
+            // Controle da música ambiente
+            // Controle da música ambiente
+if (telaAlvo === 'jogos') {
+    playAudioJogos();        // entrou na tela de jogos → toca música
+} else if (telaAnterior === 'jogos') {
+    pauseAudioJogos();       // saiu da tela de jogos → para música
+}
+
+            // Força a atualização dos badges na home (já existia)
             atualizarDinamicaHome();
         });
     });
@@ -346,13 +368,32 @@ const API_KEY = "da54b3d1f91b3ca0850de8cb7890e572";
 function obterEmojiClima(condicao, sunrise, sunset) {
     const agora = Math.floor(Date.now() / 1000);
     const eNoite = agora < sunrise || agora > sunset;
-    const emojis = {
-        'Clear': eNoite ? '🌙' : '☀️',
-        'Clouds': '☁️',
-        'Rain': '🌧️',
-        'Thunderstorm': '⛈️'
-    };
-    return emojis[condicao] || '🌡️';
+    let emoji = '';
+    let classe = '';
+
+    switch(condicao) {
+        case 'Clear':
+            emoji = eNoite ? '🌙' : '☀️';
+            classe = eNoite ? 'emoji-lua' : 'emoji-sol';
+            break;
+        case 'Clouds':
+            emoji = '☁️';
+            classe = 'emoji-nuvem';
+            break;
+        case 'Rain':
+            emoji = '🌧️';
+            classe = 'emoji-chuva';
+            break;
+        case 'Thunderstorm':
+            emoji = '⛈️';
+            classe = 'emoji-tempestade'; // pode criar depois
+            break;
+        default:
+            emoji = '🌡️';
+            classe = '';
+    }
+
+    return `<span class="${classe}">${emoji}</span>`;
 }
 
 async function atualizarClima() {
@@ -596,6 +637,28 @@ function renderizarPlanta() {
     }
 }
 
+// Saudação personalizada
+function atualizarSaudacao() {
+    const agora = new Date();
+    const hora = agora.getHours();
+    let saudacao = '';
+
+    if (hora >= 5 && hora < 12) {
+        saudacao = 'Bom dia, meu amor! 🌞';
+    } else if (hora >= 12 && hora < 18) {
+        saudacao = 'Boa tarde, princesa! ☀️';
+    } else if (hora >= 18 && hora < 22) {
+        saudacao = 'Boa noite, meu céu! 🌙';
+    } else {
+        saudacao = 'Já é madrugada... sonhando com você? 🌜';
+    }
+
+    const elSaudacao = document.getElementById('saudacao-personalizada');
+    if (elSaudacao) {
+        elSaudacao.innerText = saudacao;
+    }
+}
+
 // ==========================================
 // 7. COFRE & RELÍQUIAS - SISTEMA AUTÔNOMO "SAFRA 2026"
 // ==========================================
@@ -778,11 +841,20 @@ const BIBLIOTECA_RELIQUIAS = {
     ]
 };
 
-function abrirReliquia(tipo) {
+function abrirReliquia(event, tipo) {
     if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
         mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
         return;
     }
+    event.currentTarget
+    // Adiciona animação de "abrir baú" ao ícone clicado
+const iconeClicado = event.currentTarget.querySelector('.icone-reliquia');
+if (iconeClicado) {
+    iconeClicado.classList.add('abrindo-bau');
+    setTimeout(() => {
+        iconeClicado.classList.remove('abrindo-bau');
+    }, 300);
+}
     const modal = document.getElementById('modal-reliquia');
     const corpo = document.getElementById('corpo-modal');
     if (!modal || !corpo) return;
@@ -802,14 +874,25 @@ function abrirReliquia(tipo) {
             <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Sincronia de Almas</p>
             <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
     } else if (tipo === 'ceu') {
-        const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
-        corpo.innerHTML = `
-            <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
-            <div class="modal-ceu">
-                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
-                <p>"${textoCeu}"</p>
-            </div>`;
-    } else if (tipo === 'cartas') {
+    const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
+    corpo.innerHTML = `
+        <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
+        <div class="modal-ceu" id="modal-ceu-container">
+            <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
+            <p>"${textoCeu}"</p>
+        </div>`;
+
+    // Adiciona estrelas cadentes AQUI
+    const container = document.getElementById('modal-ceu-container');
+    for (let i = 0; i < 5; i++) {
+        const estrela = document.createElement('div');
+        estrela.className = 'estrela-cadente';
+        estrela.style.top = Math.random() * 100 + '%';
+        estrela.style.left = Math.random() * 100 + '%';
+        estrela.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(estrela);
+    }
+} else if (tipo === 'cartas') {
         const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Semente Exclusiva</h3>
@@ -820,7 +903,7 @@ function abrirReliquia(tipo) {
                     <p style="font-family: 'Playfair Display', serif; color: var(--cor-primaria);">Com amor,<br>${NOME_PARCEIRO}</p>
                 </div>
             </div>`;
-    } else if (tipo === 'encontro') {
+} else if (tipo === 'encontro') {
         const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
         corpo.innerHTML = `
             <div class="bilhete-dourado">
@@ -838,6 +921,7 @@ function abrirReliquia(tipo) {
             </div>`;
     }
 
+    
     modal.classList.remove('escondido');
 }
 
@@ -874,6 +958,7 @@ function abrirJogo(tipo) {
             }
         }
     }
+    document.body.classList.add('modo-jogo-ativo');
 }
 
 function voltarMenuJogos() {
@@ -882,6 +967,7 @@ function voltarMenuJogos() {
     document.querySelector('nav.menu-inferior').classList.remove('escondido');
     document.getElementById('header-jogos-main').classList.remove('escondido'); // Volta o Header Jogos
     atualizarDinamicaHome(); // Fix da persistência dos badges
+    document.body.classList.remove('modo-jogo-ativo');
 }
 
 const perguntasSincronia = [
@@ -973,7 +1059,8 @@ async function carregarLeis() {
         if (!container) return;
 
         container.innerHTML = "";
-        linhas.forEach(linha => {
+
+        linhas.forEach((linha, index) => {
             const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (colunas.length >= 2) {
                 const art = colunas[0].replace(/"/g, '').trim();
@@ -992,10 +1079,32 @@ async function carregarLeis() {
                 const item = document.createElement("div");
                 item.className = "item-lei";
                 item.innerHTML = `<span class="num-artigo">${art}</span><p>${cont}</p>${par ? `<small>§ Único: ${par}</small>` : ""}`;
+                
+                // Aplica delay baseado no índice (apenas para itens, não para títulos)
+                item.style.animationDelay = (index * 0.1) + 's';
+                
                 container.appendChild(item);
             }
         });
-    } catch (e) { }
+
+        // Agora, após o loop, adicionamos a assinatura UMA ÚNICA vez
+        const dataInicioObj = new Date(dataInicio);
+        const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+        const dia = dataInicioObj.getDate();
+        const mes = meses[dataInicioObj.getMonth()];
+        const ano = dataInicioObj.getFullYear();
+
+        const assinatura = document.createElement('div');
+        assinatura.className = 'assinatura-leis';
+        assinatura.innerHTML = `
+            <p>Promulgado em nome do amor, por João, em ${dia} de ${mes} de ${ano}.</p>
+            <p class="local-data">Santuário, em toda eternidade.</p>
+        `;
+        container.appendChild(assinatura);
+
+    } catch (e) { 
+        console.error('Erro ao carregar leis:', e);
+    }
 }
 
 // 10. DINÂMICA DA HOME E INICIALIZAÇÃO
@@ -1162,6 +1271,45 @@ function mostrarMensagemSurpresa() {
     btn.style.cursor = 'not-allowed';
 }
 
+function toggleMuteJogos() {
+    if (!audioJogos) return;
+    audioJogos.muted = !audioJogos.muted;
+    audioJogosMuted = audioJogos.muted;
+    const btn = document.getElementById('btn-mute-jogos');
+    if (btn) {
+        btn.innerText = audioJogos.muted ? '🔇' : '🔊';
+    }
+    localStorage.setItem('audio_jogos_muted', audioJogos.muted);
+}
+
+function playAudioJogos() {
+    if (!audioJogos) {
+        audioJogos = document.getElementById('audio-jogos');
+        if (!audioJogos) return;
+        audioJogos.volume = 0.2;
+        audioJogos.muted = audioJogosMuted;
+    }
+    // Só toca se estiver pausado
+    if (audioJogos.paused) {
+        audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));
+    }
+    // Mostra o botão de mute
+    const btn = document.getElementById('btn-mute-jogos');
+    if (btn) {
+        btn.classList.remove('escondido');
+        btn.innerText = audioJogosMuted ? '🔇' : '🔊';
+    }
+}
+
+function pauseAudioJogos() {
+    if (audioJogos && !audioJogos.paused) {
+        audioJogos.pause();
+    }
+    // Esconde o botão de mute
+    const btn = document.getElementById('btn-mute-jogos');
+    if (btn) btn.classList.add('escondido');
+}
+
 // Boot do Sistema
 window.addEventListener('DOMContentLoaded', () => {
     atualizarJardim();
@@ -1173,6 +1321,9 @@ window.addEventListener('DOMContentLoaded', () => {
     carregarLeis();
     atualizarClima();
     atualizarContadorVisual();
+    atualizarSaudacao();
+    setInterval(atualizarSaudacao, 60000); // atualiza a cada minuto
+    document.getElementById('btn-mute-jogos')?.addEventListener('click', toggleMuteJogos);
 
     // Inicializa a mensagem surpresa diária
     inicializarSurpresaDiaria();

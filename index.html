@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="Santuário">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -25,6 +26,33 @@
                         00d 00h 00m 00s
                     </div>
                 </div>
+                <div class="cartao-vidro" style="text-align: center; margin-top: 5px;">
+    <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: var(--cor-primaria);"></p>
+</div>
+                <div class="particulas">
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 50%; left: 50%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <!-- adicione quantas quiser -->
+</div>
 
                 <div class="cartao-vidro" id="frase-do-dia">
                     <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
@@ -85,11 +113,22 @@
                     <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Sincronize mentes e corações</p>
                 </div>
 
+                <!-- Áudio ambiente -->
+<audio id="audio-jogos" loop preload="auto">
+    <source src="assets/ambient.mp3" type="audio/mpeg">
+    Seu navegador não suporta áudio.
+</audio>
+
+<!-- Botão de mute -->
+<button id="btn-mute-jogos" class="btn-mute escondido" title="Ativar/desativar música">🔊</button>
+
 <div id="menu-jogos" class="grade-jogos">
     <div class="item-jogo" onclick="abrirJogo('termo')">
         <img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
         <p>Termo do Santuário</p>
     </div>
+
+    
     <div class="item-jogo" onclick="abrirJogo('tribunal')">
         <img src="assets/icones-jogos/tribunal.png" alt="Tribunal do Afeto" class="icone-jogo-img">
         <p>Tribunal do Afeto</p>
@@ -376,22 +415,22 @@
                 </div>
 
                 <div class="grade-cofre" id="grade-reliquias">
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia('musica')">
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'musica')">
                         <span class="icone-reliquia">🎵</span>
                         <p>Nossa Trilha</p>
                         <small class="status-reliquia">Trancado</small>
                     </div>
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia('ceu')">
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'ceu')">
                         <span class="icone-reliquia">🌌</span>
                         <p>Mesmo Céu</p>
                         <small class="status-reliquia">Trancado</small>
                     </div>
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia('cartas')">
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'cartas')">
                         <span class="icone-reliquia">✉️</span>
                         <p>Sementes</p>
                         <small class="status-reliquia">Trancado</small>
                     </div>
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia('encontro')">
+                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'encontro')">
                         <span class="icone-reliquia">🎟️</span>
                         <p>O Futuro</p>
                         <small class="status-reliquia">Trancado</small>

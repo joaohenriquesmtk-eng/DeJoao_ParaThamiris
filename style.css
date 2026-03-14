@@ -92,6 +92,10 @@ body {
     padding-bottom: 20px;
 }
 
+.tela {
+    overflow-y: auto !important;
+}
+
 @keyframes surgirSuave {
     from {
         opacity: 0;
@@ -465,7 +469,6 @@ body {
     to { opacity: 1; }
 }
 
-/* Leis */
 #leis {
     background: #fdfbf7;
     color: #2c3e50;
@@ -474,6 +477,8 @@ body {
     border: 10px double #d4af37;
     margin: 10px;
     border-radius: 5px;
+    position: relative; /* necessário para o pseudo-elemento */
+    overflow: hidden; /* garante que a textura não ultrapasse as bordas */
 }
 
 .header-leis h3 {
@@ -864,7 +869,7 @@ body {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 100px); /* Ajuste para caber melhor */
+    max-height: calc(100vh - 75px); /* Ajuste para caber melhor */
     overflow-y: auto;
     background: var(--cor-vidro);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -2180,4 +2185,298 @@ body {
     border-radius: 20px;
     padding: 15px;
     margin: 10px 0;
+}
+
+#streak-jardim {
+    display: none !important;
+}
+
+@keyframes pulsarTimer {
+    0% { text-shadow: 0 0 2px var(--cor-primaria); }
+    50% { text-shadow: 0 0 10px var(--cor-primaria); }
+    100% { text-shadow: 0 0 2px var(--cor-primaria); }
+}
+#timer-principal {
+    animation: pulsarTimer 3s infinite ease-in-out;
+}
+
+#leis {
+    position: relative;
+}
+/* Textura de desgaste (ruído) */
+#leis::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wNSIgLz48L3N2Zz4=');
+    background-repeat: repeat;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Garantir que o conteúdo fique acima da textura */
+#leis > * {
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes surgirSuave {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+        filter: blur(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Animação para o sol (quando aparecer ☀️ ou 🌙) */
+@keyframes girarSol {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.emoji-sol {
+    display: inline-block;
+    animation: girarSol 10s linear infinite;
+}
+
+/* Animação para nuvem (quando aparecer ☁️) */
+@keyframes flutuarNuvem {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+.emoji-nuvem {
+    display: inline-block;
+    animation: flutuarNuvem 4s ease-in-out infinite;
+}
+
+/* Animação para chuva (quando aparecer 🌧️) */
+@keyframes cairChuva {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(5px); opacity: 0.7; }
+}
+
+.emoji-chuva {
+    display: inline-block;
+    animation: cairChuva 0.5s infinite;
+}
+
+@keyframes brilhoLua {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+    100% { filter: brightness(1); }
+}
+
+.emoji-lua {
+    display: inline-block;
+    animation: brilhoLua 3s infinite ease-in-out;
+}
+
+/* Opção com múltiplas partículas (estrelas) */
+#home {
+    position: relative;
+    overflow: hidden;
+}
+
+.particulas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particula {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: rgba(212, 175, 55, 0.6);
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.8);
+    animation: flutuarParticula 15s infinite linear;
+}
+
+@keyframes flutuarParticula {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+    100% {
+        transform: translateY(-100vh) translateX(20px);
+    }
+}
+
+/* Fonte solene para os artigos */
+#leis .item-lei p,
+#leis .item-lei small {
+    font-family: 'Cormorant Garamond', 'Libre Baskerville', 'Times New Roman', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Ajuste para o título do artigo */
+#leis .num-artigo {
+    font-family: 'Cormorant Garamond', 'Libre Baskerville', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Títulos das divisões (TÍTULO I, etc.) */
+#leis .titulo-divisao {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+/* Animação de fade-in */
+@keyframes aparecerItem {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.item-lei {
+    animation: aparecerItem 0.5s ease forwards;
+    opacity: 0; /* começa invisível */
+}
+
+/* Assinatura no final das leis */
+.assinatura-leis {
+    text-align: right;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px dashed rgba(212, 175, 55, 0.5);
+    font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+    font-style: italic;
+    color: #5a3e1b;
+    font-size: 1.1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.assinatura-leis .local-data {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+/* Animação de abrir baú */
+@keyframes abrirBau {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.item-cofre:active .icone-reliquia {
+    animation: abrirBau 0.3s ease;
+}
+
+.abrindo-bau {
+    animation: abrirBau 0.3s ease;
+}
+
+/* Estrelas cadentes para o modal do céu */
+.modal-ceu {
+    position: relative;
+    overflow: hidden;
+}
+
+.estrela-cadente {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px white;
+    opacity: 0;
+    animation: cairEstrela 3s linear infinite;
+}
+
+@keyframes cairEstrela {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(100px, 100px) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+.emoji-tempestade {
+    display: inline-block;
+    animation: tremer 0.2s infinite;
+}
+
+@keyframes tremer {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(2px, 0); }
+    50% { transform: translate(-2px, 0); }
+    75% { transform: translate(2px, 0); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Botão de mute para a música ambiente */
+.btn-mute {
+    position: fixed;
+    bottom: 100px; /* acima do menu inferior */
+    right: 15px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--cor-primaria);
+    color: #000;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-mute:hover {
+    background: #ffd700;
+    transform: scale(1.1);
+}
+
+.btn-mute:active {
+    transform: scale(0.95);
+}
+
+/* Ajuste para telas pequenas */
+@media (max-width: 450px) {
+    .btn-mute {
+        bottom: 90px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Modo jogo ativo: tela ocupa toda a altura e botão mute mais abaixo */
+body.modo-jogo-ativo .tela {
+    height: 100vh;
+}
+body.modo-jogo-ativo .btn-mute {
+    bottom: 20px; /* você pode mudar para 30px se quiser mais acima */
 }

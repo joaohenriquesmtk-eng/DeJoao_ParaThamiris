@@ -1,5 +1,5 @@
 // ==========================================
-// JULGAMENTO DA SAFRA - COM ANIMAÇÕES E ÁUDIO
+// JULGAMENTO DA SAFRA - MOTOR BLINDADO E COM VIBRAÇÃO
 // ==========================================
 
 (function() {
@@ -13,20 +13,14 @@
     let meta = 100;
     let selecionada = null;
     let jogoAtivo = true;
-    let processando = false; // Evita múltiplas animações simultâneas
+    let processando = false; 
 
     // ========== EFEITOS SONOROS ==========
     const somAcerto = new Audio('assets/sons/acerto.mp3');
-    const somErro   = new Audio('assets/sons/erro.mp3');
     const somNivel  = new Audio('assets/sons/nivel.mp3');
 
     somAcerto.volume = 0.6;
-    somErro.volume   = 0.6;
     somNivel.volume  = 0.7;
-
-    somAcerto.load();
-    somErro.load();
-    somNivel.load();
 
     function tocarSom(som) {
         if (som) {
@@ -57,10 +51,8 @@
 
     function renderizarGrade() {
         const gradeDiv = document.getElementById('julgamento-grade');
-        if (!gradeDiv) {
-            console.error('Elemento #julgamento-grade não encontrado!');
-            return;
-        }
+        if (!gradeDiv) return;
+        
         gradeDiv.innerHTML = '';
         for (let i = 0; i < linhas; i++) {
             for (let j = 0; j < colunas; j++) {
@@ -68,7 +60,14 @@
                 peca.className = 'peca-julgamento';
                 peca.dataset.linha = i;
                 peca.dataset.coluna = j;
-                peca.innerText = grade[i][j];
+                peca.innerText = grade[i][j] || '';
+                
+                if (grade[i][j] === null) {
+                    peca.style.transform = 'scale(0)';
+                    peca.style.opacity = '0';
+                    peca.style.transition = 'all 0.2s';
+                }
+                
                 peca.onclick = () => selecionarPeca(i, j);
                 gradeDiv.appendChild(peca);
             }
@@ -93,35 +92,29 @@
     function temJogadaPossivel() {
         for (let i = 0; i < linhas; i++) {
             for (let j = 0; j < colunas; j++) {
-                // Troca com vizinho da direita
                 if (j + 1 < colunas) {
                     const temp = grade[i][j];
                     grade[i][j] = grade[i][j+1];
                     grade[i][j+1] = temp;
                     if (verificarCombinacoes()) {
-                        const temp2 = grade[i][j];
-                        grade[i][j] = grade[i][j+1];
-                        grade[i][j+1] = temp2;
+                        grade[i][j+1] = grade[i][j];
+                        grade[i][j] = temp;
                         return true;
                     }
-                    const temp2 = grade[i][j];
-                    grade[i][j] = grade[i][j+1];
-                    grade[i][j+1] = temp2;
+                    grade[i][j+1] = grade[i][j];
+                    grade[i][j] = temp;
                 }
-                // Troca com vizinho de baixo
                 if (i + 1 < linhas) {
                     const temp = grade[i][j];
                     grade[i][j] = grade[i+1][j];
                     grade[i+1][j] = temp;
                     if (verificarCombinacoes()) {
-                        const temp2 = grade[i][j];
-                        grade[i][j] = grade[i+1][j];
-                        grade[i+1][j] = temp2;
+                        grade[i+1][j] = grade[i][j];
+                        grade[i][j] = temp;
                         return true;
                     }
-                    const temp2 = grade[i][j];
-                    grade[i][j] = grade[i+1][j];
-                    grade[i+1][j] = temp2;
+                    grade[i+1][j] = grade[i][j];
+                    grade[i][j] = temp;
                 }
             }
         }
@@ -143,29 +136,22 @@
     function verificarCombinacoes() {
         for (let i = 0; i < linhas; i++) {
             for (let j = 0; j < colunas - 2; j++) {
-                if (grade[i][j] && grade[i][j] === grade[i][j+1] && grade[i][j] === grade[i][j+2]) {
-                    return true;
-                }
+                if (grade[i][j] && grade[i][j] === grade[i][j+1] && grade[i][j] === grade[i][j+2]) return true;
             }
         }
         for (let j = 0; j < colunas; j++) {
             for (let i = 0; i < linhas - 2; i++) {
-                if (grade[i][j] && grade[i][j] === grade[i+1][j] && grade[i][j] === grade[i+2][j]) {
-                    return true;
-                }
+                if (grade[i][j] && grade[i][j] === grade[i+1][j] && grade[i][j] === grade[i+2][j]) return true;
             }
         }
         return false;
     }
 
-    // Aplica gravidade SEM animação (interna, para o modelo)
     function aplicarGravidadeModelo() {
         for (let j = 0; j < colunas; j++) {
             const coluna = [];
             for (let i = 0; i < linhas; i++) {
-                if (grade[i][j] !== null) {
-                    coluna.push(grade[i][j]);
-                }
+                if (grade[i][j] !== null) coluna.push(grade[i][j]);
             }
             for (let i = linhas - 1; i >= 0; i--) {
                 if (coluna.length > 0) {
@@ -177,7 +163,6 @@
         }
     }
 
-    // Preenche os nulls com novas peças (modelo)
     function preencherNovasPecasModelo() {
         for (let i = 0; i < linhas; i++) {
             for (let j = 0; j < colunas; j++) {
@@ -188,26 +173,68 @@
         }
     }
 
-    // Versão com animação de queda para as NOVAS peças
-    function aplicarGravidadeEAnimar() {
-        // Primeiro, aplicamos a gravidade normalmente (sem animação) no modelo
-        aplicarGravidadeModelo();
+    function resolverCombinacoesSemAnimacao() {
+        let combinou = true;
+        while (combinou) {
+            combinou = false;
+            const removerSet = new Set();
 
-        // Depois, ao renderizar, as peças que estão no topo (ou que mudaram) podem ganhar a classe 'nova'
-        // Mas como a grade já foi atualizada, precisamos identificar quais peças são novas.
-        // Uma abordagem simples: após aplicar gravidade e preencher novas peças, renderizamos e adicionamos 'nova' a todas as peças que acabaram de ser criadas.
-        // No entanto, como não temos histórico, faremos o seguinte: após preencher, renderizamos e, em seguida, adicionamos a classe 'nova' a todas as peças.
-        // Isso fará com que todas as peças recém-chegadas (e até mesmo as que caíram) ganhem a animação, o que é aceitável visualmente.
+            for (let i = 0; i < linhas; i++) {
+                for (let j = 0; j < colunas - 2; j++) {
+                    if (grade[i][j] && grade[i][j] === grade[i][j+1] && grade[i][j] === grade[i][j+2]) {
+                        let k = j;
+                        while (k < colunas && grade[i][k] === grade[i][j]) {
+                            removerSet.add(`${i},${k}`);
+                            k++;
+                        }
+                        combinou = true;
+                    }
+                }
+            }
+            for (let j = 0; j < colunas; j++) {
+                for (let i = 0; i < linhas - 2; i++) {
+                    if (grade[i][j] && grade[i][j] === grade[i+1][j] && grade[i][j] === grade[i+2][j]) {
+                        let k = i;
+                        while (k < linhas && grade[k][j] === grade[i][j]) {
+                            removerSet.add(`${k},${j}`);
+                            k++;
+                        }
+                        combinou = true;
+                    }
+                }
+            }
+
+            if (!combinou) break;
+
+            const paraRemover = Array.from(removerSet).map(coord => {
+                const [l, c] = coord.split(',').map(Number);
+                return { linha: l, coluna: c };
+            });
+
+            paraRemover.forEach(pos => {
+                grade[pos.linha][pos.coluna] = null;
+            });
+
+            pontuacao += paraRemover.length * 10;
+            aplicarGravidadeModelo();
+            preencherNovasPecasModelo();
+
+            while (pontuacao >= meta) {
+                nivel++;
+                meta = Math.floor(meta * 1.5);
+                pontuacao = 0;
+            }
+        }
+        atualizarInterface();
+        salvarJogo();
     }
 
     function processarCombinacoes() {
-        if (processando) return; // Evita loops enquanto anima
+        // Agora verificamos, mas o jogo sempre libera a trava antes de recursões
+        if (processando) return; 
         processando = true;
 
         let combinou = false;
-        const animacoes = [];
-
-        // Identifica todas as combinações
         const removerSet = new Set();
 
         // Linhas
@@ -242,35 +269,28 @@
             return;
         }
 
-        tocarSom(somAcerto); // 🔊 Som de acerto
+        tocarSom(somAcerto); 
 
         const paraRemover = Array.from(removerSet).map(coord => {
             const [l, c] = coord.split(',').map(Number);
             return { linha: l, coluna: c };
         });
 
-        // Aplica animação de "removendo" nas peças
         paraRemover.forEach(pos => {
             const pecaEl = document.querySelector(`.peca-julgamento[data-linha="${pos.linha}"][data-coluna="${pos.coluna}"]`);
-            if (pecaEl) {
-                pecaEl.classList.add('removendo');
-            }
+            if (pecaEl) pecaEl.classList.add('removendo');
         });
 
-        // Aguarda a animação (300ms) e então remove as peças do modelo e aplica gravidade
         setTimeout(() => {
-            // Remove as peças do modelo (marca como null)
             paraRemover.forEach(pos => {
                 grade[pos.linha][pos.coluna] = null;
             });
 
             pontuacao += paraRemover.length * 10;
 
-            // Aplica gravidade e preenche novas peças (modelo)
             aplicarGravidadeModelo();
             preencherNovasPecasModelo();
 
-            // Verifica se atingiu meta
             if (pontuacao >= meta) {
                 nivel++;
                 meta = Math.floor(meta * 1.5);
@@ -281,24 +301,19 @@
 
             atualizarInterface();
             salvarJogo();
-
-            // Renderiza a grade (agora com as novas peças)
             renderizarGrade();
 
-            // Adiciona animação de queda nas novas peças (todas as que estão na grade podem ganhar 'nova', mas para evitar excesso, podemos adicionar apenas nas que estão no topo? Na prática, todas as peças recém-chegadas estão em posições que podem ter mudado. Vamos adicionar 'nova' em todas e remover após a animação)
             document.querySelectorAll('.peca-julgamento').forEach(el => {
                 el.classList.add('nova');
-                setTimeout(() => {
-                    el.classList.remove('nova');
-                }, 400); // duração da animação 'cairMola'
+                setTimeout(() => el.classList.remove('nova'), 400); 
             });
 
-            // Verifica se ainda há combinações (chama novamente)
             if (verificarCombinacoes()) {
-                processarCombinacoes(); // recursivo
+                // A SOLUÇÃO DO CONGELAMENTO: Libera a trava explicitamente antes da próxima chamada em cascata!
+                processando = false; 
+                setTimeout(processarCombinacoes, 400); // Dá um fôlego para as peças caírem na tela
             } else {
                 processando = false;
-                // Verifica se há jogadas possíveis, senão reembaralha
                 if (!temJogadaPossivel()) {
                     grade = gerarGradeAleatoria();
                     mostrarToast("🌀 Grade reembaralhada!");
@@ -306,11 +321,11 @@
                     salvarJogo();
                 }
             }
-        }, 300); // tempo da animação de remoção
+        }, 300); 
     }
 
     function selecionarPeca(linha, coluna) {
-        if (!jogoAtivo || processando) return; // bloqueia durante animações
+        if (!jogoAtivo || processando || grade[linha][coluna] === null) return; 
 
         if (selecionada === null) {
             selecionada = { linha, coluna };
@@ -318,21 +333,52 @@
         } else {
             const primeira = selecionada;
             const segunda = { linha, coluna };
+            
+            // Remove a seleção visual
+            document.querySelectorAll('.peca-julgamento').forEach(p => p.classList.remove('selecionada'));
+            selecionada = null;
+
             if (saoAdjacentes(primeira, segunda)) {
                 trocarPecas(primeira, segunda);
+                
                 if (verificarCombinacoes()) {
                     processarCombinacoes();
                 } else {
-                    trocarPecas(primeira, segunda); // desfaz
-                    tocarSom(somErro);
+                    processando = true;
+                    
+                    // Vibração visual (CSS) nas DUAS peças da troca inválida
+                    const p1 = document.querySelector(`.peca-julgamento[data-linha="${primeira.linha}"][data-coluna="${primeira.coluna}"]`);
+                    const p2 = document.querySelector(`.peca-julgamento[data-linha="${segunda.linha}"][data-coluna="${segunda.coluna}"]`);
+                    if (p1) p1.classList.add('erro-plantio');
+                    if (p2) p2.classList.add('erro-plantio');
+                    
+                    // Vibração física (Celular)
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    
                     mostrarToast("❌ Sem combinação!");
+
+                    setTimeout(() => {
+                        trocarPecas(primeira, segunda); 
+                        processando = false;
+                    }, 400);
                 }
             } else {
-                tocarSom(somErro);
+                processando = true;
+                
+                // Clicou longe, vibra a segunda peça
+                const p2 = document.querySelector(`.peca-julgamento[data-linha="${linha}"][data-coluna="${coluna}"]`);
+                if (p2) p2.classList.add('erro-plantio');
+                
+                // Vibração física rápida
+                if (navigator.vibrate) navigator.vibrate(100);
+                
                 mostrarToast("❌ Escolha uma peça adjacente!");
+                
+                setTimeout(() => {
+                    if (p2) p2.classList.remove('erro-plantio');
+                    processando = false;
+                }, 400);
             }
-            document.querySelectorAll('.peca-julgamento').forEach(p => p.classList.remove('selecionada'));
-            selecionada = null;
         }
     }
 
@@ -343,9 +389,8 @@
             pontuacao = 0;
             nivel = 1;
             meta = 100;
-            atualizarInterface();
+            resolverCombinacoesSemAnimacao();
             renderizarGrade();
-            salvarJogo();
         }
     }
 
@@ -353,6 +398,7 @@
         if (confirm('Iniciar novo caso? A pontuação atual será perdida.')) {
             grade = gerarGradeAleatoria();
             pontuacao = 0;
+            resolverCombinacoesSemAnimacao();
             renderizarGrade();
             atualizarInterface();
             salvarJogo();
@@ -360,7 +406,6 @@
     }
 
     function inicializarJulgamento() {
-        console.log('Inicializando Julgamento da Safra');
         const salvo = localStorage.getItem('julgamento_safra');
         if (salvo) {
             try {
@@ -371,14 +416,15 @@
                 meta = dados.meta;
                 if (!grade || grade.length !== linhas) grade = gerarGradeAleatoria();
             } catch (e) {
-                console.warn('Erro ao carregar dados, gerando nova grade', e);
                 grade = gerarGradeAleatoria();
             }
         } else {
             grade = gerarGradeAleatoria();
         }
-        atualizarInterface();
+        
+        resolverCombinacoesSemAnimacao();
         renderizarGrade();
+        atualizarInterface();
     }
 
     // ========== EXPOR FUNÇÕES GLOBAIS ==========
@@ -388,7 +434,6 @@
     };
 
     window.iniciarJulgamento = function() {
-        console.log('Iniciando Julgamento da Safra');
         inicializarJulgamento();
 
         const btnNovo = document.getElementById('julgamento-btn-novo');

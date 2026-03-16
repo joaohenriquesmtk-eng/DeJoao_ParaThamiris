@@ -70,41 +70,57 @@ body {
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
-/* Menu inferior */
+/* ===== MENU INFERIOR ===== */
 .menu-inferior {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    /* CORREÇÃO: Altura do menu + a medida exata da barra de gestos do iPhone dela */
-    height: calc(70px + env(safe-area-inset-bottom)); 
+    height: calc(85px + env(safe-area-inset-bottom)); /* Aumentado para caber ícone + texto */
+    padding-bottom: env(safe-area-inset-bottom);
     background: rgba(15, 15, 15, 0.8);
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    /* CORREÇÃO: Empurra os ícones para cima, longe da linha do iPhone */
-    padding-bottom: env(safe-area-inset-bottom); 
+    position: fixed;
+    bottom: 0;
+    width: 100%;
     z-index: 999;
 }
 
+/* Itens do menu */
 .item-menu {
     display: flex;
     flex-direction: column;
     align-items: center;
     color: #666;
-    font-size: 10px;
     text-decoration: none;
     transition: 0.3s;
+    font-size: 26px;        /* Tamanho do emoji (ícone) */
+    line-height: 1;
 }
 
+/* Texto do item (Home, Leis, Jogos, Cofre) */
+.item-menu span {
+    font-size: 12px;        /* Tamanho do texto */
+    margin-top: 5px;
+    display: block;
+    text-transform: uppercase; /* Opcional, para combinar com o design */
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Item ativo (dourado) */
 .item-menu.ativo {
     color: var(--cor-primaria);
 }
 
-.icone-menu {
-    font-size: 24px;
-    margin-bottom: 4px;
+/* Ajuste para telas muito pequenas (opcional) */
+@media (max-width: 380px) {
+    .item-menu {
+        font-size: 22px;
+    }
+    .item-menu span {
+        font-size: 10px;
+    }
 }
 
 /* Sistema de telas */
@@ -115,10 +131,9 @@ body {
 /* Atualize este bloco que já existe */
 .tela {
     animation: surgirSuave 0.4s ease-out;
-    height: 100dvh; 
+    height: 100dvh;
     overflow-y: auto !important;
-    /* CORREÇÃO: Aumentamos o respiro final para garantir que nada fique atrás da barra */
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)); /* Antes era 120px, mas pode manter ou aumentar um pouco */
 }
 
 /* CORREÇÃO: Quando um jogo abrir e esconder o menu, precisamos ajustar o fundo */
@@ -3862,3 +3877,48 @@ body.modo-alerta {
 }
 
 /* Tooltip personalizado (opcional) – usando apenas o title do HTML */
+
+/* Aviso de rotação */
+#aviso-rotacao {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #090909;
+    color: #D4AF37;
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Aviso de orientação */
+#aviso-orientacao {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    color: #D4AF37;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+#aviso-orientacao.escondido {
+    display: none !important;
+}
+
+/* Conteúdo do jogo */
+.conteudo-minifazenda {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.conteudo-minifazenda.escondido {
+    display: none !important;
+}

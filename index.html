@@ -356,124 +356,122 @@
                 </div>
 
                 <!-- MINI FAZENDA -->
-                <div id="container-minifazenda" class="escondido">
-                    <div id="aviso-orientacao" class="aviso-orientacao escondido">
-                        <p>🔄 Por favor, vire o celular para jogar no modo paisagem.</p>
+<div id="container-minifazenda" class="escondido">
+    <div id="aviso-orientacao" class="aviso-orientacao escondido">
+        <p>🔄 Por favor, vire o celular para jogar no modo paisagem.</p>
+    </div>
+    <div id="conteudo-minifazenda" class="conteudo-minifazenda">
+        <!-- BARRA SUPERIOR -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+                <button class="btn-info" onclick="toggleInstrucoesMiniFazenda()">❓</button>
+                <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+            </div>
+            <div class="top-bar-right">
+                <span class="recurso">💰 <span id="mf-dinheiro">50</span></span>
+                <span class="recurso">📊 Nível <span id="mf-nivel">1</span></span>
+                <span class="recurso">⭐ EXP <span id="mf-exp">0</span>/<span id="mf-exp-prox">50</span></span>
+            </div>
+        </div>
+
+        <!-- ÁREA PRINCIPAL -->
+        <div class="main-area">
+            <!-- Grade de plantio -->
+            <div class="grade-area">
+                <div class="cerca">
+                    <div id="mf-grade" class="mf-grade"></div>
+                </div>
+            </div>
+
+            <!-- Painel lateral -->
+            <div class="painel-area">
+                <div class="painel-conteudo">
+                    <!-- Instruções -->
+                    <div id="instrucoes-minifazenda" class="escondido cartao-instrucoes">
+                        <h4>🌱 Como Cuidar da Fazenda</h4>
+                        <ul>
+                            <li><strong>Plantio:</strong> Compre sementes com o dinheiro (💰). Plante nos quadrados vazios (➕).</li>
+                            <li>Cada planta tem um tempo de crescimento. Quando pronta (brilhando verde), clique para colher.</li>
+                            <li>Ao colher, você ganha dinheiro e experiência (⭐). Suba de nível para expandir a fazenda.</li>
+                        </ul>
+                        <h4 style="margin-top: 15px;">🐾 Animais</h4>
+                        <ul>
+                            <li><strong>Comprar:</strong> Na aba "Animais", compre animais com dinheiro.</li>
+                            <li><strong>Felicidade:</strong> Cada animal tem um círculo colorido que indica seu estado:
+                                <span style="display: inline-block; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; margin: 0 4px;"></span> Alta (≥70%),
+                                <span style="display: inline-block; width: 12px; height: 12px; background: #f39c12; border-radius: 50%; margin: 0 4px;"></span> Média (30-69%),
+                                <span style="display: inline-block; width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; margin: 0 4px;"></span> Baixa (<30%).
+                            </li>
+                            <li><strong>Alimentar:</strong> Clique no ícone de maçã (🍎) no card do animal para alimentá‑lo (custa 5💰). A felicidade aumenta.</li>
+                            <li>Animais felizes podem produzir recursos no futuro (em breve).</li>
+                        </ul>
                     </div>
 
-                    <!-- BARRA SUPERIOR -->
-                    <div class="top-bar">
-                        <div class="top-bar-left">
-                            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-                            <button class="btn-info" onclick="toggleInstrucoesMiniFazenda()">❓</button>
-                            <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-                        </div>
-                        <div class="top-bar-right">
-                            <span class="recurso">💰 <span id="mf-dinheiro">50</span></span>
-                            <span class="recurso">📊 Nível <span id="mf-nivel">1</span></span>
-                            <span class="recurso">⭐ EXP <span id="mf-exp">0</span>/<span id="mf-exp-prox">50</span></span>
-                        </div>
+                    <!-- Abas -->
+                    <div class="painel-abas">
+                        <button class="aba-ativa" data-aba="cultivo">🌱 Cultivo</button>
+                        <button data-aba="animais">🐾 Animais</button>
+                        <button data-aba="conquistas">🏆 Conquistas</button>
                     </div>
 
-                    <!-- ÁREA PRINCIPAL -->
-                    <div class="main-area">
-                        <!-- Grade de plantio -->
-                        <div class="grade-area">
-                            <div class="cerca">
-                                <div id="mf-grade" class="mf-grade"></div>
+                    <!-- Conteúdo Cultivo -->
+                    <div id="aba-cultivo" class="aba-conteudo">
+                        <div class="deposito-area collapsible-section">
+                            <div class="section-header">
+                                <span class="deposito-titulo">🌱 Suas sementes:</span>
+                                <button class="collapse-btn" id="collapseSementesBtn">▼</button>
+                            </div>
+                            <div id="mf-deposito" class="deposito-lista"></div>
+                        </div>
+
+                        <div class="selecao-area">
+                            <span class="selecao-titulo">🌱 Escolha a semente:</span>
+                            <div class="botoes-sementes">
+                                <button class="btn-tipo-semente" data-tipo="0" title="Milho (10💰)">🌽 10💰</button>
+                                <button class="btn-tipo-semente" data-tipo="1" title="Cenoura (12💰)">🥕 12💰</button>
+                                <button class="btn-tipo-semente" data-tipo="2" title="Tomate (15💰)">🍅 15💰</button>
+                                <button class="btn-tipo-semente" data-tipo="3" title="Abóbora (20💰)">🎃 20💰</button>
+                                <button class="btn-tipo-semente" data-tipo="4" title="Morango (18💰)">🍓 18💰</button>
+                                <button class="btn-tipo-semente" data-tipo="5" title="Alface (8💰)">🥬 8💰</button>
+                                <button class="btn-tipo-semente" data-tipo="6" title="Girassol (25💰)">🌻 25💰</button>
+                                <button class="btn-tipo-semente" data-tipo="7" title="Batata (14💰)">🥔 14💰</button>
                             </div>
                         </div>
 
-                        <!-- Painel lateral -->
-                        <div class="painel-area">
-                            <div class="painel-conteudo">
-                                <!-- Instruções -->
-                                <div id="instrucoes-minifazenda" class="escondido cartao-instrucoes">
-    <h4>🌱 Como Cuidar da Fazenda</h4>
-    <ul>
-        <li><strong>Plantio:</strong> Compre sementes com o dinheiro (💰). Plante nos quadrados vazios (➕).</li>
-        <li>Cada planta tem um tempo de crescimento. Quando pronta (brilhando verde), clique para colher.</li>
-        <li>Ao colher, você ganha dinheiro e experiência (⭐). Suba de nível para expandir a fazenda.</li>
-    </ul>
-    <h4 style="margin-top: 15px;">🐾 Animais</h4>
-    <ul>
-        <li><strong>Comprar:</strong> Na aba "Animais", compre animais com dinheiro.</li>
-        <li><strong>Felicidade:</strong> Cada animal tem um círculo colorido que indica seu estado:
-            <span style="display: inline-block; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; margin: 0 4px;"></span> Alta (≥70%),
-            <span style="display: inline-block; width: 12px; height: 12px; background: #f39c12; border-radius: 50%; margin: 0 4px;"></span> Média (30-69%),
-            <span style="display: inline-block; width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; margin: 0 4px;"></span> Baixa (<30%).
-        </li>
-        <li><strong>Alimentar:</strong> Clique no ícone de maçã (🍎) no card do animal para alimentá‑lo (custa 5💰). A felicidade aumenta.</li>
-        <li>Animais felizes podem produzir recursos no futuro (em breve).</li>
-    </ul>
-</div>
+                        <div class="botoes-acao">
+                            <button id="mf-btn-comprar-semente" class="btn-acao">Comprar Semente <span id="mf-preco-semente">(10💰)</span></button>
+                            <button id="mf-btn-reiniciar" class="btn-refresh">Reiniciar</button>
+                        </div>
+                    </div>
 
-                                <!-- Abas -->
-                                <div class="painel-abas">
-                                    <button class="aba-ativa" data-aba="cultivo">🌱 Cultivo</button>
-                                    <button data-aba="animais">🐾 Animais</button>
-                                    <button data-aba="conquistas">🏆 Conquistas</button>
-                                </div>
-
-                                <!-- Conteúdo Cultivo -->
-                                <div id="aba-cultivo" class="aba-conteudo">
-                                    <div class="deposito-area collapsible-section">
-                                        <div class="section-header">
-                                            <span class="deposito-titulo">🌱 Suas sementes:</span>
-                                            <button class="collapse-btn" id="collapseSementesBtn">▼</button>
-                                        </div>
-                                        <div id="mf-deposito" class="deposito-lista"></div>
-                                    </div>
-
-                                    <div class="selecao-area">
-                                        <span class="selecao-titulo">🌱 Escolha a semente:</span>
-                                        <div class="botoes-sementes">
-                                            <button class="btn-tipo-semente" data-tipo="0" title="Milho (10💰)">🌽 10💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="1" title="Cenoura (12💰)">🥕 12💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="2" title="Tomate (15💰)">🍅 15💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="3" title="Abóbora (20💰)">🎃 20💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="4" title="Morango (18💰)">🍓 18💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="5" title="Alface (8💰)">🥬 8💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="6" title="Girassol (25💰)">🌻 25💰</button>
-                                            <button class="btn-tipo-semente" data-tipo="7" title="Batata (14💰)">🥔 14💰</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="botoes-acao">
-                                        <button id="mf-btn-comprar-semente" class="btn-acao">Comprar Semente <span id="mf-preco-semente">(10💰)</span></button>
-                                        <button id="mf-btn-reiniciar" class="btn-refresh">Reiniciar</button>
-                                    </div>
-                                </div>
-
-                                <!-- Conteúdo Animais -->
-                                <div id="aba-animais" class="aba-conteudo escondido">
-                                    <div class="animais-area">
-                                        <div id="mf-animais" class="animais-lista"></div>
-                                    </div>
-                                    <div class="compra-animais-area" style="margin-top: 15px;">
-                                        <span class="compra-animais-titulo" style="display: block; color: #FFD700; font-weight: bold; margin-bottom: 10px; text-align: center;">🐾 Comprar animal:</span>
-                                        <div class="botoes-animais">
-                                            <button class="btn-tipo-animal" data-animal="0" title="Galinha (30💰)">🐔 30💰</button>
-                                            <button class="btn-tipo-animal" data-animal="1" title="Vaca (50💰)">🐄 50💰</button>
-                                            <button class="btn-tipo-animal" data-animal="2" title="Porco (40💰)">🐖 40💰</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Conteúdo Conquistas -->
-                                <div id="aba-conquistas" class="aba-conteudo escondido">
-                                    <div class="conquistas-area">
-                                        <!-- Metas diárias (opcional) -->
-                                        <div id="mf-metas" class="metas-container" style="margin-bottom: 15px;">
-                                            <!-- Será preenchido por JS -->
-                                        </div>
-                                        <div id="mf-conquistas-lista" class="conquistas-lista"></div>
-                                    </div>
-                                </div>
+                    <!-- Conteúdo Animais -->
+                    <div id="aba-animais" class="aba-conteudo escondido">
+                        <div class="animais-area">
+                            <div id="mf-animais" class="animais-lista"></div>
+                        </div>
+                        <div class="compra-animais-area" style="margin-top: 15px;">
+                            <span class="compra-animais-titulo" style="display: block; color: #FFD700; font-weight: bold; margin-bottom: 10px; text-align: center;">🐾 Comprar animal:</span>
+                            <div class="botoes-animais">
+                                <button class="btn-tipo-animal" data-animal="0" title="Galinha (30💰)">🐔 30💰</button>
+                                <button class="btn-tipo-animal" data-animal="1" title="Vaca (50💰)">🐄 50💰</button>
+                                <button class="btn-tipo-animal" data-animal="2" title="Porco (40💰)">🐖 40💰</button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo Conquistas -->
+                    <div id="aba-conquistas" class="aba-conteudo escondido">
+                        <div class="conquistas-area">
+                            <div id="mf-metas" class="metas-container" style="margin-bottom: 15px;"></div>
+                            <div id="mf-conquistas-lista" class="conquistas-lista"></div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div> <!-- fim conteudo-minifazenda -->
+</div> <!-- fim container-minifazenda -->
 
                 <div id="container-jardim" class="escondido" style="padding-top: 10px; text-align: center;">
                     <div class="cartao-vidro">

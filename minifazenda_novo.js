@@ -733,18 +733,19 @@ confetti({
 
     // ========== CONTROLE DE ORIENTAÇÃO ==========
     function ajustarLayoutPelaOrientacao() {
-        const aviso = document.getElementById('aviso-orientacao');
-        const container = document.getElementById('container-minifazenda');
-        if (!aviso || !container) return;
+    const aviso = document.getElementById('aviso-orientacao');
+    const conteudo = document.getElementById('conteudo-minifazenda');
+    const container = document.getElementById('container-minifazenda');
+    if (!aviso || !conteudo || !container) return;
 
-        if (window.matchMedia("(orientation: portrait)").matches) {
-            aviso.classList.remove('escondido');
-            container.classList.add('oculto');
-        } else {
-            aviso.classList.add('escondido');
-            container.classList.remove('oculto');
-        }
+    if (window.matchMedia("(orientation: portrait)").matches) {
+        aviso.classList.remove('escondido');
+        conteudo.classList.add('escondido');
+    } else {
+        aviso.classList.add('escondido');
+        conteudo.classList.remove('escondido');
     }
+}
 
     // ========== EXPOR FUNÇÕES GLOBAIS ==========
     window.iniciarMiniFazenda = function() {

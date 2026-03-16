@@ -1,0 +1,3864 @@
+/* ==========================================
+   CONFIGURAÇÕES GLOBAIS
+========================================== */
+:root {
+    --cor-fundo: #090909;
+    --cor-primaria: #D4AF37;
+    --cor-agronomia: #2ecc71;
+    --cor-vidro: rgba(255, 255, 255, 0.05);
+    --fonte-padrao: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Tema Azul Noturno */
+.tema-azul {
+    --cor-primaria: #3498db;
+    --cor-fundo: #0a0f1a;
+}
+
+/* Tema Rosa Suave */
+.tema-rosa {
+    --cor-primaria: #e84393;
+    --cor-fundo: #1a0f17;
+}
+
+/* Tema Verde Esmeralda */
+.tema-verde {
+    --cor-primaria: #2ecc71;
+    --cor-fundo: #0f1a0f;
+}
+
+/* Tema Roxo Real */
+.tema-roxo {
+    --cor-primaria: #9b59b6;
+    --cor-fundo: #1a0f1a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--cor-fundo);
+    color: #ffffff;
+    font-family: var(--fonte-padrao);
+    line-height: 1.6;
+    overflow: hidden;
+    /* CORREÇÃO: 100dvh garante a leitura da tela real do iPhone, ignorando as barras do navegador */
+    height: 100dvh; 
+}
+
+#app-shell {
+    display: flex;
+    flex-direction: column;
+    /* CORREÇÃO: Usando a medida dinâmica */
+    height: 100dvh; 
+    padding-top: env(safe-area-inset-top);
+}
+
+/* Efeito vidro */
+.cartao-vidro {
+    background: var(--cor-vidro);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 20px;
+    margin: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Menu inferior */
+.menu-inferior {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    /* CORREÇÃO: Altura do menu + a medida exata da barra de gestos do iPhone dela */
+    height: calc(70px + env(safe-area-inset-bottom)); 
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    /* CORREÇÃO: Empurra os ícones para cima, longe da linha do iPhone */
+    padding-bottom: env(safe-area-inset-bottom); 
+    z-index: 999;
+}
+
+.item-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    font-size: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.item-menu.ativo {
+    color: var(--cor-primaria);
+}
+
+.icone-menu {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+/* Sistema de telas */
+.escondido {
+    display: none !important;
+}
+
+/* Atualize este bloco que já existe */
+.tela {
+    animation: surgirSuave 0.4s ease-out;
+    height: 100dvh; 
+    overflow-y: auto !important;
+    /* CORREÇÃO: Aumentamos o respiro final para garantir que nada fique atrás da barra */
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
+}
+
+/* CORREÇÃO: Quando um jogo abrir e esconder o menu, precisamos ajustar o fundo */
+body.modo-jogo-ativo .tela {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes surgirSuave {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   JOGO TERMO - VISUAL MODERNO E RESPONSIVO
+========================================== */
+#tabuleiro-termo {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 8px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.linha-termo {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.letra-quadrado {
+    width: min(56px, 10vw);
+    height: min(56px, 10vw);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s, border-color 0.3s;
+    animation: surgirLetra 0.3s ease-out;
+}
+
+@keyframes surgirLetra {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.letra-quadrado.correta {
+    background: linear-gradient(145deg, #2ecc71, #27ae60);
+    border-color: #f1c40f;
+    box-shadow: 0 0 15px #2ecc71, 0 4px 8px rgba(0, 0, 0, 0.5);
+    animation: acertou 0.5s ease;
+}
+
+.letra-quadrado.presente {
+    background: linear-gradient(145deg, #f39c12, #e67e22);
+    border-color: #f1c40f;
+    box-shadow: 0 0 15px #f39c12, 0 4px 8px rgba(0, 0, 0, 0.5);
+    animation: presente 0.5s ease;
+}
+
+.letra-quadrado.ausente {
+    background: linear-gradient(145deg, #3a3a3c, #2c2c2e);
+    border-color: #5a5a5c;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+    opacity: 0.8;
+}
+
+@keyframes acertou {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); background: #2ecc71; box-shadow: 0 0 25px #2ecc71; }
+    100% { transform: scale(1); }
+}
+
+@keyframes presente {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); background: #f39c12; box-shadow: 0 0 20px #f39c12; }
+    100% { transform: scale(1); }
+}
+
+/* Teclado - totalmente responsivo */
+#teclado-termo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 5px;
+}
+
+.linha-teclado {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.tecla {
+    background: linear-gradient(145deg, #3a2a1a, #5d3a1a);
+    border: 2px solid #d4af37;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 600;
+    font-size: clamp(0.75rem, 3.5vw, 1rem);
+    padding: 10px 0;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+    transition: all 0.1s ease;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    flex: 1 1 0px;
+    min-width: 28px;
+    max-width: 48px;
+    white-space: nowrap;
+}
+
+.tecla-larga {
+    flex: 1.8 1 0px;
+    min-width: 45px;
+    max-width: 70px;
+}
+
+.tecla:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Responsividade extrema */
+@media (max-width: 380px) {
+    .tecla {
+        font-size: 0.7rem;
+        padding: 8px 0;
+        min-width: 24px;
+    }
+    .tecla-larga {
+        min-width: 38px;
+    }
+    .linha-teclado {
+        gap: 3px;
+    }
+}
+
+/* Efeito de vitória no tabuleiro */
+#tabuleiro-termo.vitoria .letra-quadrado {
+    animation: vitoriaPulse 0.8s infinite alternate;
+}
+
+@keyframes vitoriaPulse {
+    from { box-shadow: 0 0 10px #d4af37, 0 4px 8px rgba(0,0,0,0.5); }
+    to { box-shadow: 0 0 25px #d4af37, 0 4px 12px rgba(0,0,0,0.8); }
+}
+
+/* Instruções dos jogos */
+.cartao-instrucoes {
+    font-size: 0.85rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.cartao-instrucoes h4 {
+    color: var(--cor-primaria);
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.cartao-instrucoes ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.cartao-instrucoes li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+    color: #ddd;
+}
+
+.cartao-instrucoes li::before {
+    content: "✦";
+    color: var(--cor-primaria);
+    position: absolute;
+    left: 0;
+}
+
+/* ==========================================
+   FRASE DO DIA, CLIMA, PULSO, BADGES (mantidos)
+========================================== */
+#frase-do-dia {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-frase {
+    position: relative;
+    padding: 20px 40px;
+}
+
+.aspas-decorativa {
+    font-family: 'Playfair Display', serif;
+    font-size: 60px;
+    color: var(--cor-primaria);
+    opacity: 0.4;
+    position: absolute;
+    line-height: 1;
+}
+
+.aspas-decorativa:first-child {
+    top: -10px;
+    left: 0;
+}
+
+.aspas-decorativa:last-child {
+    bottom: -40px;
+    right: 0;
+}
+
+.texto-itálico {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.container-clima {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 15px;
+    gap: 10px;
+}
+
+.mini-card-clima {
+    background: var(--cor-vidro);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 12px;
+    flex: 1;
+    text-align: center;
+}
+
+.mini-card-clima .cidade {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.dados-clima {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.area-pulso {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+}
+
+#btn-pulso {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+    border: 2px solid var(--cor-primaria);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    font-size: 30px;
+    color: var(--cor-primaria);
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    transition: 0.3s;
+}
+
+#btn-pulso:active {
+    transform: scale(0.9);
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+.feedback-pulso {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--cor-primaria);
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.feedback-pulso.visivel {
+    opacity: 1;
+    bottom: -35px;
+}
+
+/* Solo Fértil */
+.barra-status {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    margin: 10px 0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+#progresso-crescimento {
+    height: 100%;
+    background: linear-gradient(90deg, #2ecc71, #d4af37);
+    border-radius: 20px;
+    transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+/* Badges */
+.container-notificacoes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.badge-home {
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    color: var(--cor-primaria);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.badge-especial {
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.15), rgba(184, 134, 11, 0.15));
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#leis {
+    background: #fdfbf7;
+    color: #2c3e50;
+    padding: 30px 20px;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://www.transparenttextures.com/patterns/paper.png');
+    border: 10px double #d4af37;
+    margin: 10px;
+    border-radius: 5px;
+    position: relative; /* necessário para o pseudo-elemento */
+    overflow: hidden; /* garante que a textura não ultrapasse as bordas */
+}
+
+.header-leis h3 {
+    font-family: 'Playfair Display', serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #d4af37;
+    display: inline-block;
+    padding-bottom: 5px;
+    color: #1a1a1a !important;
+}
+
+.item-lei {
+    background: transparent !important;
+    border-left: 2px solid #d4af37 !important;
+    padding: 15px;
+    margin-bottom: 25px;
+}
+
+.num-artigo {
+    color: #8b0000 !important;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+.titulo-divisao {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: #8b0000;
+    font-weight: bold;
+    margin: 35px 0 15px;
+    font-size: 1.3rem;
+    border-bottom: 1px dashed rgba(139, 0, 0, 0.3);
+    padding-bottom: 5px;
+}
+
+.titulo-divisao small {
+    display: block;
+    font-size: 0.85rem;
+    color: #555;
+    font-style: italic;
+    font-family: var(--fonte-padrao);
+    margin-top: 3px;
+    font-weight: normal;
+}
+
+/* Hub de jogos */
+.grade-jogos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 10px;
+}
+
+.item-jogo {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+}
+
+.icone-jogo {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Cofre */
+.grade-cofre {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 15px;
+}
+
+.item-cofre {
+    position: relative;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px 10px;
+    text-align: center;
+    transition: all 0.5s;
+    overflow: hidden;
+}
+
+.item-cofre.bloqueado {
+    filter: grayscale(1) blur(1px);
+    opacity: 0.4;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+}
+
+.item-cofre:not(.bloqueado)::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -150%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: 0.8s;
+}
+
+.item-cofre:not(.bloqueado):hover::after {
+    left: 100%;
+}
+
+.status-reliquia {
+    display: block;
+    font-size: 8px;
+    text-transform: uppercase;
+    margin-top: 8px;
+    opacity: 0.5;
+    letter-spacing: 1px;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.conteudo-modal {
+    width: 100%;
+    max-width: 350px;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 30px 20px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.fechar-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: var(--cor-primaria);
+    cursor: pointer;
+    line-height: 1;
+}
+
+#corpo-modal iframe {
+    width: 100%;
+    height: 400px;
+    margin-top: 15px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cor-primaria);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); border-color: var(--cor-primaria); }
+    70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); border-color: var(--cor-primaria); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-acao {
+    background: var(--cor-primaria);
+    color: #000;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+    cursor: pointer;
+}
+
+
+/* Estilos exclusivos do cofre */
+.modal-ceu {
+    background: linear-gradient(180deg, #020111 0%, #20124d 100%);
+    border-radius: 15px;
+    padding: 25px 15px;
+    text-align: center;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-ceu::before {
+    content: "✨ . * . ✨ * . * ✨";
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    color: white;
+    opacity: 0.3;
+    letter-spacing: 5px;
+    animation: piscar 4s infinite alternate;
+}
+
+.modal-ceu p {
+    position: relative;
+    z-index: 2;
+    font-style: italic;
+    color: #e0e0e0;
+    margin-top: 15px;
+    line-height: 1.8;
+}
+
+.bilhete-dourado {
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    border-radius: 10px;
+    padding: 2px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    transform: perspective(500px) rotateX(5deg);
+}
+
+.bilhete-dourado-inner {
+    background: #111;
+    border: 1px dashed #d4af37;
+    border-radius: 8px;
+    padding: 25px 15px;
+    text-align: center;
+    color: #d4af37;
+}
+
+.bilhete-header {
+    font-family: 'Playfair Display', serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.bilhete-corpo {
+    font-size: 0.9rem;
+    color: #ddd;
+    line-height: 1.6;
+}
+
+.bilhete-destaque {
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: bold;
+    margin: 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes piscar {
+    0% { opacity: 0.1; }
+    100% { opacity: 0.6; }
+}
+
+/* Botão Refresh */
+.btn-refresh {
+    background: var(--cor-vidro);
+    border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    padding: 15px 25px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+}
+
+.btn-refresh:active {
+    transform: scale(0.95);
+    background: rgba(212, 175, 55, 0.2);
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: fit-content;
+    max-width: 90vw;
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--cor-primaria);
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid var(--cor-primaria);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    animation: fadeInOut 2s ease forwards;
+    pointer-events: none;
+    text-align: center;
+    white-space: normal;      /* ← permite quebrar linha */
+    word-wrap: break-word;    /* ← quebra palavras longas */
+    line-height: 1.4;         /* ← espaçamento entre linhas */
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    15% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    85% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Botão Mensagem Surpresa */
+#btn-surpresa {
+    background: linear-gradient(145deg, #D4AF37, #b38b2c);
+    border: none;
+    color: #000;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    transition: all 0.3s;
+}
+
+#btn-surpresa:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.6);
+}
+
+#texto-surpresa {
+    color: #e0e0e0;
+    font-family: 'Playfair Display', serif;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding-top: 15px;
+}
+
+#btn-surpresa:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+#btn-surpresa {
+    transition: opacity 0.3s, filter 0.3s;
+}
+
+/* Animações */
+.renascer {
+    animation: brilhoRenascimento 1s ease-in-out;
+}
+
+@keyframes brilhoRenascimento {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.3); filter: brightness(1.5); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+.germinar {
+    animation: germinar 0.5s ease;
+}
+
+@keyframes germinar {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+
+/* ==========================================
+   MINI FAZENDA - SLOTS COM EFEITO 3D
+========================================== */
+.slot-fazenda {
+    background: #8B5A2B;
+    background-image: radial-gradient(circle at 30% 30%, #A56B3A 10%, transparent 15%),
+                      linear-gradient(135deg, #7B4A2A 20%, #9B6B3A 80%);
+    border: 4px solid #5D3A1A;
+    border-radius: 16px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 6vw, 2rem); /* Ajuste responsivo */
+    min-width: 0;
+    min-height: 0;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s, filter 0.2s;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 8px rgba(0,0,0,0.5), 0 0 0 2px rgba(212, 175, 55, 0.3);
+    color: #fff;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+    animation: brilhoSlot 3s infinite alternate;
+}
+
+/* Brilho suave nos slots */
+@keyframes brilhoSlot {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.15); }
+}
+
+/* Efeito ao passar o mouse (hover) */
+.slot-fazenda:hover {
+    transform: perspective(500px) rotateX(2deg) rotateY(2deg) scale(1.02);
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 6px 12px rgba(0,0,0,0.6), 0 0 0 3px #D4AF37;
+    border-color: #D4AF37;
+}
+
+/* Classe para planta crescendo (opacidade e animação) */
+.slot-fazenda.crescendo {
+    opacity: 0.7;
+    animation: respiracao-crescimento 2s infinite ease-in-out;
+}
+
+/* Planta pronta para colheita */
+.slot-fazenda.pronto {
+    animation: pulsar-pronto 1.5s infinite alternate ease-in-out;
+    cursor: grab;
+    filter: none;
+    opacity: 1;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 12px rgba(46,204,113,0.6), 0 0 0 3px #2ecc71;
+}
+
+/* Animações existentes (já estão no seu CSS, mas vou reforçar) */
+@keyframes pulsar-pronto {
+    0% { transform: scale(1); box-shadow: inset 0 -4px 0 #3D2A0A, 0 0 10px rgba(46,204,113,0.4); }
+    100% { transform: scale(1.08); box-shadow: inset 0 -4px 0 #3D2A0A, 0 0 20px rgba(46,204,113,0.8), 0 0 15px #D4AF37; }
+}
+
+@keyframes respiracao-crescimento {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.03); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* Animação de plantio */
+.animacao-plantar {
+    animation: pop-plantio 0.3s ease-out forwards;
+}
+
+@keyframes pop-plantio {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.8); background-color: #4A2E15; }
+    100% { transform: scale(1); }
+}
+
+/* Animação de colheita */
+.colhendo {
+    animation: voar-colheita 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    pointer-events: none;
+}
+
+@keyframes voar-colheita {
+    0% { transform: scale(1.1) translateY(0); opacity: 1; }
+    100% { transform: scale(1.5) translateY(-30px); opacity: 0; filter: blur(2px); }
+}
+
+/* Erro ao plantar (tremer) */
+.erro-plantio {
+    animation: tremer-erro 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #e74c3c !important;
+}
+
+@keyframes tremer-erro {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(3px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+/* ==========================================
+   ANIMAÇÕES DA MINI FAZENDA (A NATA)
+========================================== */
+
+/* Planta pronta para colheita: Brilho pulsante e salto suave */
+.slot-fazenda.pronto {
+    animation: pulsar-pronto 1.5s infinite alternate ease-in-out;
+    cursor: grab;
+    filter: none !important; /* Remove a escala de cinza do crescimento */
+    opacity: 1 !important;
+}
+
+@keyframes pulsar-pronto {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(46, 204, 113, 0.4) inset; }
+    100% { transform: scale(1.08); box-shadow: 0 0 20px rgba(46, 204, 113, 0.8) inset, 0 0 15px rgba(212, 175, 55, 0.5); }
+}
+
+/* Animação de negação: Quando tenta plantar sem semente */
+.erro-plantio {
+    animation: tremer-erro 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #e74c3c !important;
+}
+
+@keyframes tremer-erro {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(3px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+/* Efeito ao jogar a semente na terra */
+.animacao-plantar {
+    animation: pop-plantio 0.3s ease-out forwards;
+}
+
+@keyframes pop-plantio {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.8); background-color: #4A2E15; }
+    100% { transform: scale(1); }
+}
+
+/* Efeito de colheita: A planta voa para cima e desaparece */
+.colhendo {
+    animation: voar-colheita 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    pointer-events: none;
+}
+
+@keyframes voar-colheita {
+    0% { transform: scale(1.1) translateY(0); opacity: 1; }
+    100% { transform: scale(1.5) translateY(-30px); opacity: 0; filter: blur(2px); }
+}
+
+/* Ajuste na semente crescendo (estágio intermediário) */
+.slot-fazenda[style*="opacity: 0.6"] {
+    animation: respiracao-crescimento 2s infinite ease-in-out;
+}
+
+@keyframes respiracao-crescimento {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.03); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* ==========================================
+   BOTÕES DE SELEÇÃO DE SEMENTE - VISUAL IMPECÁVEL
+========================================== */
+.botoes-sementes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 15px 0;
+    padding: 0 5px;
+}
+
+.btn-tipo-semente {
+    width: 100%;
+    padding: 14px 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: linear-gradient(145deg, #3a2a1a, #5d3a1a);
+    border: 2px solid #d4af37;
+    border-radius: 40px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-tipo-semente:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #3d2a0a, 0 10px 15px rgba(0,0,0,0.4);
+    background: linear-gradient(145deg, #4e351f, #7b4f2a);
+    border-color: #ffd700;
+}
+
+.btn-tipo-semente:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Botão selecionado - destaque dourado */
+.btn-tipo-semente.selecionado {
+    background: linear-gradient(145deg, #d4af37, #b38b2c);
+    border-color: #ffd700;
+    color: #1a0f00;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 4px 0 #8b691f, 0 0 15px #ffd700;
+    transform: scale(1.05);
+    font-weight: 700;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 450px) {
+    .btn-tipo-semente {
+        padding: 12px 5px;
+        font-size: 1rem;
+        gap: 5px;
+    }
+    .botoes-sementes {
+        gap: 8px;
+    }
+}
+
+/* Efeito de brilho ao passar o mouse sobre selecionado */
+.btn-tipo-semente.selecionado:hover {
+    box-shadow: 0 4px 0 #8b691f, 0 0 20px #ffaa00;
+}
+
+/* ==========================================
+   TRIBUNAL DO AFETO - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-tribunal .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 20px) !important; /* antes era 100px */
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+/* ==========================================
+   TRIBUNAL DO AFETO - PAINEL DE RECURSOS (IGUAL AO JULGAMENTO)
+========================================== */
+#container-tribunal .painel-recursos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a) !important;
+    background-size: 200% 200% !important;
+    animation: gradienteMovel 8s infinite alternate !important;
+    border: 3px solid #d4af37 !important;
+    border-radius: 50px !important;
+    padding: 10px 15px !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    color: #FFD700 !important;
+    font-weight: bold !important;
+    text-shadow: 2px 2px 0 #3D2A0A !important;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A !important;
+    margin-bottom: 15px !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    font-size: 0.9rem !important;
+}
+
+.carta-tribunal {
+    background: #fdf5e6;
+    background-image: linear-gradient(145deg, #f0e6d2, #fff0d0);
+    border: 3px solid #d4af37;
+    border-radius: 12px;
+    padding: 10px;
+    width: 100px;
+    min-width: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 0 #8b691f, 0 6px 10px rgba(0,0,0,0.2);
+    color: #2c3e50;
+}
+
+.carta-tribunal.selecionada {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px #ffd700, 0 4px 0 #8b691f, 0 8px 15px rgba(0,0,0,0.3);
+}
+
+.carta-icone {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.carta-nome {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.carta-valor {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d4af37;
+    background: #2c3e50;
+    border-radius: 20px;
+    padding: 2px 10px;
+    margin-bottom: 3px;
+}
+
+.carta-tipo {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+#tribunal-mao {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    min-height: 140px;
+}
+
+/* Responsividade */
+@media (max-width: 450px) {
+    .carta-tribunal {
+        width: 80px;
+        min-width: 70px;
+        padding: 5px;
+    }
+    .carta-icone {
+        font-size: 1.5rem;
+    }
+    .carta-nome {
+        font-size: 0.8rem;
+    }
+    .carta-valor {
+        font-size: 1rem;
+    }
+}
+
+/* ==========================================
+   TRIBUNAL DO AMOR - ESTÉTICA E ANIMAÇÕES 4x2
+========================================== */
+
+/* Container das cartas */
+#tribunal-mao { 
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* Força 4 colunas */
+    gap: 6px !important;
+    padding: 10px;
+    justify-items: center;
+}
+
+/* Ajuste individual da carta */
+.carta-tribunal {
+    width: 100% !important;      /* Ocupa o espaço da coluna da grade */
+    min-width: 0 !important;      /* Remove a restrição de largura anterior */
+    height: auto;
+    padding: 6px 4px !important;  /* Reduz espaço interno */
+    border-radius: 8px !important;
+}
+
+/* Ajuste dos elementos internos para caberem no tamanho reduzido */
+.carta-icone {
+    font-size: 1.2rem !important; /* Ícones menores */
+    margin-bottom: 2px !important;
+}
+
+.carta-nome {
+    font-size: 0.65rem !important; /* Texto pequeno para não quebrar */
+    line-height: 1.1;
+    margin-bottom: 2px !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limita a duas linhas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.carta-valor {
+    font-size: 0.7rem !important;
+    font-weight: bold;
+}
+
+#btn-verificar {
+    margin-top: 20px;
+    width: calc(100% - 30px);
+    margin-left: 15px;
+    margin-right: 15px;
+    box-sizing: border-box;
+    transition: transform 0.1s;
+}
+#btn-verificar:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================
+   SINCRONIA - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-sincronia .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+#container-sincronia .header-jogos h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cor-primaria);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+#container-sincronia .subtitulo-lei {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+#area-pergunta {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 25px 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#texto-pergunta {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: #f0f0f0;
+    line-height: 1.6;
+    text-align: center;
+    transition: opacity 0.3s ease;
+    margin: 0;
+}
+
+#container-sincronia .btn-acao {
+    background: linear-gradient(145deg, #d4af37, #b38b2c);
+    color: #1a0f00;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #8b691f, 0 6px 10px rgba(0,0,0,0.3);
+    transition: all 0.1s ease;
+    width: 100%;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#container-sincronia .btn-acao:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #8b691f, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Botões de navegação e informação */
+#container-sincronia .btn-voltar,
+#container-sincronia .btn-info {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 30px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+#container-sincronia .btn-info {
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+#container-sincronia .btn-voltar:active,
+#container-sincronia .btn-info:active {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+/* Instruções */
+#container-sincronia .cartao-instrucoes {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+#container-sincronia .cartao-instrucoes h4 {
+    color: var(--cor-primaria);
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#container-sincronia .cartao-instrucoes ul {
+    list-style: none;
+    padding: 0;
+}
+
+#container-sincronia .cartao-instrucoes li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+#container-sincronia .cartao-instrucoes li::before {
+    content: "✨";
+    position: absolute;
+    left: 0;
+    color: var(--cor-primaria);
+}
+
+/* ==========================================
+   SOLO FÉRTIL - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-jardim .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 100px); /* Ajuste para caber melhor */
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+#container-jardim h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cor-primaria);
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* Área da planta */
+#emoji-planta {
+    font-size: 8rem;
+    line-height: 1.2;
+    text-align: center;
+    filter: drop-shadow(0 10px 8px rgba(0,0,0,0.6));
+    transition: transform 0.3s ease, filter 0.3s;
+    animation: flutuar 4s infinite alternate ease-in-out;
+}
+
+@keyframes flutuar {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+}
+
+/* Barra de vida (crescimento) */
+.barra-vida {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 40px;
+    height: 16px;
+    margin: 20px 0 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+#progresso-crescimento {
+    height: 100%;
+    background: linear-gradient(90deg, #8B5A2B, #D4AF37, #2ecc71);
+    border-radius: 40px;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 10px #D4AF37;
+    width: 0%;
+}
+
+/* Status e avisos */
+#status-texto {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #f0f0f0;
+    text-align: center;
+    margin: 10px 0 5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+}
+
+#aviso-regada {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Botão regar */
+#btn-regar {
+    background: linear-gradient(145deg, #5D3A1A, #8B5A2B);
+    border: 2px solid #D4AF37;
+    border-radius: 60px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.4rem;
+    padding: 16px 20px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #3D2A0A, 0 12px 20px rgba(0,0,0,0.4);
+    transition: all 0.1s ease;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+#btn-regar:active {
+    transform: translateY(5px);
+    box-shadow: 0 3px 0 #3D2A0A, 0 12px 20px rgba(0,0,0,0.4);
+}
+
+#btn-regar:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+/* ==========================================
+   SOLO FÉRTIL - PAINEL DE CICLOS (IGUAL AOS DEMAIS)
+========================================== */
+#contador-ciclos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a);
+    background-size: 200% 200%;
+    animation: gradienteMovel 8s infinite alternate;
+    border: 3px solid #d4af37;
+    border-radius: 50px;
+    padding: 10px 15px;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #3D2A0A;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A;
+    display: inline-block;       /* Para que o fundo se ajuste ao conteúdo */
+    margin-top: 15px;            /* Espaçamento superior */
+    font-size: 1rem;             /* Ajuste do tamanho da fonte */
+    text-align: center;
+    width: auto;                 /* Largura automática */
+    align-self: center;          /* Centraliza no container flex */
+}
+
+/* Animações existentes (já usadas no JS) */
+.renascer {
+    animation: brilhoRenascimento 1s ease-in-out !important;
+}
+
+@keyframes brilhoRenascimento {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.3); filter: brightness(1.5) drop-shadow(0 0 15px gold); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+.germinar {
+    animation: germinar 0.5s ease !important;
+}
+
+@keyframes germinar {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); filter: brightness(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Responsividade */
+@media (max-width: 450px) {
+    #emoji-planta {
+        font-size: 6rem;
+    }
+    #btn-regar {
+        font-size: 1.2rem;
+        padding: 14px 16px;
+    }
+    #container-jardim h3 {
+        font-size: 1.6rem;
+    }
+}
+
+/* ==========================================
+   ESTILO PADRÃO PARA BOTÕES DE NAVEGAÇÃO E INFORMAÇÃO EM TODOS OS JOGOS
+========================================== */
+[id^="container-"] .btn-voltar,
+[id^="container-"] .btn-info {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 30px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Botão "?" (instruções) em formato circular */
+[id^="container-"] .btn-info {
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+/* Efeito ao clicar (ativo) */
+[id^="container-"] .btn-voltar:active,
+[id^="container-"] .btn-info:active {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+/* ==========================================
+   JULGAMENTO DA SAFRA - VISUAL 3D E ANIMAÇÕES
+========================================== */
+#container-julgamento .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+}
+
+#julgamento-grade {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* Peças do jogo */
+.peca-julgamento {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #5D3A1A, #8B5A2B);
+    border: 3px solid #d4af37;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5);
+    transition: all 0.1s ease;
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+    animation: brilhoPeca 2s infinite alternate;
+}
+
+.peca-julgamento:hover {
+    transform: perspective(500px) rotateX(5deg) rotateY(5deg) scale(1.05);
+    box-shadow: 0 8px 0 #3D2A0A, 0 15px 20px rgba(0,0,0,0.6);
+    border-color: #ffd700;
+}
+
+.peca-julgamento:active {
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg) scale(0.95);
+    box-shadow: 0 2px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5);
+}
+
+/* Animação de brilho suave */
+@keyframes brilhoPeca {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.2); text-shadow: 0 0 5px gold; }
+}
+
+/* Efeito quando a peça é selecionada para troca */
+.peca-julgamento.selecionada {
+    border-color: #2ecc71;
+    box-shadow: 0 0 20px #2ecc71, 0 5px 0 #3D2A0A;
+    transform: scale(1.1);
+}
+
+/* Animação de desaparecimento */
+.peca-julgamento.removendo {
+    animation: sumir 0.3s ease forwards;
+    pointer-events: none;
+}
+
+@keyframes sumir {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; filter: blur(2px); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+/* Animação de queda */
+@keyframes cair {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.peca-julgamento.nova {
+    animation: cair 0.3s ease-out;
+}
+
+/* Responsividade */
+@media (max-width: 450px) {
+    .peca-julgamento {
+        font-size: 1.5rem;
+    }
+}
+
+/* ==========================================
+   JULGAMENTO DA SAFRA - ANIMAÇÕES EXTRAS
+========================================== */
+
+/* Brilho mais intenso nas peças prontas para combinar (quando já há combinação) */
+.peca-julgamento.combinavel {
+    animation: combinavelPulse 1s infinite alternate;
+}
+
+@keyframes combinavelPulse {
+    from { box-shadow: 0 5px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5), 0 0 10px gold; }
+    to { box-shadow: 0 5px 0 #3D2A0A, 0 8px 25px rgba(255,215,0,0.8), 0 0 25px gold; transform: scale(1.02); }
+}
+
+/* Animação de "pulo" ao selecionar uma peça */
+.peca-julgamento.selecionada {
+    animation: selecionadaPulo 0.3s ease;
+}
+
+@keyframes selecionadaPulo {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1.1); } /* Mantém o scale da classe .selecionada */
+}
+
+/* Efeito de onda ao combinar (aplicado via JS na classe .combinando) */
+.peca-julgamento.combinando {
+    animation: combinarOnda 0.4s ease-out;
+}
+
+@keyframes combinarOnda {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.3); filter: brightness(1.5) drop-shadow(0 0 15px gold); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+/* Nova peça caindo com efeito de "mola" */
+.peca-julgamento.nova {
+    animation: cairMola 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cairMola {
+    0% { transform: translateY(-100%) scale(0.8); opacity: 0; }
+    70% { transform: translateY(5%) scale(1.05); opacity: 1; }
+    100% { transform: translateY(0) scale(1); }
+}
+
+/* Painel de recursos com gradiente animado */
+#container-julgamento .painel-recursos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a);
+    background-size: 200% 200%;
+    animation: gradienteMovel 8s infinite alternate;
+    border: 3px solid #d4af37;
+    border-radius: 50px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #3D2A0A;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+@keyframes gradienteMovel {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Botões com efeito de brilho ao passar o mouse */
+#julgamento-btn-novo, #julgamento-btn-reiniciar {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#julgamento-btn-novo::after, #julgamento-btn-reiniciar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#julgamento-btn-novo:hover::after, #julgamento-btn-reiniciar:hover::after {
+    left: 100%;
+}
+
+/* Efeito de brilho sutil nas bordas da grade */
+#julgamento-grade {
+    position: relative;
+    overflow: hidden;
+}
+
+#julgamento-grade::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,215,0,0.1), transparent 70%);
+    pointer-events: none;
+    animation: brilhoFundo 5s infinite alternate;
+}
+
+@keyframes brilhoFundo {
+    from { opacity: 0.3; }
+    to { opacity: 0.8; }
+}
+
+/* Efeito de "vidro" mais pronunciado no cartão principal */
+#container-julgamento .cartao-vidro {
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+}
+
+/* Ícones personalizados dos jogos */
+.icone-jogo-img {
+    width: 64px;        /* Ajuste conforme necessário */
+    height: 64px;       /* Mantém a proporção quadrada */
+    display: block;
+    margin: 0 auto 10px auto; /* Centraliza e dá espaçamento inferior */
+    object-fit: contain; /* Garante que a imagem não distorça */
+}
+
+/* Em telas pequenas, reduz um pouco */
+@media (max-width: 450px) {
+    .icone-jogo-img {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@keyframes piscarDica {
+    0% { opacity: 1; background: #ffd700; }
+    50% { opacity: 0.5; background: #ffaa00; }
+    100% { opacity: 1; background: #ffd700; }
+}
+
+/* ==========================================
+   JULGAMENTO DA SAFRA - ANIMAÇÕES EXTRAS
+========================================== */
+
+.peca-julgamento.caindo {
+    animation: cair 0.3s ease-out;
+}
+
+.peca-julgamento.removendo {
+    animation: sumir 0.3s ease forwards;
+    pointer-events: none;
+}
+
+@keyframes sumir {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; filter: blur(2px); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes cair {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsividade da grade */
+#julgamento-grade {
+    display: grid;
+    gap: 5px;
+    padding: 5px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.peca-julgamento {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #5D3A1A, #8B5A2B);
+    border: 3px solid #d4af37;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 5vw, 2.5rem);
+    cursor: pointer;
+    box-shadow: 0 5px 0 #3D2A0A, 0 8px 15px rgba(0,0,0,0.5);
+    transition: all 0.1s ease;
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+    animation: brilhoPeca 2s infinite alternate;
+}
+
+@media (max-width: 450px) {
+    .peca-julgamento {
+        font-size: 1.2rem;
+        border-width: 2px;
+    }
+    #julgamento-grade {
+        gap: 3px;
+    }
+}
+
+/* Botões de ação */
+#mf-btn-comprar-semente, #mf-btn-reiniciar {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#mf-btn-comprar-semente::after, #mf-btn-reiniciar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#mf-btn-comprar-semente:hover::after, #mf-btn-reiniciar:hover::after {
+    left: 100%;
+}
+
+#mf-btn-comprar-semente:active, #mf-btn-reiniciar:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #3D2A0A;
+}
+
+/* ==========================================
+   MINI FAZENDA - PAINEL DE RECURSOS (IGUAL AO JULGAMENTO)
+========================================== */
+#container-minifazenda .painel-recursos {
+    background: linear-gradient(145deg, #2c3e50, #1a2a3a);
+    background-size: 200% 200%;
+    animation: gradienteMovel 8s infinite alternate;
+    border: 3px solid #d4af37;
+    border-radius: 50px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #3D2A0A;
+    box-shadow: inset 0 2px 5px #FFD700, 0 4px 0 #3D2A0A;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+/* Aproveita a animação que já existe no Julgamento */
+@keyframes gradienteMovel {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Ajuste da cerca (grade) */
+#container-minifazenda .cerca {
+    margin-bottom: 8px; /* antes era 15px, reduzido */
+}
+
+/* Espaço entre a grade e o texto "Suas sementes" */
+#container-minifazenda div[style*="margin: 15px 0 10px"] {
+    margin: 5px 0 5px !important; /* reduzido de 15px para 5px */
+}
+
+/* Depósito de sementes */
+#mf-deposito {
+    margin-bottom: 5px !important; /* reduzir espaço abaixo do depósito */
+}
+
+/* Espaço entre o depósito e o texto "Escolha a semente" */
+#container-minifazenda div[style*="margin: 10px 0"] {
+    margin: 5px 0 5px !important; /* reduzido de 10px para 5px */
+}
+
+/* Botões de sementes */
+.botoes-sementes {
+    margin-top: 0 !important; /* elimina margem superior extra */
+    margin-bottom: 10px; /* um pequeno espaçamento antes dos botões de ação */
+}
+
+/* ==========================================
+   SOLO FÉRTIL - BOTÃO REGAR COM EFEITO DE BRILHO
+========================================== */
+#btn-regar {
+    position: relative;
+    overflow: hidden;
+}
+
+#btn-regar::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#btn-regar:hover::after {
+    left: 100%;
+}
+
+#container-sincronia #area-pergunta {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    padding: 25px 15px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* ==========================================
+   SINCRONIA - BOTÃO NOVA REFLEXÃO COM BRILHO
+========================================== */
+#container-sincronia .btn-acao {
+    position: relative;
+    overflow: hidden;
+}
+
+#container-sincronia .btn-acao::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#container-sincronia .btn-acao:hover::after {
+    left: 100%;
+}
+
+/* ==========================================
+   TERMO - CONTAINER COM EFEITO VIDRO
+========================================== */
+#container-termo .cartao-vidro {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+/* ==========================================
+   TERMO - BOTÃO VERIFICAR COM BRILHO
+========================================== */
+#container-termo .btn-acao {
+    position: relative;
+    overflow: hidden;
+}
+
+#container-termo .btn-acao::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#container-termo .btn-acao:hover::after {
+    left: 100%;
+}
+
+#termo-reset-container .btn-refresh {
+    position: relative;
+    overflow: hidden;
+}
+
+#termo-reset-container .btn-refresh::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+    transform: rotate(25deg);
+    transition: left 0.5s;
+}
+
+#termo-reset-container .btn-refresh:hover::after {
+    left: 100%;
+}
+
+#tabuleiro-termo {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+#streak-jardim {
+    display: none !important;
+}
+
+@keyframes pulsarTimer {
+    0% { text-shadow: 0 0 2px var(--cor-primaria); }
+    50% { text-shadow: 0 0 10px var(--cor-primaria); }
+    100% { text-shadow: 0 0 2px var(--cor-primaria); }
+}
+#timer-principal {
+    animation: pulsarTimer 3s infinite ease-in-out;
+}
+
+#leis {
+    position: relative;
+}
+/* Textura de desgaste (ruído) */
+#leis::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wNSIgLz48L3N2Zz4=');
+    background-repeat: repeat;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Garantir que o conteúdo fique acima da textura */
+#leis > * {
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes surgirSuave {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+        filter: blur(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Animação para o sol (quando aparecer ☀️ ou 🌙) */
+@keyframes girarSol {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.emoji-sol {
+    display: inline-block;
+    animation: girarSol 10s linear infinite;
+}
+
+/* Animação para nuvem (quando aparecer ☁️) */
+@keyframes flutuarNuvem {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+.emoji-nuvem {
+    display: inline-block;
+    animation: flutuarNuvem 4s ease-in-out infinite;
+}
+
+/* Animação para chuva (quando aparecer 🌧️) */
+@keyframes cairChuva {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(5px); opacity: 0.7; }
+}
+
+.emoji-chuva {
+    display: inline-block;
+    animation: cairChuva 0.5s infinite;
+}
+
+@keyframes brilhoLua {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+    100% { filter: brightness(1); }
+}
+
+.emoji-lua {
+    display: inline-block;
+    animation: brilhoLua 3s infinite ease-in-out;
+}
+
+/* Opção com múltiplas partículas (estrelas) */
+#home {
+    position: relative;
+    overflow: hidden;
+}
+
+.particulas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particula {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: rgba(212, 175, 55, 0.6);
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.8);
+    animation: flutuarParticula 15s infinite linear;
+}
+
+@keyframes flutuarParticula {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+    100% {
+        transform: translateY(-100dvh) translateX(20px);
+    }
+}
+
+/* Fonte solene para os artigos */
+#leis .item-lei p,
+#leis .item-lei small {
+    font-family: 'Cormorant Garamond', 'Libre Baskerville', 'Times New Roman', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Ajuste para o título do artigo */
+#leis .num-artigo {
+    font-family: 'Cormorant Garamond', 'Libre Baskerville', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Títulos das divisões (TÍTULO I, etc.) */
+#leis .titulo-divisao {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+/* Animação de fade-in */
+@keyframes aparecerItem {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.item-lei {
+    animation: aparecerItem 0.5s ease forwards;
+    opacity: 0; /* começa invisível */
+}
+
+/* Assinatura no final das leis */
+.assinatura-leis {
+    text-align: right;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px dashed rgba(212, 175, 55, 0.5);
+    font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+    font-style: italic;
+    color: #5a3e1b;
+    font-size: 1.1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.assinatura-leis .local-data {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+/* Animação de abrir baú */
+@keyframes abrirBau {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.item-cofre:active .icone-reliquia {
+    animation: abrirBau 0.3s ease;
+}
+
+.abrindo-bau {
+    animation: abrirBau 0.3s ease;
+}
+
+/* Estrelas cadentes para o modal do céu */
+.modal-ceu {
+    position: relative;
+    overflow: hidden;
+}
+
+.estrela-cadente {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px white;
+    opacity: 0;
+    animation: cairEstrela 3s linear infinite;
+}
+
+@keyframes cairEstrela {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(100px, 100px) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+.emoji-tempestade {
+    display: inline-block;
+    animation: tremer 0.2s infinite;
+}
+
+@keyframes tremer {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(2px, 0); }
+    50% { transform: translate(-2px, 0); }
+    75% { transform: translate(2px, 0); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Botão de mute para a música ambiente */
+.btn-mute {
+    position: fixed;
+    bottom: 100px; /* acima do menu inferior */
+    right: 15px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--cor-primaria);
+    color: #000;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-mute:hover {
+    background: #ffd700;
+    transform: scale(1.1);
+}
+
+.btn-mute:active {
+    transform: scale(0.95);
+}
+
+/* Ajuste para telas pequenas */
+@media (max-width: 450px) {
+    .btn-mute {
+        bottom: 90px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Modo jogo ativo: tela ocupa toda a altura e botão mute mais abaixo */
+body.modo-jogo-ativo .tela {
+    height: 100dvh;
+}
+body.modo-jogo-ativo .btn-mute {
+    bottom: 20px; /* você pode mudar para 30px se quiser mais acima */
+}
+
+/* Botão de mute dentro dos jogos (igual ao botão de informação) */
+.btn-mute-jogo {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.btn-mute-jogo:active {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+/* Botão global de mute visível apenas fora dos jogos */
+body:not(.jogo-aberto) #btn-mute-jogos {
+    display: flex;
+}
+body.jogo-aberto #btn-mute-jogos {
+    display: none;
+}
+
+/* Ajuste para que o conteúdo da tela Leis não fique atrás do menu inferior */
+#leis {
+    padding-bottom: calc(85px + 20px); /* 85px do menu + 20px extra */
+}
+
+/* ==========================================
+   CARTÃO DA SAUDAÇÃO - DESTAQUE ESPECIAL
+========================================== */
+.cartao-saudacao {
+    position: relative;
+    background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: brilhoSaudacao 3s infinite alternate ease-in-out;
+}
+
+/* Efeito de borda gradiente animada */
+.cartao-saudacao::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #D4AF37, #f9e076, #D4AF37, #b38b2c);
+    background-size: 300% 300%;
+    border-radius: 26px; /* Ajuste para coincidir com o border-radius do cartao-vidro (24px) + 2px */
+    z-index: -1;
+    animation: bordaGradiente 6s ease infinite;
+}
+
+/* Animação de brilho pulsante */
+@keyframes brilhoSaudacao {
+    0% {
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.8), 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Animação do gradiente na borda */
+@keyframes bordaGradiente {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Pequeno detalhe: uma estrela ou brilho no canto (opcional) */
+.cartao-saudacao::after {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -5px;
+    font-size: 20px;
+    color: #D4AF37;
+    opacity: 0.7;
+    animation: girarEstrela 4s linear infinite;
+    filter: drop-shadow(0 0 5px gold);
+}
+
+@keyframes girarEstrela {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#mensagem-clima {
+    font-style: italic;
+    border-left: 3px solid var(--cor-primaria);
+}
+
+/* ==========================================
+   CARTÃO DO CLIMA - COM ANIMAÇÃO ESPECIAL
+========================================== */
+.cartao-clima {
+    position: relative;
+    background: linear-gradient(145deg, rgba(52, 152, 219, 0.1), rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: brilhoClima 3s infinite alternate ease-in-out;
+}
+
+/* Borda gradiente com cores que remetem ao clima (azul, dourado, branco) */
+.cartao-clima::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #3498db, #f1c40f, #3498db, #b0e0e6);
+    background-size: 300% 300%;
+    border-radius: 26px;
+    z-index: -1;
+    animation: bordaClima 6s ease infinite;
+}
+
+/* Animação de brilho pulsante */
+@keyframes brilhoClima {
+    0% {
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(52, 152, 219, 0.6), 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Animação do gradiente na borda */
+@keyframes bordaClima {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Ícone decorativo (agora um elemento real) */
+.icone-clima {
+    position: absolute;
+    top: -12px;
+    left: -8px;
+    font-size: 26px;
+    color: #f1c40f;
+    opacity: 0.9;
+    animation: flutuarClima 4s infinite alternate ease-in-out;
+    filter: drop-shadow(0 0 5px #f1c40f);
+    z-index: 2;
+    pointer-events: none; /* para não interferir em cliques */
+}
+
+@keyframes flutuarClima {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+        transform: translate(5px, 5px) rotate(10deg);
+    }
+}
+
+/* Garantir que a mensagem fique em preto */
+.cartao-clima #texto-mensagem-clima {
+    color: #000000;
+    position: relative;
+    z-index: 1;
+}
+
+/* Botão de mute na tela Jogos (menu) */
+#btn-mute-jogos-tela {
+    position: fixed;
+    bottom: calc(85px + env(safe-area-inset-bottom) + 10px); /* acima do menu */
+    right: 20px;
+    z-index: 1000;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Esconde o botão quando um jogo estiver aberto */
+body.jogo-aberto #btn-mute-jogos-tela {
+    display: none;
+}
+
+/* Estilo para o contador de pulsos */
+#contador-pulso {
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--cor-primaria);
+    text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+    min-height: 24px; /* evita que a página "pule" quando o texto muda */
+}
+
+/* TELA DE LOGIN */
+#tela-login {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    background-color: var(--cor-fundo);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Fica em cima de tudo */
+    padding: 20px;
+    transition: opacity 0.5s ease;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+}
+
+.login-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--cor-primaria);
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: var(--cor-vidro);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+}
+
+.login-input:focus {
+    border-color: var(--cor-primaria);
+}
+
+.btn-entrar {
+    width: 100%;
+    padding: 12px;
+    background: var(--cor-primaria);
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.login-erro {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    min-height: 20px;
+}
+
+/* ==========================================
+   TERMÔMETRO E POST-ITS
+========================================== */
+.botoes-mood {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.btn-mood {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: white;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-mood:active {
+    transform: scale(0.95);
+    background: rgba(212, 175, 55, 0.2);
+}
+
+/* O Segredo Visual: Quando ela estiver cansada, a tela escurece suavemente */
+body.modo-cansada {
+    background-color: #030303 !important;
+}
+body.modo-cansada .cartao-vidro {
+    background: rgba(10, 10, 20, 0.4);
+    border-color: rgba(100, 149, 237, 0.3); /* Um tom de azul calmo */
+}
+
+/* ==========================================
+   MURAL DE RECADO (POST-ITS IMORTAIS) E ALERTAS
+========================================== */
+.postit {
+    color: #1a1a1a;
+    padding: 12px 15px;
+    border-radius: 2px 15px 15px 15px;
+    font-family: 'Playfair Display', serif;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.3);
+    position: relative;
+    animation: surgirLetra 0.4s ease-out;
+    margin-bottom: 8px;
+}
+
+/* Post-it do João: Dourado elegante */
+.postit-joao {
+    background: linear-gradient(145deg, #f9e076, #e6c84c); 
+    border-left: 5px solid #b38b2c;
+}
+
+/* Post-it da Thamiris: Lilás/Rosa claro, suave e romântico */
+.postit-thamiris {
+    background: linear-gradient(145deg, #e6e6fa, #d8bfd8); 
+    border-left: 5px solid #a67c9c;
+}
+
+.postit-autor {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+/* Alerta Vermelho Pulsante para a Tela Inteira */
+body.modo-alerta {
+    animation: piscarAlertaRed 2s infinite alternate !important;
+}
+
+@keyframes piscarAlertaRed {
+    0% { box-shadow: inset 0 0 0px rgba(255, 0, 0, 0); }
+    100% { box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.4); }
+}
+
+.botoes-temas {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.btn-tema {
+    background: var(--cor-vidro);
+    border: 1px solid var(--cor-primaria);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+.btn-tema:hover {
+    background: var(--cor-primaria);
+    color: black;
+}
+.btn-tema.ativo {
+    background: var(--cor-primaria);
+    color: black;
+    font-weight: bold;
+}
+
+@keyframes onda {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+    100% { box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); }
+}
+.pulso-enviado {
+    animation: onda 1s ease-out;
+}
+
+@keyframes brilhoPlanta {
+    0% { filter: drop-shadow(0 0 5px gold); }
+    50% { filter: drop-shadow(0 0 20px gold); }
+    100% { filter: drop-shadow(0 0 5px gold); }
+}
+.regando {
+    animation: brilhoPlanta 0.8s ease-out;
+}
+
+.btn-fixar, .btn-curtir {
+    background: transparent;
+    border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: 0.2s;
+}
+.btn-fixar:hover, .btn-curtir:hover {
+    background: var(--cor-primaria);
+    color: #000;
+}
+.btn-curtir {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+.btn-curtir:hover {
+    background: #ff6b6b;
+    color: white;
+}
+
+/* Ícone de temas flutuante */
+.tema-icon {
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom)); /* fica acima do menu inferior */
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    background: var(--cor-primaria);
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: transform 0.2s;
+}
+.tema-icon:active {
+    transform: scale(0.9);
+}
+
+/* Seletor de temas (popup) */
+.tema-selector {
+    position: fixed;
+    bottom: calc(140px + env(safe-area-inset-bottom));
+    right: 15px;
+    width: 250px;
+    z-index: 1001;
+}
+.tema-selector .cartao-vidro {
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--cor-primaria);
+}
+
+/* Ajuste para telas pequenas */
+@media (max-width: 450px) {
+    .tema-selector {
+        width: 200px;
+        right: 10px;
+    }
+}
+
+/* Aviso de orientação */
+.aviso-orientacao {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(5px);
+}
+
+.aviso-orientacao p {
+    background: var(--cor-primaria);
+    color: black;
+    padding: 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    max-width: 80%;
+}
+
+/* Classe para esconder o container do jogo quando necessário */
+#container-minifazenda.oculto {
+    display: none !important;
+}
+
+/* ==========================================
+   MINI FAZENDA - LAYOUT PROFISSIONAL (PAISAGEM)
+========================================== */
+
+#container-minifazenda {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    background-color: var(--cor-fundo);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+#container-minifazenda.oculto {
+    display: none !important;
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+    height: 60px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.top-bar-left {
+    display: flex;
+    gap: 10px;
+}
+
+.top-bar-left .btn-voltar,
+.top-bar-left .btn-info,
+.top-bar-left .btn-mute-jogo {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 30px;
+    padding: 6px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.top-bar-left .btn-info,
+.top-bar-left .btn-mute-jogo {
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+}
+.top-bar-left button:hover {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+.top-bar-right {
+    display: flex;
+    gap: 15px;
+    font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+.top-bar-right .recurso {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px 12px;
+    border-radius: 30px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    font-size: 0.95rem;
+}
+
+/* ÁREA PRINCIPAL (grade + painel) */
+.main-area {
+    flex: 1;
+    display: flex;
+    min-height: 0; /* importante para evitar overflow */
+}
+
+/* Área da grade (esquerda) - agora ocupará toda a altura */
+.grade-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    min-width: 0;
+}
+
+.grade-area .cerca {
+    border: 10px double #8B5A2B;
+    border-radius: 30px;
+    background: #5D3A1A;
+    padding: 15px;
+    box-shadow: inset 0 0 0 3px #FFD700, 0 6px 0 #3D2A0A;
+    flex: 1; /* ocupa todo o espaço disponível */
+    display: flex;
+    width: 100%;
+    min-height: 0; /* essencial para que o flex child possa encolher */
+}
+
+#mf-grade {
+    display: grid;
+    grid-auto-rows: 1fr; /* cada linha ocupa altura igual, preenchendo a altura total */
+    gap: 8px;
+    width: 100%;
+    height: 100%; /* ocupa toda a altura da .cerca */
+    min-height: 0;
+}
+
+/* Slots ocupam 100% da célula */
+.slot-fazenda {
+    background: #8B5A2B;
+    background-image: radial-gradient(circle at 30% 30%, #A56B3A 10%, transparent 15%),
+                      linear-gradient(135deg, #7B4A2A 20%, #9B6B3A 80%);
+    border: 4px solid #5D3A1A;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 5vw, 2.5rem);
+    cursor: pointer;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(212, 175, 55, 0.3);
+    color: #fff;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s, box-shadow 0.2s;
+    width: 100%;
+    height: 100%; /* ocupa toda a célula */
+}
+.slot-fazenda:hover {
+    transform: scale(1.02);
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 6px 12px rgba(0, 0, 0, 0.6), 0 0 0 3px #D4AF37;
+    border-color: #D4AF37;
+}
+.slot-fazenda.crescendo {
+    opacity: 0.7;
+    animation: respiracao-crescimento 2s infinite ease-in-out;
+}
+.slot-fazenda.pronto {
+    animation: pulsar-pronto 1.5s infinite alternate ease-in-out;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 12px rgba(46, 204, 113, 0.6), 0 0 0 3px #2ecc71;
+}
+
+/* Painel lateral (direita) */
+.painel-area {
+    width: 300px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 15px;
+    overflow-y: auto; /* permite rolar se conteúdo for maior */
+    flex-shrink: 0;
+}
+
+.painel-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Ajustes nos elementos internos do painel */
+.deposito-area, .selecao-area {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 15px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.deposito-titulo, .selecao-titulo {
+    display: block;
+    color: #FFD700;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.deposito-lista {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    min-height: 40px;
+}
+
+.item-deposito {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 20px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+}
+
+.botoes-sementes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.btn-tipo-semente {
+    width: 100%;
+    padding: 10px 5px;
+    font-size: 1rem;
+    background: linear-gradient(145deg, #3a2a1a, #5d3a1a);
+    border: 2px solid #d4af37;
+    border-radius: 40px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-tipo-semente.selecionado {
+    background: linear-gradient(145deg, #d4af37, #b38b2c);
+    color: #1a0f00;
+    box-shadow: 0 0 15px #ffd700;
+}
+
+.botoes-acao {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.botoes-acao .btn-acao,
+.botoes-acao .btn-refresh {
+    flex: 1;
+    margin: 0;
+    font-size: 0.9rem;
+    padding: 10px 5px;
+}
+
+#instrucoes-minifazenda {
+    margin-top: 0;
+}
+
+/* Ajuste para telas muito pequenas */
+@media (max-width: 700px) {
+    .painel-area {
+        width: 250px;
+        padding: 10px;
+    }
+    .top-bar-right .recurso {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+}
+
+.animais-area {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 15px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+.animais-titulo {
+    display: block;
+    color: #FFD700;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.animais-lista {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    min-height: 40px;
+}
+.item-animal {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 20px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.item-animal:hover {
+    background: var(--cor-primaria);
+    color: #000;
+}
+.item-animal .felicidade {
+    font-size: 0.7rem;
+    margin-left: 5px;
+    color: #ff6b6b;
+}
+
+/* Estilos para a lista de animais - usando grid para cards */
+.animais-lista {
+    display: grid;
+    grid-template-columns: 1fr; /* Mantém uma coluna */
+    gap: 10px;
+    padding: 5px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Card de cada animal */
+.item-animal-card {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 20px;
+    padding: 10px;                /* reduzido de 12px */
+    display: flex;
+    align-items: center;
+    gap: 10px;                     /* reduzido de 15px */
+    transition: all 0.2s ease;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;               /* permite quebra se necessário */
+}
+
+.item-animal-card:hover {
+    transform: scale(1.02);
+    background: rgba(212, 175, 55, 0.15);
+    border-color: #ffd700;
+}
+
+/* Ícone do animal em tamanho maior */
+.animal-icone {
+    font-size: 2.5rem;             /* reduzido de 3rem */
+    min-width: 50px;                /* reduzido de 60px */
+    text-align: center;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+}
+
+/* Informações do animal (nome e status) */
+.animal-info {
+    flex: 1;
+    min-width: 0;                  /* evita estouro */
+}
+
+.animal-nome {
+    font-size: 1rem;                /* reduzido de 1.2rem */
+    font-weight: bold;
+    color: var(--cor-primaria);
+    display: block;
+    margin-bottom: 4px;
+    text-shadow: 1px 1px 0 #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Barra de felicidade */
+.animal-felicidade-bar {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 8px;
+    width: 100%;
+    overflow: hidden;
+    margin: 5px 0;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.animal-felicidade-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #ffb347);
+    border-radius: 10px;
+    width: 0%; /* Controlado pelo JS */
+    transition: width 0.3s ease;
+}
+
+/* Texto de felicidade */
+.animal-felicidade-texto {
+    font-size: 0.8rem;
+    color: #ffb347;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Botão de alimentar no card */
+.btn-alimentar-card {
+    background: var(--cor-primaria);
+    border: none;
+    color: #000;
+    font-size: 0.8rem;              /* reduzido de 0.9rem */
+    font-weight: bold;
+    padding: 6px 10px;               /* reduzido */
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 #8b691f;
+    margin-left: auto;               /* alinha à direita */
+    flex-shrink: 0;                  /* não encolhe */
+}
+.btn-alimentar-card:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+.btn-alimentar-card:hover {
+    background: #ffd700;
+}
+
+/* Animação de clique no slot (efeito de "pressionar") */
+.slot-fazenda:active {
+    transform: scale(0.95);
+    box-shadow: inset 0 -2px 0 #3D2A0A, 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: transform 0.05s ease-in, box-shadow 0.05s ease-in;
+}
+
+/* Animação de texto flutuante para recompensas */
+.floating-text {
+    position: absolute;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 2px 2px 0 #000;
+    pointer-events: none;
+    animation: floatUp 0.8s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(1.5);
+    }
+}
+
+/* Efeito de partículas simuladas (pode ser usado ao colher) */
+.particle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #ffd700;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFade 0.6s ease-out forwards;
+}
+
+@keyframes particleFade {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px) translateX(10px) scale(0.5);
+    }
+}
+
+.painel-abas {
+    display: flex;
+    gap: 5px;
+    margin: 10px 0;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 5px;
+}
+.painel-abas button {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: white;
+    padding: 8px 0;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+.painel-abas button.aba-ativa {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--cor-primaria);
+    border-bottom-color: transparent;
+    color: var(--cor-primaria);
+    font-weight: bold;
+}
+.aba-conteudo.escondido {
+    display: none;
+}
+
+/* Botões de compra de animais */
+.btn-tipo-animal {
+    width: 100%;
+    padding: 8px 5px;
+    font-size: 0.9rem;
+    background: linear-gradient(145deg, #3a2a1a, #5d3a1a);
+    border: 2px solid #d4af37;
+    border-radius: 40px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+.btn-tipo-animal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #3d2a0a, 0 10px 15px rgba(0,0,0,0.4);
+    background: linear-gradient(145deg, #4e351f, #7b4f2a);
+    border-color: #ffd700;
+}
+.btn-tipo-animal:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #3d2a0a, 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Botões de sementes e animais compactos */
+.btn-tipo-semente,
+.btn-tipo-animal {
+    padding: 6px 3px;  /* reduzido de 10px 5px */
+    font-size: 0.85rem;  /* um pouco menor */
+    gap: 3px;
+}
+
+/* Para telas muito pequenas, podemos reduzir ainda mais */
+@media (max-width: 700px) {
+    .btn-tipo-semente,
+    .btn-tipo-animal {
+        padding: 5px 2px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ==========================================
+   SEÇÃO COLAPSÁVEL "SUAS SEMENTES" - CORREÇÃO FINAL
+========================================== */
+
+/* Container principal */
+.deposito-area {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    min-height: 0; /* remove qualquer altura mínima residual */
+}
+
+/* Cabeçalho – padding reduzido para diminuir altura */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    padding: 8px 15px;      /* ← reduzido de 15px para 8px vertical */
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Título do cabeçalho – sem margens extras */
+.section-header .deposito-titulo {
+    margin: 0;
+    font-size: 1rem;
+    color: #FFD700;          /* dourado, como antes */
+    font-weight: bold;
+}
+
+/* ===== BOTÃO DE COLAPSO – ESTILO IGUAL AOS BOTÕES DOS JOGOS ===== */
+.section-header .collapse-btn {
+    background: transparent !important;        /* remove fundo branco */
+    border: 2px solid var(--cor-primaria) !important;
+    color: var(--cor-primaria) !important;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: none;
+    outline: none;
+}
+
+/* Efeito ao clicar (igual aos botões dos jogos) */
+.section-header .collapse-btn:active {
+    background: var(--cor-primaria) !important;
+    color: #000 !important;
+}
+
+/* Efeito suave ao passar o mouse (opcional, igual aos outros) */
+.section-header .collapse-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Rotação da seta quando colapsado (mantém a funcionalidade) */
+.section-header .collapse-btn.rotated {
+    transform: rotate(180deg);
+}
+
+/* Lista de sementes (conteúdo colapsável) */
+.deposito-lista {
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    max-height: 500px;          /* altura expandida (ajuste se necessário) */
+    opacity: 1;
+    padding: 0 15px 15px 15px;  /* laterais e inferior quando expandido */
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Estado colapsado */
+.deposito-area.collapsed .deposito-lista {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 15px;            /* mantém padding lateral, zera vertical */
+    margin: 0;
+}
+
+/* Ajuste fino para itens dentro da lista (mantém seu espaçamento) */
+.deposito-lista .item-deposito {
+    padding: 5px 10px;
+    margin: 0 5px 5px 0;
+}
+
+.conquistas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 5px;
+}
+
+.item-conquista {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 15px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.item-conquista.bloqueada {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+}
+
+.conquista-icone {
+    font-size: 2rem;
+    min-width: 50px;
+    text-align: center;
+}
+
+.conquista-info {
+    flex: 1;
+}
+
+.conquista-nome {
+    font-weight: bold;
+    color: var(--cor-primaria);
+    display: block;
+}
+
+.conquista-desc {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.conquista-check {
+    font-size: 1.2rem;
+    margin-left: auto;
+}
+
+.metas-container {
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+.item-meta {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+}
+.item-meta .barra-meta {
+    background: rgba(255,255,255,0.2);
+    height: 8px;
+    border-radius: 4px;
+    margin: 5px 0;
+    overflow: hidden;
+}
+.item-meta .barra-meta div {
+    height: 100%;
+    background: var(--cor-primaria);
+}
+
+/* 5.1 Planta crescendo com pulsação suave */
+@keyframes pulsarCrescimento {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); filter: brightness(1.1); }
+    100% { transform: scale(1); }
+}
+.crescendo {
+    animation: pulsarCrescimento 2s infinite ease-in-out;
+}
+
+/* 5.1 Gotinhas de Água */
+.gota {
+    position: absolute;
+    width: 4px;
+    height: 10px;
+    background: #3498db;
+    border-radius: 50%;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: cairGota 0.6s linear forwards;
+    z-index: 10;
+}
+@keyframes cairGota {
+    0% { transform: translateY(-20px); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(20px); opacity: 0; }
+}
+
+/* 5.3 Transição de Entrada */
+.fazenda-container {
+    animation: fadeInFazenda 0.8s ease-out;
+}
+@keyframes fadeInFazenda {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Efeito Viagem (Blur) */
+.efeito-viagem {
+    filter: blur(15px);
+    transition: filter 0.5s ease-in-out;
+}
+
+@media (max-width: 400px) {
+    .item-animal-card {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .btn-alimentar-card {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+    .animal-icone {
+        font-size: 2rem;
+        min-width: 40px;
+    }
+}
+
+/* ==========================================
+   LISTA DE ANIMAIS - VERSÃO MINIMALISTA
+========================================== */
+
+/* Container da lista: 3 colunas em telas maiores, 2 em médias, 1 em pequenas */
+.animais-lista {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+    gap: 6px;
+    padding: 5px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ajuste responsivo */
+@media (max-width: 600px) {
+    .animais-lista {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 400px) {
+    .animais-lista {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card do animal */
+.item-animal-card {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--cor-primaria);
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;      /* empilha verticalmente */
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ícone do animal */
+.animal-icone {
+    font-size: 2rem;             /* um pouco maior para destaque */
+    line-height: 1;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+
+/* Nome do animal */
+.animal-nome {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--cor-primaria);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* Container da felicidade (ícone + círculo) */
+.animal-felicidade {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: #ffb347;
+}
+
+/* Círculo de status da felicidade */
+.status-felicidade {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 4px currentColor;
+}
+
+/* Cores conforme nível (definidas via JS) */
+.status-felicidade.alta {
+    background-color: #2ecc71;
+    box-shadow: 0 0 6px #2ecc71;
+}
+.status-felicidade.media {
+    background-color: #f39c12;
+    box-shadow: 0 0 6px #f39c12;
+}
+.status-felicidade.baixa {
+    background-color: #e74c3c;
+    box-shadow: 0 0 6px #e74c3c;
+}
+
+/* Botão alimentar como ícone */
+.btn-alimentar-card {
+    background: transparent;
+    border: none;
+    color: var(--cor-primaria);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 2px;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.btn-alimentar-card:hover {
+    transform: scale(1.2);
+    color: #ffd700;
+}
+
+/* Tooltip personalizado (opcional) – usando apenas o title do HTML */

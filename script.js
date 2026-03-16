@@ -1,0 +1,1803 @@
+// ==========================================
+// SANTUÁRIO - MOTOR DE IDENTIDADE E ESTADO
+// ==========================================
+
+window.IDS_SANTUARIO = {
+    "Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",
+    "meXVetR7D7b8d00Yuw8wjtRlpoi1": "thamiris"
+};
+
+// Variáveis globais de estado
+window.usuarioLogado = null;
+window.souJoao = false;
+window.MEU_NOME = "";
+window.NOME_PARCEIRO = "";
+
+if (window.__SANTUARIO_SCRIPT_CARREGADO) {
+    console.warn('Script já carregado.');
+} else {
+    window.__SANTUARIO_SCRIPT_CARREGADO = true;
+    const dataInicio = new Date("2025-10-29T16:30:00").getTime();
+
+// Variáveis globais (serão preenchidas pelo login)
+window.usuarioLogado = null;
+window.souJoao = false;
+window.MEU_NOME = "";
+window.NOME_PARCEIRO = "";
+
+// ==========================================
+// SISTEMA PARA O PULSO (usa Firebase)
+// ==========================================
+window.SantuarioApp = window.SantuarioApp || {};
+window.SantuarioApp.inicializado = false;
+window.SantuarioApp.modulos = null;
+window.SantuarioApp.conectar = function() {
+    if (!this.inicializado || !this.modulos) return;
+    const { db, ref, onValue } = this.modulos;
+    console.log("Satélite do Santuário Conectado!");
+
+    const refPulsoParceiro = ref(db, 'pulsos/' + NOME_PARCEIRO.toLowerCase());
+    onValue(refPulsoParceiro, (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.timestamp > window.ultimoPulsoRecebido) {
+            window.ultimoPulsoRecebido = dados.timestamp;
+            receberPulsoVisual();
+        }
+    });
+
+    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    const refContadorParceiro = ref(db, 'pulsosContador/' + NOME_PARCEIRO.toLowerCase() + '/' + hoje);
+    onValue(refContadorParceiro, (snapshot) => {
+        const contador = snapshot.val() || 0;
+        atualizarContadorInterface(contador);
+    });
+
+    const refJardim = ref(db, 'jardim_global');
+    onValue(refJardim, (snapshot) => {
+        if (snapshot.exists()) {
+            statusPlanta = snapshot.val();
+            renderizarPlanta();
+        } else {
+            statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
+            renderizarPlanta();
+        }
+    });
+
+    // --- ESCUTA DO TERMÔMETRO DO CUIDADO ---
+    const refMoodParceiro = ref(db, 'moods/' + window.NOME_PARCEIRO.toLowerCase());
+    onValue(refMoodParceiro, (snapshot) => {
+        const dados = snapshot.val();
+        if (dados) {
+            atualizarTelaPeloMood(dados.estado, dados.timestamp);
+        }
+    });
+
+    // --- ESCUTA DOS POST-ITS (IMORTAIS) ---
+const refPostits = ref(db, 'postits');
+onValue(refPostits, (snapshot) => {
+    const area = document.getElementById('area-postits');
+    if (!area) return;
+
+    area.innerHTML = '';
+    const postits = [];
+
+    snapshot.forEach((filho) => {
+        postits.push({ key: filho.key, ...filho.val() });
+    });
+
+    // Ordenar: fixados primeiro, depois por timestamp decrescente (mais recentes primeiro)
+    postits.sort((a, b) => {
+        if (a.fixado && !b.fixado) return -1;
+        if (!a.fixado && b.fixado) return 1;
+        return b.timestamp - a.timestamp;
+    });
+
+    postits.forEach(p => {
+        // Converte o Timestamp em data legível
+        const dataObjeto = new Date(p.timestamp);
+        const dataFormatada = `${String(dataObjeto.getDate()).padStart(2, '0')}/${String(dataObjeto.getMonth()+1).padStart(2, '0')} às ${String(dataObjeto.getHours()).padStart(2, '0')}:${String(dataObjeto.getMinutes()).padStart(2, '0')}`;
+
+        // Define a cor baseada em quem escreveu
+        const classeAutor = (p.autor === 'João') ? 'postit-joao' : 'postit-thamiris';
+
+        const div = document.createElement('div');
+        div.className = `postit ${classeAutor}`;
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;">
+                <span class="postit-autor">${p.autor}</span>
+                <span style="font-size: 0.65rem; opacity: 0.6; font-weight: normal;">${dataFormatada}</span>
+            </div>
+            <div style="font-size: 0.95rem; margin-bottom: 8px;">${p.mensagem}</div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        `;
+
+        // Botão de fixar (só para o autor)
+        if (p.autor === window.MEU_NOME) {
+            const btnFixar = document.createElement('button');
+            btnFixar.innerText = p.fixado ? '📌 Fixado' : '📍 Fixar';
+            btnFixar.className = 'btn-fixar';
+            btnFixar.onclick = (e) => {
+                e.stopPropagation();
+                fixarPostit(p.key, !p.fixado);
+            };
+            div.querySelector('div:last-child').appendChild(btnFixar);
+        }
+
+        // Botão de curtir
+        const btnCurtir = document.createElement('button');
+        btnCurtir.innerText = `❤️ ${p.curtidas || 0}`;
+        btnCurtir.className = 'btn-curtir';
+        btnCurtir.onclick = (e) => {
+            e.stopPropagation();
+            curtirPostit(p.key);
+        };
+        div.querySelector('div:last-child').appendChild(btnCurtir);
+
+        area.appendChild(div);
+    });
+
+    // Desce a barra de rolagem suavemente para o recado mais novo (se houver)
+    if (postits.length > 0) {
+        area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+    }
+});
+};
+// ==========================================
+
+let statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
+let audioJogos = null;
+let audioJogosMuted = localStorage.getItem('audio_jogos_muted') === 'true';
+let telaAtual = 'home';
+
+// 1. MOTOR DO TEMPO
+function atualizarMotorDoTempo() {
+    const agora = new Date().getTime();
+    const diferenca = agora - dataInicio;
+    const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((diferenca % (1000 * 60)) / 1000);
+    const formatar = (n) => n < 10 ? "0" + n : n;
+
+    const timerElemento = document.getElementById("timer-principal");
+    if (timerElemento) {
+        timerElemento.innerHTML = `${dias}d ${formatar(horas)}h ${formatar(minutos)}m ${formatar(segundos)}s`;
+    }
+}
+
+// 2. CONFIGURAÇÃO DA PLANILHA EXTERNA
+const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?output=csv";
+
+async function carregarDadosExternos() {
+    try {
+        const resposta = await fetch(URL_PLANILHA);
+        const dadosTexto = await resposta.text();
+        const linhas = dadosTexto.split(/\r?\n/).slice(1);
+        const dadosDoDia = linhas.map(linha => {
+            if (!linha.trim()) return null;
+            const colunas = linha.split(",");
+            const data = colunas[0].trim();
+            const palavra = colunas[colunas.length - 1].trim().toUpperCase();
+            let frase = colunas.slice(1, colunas.length - 1).join(",");
+            frase = frase.replace(/(^"|"$)/g, '').trim();
+            return { data, frase, palavra };
+        }).filter(Boolean);
+
+        const d = new Date();
+        const hojeFormatado = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        const configHoje = dadosDoDia.find(item => item.data === hojeFormatado) || dadosDoDia[0];
+
+        if (configHoje) {
+            const elFrase = document.getElementById("frase-do-dia");
+            if (elFrase) {
+                elFrase.innerHTML = `<div class="container-frase"><span class="aspas-decorativa">“</span><p class="texto-itálico">${configHoje.frase}</p><span class="aspas-decorativa">”</span></div>`;
+            }
+            window.PALAVRA_DO_DIA = configHoje.palavra;
+            if (localStorage.getItem('santuario_vitoria_dia') === hojeFormatado) {
+                setTimeout(liberarCofreVisual, 500);
+            }
+        }
+    } catch (e) {
+        console.error("Erro planilha:", e);
+    }
+}
+
+// 3. NAVEGAÇÃO SPA
+function configurarNavegacao() {
+    const botoesMenu = document.querySelectorAll('.item-menu');
+    const todasAsTelas = document.querySelectorAll('.tela');
+
+    botoesMenu.forEach(botao => {
+        botao.addEventListener('click', (evento) => {
+            evento.preventDefault();
+            const telaAlvo = botao.getAttribute('data-alvo');
+            
+            if (telaAlvo === telaAtual) return;
+
+            const telaAnterior = telaAtual;
+
+            botoesMenu.forEach(b => b.classList.remove('ativo'));
+            botao.classList.add('ativo');
+
+            todasAsTelas.forEach(tela => tela.classList.add('escondido'));
+            const elementoTela = document.getElementById(telaAlvo);
+            if (elementoTela) elementoTela.classList.remove('escondido');
+
+            telaAtual = telaAlvo;
+
+            if (telaAlvo === 'jogos') {
+                playAudioJogos();
+            } else if (telaAnterior === 'jogos') {
+                pauseAudioJogos();
+            }
+
+            atualizarDinamicaHome();
+        });
+    });
+}
+
+// 4. JOGO: TERMO (código original)
+let tentativaAtual = 0;
+let letraAtual = 0;
+let grade = ["", "", "", "", "", ""];
+
+function salvarEstadoTermo() {
+    const estado = {
+        tentativaAtual: tentativaAtual,
+        letraAtual: letraAtual,
+        grade: grade
+    };
+    sessionStorage.setItem('termo_estado', JSON.stringify(estado));
+}
+
+function inicializarTermo() {
+    const tabuleiro = document.getElementById("tabuleiro-termo");
+    if (!tabuleiro) return;
+    tabuleiro.innerHTML = "";
+
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
+
+    if (ganhouHoje) {
+        const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+        for (let i = 0; i < 6; i++) {
+            let linha = document.createElement("div");
+            linha.className = "linha-termo";
+            for (let j = 0; j < 5; j++) {
+                let quadrado = document.createElement("div");
+                quadrado.className = "letra-quadrado correta";
+                quadrado.innerText = palavraFinal[j];
+                linha.appendChild(quadrado);
+            }
+            tabuleiro.appendChild(linha);
+        }
+
+        document.getElementById("teclado-termo").innerHTML = "";
+        document.getElementById("btn-verificar").classList.add("escondido");
+
+        const inst = document.getElementById('instrucoes-termo');
+        inst.innerHTML = `<h4 style="text-align:center; color: var(--cor-agronomia);">Vitória Colhida! 🌱</h4>
+                          <p style="text-align:center;">Volte amanhã para colher uma nova palavra e liberar mais relíquias.</p>`;
+        inst.classList.remove('escondido');
+
+        tentativaAtual = 6;
+        return;
+    }
+
+    tentativaAtual = 0;
+    letraAtual = 0;
+    grade = ["", "", "", "", "", ""];
+    document.getElementById("btn-verificar").classList.remove("escondido");
+    document.getElementById("teclado-termo").innerHTML = "";
+
+    for (let i = 0; i < 6; i++) {
+        let linha = document.createElement("div");
+        linha.className = "linha-termo";
+        for (let j = 0; j < 5; j++) {
+            let quadrado = document.createElement("div");
+            quadrado.className = "letra-quadrado";
+            quadrado.id = `q-${i}-${j}`;
+            linha.appendChild(quadrado);
+        }
+        tabuleiro.appendChild(linha);
+    }
+    restaurarEstadoTermo();
+
+    gerarTeclado();
+
+    const btnVerificar = document.getElementById('btn-verificar');
+    if (btnVerificar) {
+        const novoBtn = btnVerificar.cloneNode(true);
+        btnVerificar.parentNode.replaceChild(novoBtn, btnVerificar);
+        novoBtn.addEventListener('click', verificarPalavra);
+    }
+}
+
+function gerarTeclado() {
+    const tecladoContainer = document.getElementById("teclado-termo");
+    if (!tecladoContainer) return;
+    const layout = [
+        ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+        ["⌫", "Z", "X", "C", "V", "B", "N", "M"]
+    ];
+    layout.forEach(linha => {
+        const divLinha = document.createElement("div");
+        divLinha.className = "linha-teclado";
+        linha.forEach(tecla => {
+            const btn = document.createElement("button");
+            btn.innerText = tecla;
+            btn.className = tecla.length > 1 ? "tecla tecla-larga" : "tecla";
+            btn.onclick = () => processarEntrada(tecla);
+            divLinha.appendChild(btn);
+        });
+        tecladoContainer.appendChild(divLinha);
+    });
+}
+
+function processarEntrada(tecla) {
+    if (tentativaAtual >= 6) return;
+    else if (tecla === "⌫") apagarLetra();
+    else adicionarLetra(tecla);
+}
+
+function adicionarLetra(letra) {
+    if (letraAtual < 5) {
+        const quadrado = document.getElementById(`q-${tentativaAtual}-${letraAtual}`);
+        if (quadrado) {
+            quadrado.innerText = letra;
+            grade[tentativaAtual] += letra;
+            letraAtual++;
+            salvarEstadoTermo();
+        }
+    }
+}
+
+function apagarLetra() {
+    if (letraAtual > 0) {
+        letraAtual--;
+        const quadrado = document.getElementById(`q-${tentativaAtual}-${letraAtual}`);
+        if (quadrado) {
+            quadrado.innerText = "";
+            grade[tentativaAtual] = grade[tentativaAtual].slice(0, -1);
+            salvarEstadoTermo();
+        }
+    }
+}
+
+function verificarPalavra() {
+    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+    salvarEstadoTermo();
+    const palpite = grade[tentativaAtual];
+    if (palpite.length < 5) return;
+
+    for (let i = 0; i < 5; i++) {
+        const quadrado = document.getElementById(`q-${tentativaAtual}-${i}`);
+        const letra = palpite[i];
+        if (letra === palavraFinal[i]) quadrado.classList.add("correta");
+        else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
+        else quadrado.classList.add("ausente");
+    }
+
+    if (palpite === palavraFinal) finalizarVitoria();
+    else {
+        tentativaAtual++;
+        letraAtual = 0;
+        if (tentativaAtual === 6) {
+            mostrarToast("Não foi dessa vez... Mas você merece outra chance!");
+            document.getElementById('termo-reset-container').classList.remove('escondido');
+        }
+    }
+}
+
+function finalizarVitoria() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    localStorage.setItem('santuario_vitoria_dia', hoje);
+    mostrarToast("Incrível! Você colheu a vitória! 🌱");
+    // Confetes
+confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 }
+});
+    inicializarTermo();
+    liberarCofreVisual();
+    atualizarDinamicaHome();
+    document.getElementById('tabuleiro-termo').classList.add('vitoria');
+}
+
+function resetarTermo() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    sessionStorage.removeItem('termo_estado');
+    if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
+        return;
+    }
+    tentativaAtual = 0;
+    letraAtual = 0;
+    grade = ["", "", "", "", "", ""];
+    inicializarTermo();
+    const resetContainer = document.getElementById('termo-reset-container');
+    if (resetContainer) {
+        resetContainer.classList.add('escondido');
+    }
+}
+
+function restaurarEstadoTermo() {
+    const estadoSalvo = sessionStorage.getItem('termo_estado');
+    if (estadoSalvo) {
+        try {
+            const estado = JSON.parse(estadoSalvo);
+            tentativaAtual = estado.tentativaAtual;
+            letraAtual = estado.letraAtual;
+            grade = estado.grade;
+
+            for (let i = 0; i <= tentativaAtual; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const quadrado = document.getElementById(`q-${i}-${j}`);
+                    if (quadrado && grade[i] && grade[i][j]) {
+                        quadrado.innerText = grade[i][j];
+                        if (i < tentativaAtual) {
+                            const letra = grade[i][j];
+                            const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+                            if (letra === palavraFinal[j]) quadrado.classList.add("correta");
+                            else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
+                            else quadrado.classList.add("ausente");
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Estado do Termo corrompido. Ignorando...');
+            sessionStorage.removeItem('termo_estado');
+        }
+    }
+}
+
+function liberarCofreVisual() {
+    const botaoCofre = document.querySelector('[data-alvo="cofre"]');
+    if (botaoCofre) {
+        botaoCofre.style.animation = "pulse-gold 2s infinite";
+        botaoCofre.classList.remove('bloqueado');
+    }
+    const msg = document.getElementById('msg-cofre');
+    if (msg) msg.innerText = "Acesso Concedido para Hoje";
+
+    document.querySelectorAll('.item-cofre').forEach(item => {
+        item.classList.remove('bloqueado');
+        const status = item.querySelector('.status-reliquia');
+        if (status) status.innerText = "Disponível";
+    });
+}
+
+function toggleInstrucoesTermo() {
+    document.getElementById('instrucoes-termo').classList.toggle('escondido');
+}
+function toggleInstrucoesSincronia() {
+    document.getElementById('instrucoes-sincronia').classList.toggle('escondido');
+}
+function toggleInstrucoesJardim() {
+    document.getElementById('instrucoes-jardim').classList.toggle('escondido');
+}
+
+// 5. CLIMA
+const API_KEY = "da54b3d1f91b3ca0850de8cb7890e572";
+
+function obterEmojiClima(condicao, sunrise, sunset) {
+    const agora = Math.floor(Date.now() / 1000);
+    const eNoite = agora < sunrise || agora > sunset;
+    let emoji = '';
+    let classe = '';
+
+    switch(condicao) {
+        case 'Clear':
+            emoji = eNoite ? '🌙' : '☀️';
+            classe = eNoite ? 'emoji-lua' : 'emoji-sol';
+            break;
+        case 'Clouds':
+            emoji = '☁️';
+            classe = 'emoji-nuvem';
+            break;
+        case 'Rain':
+            emoji = '🌧️';
+            classe = 'emoji-chuva';
+            break;
+        case 'Thunderstorm':
+            emoji = '⛈️';
+            classe = 'emoji-tempestade';
+            break;
+        default:
+            emoji = '🌡️';
+            classe = '';
+    }
+
+    return `<span class="${classe}">${emoji}</span>`;
+}
+
+async function atualizarClima() {
+    const elJoão = document.getElementById("temp-usuario");
+    const elThamiris = document.getElementById("temp-thamiris");
+    const elMensagem = document.getElementById("texto-mensagem-clima");
+    const elIconeClima = document.getElementById("icone-clima");
+
+    try {
+        const resJ = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Colombo,BR&units=metric&appid=${API_KEY}`);
+        const resT = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Goiania,BR&units=metric&appid=${API_KEY}`);
+
+        if (!resJ.ok || !resT.ok) throw new Error('Erro na API');
+
+        const dJ = await resJ.json();
+        const dT = await resT.json();
+
+        if (dJ.main && elJoão) {
+            elJoão.innerHTML = `${Math.round(dJ.main.temp)}°C ${obterEmojiClima(dJ.weather[0].main, dJ.sys.sunrise, dJ.sys.sunset)}`;
+        }
+        if (dT.main && elThamiris) {
+            elThamiris.innerHTML = `${Math.round(dT.main.temp)}°C ${obterEmojiClima(dT.weather[0].main, dT.sys.sunrise, dT.sys.sunset)}`;
+        }
+
+        if (dT.main && elMensagem) {
+            const condicao = dT.weather[0].main;
+            const temp = Math.round(dT.main.temp);
+            elMensagem.innerText = gerarMensagemClima(condicao, temp);
+        }
+
+        if (dT.main && elIconeClima) {
+            const condicao = dT.weather[0].main;
+            let icone = '⛅';
+            switch (condicao) {
+                case 'Clear': icone = '☀️'; break;
+                case 'Clouds': icone = '☁️'; break;
+                case 'Rain': icone = '🌧️'; break;
+                case 'Thunderstorm': icone = '⛈️'; break;
+                case 'Snow': icone = '❄️'; break;
+                case 'Mist': case 'Fog': case 'Haze': icone = '🌫️'; break;
+                default: icone = '⛅';
+            }
+            elIconeClima.innerText = icone;
+        }
+
+    } catch (e) {
+        if (elJoão) elJoão.innerHTML = "❌ Indisponível";
+        if (elThamiris) elThamiris.innerHTML = "❌ Indisponível";
+        if (elMensagem) elMensagem.innerText = "❌ Clima indisponível no momento";
+        if (elIconeClima) elIconeClima.innerText = '❓';
+    }
+}
+
+function gerarMensagemClima(condicao, temperatura) {
+    const mensagens = {
+        Clear: [
+            "O céu de Goiânia está lindo hoje, igual você! 🌞",
+            "Solzinho aí? Aproveita e manda um raio de luz pra mim! ☀️",
+            "Céu limpo em Goiânia – combina com a transparência do meu amor por você."
+        ],
+        Clouds: [
+            "O dia em Goiânia está nublado, mas você continua sendo meu sol ☁️💛",
+            "Nublado? Perfeito para um café e uma conversa comigo.",
+            "Até as nuvens sabem que você é a parte mais bonita do céu."
+        ],
+        Rain: [
+            "Tá chovendo em Goiânia? Leva guarda-chuva, meu amor! 🌧️☔",
+            "Chuva aí? Isso é a natureza regando a saudade que eu tenho de você.",
+            "Cada gota dessa chuva é um pensamento meu caindo em você."
+        ],
+        Thunderstorm: [
+            "Tempestade aí? Fica segura e me avisa quando passar! ⛈️❤️",
+            "Trovões? Fica calma, estou aqui (mesmo longe). Depois me conta se tá tudo bem.",
+            "A força da tempestade não chega aos pés da força do que sinto por você."
+        ],
+        Snow: [
+            "Neve em Goiânia? Isso sim é raro! Se proteger do frio, viu? ❄️",
+            "Frio extremo? Hora de me ligar e pedir um abraço virtual."
+        ],
+        Mist: [
+            "Névoa em Goiânia? Parece cenário de filme romântico. Sinto sua falta.",
+            "Visibilidade baixa? Não deixa baixar a nossa conexão!"
+        ]
+    };
+    const padrao = [
+        "O clima em Goiânia está imprevisível, mas meu amor por você é constante! 🌡️",
+        "Seja qual for o tempo, meu pensamento em você não muda.",
+        `${temperatura}°C em Goiânia – mas o que esquenta mesmo é meu coração por você.`
+    ];
+    const lista = mensagens[condicao] || padrao;
+    return lista[Math.floor(Math.random() * lista.length)];
+}
+
+// ==========================================
+// FUNÇÕES DO PULSO E JARDIM
+// ==========================================
+window.ultimoPulsoRecebido = Date.now();
+
+function enviarPulso() {
+    if (!window.SantuarioApp.inicializado || !window.MEU_NOME) {
+        mostrarToast("Aguardando identificação... tente novamente.");
+        return;
+    }
+    const { db, ref, set, runTransaction } = window.SantuarioApp.modulos;
+    
+    const refMeuPulso = ref(db, 'pulsos/' + window.MEU_NOME.toLowerCase());
+    set(refMeuPulso, { timestamp: Date.now() });
+
+    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    const refMeuContador = ref(db, 'pulsosContador/' + window.MEU_NOME.toLowerCase() + '/' + hoje);
+    runTransaction(refMeuContador, (valorAtual) => (valorAtual || 0) + 1);
+
+    const btn = document.getElementById("btn-pulso");
+btn.classList.add('pulso-enviado');
+setTimeout(() => btn.classList.remove('pulso-enviado'), 1000);
+    const icone = document.getElementById("icone-semente");
+    const feedback = document.getElementById("msg-feedback");
+    const txtContador = document.getElementById("contador-pulso");
+    
+
+    if (icone) icone.innerText = "💖";
+    if (btn) btn.classList.add("germinar");
+    if (txtContador) txtContador.innerText = "Sintonia enviada pelo espaço...";
+    if (feedback) {
+        feedback.innerText = "Chegou lá!";
+        feedback.classList.add("visivel");
+    }
+
+    setTimeout(() => {
+        if (icone) icone.innerText = "🌱";
+        if (btn) btn.classList.remove("germinar");
+        if (feedback) feedback.classList.remove("visivel");
+    }, 2500);
+    
+}
+
+
+
+function receberPulsoVisual() {
+    if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 400]);
+    }
+
+    mostrarToast(`💓 ${window.NOME_PARCEIRO} está pensando em você agora!`);
+
+    const btn = document.getElementById("btn-pulso");
+    if (btn) {
+        btn.style.transition = "all 0.3s";
+        btn.style.boxShadow = "0 0 40px #e74c3c, inset 0 0 20px #e74c3c";
+        btn.style.borderColor = "#e74c3c";
+        
+        setTimeout(() => {
+            btn.style.boxShadow = "";
+            btn.style.borderColor = "";
+        }, 4000);
+    }
+}
+
+function atualizarContadorInterface(quantidade) {
+    const elemento = document.getElementById("contador-pulso");
+    if (!elemento || !window.NOME_PARCEIRO) return;
+
+    const nome = window.NOME_PARCEIRO;
+    const texto = quantidade > 0 
+        ? `💖 ${nome} pensou em você ${quantidade} ${quantidade === 1 ? 'vez' : 'vezes'} hoje`
+        : `💭 ${nome} ainda não enviou um sinal hoje`;
+
+    if (elemento.innerText !== texto) {
+        elemento.style.transition = 'transform 0.2s, color 0.2s';
+        elemento.style.transform = 'scale(1.05)';
+        elemento.style.color = '#e84342';
+        setTimeout(() => {
+            elemento.style.transform = 'scale(1)';
+            elemento.style.color = '';
+        }, 200);
+    }
+
+    elemento.innerText = texto;
+}
+
+function regarPlanta() {
+    if (!window.SantuarioApp.inicializado || !window.MEU_NOME) {
+        mostrarToast("Aguardando identificação...");
+        return;
+    }
+
+    const { db, ref, get, set } = window.SantuarioApp.modulos;
+    const refJardim = ref(db, 'jardim_global');
+
+    get(refJardim).then((snapshot) => {
+        let dados = snapshot.val() || { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
+        
+        const agora = new Date();
+        const hoje = agora.toLocaleDateString('pt-BR');
+
+        if (dados.diaUltimaRegada === hoje) {
+            mostrarToast("A terra já está úmida hoje. Voltem amanhã! 🌱");
+            return;
+        }
+
+        const somRega = new Audio('assets/sons/mf/regar.mp3');
+somRega.volume = 0.4;
+somRega.play().catch(e => console.log('Áudio bloqueado:', e));
+
+function animarRega(elemento) {
+    for (let i = 0; i < 5; i++) {
+        const gota = document.createElement('div');
+        gota.className = 'gota';
+        gota.style.left = Math.random() * 40 + 'px';
+        gota.style.top = '-10px';
+        elemento.appendChild(gota);
+        setTimeout(() => gota.remove(), 600);
+    }
+}
+
+        const ontem = new Date();
+        ontem.setDate(agora.getDate() - 1);
+        const ontemStr = ontem.toLocaleDateString('pt-BR');
+
+        if (dados.diaUltimaRegada === ontemStr) {
+            dados.sequencia += 1;
+        } else {
+            dados.sequencia = 1;
+        }
+
+        dados.nivel += 4;
+        if (dados.nivel >= 100) {
+            dados.ciclos += 1;
+            dados.nivel = 0;
+            mostrarToast(`🌸 CICLO COMPLETO! O amor de vocês atingiu um novo nível!`);
+        } else {
+            mostrarToast(`💦 Planta regada por ${window.MEU_NOME}!`);
+        }
+
+        const emoji = document.getElementById("emoji-planta");
+emoji.classList.add('regando');
+setTimeout(() => emoji.classList.remove('regando'), 800);
+
+        dados.diaUltimaRegada = hoje;
+        dados.ultimaRegada = agora.getTime();
+
+        set(refJardim, dados);
+        animarRega(document.getElementById('emoji-planta'));
+    });
+}
+
+function renderizarPlanta() {
+    const barra = document.getElementById("progresso-crescimento");
+    const emoji = document.getElementById("emoji-planta");
+    const texto = document.getElementById("status-texto");
+    const aviso = document.getElementById("aviso-regada");
+    const btn = document.getElementById("btn-regar");
+    const contadorCiclos = document.getElementById('contador-ciclos');
+    
+    if (contadorCiclos) contadorCiclos.innerText = `🌱 Ciclos completados: ${statusPlanta.ciclos || 0}`;
+    if (!barra || !emoji || !texto) return;
+    
+    barra.style.width = statusPlanta.nivel + "%";
+
+    if (statusPlanta.nivel <= 0) {
+        emoji.innerText = "🌱";
+        texto.innerText = "Um novo ciclo se inicia. Cuidem juntos.";
+    } else if (statusPlanta.nivel < 25) {
+        emoji.innerText = "🌿";
+        texto.innerText = "As raízes estão se firmando.";
+    } else if (statusPlanta.nivel < 50) {
+        emoji.innerText = "🌳";
+        texto.innerText = "Crescimento contínuo e forte.";
+    } else if (statusPlanta.nivel < 90) {
+        emoji.innerText = "🍃";
+        texto.innerText = "A folhagem já provê abrigo e paz.";
+    } else {
+        emoji.innerText = "🌸";
+        texto.innerText = "Prestes a florescer um novo marco!";
+    }
+
+    if (statusPlanta.diaUltimaRegada === new Date().toLocaleDateString('pt-BR')) {
+        if (btn) btn.style.opacity = "0.5";
+        if (aviso) aviso.innerText = "Solo nutrido por hoje. Descansem.";
+    } else {
+        if (btn) btn.style.opacity = "1";
+        if (aviso) aviso.innerText = "A planta aguarda a água de um de vocês.";
+    }
+}
+
+// Saudação personalizada
+function atualizarSaudacao() {
+    const agora = new Date();
+    const hora = agora.getHours();
+    let saudacao = '';
+
+    if (hora >= 6 && hora < 12) {
+        saudacao = 'Bom dia, meu amor! 🌞';
+    } else if (hora >= 12 && hora < 18) {
+        saudacao = 'Boa tarde, princesa! ☀️';
+    } else if (hora >= 18 && hora < 24) {
+        saudacao = 'Boa noite, meu céu! 🌙';
+    } else {
+        saudacao = 'Já é madrugada... sonhando com você! 🌜';
+    }
+
+    const elSaudacao = document.getElementById('saudacao-personalizada');
+    if (elSaudacao) {
+        elSaudacao.innerText = saudacao;
+    }
+}
+
+// ==========================================
+// 7. COFRE & RELÍQUIAS - SISTEMA AUTÔNOMO "SAFRA 2026"
+// ==========================================
+
+const BIBLIOTECA_RELIQUIAS = {
+    ceu: [
+        "Enquanto o sol se põe no horizonte de Goiânia, as primeiras estrelas aparecem aqui em Colombo. É o mesmo céu, apenas em tempos diferentes.",
+        "A lua que ilumina as ruas de Goiânia hoje é a mesma que reflete nos meus olhos aqui. Estamos sob o mesmo teto universal.",
+        "A distância entre nossas coordenadas geográficas é grande, mas a luz das estrelas não conhece fronteiras. Olhe para cima, eu estou lá com você.",
+        "Mesmo que o clima em Colombo seja diferente do calor de Goiânia, o universo que nos envolve é um só. Sinta a conexão no ar.",
+        "Cada constelação que cruza o meridiano hoje leva um pensamento meu até você. O céu é o nosso correio sentimental.",
+        "Não importa o fuso ou a distância: se ambos olharmos para o alto agora, nossos olhares se cruzam no infinito.",
+        "O ciclo hídrico, as nuvens que viajam... tudo o que flutua acima de nós prova que nada está realmente separado.",
+        "Goiânia tem o seu brilho, Colombo tem o meu silêncio, mas o céu de hoje une nossas essências em uma só moldura.",
+        "A física explica a distância, mas o céu prova a unidade. Somos dois pontos sob a mesma abóbada celeste.",
+        "Que a imensidão do céu de hoje te lembre que o meu amor por você não tem limites cartográficos.",
+        "O céu de Colombo hoje sopra um vento sul que carrega o meu 'eu te amo' até o calor de Goiânia.",
+        "As estrelas são os pontos de GPS que o destino traçou para que nossas almas nunca se perdessem.",
+        "A mesma lua que ilumina sua leitura do Vade Mecum é a que brilha sobre meus mapas de solo.",
+        "A distância é uma grandeza física; nosso amor é uma constante universal que o céu apenas molda.",
+        "Se o céu fosse um tribunal, a lua seria a testemunha ocular de que não passo um minuto sem te desejar.",
+        "Não existe nuvem pesada o suficiente para esconder o brilho que você emana no meu horizonte.",
+        "Olhar para o alto é o meu ritual de proximidade; o universo é o nosso ponto de encontro oficial.",
+        "Enquanto a terra gira, meu pensamento orbita você como um satélite em sintonia perfeita.",
+        "O céu hoje tem a cor da paz que sinto quando ouço a sua voz através das ondas do espaço.",
+        "Somos dois pontos em estados diferentes, mas sob a mesma cúpula de infinito. Nada nos separa.",
+        "A atmosfera entre nós não é vácuo, é preenchida por uma saudade que se converte em força.",
+        "Que o brilho de Sirius hoje te lembre que a luz mais forte da minha vida vem de Goiânia.",
+        "O pôr do sol é o ensaio geral para o dia em que o veremos juntos, sem telas entre nós.",
+        "A astronomia explica os astros; o que eu sinto por você explica o porquê de eles brilharem.",
+        "Cada estrela hoje é um pixel da imagem do futuro que estou construindo ao seu lado.",
+        "O céu não é o limite para nós; é apenas o cenário onde nossa história é escrita com luz.",
+        "Goiânia e Colombo dividem o mesmo meridiano de afeto. O tempo para nós é sempre agora.",
+        "Sinta a brisa: é a atmosfera fazendo o intercâmbio de suspiros entre o meu peito e o seu.",
+        "A imensidão do céu é o único lugar que comporta a grandiosidade do que sinto por você.",
+        "Nossas coordenadas são diferentes, mas o nosso zênite é o mesmo: a felicidade mútua.",
+        "O céu noturno é o pergaminho onde as constelações desenham o nosso 'para sempre'.",
+        "A luz que viajou anos-luz para chegar aqui hoje é jovem perto da eternidade do nosso amor.",
+        "Não importa o quão longe o horizonte pareça, ele sempre termina onde você começa.",
+        "O céu de hoje é um espelho: ele reflete a beleza que eu vejo em você todos os dias.",
+        "Mesmo que o tempo mude, minha lealdade a você é tão fixa quanto a Estrela Polar.",
+        "O firmamento é o nosso teto compartilhado enquanto nossa casa física ainda está em obras no destino.",
+        "A vastidão acima de nós é a prova de que para o amor, não existe território proibido.",
+        "Beije a lua com o olhar; eu farei o mesmo daqui e nos encontraremos no reflexo dela.",
+        "O céu de hoje é o prefácio do livro que escreveremos quando a distância for apenas uma lembrança.",
+        "Você é o sol do meu sistema particular; tudo em mim gravita ao redor da sua existência.",
+        "O satélite que mapeia as terras lá do alto é o mesmo que captura a intensidade do meu pensamento em você agora.",
+        "A umidade do ar em Colombo hoje é saudade condensada, esperando o sol de Goiânia para se transformar em reencontro.",
+        "O céu não tem cercas nem divisas; ele é a prova de que nosso amor é um território livre de qualquer embargo.",
+        "As ondas de rádio cruzam o país, mas é o brilho da lua que faz o download direto do meu coração para o seu.",
+        "Se a distância fosse medida em anos-luz, o céu de hoje diria que já chegamos ao nosso destino final: um ao lado do outro.",
+        "O vento que sopra no Sul hoje é o mensageiro que leva o oxigênio da minha vida para alimentar os seus sonhos aí.",
+        "Cada estrela cadente é uma petição de urgência que envio ao universo para que o tempo acelere até o nosso abraço.",
+        "A estratosfera é o único lugar vasto o suficiente para guardar o arquivo completo de tudo o que planejamos juntos.",
+        "Olhe para o horizonte: onde a terra parece terminar, é onde a nossa história ganha a imensidão do infinito.",
+        "O sol de hoje realiza a fotossíntese da minha alma, mas é o brilho dos seus olhos que me dá a energia para crescer.",
+        "Não existe fuso horário para o afeto; sob este céu, o meu relógio biológico bate no ritmo da sua respiração.",
+        "A luz zodiacal de hoje é o reflexo do ouro que você plantou na minha vida. Você é o meu maior tesouro sob o firmamento.",
+        "O céu é o diário oficial do nosso amor, onde cada nuvem desenha uma cláusula de felicidade eterna.",
+        "Mesmo que o tempo tente nos separar, o céu de hoje é a prova de que estamos sempre juntos, olhando para o mesmo infinito.",
+        "A distância é apenas um número; o céu é a prova de que para o amor, não existem fronteiras geográficas."
+    ],
+    sementes: [
+        "Nosso amor não é uma cultura de ciclo curto; é uma floresta perene. Suas raízes já atingiram o lençol freático da minha alma.",
+        "Como uma semente que rompe o solo, nosso sentimento venceu a distância e a força maior para florescer no Santuário.",
+        "Você é a cláusula pétrea do meu coração. Não cabe emenda, não cabe revisão, apenas o cumprimento integral do nosso afeto.",
+        "O veredito da minha vida foi dado no dia em que te conheci: culpado por te amar além de qualquer jurisdição.",
+        "A produtividade do meu coração atinge recordes toda vez que recebo um sinal seu. Você é o meu melhor insumo.",
+        "Nossa conexão é como um solo de alta fertilidade: exige cuidado, mas a colheita é a mais doce que a vida já produziu.",
+        "Mesmo sem o toque físico, nossa fotossíntese acontece através das palavras. Você é a luz que aciona o meu crescimento.",
+        "O Vade Mecum do meu afeto tem apenas uma lei: o bem-estar da Thamiris acima de todas as coisas.",
+        "Não há embargo que impeça o crescimento do que plantamos. Nossa história é solo protegido, área de preservação permanente.",
+        "A logística do destino pode ser complexa, mas a colheita do nosso primeiro abraço será o evento do século.",
+        "Você é a semente mais rara: aquela que floresce no deserto da distância e perfuma toda a minha vida.",
+        "O solo do meu coração foi preparado com paciência para receber a cultura mais preciosa: você.",
+        "Nossa conexão é cláusula pétrea: não admite revisão, não admite retrocesso, apenas soberania.",
+        "Como um agrônomo cuida da terra, eu cuido do nosso nós: com técnica, zelo e amor profundo.",
+        "Você é o meu veredito de felicidade absoluta, sem possibilidade de recurso ou apelação.",
+        "Suas raízes em mim são tão profundas que nenhuma intempérie do mundo consegue te arrancar.",
+        "Não somos um plantio de temporada; somos uma floresta nativa de sentimentos inesgotáveis.",
+        "A produtividade da minha alma triplicou desde que você se tornou o meu insumo principal.",
+        "Você é o direito adquirido que eu defendo com unhas e dentes perante qualquer tribunal da vida.",
+        "O adubo do nosso amor é a confiança; a colheita será a nossa vida inteira sob o mesmo teto.",
+        "Sua voz é o nutriente que faltava para que meu dia pudesse realizar a fotossíntese completa.",
+        "Nossa história é um contrato de adesão onde o coração aceitou todas as cláusulas de primeira.",
+        "Você não é apenas um plano; você é a execução de um projeto de vida que deu certo.",
+        "Em cada 'bom dia' seu, encontro a base legal para ser o homem mais feliz do planeta.",
+        "O zoneamento do meu peito é exclusivo seu: área de proteção ambiental para o nosso afeto.",
+        "Se a vida é um processo, você é a sentença favorável que eu esperei a vida inteira para ler.",
+        "Sua existência em minha vida é o milagre da germinação: transformou o seco em jardim.",
+        "Você é a minha melhor tese; o argumento imbatível de que o amor verdadeiro ainda existe.",
+        "Não há praga ou geada que destrua o que cultivamos com a verdade dos nossos olhos.",
+        "O Vade Mecum do nosso amor diz que a prioridade máxima é o seu sorriso, sempre.",
+        "Nossa conexão é de alta linhagem, semente selecionada pelos deuses para vingar no tempo.",
+        "Você é o meu patrimônio afetivo inalienável; ninguém tira, ninguém mexe, ninguém copia.",
+        "Cultivo você no meu pensamento com a precisão de quem sabe que a colheita será o paraíso.",
+        "Onde houver Thamiris, haverá florescimento. Você é a vida em sua forma mais vibrante.",
+        "O foro competente para julgar nosso amor é o abraço, e a sentença é sempre a união.",
+        "Você é a irrigação que salva o meu deserto pessoal nos dias em que a saudade aperta.",
+        "Nossa história tem validade jurídica no céu e eficácia prática em cada batida do meu coração.",
+        "Sou um engenheiro da nossa felicidade, construindo alicerces de rocha para o seu descanso.",
+        "A biodiversidade dos seus sorrisos é o que mantém o ecossistema da minha paz em equilíbrio.",
+        "Você é a Nata, o Suprassumo, o ápice da criação. E eu sou o homem que teve a honra de te plantar em mim.",
+        "Você é o meu melhor manejo: aquele que transformou um solo bruto na terra mais fértil que um homem já teve a honra de cultivar.",
+        "Nossa união é um contrato de trato sucessivo: cada dia que passa, o valor do que sinto por você se multiplica sem limites.",
+        "Não existem vícios redibitórios no nosso amor; ele é perfeito em todas as suas formas, cores e essências.",
+        "Você é a variedade de semente mais resistente do mundo: suporta a distância, vence o tempo e floresce com uma beleza única.",
+        "Minha lealdade a você é incondicional, como uma norma de ordem pública que nenhum evento externo pode revogar.",
+        "O monitoramento da nossa felicidade indica um rendimento de 100%. Você é a safra que eu esperei a vida inteira para colher.",
+        "Você é o meu direito de superfície: o chão onde eu piso e o céu que eu alcanço. Tudo em mim pertence a você.",
+        "A biodiversidade dos seus sorrisos é o que protege o meu ecossistema pessoal contra qualquer tristeza ou desânimo.",
+        "Como uma reserva legal, o meu amor por você é intocável, protegido por leis que só o coração conhece.",
+        "Você é a sentença transitada em julgado da minha busca pelo amor: não cabe mais recurso, você é a minha decisão final.",
+        "Nossa conexão tem a força de uma escritura pública lavrada nas estrelas: imutável, solene e eterna.",
+        "O plantio foi feito com verdade, a irrigação é feita com saudade e a colheita será a nossa vida inteira juntos.",
+        "Você é o suprassumo da criação, a prova de que a natureza e o destino atingiram a perfeição quando te desenharam para mim.",
+        "Você é a minha melhor prática agrícola: aquela que transformou um solo bruto na terra mais fértil que um homem já teve a honra de cultivar.",
+        "Nossa união é um contrato de trato sucessivo: cada dia que passa, o valor do que sinto por você se multiplica sem limites.",
+        "Não existem vícios redibitórios no nosso amor; ele é perfeito em todas as suas formas, cores e essências.",
+        "Você é a variedade de semente mais resistente do mundo: suporta a distância, vence o tempo e floresce com uma beleza única."
+    ],
+    futuro: [
+        { t: "O PRIMEIRO ABRAÇO EM SOLO GOIANO", d: "Válido para o momento em que a distância física se tornar zero. Sem expiração.", c: "CO-GYN-001" },
+        { t: "JANTAR À LUZ DE VELAS EM COLOMBO", d: "Válido para quando eu puder te apresentar o frio do sul, aquecida pelo meu peito.", c: "SUL-AFETO-002" },
+        { t: "PASSEIO PELOS CAMPOS DE FLORES", d: "Como agrônomo, prometo te levar onde a natureza mostra sua melhor forma.", c: "SAFRA-AMOR-003" },
+        { t: "UMA TARDE DE ESTUDOS LADO A LADO", d: "Válido para quando o seu Vade Mecum e os meus mapas dividirem a mesma mesa.", c: "LEI-VIDA-004" },
+        { t: "CAFÉ DA MANHÃ SEM TELA", d: "Válido para o primeiro dia em que acordarmos e não precisarmos de Wi-Fi para nos ver.", c: "REALIDADE-005" },
+        { t: "CERTIFICADO DE POSSE DEFINITIVA", d: "Válido para a entrega simbólica das chaves do meu futuro em suas mãos.", c: "PLENO-DIREITO-006" },
+        { t: "VALE-DESCANSO NO MEU COLO", d: "Válido para quando o mundo estiver pesado e você precisar de um santuário físico.", c: "PORTO-SEGURO-007" },
+        { t: "CAFÉ COM VADE MECUM", d: "Válido para uma manhã onde eu preparo o café enquanto você revisa suas leis. Silêncio e cumplicidade.", c: "LAW-COFFEE-08" },
+        { t: "EXPEDIÇÃO AGRONÔMICA", d: "Um passeio onde eu te mostro como a natureza obedece ao amor, assim como eu obedeço ao seu olhar.", c: "AGRO-TOUR-08" },
+        { t: "DIA SEM WI-FI", d: "Válido para 24 horas onde a única conexão permitida será o toque das nossas mãos.", c: "OFFLINE-10" },
+        { t: "O JANTAR DA VITÓRIA", d: "Comemoração por uma conquista sua. O cardápio? O que você quiser. O brinde? Nós.", c: "VICTORY-11" },
+        { t: "CINEMA NO COLO", d: "Válido para um filme que não assistiremos, porque estarei ocupado demais admirando seu perfil.", c: "MOVIE-12" },
+        { t: "PASSAGEM SÓ DE INDA", d: "O voucher simbólico para o dia em que a mala vier para ficar. Sem despedidas no aeroporto.", c: "FINAL-DEST-13" },
+        { t: "MASSAGEM PÓS-PROVA", d: "Válido para o alívio de toda a tensão dos estudos. Minhas mãos, seu relaxamento total.", c: "RELAX-14" },
+        { t: "DANÇA NA SALA", d: "Válido para uma música lenta, luz baixa e o tempo parando enquanto a gente rodopia.", c: "DANCE-15" },
+        { t: "PIQUENIQUE NO CAMPO", d: "Válido para um dia de sol, grama sob os pés e o seu riso ecoando ao ar livre.", c: "PICNIC-16" },
+        { t: "VOTO DE SILÊNCIO", d: "Válido para aqueles dias em que palavras não bastam e apenas o estar perto cura tudo.", c: "SILENCE-17" },
+        { t: "TOUR GASTRONÔMICO", d: "Válido para explorarmos os sabores de Goiânia (ou Colombo) como se fôssemos turistas do amor.", c: "FOOD-18" },
+        { t: "CAFÉ NA CAMA", d: "Válido para uma manhã de domingo preguiçosa, onde o mundo lá fora não existe.", c: "SUNDAY-19" },
+        { t: "ABRAÇO DE 5 MINUTOS", d: "Voucher para um abraço ininterrupto, recarregando nossas baterias de alma.", c: "RECHARGE-20" },
+        { t: "SURPRESA NO MEIO DO DIA", d: "Válido para um momento inesperado onde eu apareço só para te lembrar o quanto você é amada.", c: "SURPRISE-21" },
+        { t: "PROJETO NOSSA CASA", d: "Uma tarde dedicada a sonhar com cada móvel e cada cor do nosso futuro lar.", c: "DREAM-22" },
+        { t: "NOITE DE VINHO E LEIS", d: "Você explica os artigos, eu sirvo o vinho e a gente termina a noite celebrando a vida.", c: "WINE-LAW-23" },
+        { t: "CAMINHADA AO PÔR DO SOL", d: "Válido para mãos dadas enquanto o céu faz o show que a gente sempre vê separado.", c: "SUNSET-24" },
+        { t: "CHEIRO NO CANGOTE", d: "Voucher para um carinho que faz arrepiar e esquecer qualquer problema do mundo.", c: "AFFECTION-25" },
+        { t: "VOUCHER DA PAZ", d: "Válido para encerrar qualquer discussão com um beijo e a frase 'eu te amo mais'.", c: "PEACE-26" },
+        { t: "CONTAÇÃO DE HISTÓRIAS", d: "Válido para lembrarmos de como tudo começou e rirmos dos nossos primeiros nervosismos.", c: "HISTORY-27" },
+        { t: "SPA CASEIRO", d: "Eu cuido de você da cabeça aos pés. Máscara facial, pés na água e muito mimo.", c: "SPA-28" },
+        { t: "FOTO PARA O PORTA-RETRATO", d: "Válido para um registro que vai direto para a parede da nossa casa futura.", c: "PHOTO-29" },
+        { t: "VALE-DORMIR JUNTO", d: "Sentir sua respiração calma ao meu lado até o sol nascer. Sem pressa.", c: "SLEEP-30" },
+        { t: "FESTA PARTICULAR", d: "Só nós dois, nossa música favorita e a alegria de sermos quem somos juntos.", c: "PARTY-31" },
+        { t: "PRESENTINHO SEM DATA", d: "Válido para um mimo que não precisa de aniversário para acontecer. Porque você merece.", c: "GIFT-32" },
+        { t: "ABRAÇO QUE CURA TUDO", d: "Específico para dias difíceis. Onde o meu peito se torna o seu porto seguro.", c: "HEAL-33" },
+        { t: "PLANTIO SIMBÓLICO", d: "Válido para plantarmos uma árvore juntos. Ela crescerá como o nosso amor.", c: "PLANT-34" },
+        { t: "LEITURA COMPARTILHADA", d: "Eu leio para você enquanto você descansa a cabeça no meu colo.", c: "READ-35" },
+        { t: "OLHAR NO OLHO", d: "Válido para 10 minutos de silêncio apenas admirando a alma um do outro através dos olhos.", c: "SOUL-36" },
+        { t: "CERTIFICADO DE POSSE ETERNA", d: "Este voucher garante que meu coração é seu em regime de exclusividade vitalícia.", c: "ETERNAL-37" },
+        { t: "VISITA TÉCNICA AO CORAÇÃO", d: "Voucher para um dia inteiro onde eu sou o seu guia e o seu refúgio. Sem distrações.", c: "AGRO-HEART-38" },
+        { t: "ACÓRDÃO DA FELICIDADE", d: "Válido para um momento de celebração oficial da nossa união perante todos que amamos.", c: "FINAL-RULE-39" },
+        { t: "DEGUSTAÇÃO DE SAFRA ESPECIAL", d: "Válido para um jantar onde celebraremos o sucesso de um projeto nosso. Brinde à nossa resiliência.", c: "PREMIUM-40" },
+        { t: "CONSULTORIA DE ABRAÇO", d: "Voucher para quando você precisar de um suporte técnico emocional. Atendimento imediato e vitalício.", c: "SUPPORT-41" },
+        { t: "EXPEDIÇÃO AO PÔR DO SOL", d: "Válido para um momento onde o único mapa que seguiremos será o da nossa intuição.", c: "MAP-LOVE-42" },
+        { t: "VALE-DOMINGO DE CHUVA", d: "Válido para ficarmos enrolados no cobertor, ouvindo o som da água e o som do nosso amor.", c: "RAINY-43" },
+        { t: "CONTRATO DE CARINHO", d: "Voucher que garante 1000 beijos por dia, com cláusula de renovação automática a cada manhã.", c: "KISS-LAW-44" },
+        { t: "RESERVA DE LUGAR NO PEITO", d: "Válido para o resto da vida. O lugar mais seguro do mundo está sempre à sua disposição.", c: "SAFE-PLACE-45" },
+        { t: "TOUR PELA NOSSA HISTÓRIA", d: "Válido para revisitarmos os lugares onde nossas conversas mudaram nossas vidas para sempre.", c: "TIMELINE-46" },
+        { t: "VOUCHER DO REENCONTRO", d: "Específico para aquele segundo exato em que eu te ver no desembarque e o mundo parar.", c: "ARRIVAL-47" },
+        { t: "VALE-SORRISO INESPERADO", d: "Eu prometo fazer algo só para ver aquele seu brilho nos olhos que desconcerta o meu juízo.", c: "GIFT-SMILE-48" },
+        { t: "CERTIFICADO DE ADMIRAÇÃO", d: "Válido para o dia em que eu vou te listar 50 motivos (um para cada relíquia) do porquê você é a mulher da minha vida.", c: "ADMIRATION-49" },
+        { t: "O VOUCHER INFINITO", d: "Este bilhete não expira e não tem limites. Ele vale para absolutamente tudo o que nos faça feliz.", c: "ETERNAL-50" },
+        { t: "VALE-PRIMEIRA DANÇA", d: "Válido para o momento em que a música começar e nossos corpos se encontrarem sem nenhuma preocupação além de sentir o outro.", c: "FIRST-DANCE-51" },
+        { t: "ABRAÇO DE BOAS-VINDAS", d: "Válido para o instante em que nos encontrarmos novamente, seja no aeroporto ou na porta de casa.", c: "WELCOME-52" },
+        { t: "VALE-ENCONTRO SURPRESA", d: "Válido para um dia em que eu apareço sem avisar, só para te lembrar o quanto você é amada.", c: "SURPRISE-53" },
+        { t: "DIA DE FOLGA JUNTOS", d: "Válido para um dia inteiro onde o único compromisso é aproveitar a companhia um do outro.", c: "DAY-OFF-54" },
+        { t: "VALE-PRIMEIRO BEIJO", d: "Válido para o momento em que nossos lábios se encontram pela primeira vez, sem pressa e com todo o amor do mundo.", c: "FIRST-KISS-55" },
+        { t: "VALE-ABRAÇO DE DESPEDIDA", d: "Válido para o instante em que nos despedirmos novamente, seja no aeroporto ou na porta de casa. Porque cada despedida é um 'até logo'.", c: "GOODBYE-56" },
+        { t: "VALE-ENCONTRO INESPERADO", d: "Válido para um dia em que eu apareço sem avisar, só para te lembrar o quanto você é amada.", c: "SURPRISE-57" }
+    ]
+};
+
+function abrirReliquia(event, tipo) {
+    if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
+        mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
+        return;
+    }
+    event.currentTarget
+    const iconeClicado = event.currentTarget.querySelector('.icone-reliquia');
+    if (iconeClicado) {
+        iconeClicado.classList.add('abrindo-bau');
+        setTimeout(() => {
+            iconeClicado.classList.remove('abrindo-bau');
+        }, 300);
+    }
+    const modal = document.getElementById('modal-reliquia');
+    const corpo = document.getElementById('corpo-modal');
+    if (!modal || !corpo) return;
+
+    const agora = new Date();
+    const inicioAno = new Date(agora.getFullYear(), 0, 0);
+    const diff = agora - inicioAno;
+    const diaDoAno = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    corpo.innerHTML = '';
+
+    if (tipo === 'musica') {
+        corpo.innerHTML = `
+            <h3 style="color: var(--cor-primaria); margin-bottom: 5px; font-family: 'Playfair Display', serif;">Nossa Trilha</h3>
+            <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Sincronia de Almas</p>
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+    } else if (tipo === 'ceu') {
+        const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
+        corpo.innerHTML = `
+            <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
+            <div class="modal-ceu" id="modal-ceu-container">
+                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
+                <p>"${textoCeu}"</p>
+            </div>`;
+        const container = document.getElementById('modal-ceu-container');
+        for (let i = 0; i < 5; i++) {
+            const estrela = document.createElement('div');
+            estrela.className = 'estrela-cadente';
+            estrela.style.top = Math.random() * 100 + '%';
+            estrela.style.left = Math.random() * 100 + '%';
+            estrela.style.animationDelay = Math.random() * 2 + 's';
+            container.appendChild(estrela);
+        }
+    } else if (tipo === 'cartas') {
+        const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
+        corpo.innerHTML = `
+            <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Semente Exclusiva</h3>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 25px; position: relative;">
+                <span style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); font-size: 24px;">✉️</span>
+                <p style="font-style:italic; font-size: 1.1rem; line-height: 1.6; margin-top: 10px;">"${textoSemente}"</p>
+                <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; text-align: right;">
+                    <p style="font-family: 'Playfair Display', serif; color: var(--cor-primaria);">Com amor,<br>${NOME_PARCEIRO}</p>
+                </div>
+            </div>`;
+    } else if (tipo === 'encontro') {
+        const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
+        corpo.innerHTML = `
+            <div class="bilhete-dourado">
+                <div class="bilhete-dourado-inner">
+                    <div class="bilhete-header">Voucher Vitalício</div>
+                    <div class="bilhete-corpo">
+                        Vale para:
+                        <div class="bilhete-destaque">${v.t}</div>
+                        ${v.d}
+                    </div>
+                    <div style="margin-top: 20px; font-size: 0.7rem; opacity: 0.5; font-family: monospace;">
+                        ID: ${v.c}-${diaDoAno}-2026
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    modal.classList.remove('escondido');
+}
+
+function fecharModal() {
+    document.getElementById('modal-reliquia').classList.add('escondido');
+    document.getElementById('corpo-modal').innerHTML = '';
+}
+
+// ==========================================
+// 8. HUB DE JOGOS & SINCRONIA
+// ==========================================
+function abrirJogo(tipo) {
+    document.querySelector('nav.menu-inferior').classList.add('escondido');
+    document.getElementById('menu-jogos').classList.add('escondido');
+    document.getElementById('header-jogos-main').classList.add('escondido');
+    document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
+
+    const container = document.getElementById(`container-${tipo}`);
+    if (container) {
+        container.classList.remove('escondido');
+        if (tipo === 'termo') inicializarTermo();
+        if (tipo === 'sincronia') gerarNovaPergunta();
+        if (tipo === 'minifazenda') {
+            if (typeof window.iniciarMiniFazenda === 'function') {
+                window.iniciarMiniFazenda();
+            }
+        }
+        if (tipo === 'tribunal') {
+            if (typeof window.iniciarTribunal === 'function') {
+                window.iniciarTribunal();
+            }
+        }
+        if (tipo === 'julgamento') {
+            if (typeof window.iniciarJulgamento === 'function') {
+                window.iniciarJulgamento();
+            }
+        }
+    }
+    document.body.classList.add('modo-jogo-ativo');
+    document.body.classList.add('jogo-aberto');
+}
+
+function voltarMenuJogos() {
+    document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
+    document.getElementById('menu-jogos').classList.remove('escondido');
+    document.querySelector('nav.menu-inferior').classList.remove('escondido');
+    document.getElementById('header-jogos-main').classList.remove('escondido');
+    atualizarDinamicaHome();
+    document.body.classList.remove('modo-jogo-ativo');
+    document.body.classList.remove('jogo-aberto');
+    // Remover listeners de orientação
+if (window.orientacaoListener) {
+    window.removeEventListener('orientationchange', window.orientacaoListener);
+    window.removeEventListener('resize', window.orientacaoListener);
+}
+}
+
+const perguntasSincronia = [
+    "Qual é a memória mais vívida que você tem de nós dois no início?",
+    "Se pudéssemos projetar nossa casa ideal hoje, qual detalhe não poderia faltar?",
+    "Qual é a nossa melhor memória juntos?",
+    "O que você mais admira em mim?",
+    "Qual é o nosso maior sonho como casal?",
+    "Como você descreveria nós como um time?",
+    "Se pudéssemos viajar para qualquer lugar do mundo amanhã, para onde iríamos?",
+    "O que eu faço que, sem eu saber, faz você se sentir mais amada?",
+    "Qual característica minha você acha que mais combina com a sua?",
+    "Qual foi o momento em que você sentiu mais orgulho de nós como um time?",
+    "Qual cheiro te lembra de mim?",
+    "Se a nossa história fosse um filme, qual seria o título?",
+    "O que você gostaria de aprender a fazer comigo?",
+    "Qual música te faz pensar em mim instantaneamente?",
+    "Se você pudesse me dar um superpoder, qual seria?",
+    "Qual foi a maior loucura que já fez por amor (e se arrependeu ou não)?",
+    "Se o nosso amor fosse uma comida, qual seria?",
+    "Que lugarzinho secreto na sua cidade você sonha em me mostrar?",
+    "Qual foi o momento em que você pensou 'é com essa pessoa que quero passar o resto da vida'?",
+    "Se você pudesse reviver um dia nosso, qual escolheria?",
+    "Qual foi o momento exato em que você percebeu que éramos um 'caso julgado'?",
+    "Se nosso amor fosse uma semente, qual seria o fruto da nossa colheita?",
+    "Qual é a 'cláusula pétrea' (que nunca muda) do nosso relacionamento?",
+    "Qual viagem para o interior você mais quer fazer comigo?",
+    "Qual é o nosso prato favorito para dividir em um domingo de sol?",
+    "Qual música do Flamengo mais faz você lembrar da nossa energia juntos?",
+    "Quem é mais provável de ganhar uma discussão: a lógica do engenheiro ou os argumentos da advogada?",
+    "Qual 'safra' da nossa história você mais gosta de recordar?",
+    "Se tivéssemos que escrever o nosso próprio código de leis, qual seria a Lei nº 1?",
+    "Qual é o nosso refúgio favorito quando o mundo parece barulhento demais?",
+    "Qual característica minha você acha que 'germinou' em você ao longo do tempo?",
+    "No tribunal do nosso amor, qual é a sentença para quem fica com saudade demais?",
+    "Qual é o cheiro que mais te faz lembrar de mim?",
+    "Qual é o nosso maior 'projeto de vida' para os próximos 5 anos?",
+    "Praia com o sol de Goiânia ou serra com o frio de Colombo?",
+    "Quem de nós é mais provável de se perder no meio de uma lavoura?",
+    "Qual é o segredo para a nossa produtividade de felicidade ser sempre alta?",
+    "Qual é a mania do outro que você secretamente acha fofa?",
+    "Se nosso relacionamento fosse um time, quem seria o capitão e quem seria o camisa 10?",
+    "Qual filme ou série define perfeitamente o nosso enredo?",
+    "Qual 'recurso' você usaria para adiar o fim de um final de semana juntos?",
+    "Qual semente de sonho nós plantamos recentemente e você quer ver crescer?",
+    "Qual é a palavra que melhor resume o que sentimos quando estamos em silêncio?",
+    "Quem é mais provável de esquecer onde estacionou o carro no shopping?",
+    "Qual é a nossa 'jurisprudência': um erro que nos ensinou a sermos melhores hoje?",
+    "Se pudéssemos criar um feriado nacional para o nosso dia, como ele seria?",
+    "Qual é a característica que faz de nós o solo perfeito para o par ideal?",
+    "O que você acha que eu ainda não descobri sobre você?",
+    "Qual a sua tradição favorita que já criamos juntos?",
+    "Se a gente pudesse ter um animal de estimação agora, qual seria e por quê?",
+    "Que medo você já superou por minha causa?",
+    "Qual foi a primeira impressão (a petição inicial) que você teve de mim?",
+    "Se você pudesse me dar um apelido novo hoje, qual seria?",
+    "O que você diria para o seu 'eu' do passado no dia em que nos conhecemos?",
+    "O que você mais admira na forma como eu trato as pessoas?",
+    "Se a gente fosse escrever um livro juntos, sobre o que seria?",
+    "Qual defeito meu você acha que, na verdade, é uma qualidade?",
+    "Que sonho seu eu ainda não conheço?",
+    "Se pudéssemos fazer uma doação para uma causa juntos, qual escolheríamos?",
+    "Qual é a primeira coisa que faremos quando a distância entre Colombo e Goiânia for zero?",
+    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?"
+];
+
+function gerarNovaPergunta() {
+    const indiceAleatorio = Math.floor(Math.random() * perguntasSincronia.length);
+    const textoElemento = document.getElementById('texto-pergunta');
+    if (textoElemento) {
+        textoElemento.style.opacity = 0;
+        setTimeout(() => {
+            textoElemento.innerText = perguntasSincronia[indiceAleatorio];
+            textoElemento.style.opacity = 1;
+        }, 300);
+    }
+}
+
+// 9. LEIS
+const URL_LEIS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?gid=1219842239&single=true&output=csv";
+
+async function carregarLeis() {
+    try {
+        const res = await fetch(URL_LEIS);
+        const txt = await res.text();
+        const linhas = txt.split(/\r?\n/).filter(l => l.trim()).slice(1);
+        const container = document.querySelector(".lista-leis");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        linhas.forEach((linha, index) => {
+            const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (colunas.length >= 2) {
+                const art = colunas[0].replace(/"/g, '').trim();
+                const cont = colunas[1].replace(/"/g, '').trim();
+                const par = colunas[2] ? colunas[2].replace(/"/g, '').trim() : "";
+
+                if (art.includes("Art. 1º") || art.includes("Art. 1°")) {
+                    container.innerHTML += `<div class="titulo-divisao">TÍTULO I<small>Dos Direitos Fundamentais</small></div>`;
+                } else if (art.includes("Art. 4º") || art.includes("Art. 4°")) {
+                    container.innerHTML += `<div class="titulo-divisao">TÍTULO II<small>Das Obrigações e Prestações</small></div>`;
+                } else if (art.includes("Art. 7º") || art.includes("Art. 7°")) {
+                    container.innerHTML += `<div class="titulo-divisao">TÍTULO III<small>Das Penalidades e Disposições Finais</small></div>`;
+                }
+
+                const item = document.createElement("div");
+                item.className = "item-lei";
+                item.innerHTML = `<span class="num-artigo">${art}</span><p>${cont}</p>${par ? `<small>§ Único: ${par}</small>` : ""}`;
+                
+                item.style.animationDelay = (index * 0.1) + 's';
+                
+                container.appendChild(item);
+            }
+        });
+
+        const dataInicioObj = new Date(dataInicio);
+        const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+        const dia = dataInicioObj.getDate();
+        const mes = meses[dataInicioObj.getMonth()];
+        const ano = dataInicioObj.getFullYear();
+
+        const assinatura = document.createElement('div');
+        assinatura.className = 'assinatura-leis';
+        assinatura.style.marginBottom = "80px"; 
+        assinatura.style.paddingBottom = "env(safe-area-inset-bottom)";
+        assinatura.innerHTML = `
+            <p>Promulgado em nome do amor, por João, em ${dia} de ${mes} de ${ano}.</p>
+            <p class="local-data">Santuário, em toda eternidade.</p>
+        `;
+        container.appendChild(assinatura);
+
+    } catch (e) { 
+        console.error('Erro ao carregar leis:', e);
+    }
+}
+
+// 10. DINÂMICA DA HOME
+function atualizarDinamicaHome() {
+    const elStreak = document.getElementById("streak-jardim");
+    const elAtalhoCofre = document.getElementById("atalho-cofre");
+    const txtStreak = document.getElementById("texto-streak");
+    const hoje = new Date().toLocaleDateString('pt-BR');
+
+    let dadosPlanta = { sequencia: 0 };
+    const dadosSalvos = localStorage.getItem('statusPlanta_v2');
+    if (dadosSalvos) {
+        try {
+            dadosPlanta = JSON.parse(dadosSalvos);
+        } catch (e) {
+            console.warn('Dados da planta corrompidos ao atualizar home. Ignorando...');
+            localStorage.removeItem('statusPlanta_v2');
+        }
+    }
+
+    if (elStreak) {
+        if (dadosPlanta.sequencia > 0) {
+            elStreak.classList.remove("escondido");
+            if (txtStreak) txtStreak.innerText = `${dadosPlanta.sequencia} ${dadosPlanta.sequencia === 1 ? 'dia' : 'dias'} de florescimento`;
+            const icone = elStreak.querySelector('.icone-badge');
+            if (icone) {
+                if (dadosPlanta.sequencia >= 7) icone.innerText = "🔥";
+                else if (dadosPlanta.sequencia >= 3) icone.innerText = "🌿";
+                else icone.innerText = "🌱";
+            }
+        } else {
+            elStreak.classList.add("escondido");
+        }
+    }
+
+    const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
+
+    if (elAtalhoCofre) {
+        if (ganhouHoje) elAtalhoCofre.classList.remove("escondido");
+        else elAtalhoCofre.classList.add("escondido");
+    }
+
+    const msgCofre = document.getElementById('msg-cofre');
+    const itensCofre = document.querySelectorAll('.item-cofre');
+
+    if (ganhouHoje) {
+        if (msgCofre) msgCofre.innerText = "Acesso Concedido para Hoje";
+        itensCofre.forEach(item => {
+            item.classList.remove('bloqueado');
+            const s = item.querySelector('.status-reliquia');
+            if (s) s.innerText = "Disponível";
+        });
+    } else {
+        if (msgCofre) msgCofre.innerText = "Vença o desafio diário para desbloquear";
+        itensCofre.forEach(item => {
+            item.classList.add('bloqueado');
+            const s = item.querySelector('.status-reliquia');
+            if (s) s.innerText = "Trancado";
+        });
+    }
+}
+
+function mostrarToast(mensagem) {
+    const toast = document.getElementById('toast-mensagem');
+    toast.innerText = mensagem;
+    toast.classList.remove('escondido');
+    setTimeout(() => {
+        toast.classList.add('escondido');
+    }, 2000);
+}
+
+// ========== FUNÇÕES DE ÁUDIO ==========
+function toggleMuteJogos() {
+    if (!audioJogos) return;
+    audioJogos.muted = !audioJogos.muted;
+    audioJogosMuted = audioJogos.muted;
+    localStorage.setItem('audio_jogos_muted', audioJogos.muted);
+    atualizarBotoesMute();
+}
+
+function atualizarBotoesMute() {
+    const botoes = document.querySelectorAll('#btn-mute-jogos, .btn-mute-jogo');
+    botoes.forEach(btn => {
+        btn.innerText = audioJogosMuted ? '🔇' : '🔊';
+    });
+}
+
+function playAudioJogos() {
+    if (!audioJogos) {
+        audioJogos = document.getElementById('audio-jogos');
+        if (!audioJogos) return;
+        audioJogos.volume = 0.2;
+        audioJogos.muted = audioJogosMuted;
+    }
+    if (audioJogos.paused) {
+        audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));
+    }
+}
+
+function pauseAudioJogos() {
+    if (audioJogos && !audioJogos.paused) {
+        audioJogos.pause();
+    }
+}
+
+// ========== SERVICE WORKER E ATUALIZAÇÕES ==========
+function registrarServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => {
+                console.log('Service Worker registrado!', reg);
+                mostrarToast('✅ Service Worker ativo!');
+
+                reg.addEventListener('updatefound', () => {
+                    const novoSW = reg.installing;
+                    console.log('Nova versão do Service Worker encontrada!');
+                    novoSW.addEventListener('statechange', () => {
+                        if (novoSW.state === 'installed' && navigator.serviceWorker.controller) {
+                            mostrarToast('🔄 Nova versão disponível! Feche e abra o app novamente.');
+                        }
+                    });
+                });
+            })
+            .catch(err => {
+                console.error('Erro ao registrar Service Worker:', err);
+                mostrarToast('❌ Erro ao registrar Service Worker: ' + err.message);
+            });
+    } else {
+        mostrarToast('❌ Service Worker não suportado neste navegador.');
+    }
+}
+
+function verificarAtualizacao() {
+    mostrarToast('🔍 Verificando atualizações...');
+
+    if (!('serviceWorker' in navigator)) {
+        mostrarToast('❌ Service Worker não suportado neste navegador.');
+        return;
+    }
+
+    navigator.serviceWorker.getRegistration().then(reg => {
+        if (!reg) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => {
+                    mostrarToast('✅ Service Worker registrado. Recarregue a página.');
+                })
+                .catch(err => {
+                    console.error('Erro ao registrar:', err);
+                    mostrarToast('❌ Erro ao registrar: ' + err.message);
+                });
+            return;
+        }
+
+        reg.update()
+            .then(() => {
+                if (reg.installing) {
+                    reg.installing.addEventListener('statechange', function () {
+                        if (this.state === 'installed' && navigator.serviceWorker.controller) {
+                            mostrarToast('🔄 Nova versão disponível! Feche e reabra o app.');
+                        }
+                    });
+                } else if (reg.waiting) {
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    mostrarToast('🔄 Nova versão disponível! Aplicando...');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    mostrarToast('✅ Você já está na versão mais recente.');
+                }
+            })
+            .catch(err => {
+                console.error('Erro ao atualizar:', err);
+                mostrarToast('❌ Erro ao verificar atualização.');
+            });
+    });
+}
+
+// ==========================================
+// TERMÔMETRO DO CUIDADO SUPREMO & POST-ITS
+// ==========================================
+
+window.enviarMood = function(estado) {
+    if (!window.SantuarioApp.inicializado || !window.MEU_NOME) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    const texto = document.getElementById('input-mood').value.trim();
+    
+    const refMeuMood = ref(db, 'moods/' + window.MEU_NOME.toLowerCase());
+    set(refMeuMood, {
+        estado: estado,
+        mensagem: texto || null,
+        timestamp: Date.now()
+    });
+
+    // Limpa o campo
+    document.getElementById('input-mood').value = '';
+    
+    mostrarToast(`Seu coração falou. O sinal foi enviado para o espaço...`);
+};
+
+window.atualizarTelaPeloMood = function(estado, timestamp) {
+    const statusEl = document.getElementById('status-parceiro');
+    
+    if (!statusEl) return;
+
+    // Cálculo exato de tempo
+    const minutosAtras = Math.floor((Date.now() - timestamp) / 60000);
+    let tempoTexto = minutosAtras < 1 ? "agora mesmo" : `há ${minutosAtras} minutos`;
+    if (minutosAtras >= 60) {
+        const horas = Math.floor(minutosAtras / 60);
+        tempoTexto = `há ${horas} hora(s)`;
+    }
+
+    // Limpa estados visuais anteriores
+    document.body.classList.remove('modo-cansada');
+    document.body.classList.remove('modo-alerta');
+
+    let mensagem = "";
+if (estado === 'radiante') {
+    mensagem = `✨ ${window.NOME_PARCEIRO} está radiante ${tempoTexto}.`;
+} else if (estado === 'ansiosa') {
+    mensagem = `🌪️ A mente da ${window.NOME_PARCEIRO} acelerou ${tempoTexto}.`;
+} else if (estado === 'triste') {
+    mensagem = `🌧️ O dia da ${window.NOME_PARCEIRO} escureceu ${tempoTexto}.`;
+} else if (estado === 'cansada') {
+    mensagem = `🔋 ${window.NOME_PARCEIRO} está esgotada ${tempoTexto}.`;
+} else if (estado === 'saudade') {
+    mensagem = `🥺 ${window.NOME_PARCEIRO} está com saudade ${tempoTexto}.`;
+} else if (estado === 'apaixonada') {
+    mensagem = `💖 ${window.NOME_PARCEIRO} está apaixonada ${tempoTexto}!`;
+}
+if (dados.mensagem) {
+    mensagem += ` Ela escreveu: "${dados.mensagem}"`;
+}
+statusEl.innerHTML = mensagem;
+    
+    statusEl.innerHTML = mensagem;
+
+    // ==========================================
+    // SISTEMA DE ALERTA MÁXIMO (A MÁGICA)
+    // ==========================================
+    // Só dispara se for uma mensagem dela para você (e não uma velha que você acabou de carregar)
+    if (window.souJoao && minutosAtras <= 5 && ['triste', 'ansiosa', 'cansada'].includes(estado)) {
+        // A trava de segurança impede que o alarme toque duas vezes para a mesma crise
+        if (window.ultimoAlertaCuidado !== timestamp) {
+            window.ultimoAlertaCuidado = timestamp;
+            dispararAlarmeCuidado(estado);
+        }
+    }
+};
+
+window.dispararAlarmeCuidado = function(estado) {
+    // 1. Vibração agressiva (Padrão SOS: 3 curtas, 3 longas, 3 curtas)
+    if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 100, 200, 300, 100, 300, 100, 300, 200, 100, 50, 100, 50, 100]);
+    }
+
+    // 2. Toca Som de Notificação Urgente
+    const audio = document.getElementById('audio-alerta-cuidado');
+    if (audio) {
+        audio.volume = 1.0;
+        audio.play().catch(e => console.log('Áudio bloqueado pelo navegador', e));
+    }
+
+    // 3. Trava a tela com o Modal Vermelho
+    const modal = document.getElementById('modal-cuidado');
+    const txtCuidado = document.getElementById('texto-alerta-cuidado');
+    if (modal && txtCuidado) {
+        if (estado === 'ansiosa') txtCuidado.innerText = `A mente da ${window.NOME_PARCEIRO} está acelerada. Mande um áudio com a sua voz agora.`;
+        if (estado === 'triste') txtCuidado.innerText = `A ${window.NOME_PARCEIRO} não está bem. Interrompa o que puder e vá até ela.`;
+        if (estado === 'cansada') txtCuidado.innerText = `A bateria da ${window.NOME_PARCEIRO} acabou. Ofereça colo e silêncio.`;
+        modal.classList.remove('escondido');
+    }
+    
+    // 4. Pisca as bordas do app de vermelho
+    document.body.classList.add('modo-alerta');
+};
+
+window.fecharModalCuidado = function() {
+    document.getElementById('modal-cuidado').classList.add('escondido');
+    document.body.classList.remove('modo-alerta');
+    // Envia um pulso mágico de volta como confirmação de que você "recebeu o chamado"
+    if (typeof enviarPulso === 'function') enviarPulso();
+};
+
+window.enviarPostit = function() {
+    if (!window.SantuarioApp.inicializado || !window.MEU_NOME) return;
+    
+    const input = document.getElementById('input-postit');
+    const texto = input.value.trim();
+    if (texto === "") return;
+
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    // Usamos a data/hora atual como ID. Fica salvo na nuvem ETERNAMENTE.
+    const idUnico = Date.now(); 
+    const refNovoPostit = ref(db, 'postits/' + idUnico);
+    
+    set(refNovoPostit, {
+    autor: window.MEU_NOME,
+    mensagem: texto,
+    timestamp: idUnico,
+    fixado: false,
+    curtidas: 0
+});
+
+    input.value = ""; 
+};
+
+window.addEventListener('loginSucesso', async (e) => {
+    console.log(`Bem-vindo, ${window.MEU_NOME}. Conectando satélite...`);
+    
+    // Inicializa o Pulso
+    if (window.SantuarioApp && window.SantuarioApp.conectar) {
+        window.SantuarioApp.conectar();
+    }
+    
+    // Solicita permissão e só tenta obter o token se for concedida
+    const permitido = await solicitarPermissaoNotificacao();
+    if (permitido) {
+        salvarTokenFCM();
+    } else {
+        console.log('Permissão de notificação negada');
+    }
+});
+
+// ==========================================
+// REGISTRAR LOGIN NO FIREBASE
+// ==========================================
+function registrarLogin(usuario) {
+    // Verifica se os módulos estão disponíveis
+    if (!window.SantuarioApp?.modulos) return;
+    const { db, ref, push } = window.SantuarioApp.modulos;
+    
+    // Cria uma referência para a lista de logins
+    const loginsRef = ref(db, 'logins');
+    
+    // Adiciona um novo registro com timestamp e usuário
+    push(loginsRef, {
+        usuario: usuario,           // 'joao' ou 'thamiris'
+        timestamp: Date.now(),
+        data: new Date().toLocaleString('pt-BR') // formato legível
+    }).catch(error => console.error('Erro ao registrar login:', error));
+}
+
+function atualizarInterfaceGlobal() {
+    const elSaudacao = document.getElementById('saudacao-texto');
+    if (elSaudacao) elSaudacao.innerText = `Olá, ${window.MEU_NOME}`;
+    
+    // Atualiza cores ou elementos específicos baseados em quem logou
+    document.body.classList.toggle('layout-joao', window.souJoao);
+}
+
+async function solicitarPermissaoNotificacao() {
+    if (!("Notification" in window)) return false;
+    if (Notification.permission === "granted") return true;
+    if (Notification.permission === "denied") return false;
+    // permission is "default" – pedimos ao usuário
+    const permissao = await Notification.requestPermission();
+    return permissao === "granted";
+}
+
+// Função para disparar notificação local (útil para testes e eventos internos)
+window.enviarNotificacaoLocal = function(titulo, corpo) {
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(titulo, {
+                body: corpo,
+                icon: 'assets/icons/icon-192.png',
+                vibrate: [200, 100, 200]
+            });
+        });
+    }
+};
+
+// ==========================================
+// SISTEMA DE TEMAS
+// ==========================================
+function aplicarTema(tema) {
+    // Remove classes de tema anteriores
+    document.body.classList.remove('tema-azul', 'tema-rosa', 'tema-verde', 'tema-roxo');
+    if (tema === 'azul') {
+        document.body.classList.add('tema-azul');
+    } else if (tema === 'rosa') {
+        document.body.classList.add('tema-rosa');
+    } else if (tema === 'verde') {
+        document.body.classList.add('tema-verde');
+    } else if (tema === 'roxo') {
+        document.body.classList.add('tema-roxo');
+    }
+    // Salva no localStorage
+    localStorage.setItem('santuario_tema', tema);
+    // Atualiza botão ativo
+    document.querySelectorAll('.btn-tema').forEach(btn => {
+        btn.classList.remove('ativo');
+        if (btn.dataset.tema === tema) btn.classList.add('ativo');
+    });
+}
+
+// Carregar tema salvo
+const temaSalvo = localStorage.getItem('santuario_tema') || 'dourado';
+aplicarTema(temaSalvo);
+
+// Adicionar eventos aos botões
+document.querySelectorAll('.btn-tema').forEach(btn => {
+    btn.addEventListener('click', () => {
+        aplicarTema(btn.dataset.tema);
+    });
+});
+
+// ==========================================
+// FUNÇÕES PARA MURAL DE RECADOS
+// ==========================================
+
+async function fixarPostit(key, fixado) {
+    if (!window.SantuarioApp?.modulos) return;
+    const { db, ref, get, set } = window.SantuarioApp.modulos;
+
+    // Se for fixar, precisamos desafixar qualquer outro postit
+    if (fixado) {
+        const snapshot = await get(ref(db, 'postits'));
+        snapshot.forEach(child => {
+            if (child.val().fixado) {
+                // Desfixa o que estava fixado
+                set(ref(db, `postits/${child.key}/fixado`), false);
+            }
+        });
+    }
+    // Agora fixa/desfixa o atual
+    await set(ref(db, `postits/${key}/fixado`), fixado);
+}
+
+async function curtirPostit(key) {
+    if (!window.SantuarioApp?.modulos) return;
+    const { db, ref, runTransaction } = window.SantuarioApp.modulos;
+    const postitRef = ref(db, `postits/${key}/curtidas`);
+    runTransaction(postitRef, (curtidas) => (curtidas || 0) + 1)
+        .catch(error => console.error('Erro ao curtir:', error));
+}
+
+// ==========================================
+// FUNÇÃO PARA OBTER E SALVAR O TOKEN FCM
+// ==========================================
+async function salvarTokenFCM() {
+    // Se não for o João, não precisa (só ele receberá notificações)
+    if (!window.souJoao) return;
+
+    // Verifica se o Firebase Messaging está disponível
+    if (typeof window.SantuarioApp?.modulos?.messaging === 'undefined') {
+        console.log('Messaging não disponível');
+        return;
+    }
+
+    try {
+        // Aguarda o Service Worker estar ativo
+        const registration = await navigator.serviceWorker.ready;
+        console.log('Service Worker ativo, obtendo token FCM...');
+
+        const messaging = window.SantuarioApp.modulos.messaging;
+        const token = await window.SantuarioApp.modulos.getToken(messaging, {
+            vapidKey: 'BMfoiE5OUoxMK970zucUsdMO-X6zPX36rmOwlTKPEp8JTzDZzGbwqm097kQKd_508hZORw-B3AwKC6gRxm5iMjg',
+            serviceWorkerRegistration: registration // força usar o SW registrado
+        });
+
+        if (token) {
+            console.log('Token FCM obtido:', token);
+            // Salva no Realtime Database
+            const { db, ref, set } = window.SantuarioApp.modulos;
+            await set(ref(db, 'fcmTokens/joao'), token);
+            console.log('Token salvo no Firebase');
+        }
+    } catch (err) {
+        console.error('Erro ao obter token FCM:', err);
+    }
+}
+
+// ==========================================
+// BOOT DO SISTEMA
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+    setInterval(atualizarMotorDoTempo, 1000);
+    atualizarMotorDoTempo();
+    atualizarDinamicaHome();
+    configurarNavegacao();
+    carregarDadosExternos();
+    carregarLeis();
+    atualizarClima();
+    atualizarSaudacao();
+    setInterval(atualizarSaudacao, 60000);
+
+    document.getElementById('btn-mute-jogos')?.addEventListener('click', toggleMuteJogos);
+    atualizarBotoesMute();
+
+    // ==========================================
+// Ícone de temas - abrir/fechar seletor
+// ==========================================
+const temaIcon = document.getElementById('tema-icon');
+const temaSelector = document.getElementById('tema-selector');
+
+if (temaIcon && temaSelector) {
+    // Clicar no ícone abre/fecha o seletor
+    temaIcon.addEventListener('click', () => {
+        temaSelector.classList.toggle('escondido');
+    });
+
+    // Fechar o seletor ao escolher um tema (os botões já existem)
+    document.querySelectorAll('.btn-tema').forEach(btn => {
+        btn.addEventListener('click', () => {
+            temaSelector.classList.add('escondido');
+        });
+    });
+
+    // Opcional: fechar o seletor se clicar fora dele? (mais complexo, não faremos agora)
+}
+
+    // Funções de mensagem surpresa (se existirem)
+    if (typeof inicializarSurpresaDiaria === 'function') inicializarSurpresaDiaria();
+    const btnSurpresa = document.getElementById("btn-surpresa");
+    if (btnSurpresa && typeof mostrarMensagemSurpresa === 'function') {
+        btnSurpresa.onclick = mostrarMensagemSurpresa;
+    }
+
+    registrarServiceWorker();
+
+    const btnVerificar = document.getElementById('btn-verificar-atualizacao');
+    if (btnVerificar) {
+        btnVerificar.addEventListener('click', verificarAtualizacao);
+    }
+
+    // Aguarda o login para atualizar a interface do pulso
+    window.addEventListener('loginSucesso', () => {
+        if (window.SantuarioApp && typeof window.SantuarioApp.conectar === 'function') {
+            window.SantuarioApp.conectar();
+        }
+    });
+});
+}

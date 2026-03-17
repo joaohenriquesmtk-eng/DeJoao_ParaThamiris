@@ -1468,7 +1468,38 @@ window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
     const statusEl = document.getElementById('status-parceiro');
     if (!statusEl) return;
     
-    
+    // FUNÇÃO QUE FAZ O ALERTA APARECER NA TELA
+window.exibirAlertaEmergencia = function(estado, mensagem) {
+    const modal = document.getElementById('modal-emergencia');
+    const titulo = document.getElementById('emergencia-titulo');
+    const texto = document.getElementById('emergencia-mensagem');
+
+    if (modal && titulo && texto) {
+        // Define o título com o estado atual (ex: TRISTE, ANSIOSA)
+        titulo.innerText = `Alerta: ${estado.toUpperCase()}`;
+        
+        // Define a mensagem de apoio
+        texto.innerText = mensagem || "O Santuário detectou um estado crítico. Verifique como seu parceiro está agora.";
+        
+        // Remove a classe que esconde o modal para ele aparecer
+        modal.classList.remove('escondido');
+
+        // Faz o celular vibrar (se estiver no Android/Chrome)
+        if ("vibrate" in navigator) {
+            navigator.vibrate([200, 100, 200]);
+        }
+    } else {
+        console.error("Erro: Elementos do modal de emergência não encontrados no HTML.");
+    }
+};
+
+// FUNÇÃO PARA FECHAR O ALERTA
+window.fecharEmergencia = function() {
+    const modal = document.getElementById('modal-emergencia');
+    if (modal) {
+        modal.classList.add('escondido');
+    }
+};
 
     // Cálculo exato de tempo
     const minutosAtras = Math.floor((Date.now() - timestamp) / 60000);

@@ -41,37 +41,30 @@ exports.enviarNotificacaoMood = onValueCreated(
             return;
         }
 
-        const payload = {
-            notification: {
-                title: titulo,
-                body: corpo,
-                sound: 'default'
-            },
-            data: {
-                mood: estado,
-                userId: userId,
-                click_action: 'OPEN_WHATSAPP'
-            },
-            android: {
-                notification: {
-                    click_action: 'OPEN_WHATSAPP'
-                }
-            },
-            webpush: {
-                headers: {
-                    Urgency: 'high'
-                },
-                notification: {
-                    icon: '/assets/icons/icon-192.png',
-                    actions: [
-                        {
-                            action: 'whatsapp',
-                            title: '💬 Responder no WhatsApp'
-                        }
-                    ]
-                }
-            }
-        };
+        const message = {
+    notification: {
+        title: titulo,
+        body: corpo,
+    },
+    // Regras para o Android acordar a tela
+    android: {
+        priority: 'high',
+        notification: {
+            sound: 'default',
+            priority: 'high',
+            channelId: 'emergencia', // Canal de alta importância
+        }
+    },
+    // Regras para iPhone/Web
+    webpush: {
+        headers: {
+            Urgency: 'high'
+        }
+    },
+    token: tokenJoao
+};
+
+return admin.messaging().send(message);
 
         try {
             await admin.messaging().sendToDevice(tokenJoao, payload);

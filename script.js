@@ -1467,6 +1467,8 @@ window.enviarMood = function(estado) {
 window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
     const statusEl = document.getElementById('status-parceiro');
     if (!statusEl) return;
+    
+    
 
     // Cálculo exato de tempo
     const minutosAtras = Math.floor((Date.now() - timestamp) / 60000);
@@ -1501,6 +1503,7 @@ window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
     }
 
     statusEl.innerHTML = mensagemTexto;
+    
 
     // ==========================================
     // SISTEMA DE ALERTA MÁXIMO (A MÁGICA)
@@ -1511,6 +1514,27 @@ window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
             dispararAlarmeCuidado(estado);
         }
     }
+
+    const estadosCriticos = ['ansiosa', 'triste', 'cansada', 'com saudade'];
+    
+    // Se você for o João e o estado dela for crítico, dispara o alerta visual
+    if (window.souJoao && estadosCriticos.includes(estado.toLowerCase())) {
+        const modal = document.getElementById('modal-emergencia');
+        const titulo = document.getElementById('emergencia-titulo');
+        const texto = document.getElementById('emergencia-mensagem');
+
+        titulo.innerText = `A Thamiris está ${estado.toUpperCase()}`;
+        texto.innerText = mensagem || "Ela precisa de você agora. Dê uma atenção especial.";
+        modal.classList.remove('escondido');
+        
+        // Toca um som de alerta discreto se quiser
+        const audio = new Audio('assets/alerta.mp3'); 
+        audio.play().catch(() => console.log("Áudio bloqueado pelo navegador"));
+    }
+};
+
+window.fecharEmergencia = () => {
+    document.getElementById('modal-emergencia').classList.add('escondido');
 };
 
 window.dispararAlarmeCuidado = function(estado) {

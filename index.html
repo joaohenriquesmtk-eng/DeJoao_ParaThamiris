@@ -16,6 +16,7 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <!-- Import map primeiro -->
     <script type="importmap">
@@ -30,6 +31,15 @@
 </head>
 <body>
 
+    <div id="oceano-quantico-3d" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; overflow: hidden;"></div>
+
+    <div id="splash-screen">
+        <div class="splash-conteudo">
+            <span class="splash-coracao">💛</span>
+            <h1 class="splash-titulo texto-ouro-vivo">Santuário</h1>
+        </div>
+    </div>
+
     <div id="app-shell">
         <main id="conteudo-principal">
             
@@ -37,14 +47,22 @@
                 <div class="cartao-vidro" style="text-align: center;">
                     <h2 style="color: var(--cor-primaria); font-weight: 300;">Santuário</h2>
                     <p style="opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">Conexão Vital Estabelecida há:</p>
-                    <div id="timer-principal" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace;">
+                    <div id="timer-principal" class="toque-secreto" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace; cursor: pointer; user-select: none;">
                         00d 00h 00m 00s
                     </div>
                 </div>
 
 <div class="cartao-vidro cartao-saudacao" style="text-align: center; margin-top: 5px;">
+    <span class="estrela-canto">✨</span>
     <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: #000000;"></p>
 </div>
+
+<div class="cartao-vidro" style="margin-top: 20px; padding: 10px; display: flex; flex-direction: column; align-items: center;">
+                <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 5px;">A Nossa Conexão</h3>
+                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px; text-align: center;">Onde quer que você esteja, a luz nos encontra.</p>
+                
+                <div id="globo-3d" style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);"></div>
+            </div>
 
                 <div class="particulas">
     <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
@@ -85,6 +103,7 @@
 
                 <div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 20px;">
     <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Como está seu coração agora?</h4>
+    <div id="coracao-3d" style="width: 100%; height: 130px; margin-bottom: 10px;"></div>
     <div class="botoes-mood">
         <button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
         <button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
@@ -109,38 +128,26 @@
     </div>
 </div>
 
-                <div id="container-notificacoes" class="container-notificacoes">
-                    <div id="streak-jardim" class="badge-home escondido">
-                        <span class="icone-badge">🌱</span>
-                        <span id="texto-streak">0 dias de florescimento</span>
-                    </div>
+                <div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
+                    <h3 style="color: #3498db; font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
+                    <p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
+                    
+                    <div id="orbe-clima-3d" style="width: 100%; height: 230px; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;"></div>
+                    
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 15px; padding: 15px 10px 10px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
+                        
+                        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
+                            <button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')">
+                                Goiânia <span id="mini-temp-thamiris" style="color: #f1c40f;">--°C</span>
+                            </button>
+                            <button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')">
+                                Colombo <span id="mini-temp-joao" style="color: #f1c40f;">--°C</span>
+                            </button>
+                        </div>
 
-                    <div id="atalho-cofre" class="badge-home badge-especial escondido" onclick="document.querySelector('[data-alvo=\'cofre\']').click()">
-                        <span class="icone-badge">✨</span>
-                        <span>Uma nova memória te espera no Cofre!</span>
+                        <p id="texto-mensagem-clima" style="font-weight: bold; font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #fff; line-height: 1.4; min-height: 45px; display: flex; align-items: center; justify-content: center;">🌤️ Sincronizando satélites...</p>
                     </div>
                 </div>
-
-                <div class="container-clima">
-                    <div class="mini-card-clima">
-                        <span class="cidade">João</span>
-                        <div class="dados-clima">
-                            <span id="temp-usuario">--°C</span>
-                        </div>
-                    </div>
-                    <div class="mini-card-clima">
-                        <span class="cidade">Você</span>
-                        <div class="dados-clima">
-                            <span id="temp-thamiris">--°C</span>
-                        </div>
-                    </div>
-                </div>
-
-<!-- Mensagem personalizada baseada no clima de Goiânia -->
-<div class="cartao-vidro cartao-clima" id="mensagem-clima" style="text-align: center; margin-top: 15px;">
-    <span class="icone-clima" id="icone-clima">⛅</span>
-    <p id="texto-mensagem-clima">🌤️ Carregando mensagem do clima...</p>
-</div>
 
                 <!-- NOVO: Botão de Mensagem Surpresa -->
                     <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
@@ -483,25 +490,28 @@
     </div>
 </div>
                         <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A;">Nosso Solo Fértil</h3>
+                        <div id="prisma-3d" style="width: 100%; height: 160px; margin-top: 10px;"></div>
 
-                        <div id="instrucoes-jardim" class="escondido cartao-instrucoes">
-                            <h4>Como Cuidar</h4>
-                            <ul>
-                                <li>Este jardim é <b>compartilhado em tempo real</b>.</li>
-                                <li>Se um regar a planta, o outro verá o progresso instantaneamente.</li>
-                                <li>Vocês só podem regar <b>1 vez por dia</b> no total.</li>
-                                <li>O crescimento agora exige <b>25 dias</b> de dedicação para completar um ciclo.</li>
-                                <li>Se ficarem mais de 1 dia sem regar, a sequência de dias (streak) é zerada.</li>
+                        <div id="instrucoes-jardim" class="escondido cartao-instrucoes" style="border: 1px solid #D4AF37; box-shadow: 0 0 20px rgba(212,175,55,0.15); background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);">
+                            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 10px; text-align: center;">A Árvore da Vida</h4>
+                            <p style="font-size: 0.8rem; font-style: italic; color: #ccc; text-align: center; margin-bottom: 15px;">Um organismo matemático gerado pelo afeto.</p>
+                            <ul style="font-size: 0.85rem; line-height: 1.6; color: #eee; text-align: left; padding-left: 15px;">
+                                <li style="margin-bottom: 8px;"><b>A Conexão:</b> Toque diretamente na árvore para nutri-la. A água flui entre Goiânia e Colombo em tempo real.</li>
+                                <li style="margin-bottom: 8px;"><b>A Regra do Tempo:</b> A árvore só absorve água <b>1 vez por dia</b> (compartilhado entre vocês dois). A paciência fortalece as raízes.</li>
+                                <li style="margin-bottom: 8px;"><b>A Evolução:</b> Vocês começam com uma <i>Semente de Esmeralda</i>. A cada nível alcançado, a matemática gera novos troncos de ouro maciço. Como na natureza, <b>nenhuma árvore crescerá com o mesmo formato da anterior</b>.</li>
+                                <li style="margin-bottom: 8px;"><b>O Ápice:</b> Ao atingir o nível máximo, a árvore atinge a glória, emanando folhas de Sakura rosadas. Um ciclo é concluído e guardado na memória.</li>
+                                <li style="color: #ff6b6b; font-weight: bold;">⚠️ Atenção: Se a árvore ficar mais de 1 dia sem o toque de vocês, a sequência de dias é rompida.</li>
                             </ul>
                         </div>
 
-                        <div id="emoji-planta" style="font-size: 6rem; margin: 20px 0; transition: transform 0.3s ease;">🌱</div>
+                        <div id="prisma-3d" style="width: 100%; height: 300px; margin-top: 10px; cursor: pointer; position: relative;" onclick="regarPlanta()"></div>
+                        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0px; margin-bottom: 20px;">Toque na árvore mágica para regá-la 💧</p>
+
                         <div class="barra-vida" style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 12px; margin: 10px 20px; overflow: hidden;">
                             <div id="progresso-crescimento" class="progresso" style="background: var(--cor-primaria); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
                         </div>
                         <p id="status-texto" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
                         <p id="aviso-regada" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 15px;"></p>
-                        <button id="btn-regar" class="btn-acao" onclick="regarPlanta()">💦 REGAR</button>
                         <p id="contador-ciclos">🌱 Ciclos completados: 0</p>
                     </div>
                 </div>
@@ -549,43 +559,94 @@
             </section>
 
             <section id="cofre" class="tela escondido">
-                <div class="cartao-vidro" style="text-align: center; margin-bottom: 5px;">
-                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Relíquias do Santuário</h3>
-                    <p id="msg-cofre" style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">
-                        Vença o desafio diário para desbloquear
-                    </p>
-                </div>
+    <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Relíquias do Santuário</h3>
+        <p id="msg-cofre" style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">
+            Vença o desafio diário para desbloquear
+        </p>
+    </div>
 
-                <div class="grade-cofre" id="grade-reliquias">
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'musica')">
-                        <span class="icone-reliquia">🎵</span>
-                        <p>Nossa Trilha</p>
-                        <small class="status-reliquia">Trancado</small>
-                    </div>
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'ceu')">
-                        <span class="icone-reliquia">🌌</span>
-                        <p>Mesmo Céu</p>
-                        <small class="status-reliquia">Trancado</small>
-                    </div>
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'cartas')">
-                        <span class="icone-reliquia">✉️</span>
-                        <p>Sementes</p>
-                        <small class="status-reliquia">Trancado</small>
-                    </div>
-                    <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'encontro')">
-                        <span class="icone-reliquia">🎟️</span>
-                        <p>O Futuro</p>
-                        <small class="status-reliquia">Trancado</small>
-                    </div>
-                </div>
+    <div class="cartao-vidro" id="cartao-ecos" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Ecos do Santuário</h3>
+        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">O som atravessa o espaço e o tempo.</p>
+        
+        <div id="eco-3d" style="width: 100%; height: 180px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);"></div>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+            <button id="btn-gravar-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); transition: all 0.3s;" onmousedown="iniciarGravacao()" onmouseup="pararGravacao()" ontouchstart="iniciarGravacao()" ontouchend="pararGravacao()">
+                🎙️
+            </button>
+            <button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">
+                ▶️
+            </button>
+        </div>
+        <p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+    </div>
 
-                <div id="modal-reliquia" class="modal escondido">
-                    <div class="conteudo-modal cartao-vidro">
-                        <span class="fechar-modal" onclick="fecharModal()">&times;</span>
-                        <div id="corpo-modal"></div>
-                    </div>
-                </div>
-            </section>
+    <div class="cartao-vidro" id="cartao-bussola" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">A Bússola do Destino</h3>
+        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;" id="texto-alvo-bussola">Apontando para o seu amor.</p>
+        
+        <div id="bussola-3d" style="width: 100%; height: 200px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); position: relative;">
+            <div id="overlay-bussola" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10;">
+                <button id="btn-ativar-bussola" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="ativarSensoresBussola()">
+                    🧭 Sincronizar Bússola
+                </button>
+            </div>
+        </div>
+        <p id="status-bussola" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 5px; height: 15px;"></p>
+    </div>
+
+    <div class="cartao-vidro" id="cartao-carrossel" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
+        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
+        
+        <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;"></div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
+            <button id="btn-add-foto" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(0,0,0,0.5);" onclick="document.getElementById('input-foto-horizonte').click()">
+                📸 Adicionar
+            </button>
+            <button class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,0.1);" onclick="limparCarrosselHorizontes()">
+                🗑️ Limpar Tudo
+            </button>
+        </div>
+        
+        <p id="status-carrossel" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+        <p style="font-size: 0.6rem; color: #666;">Segure uma foto para apagá-la individualmente.</p>
+    </div>
+
+    <div class="grade-cofre" id="grade-reliquias">
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'musica')">
+            <span class="icone-reliquia">🎵</span>
+            <p>Nossa Trilha</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'ceu')">
+            <span class="icone-reliquia">🌌</span>
+            <p>Mesmo Céu</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'cartas')">
+            <span class="icone-reliquia">✉️</span>
+            <p>Sementes</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'encontro')">
+            <span class="icone-reliquia">🎟️</span>
+            <p>O Futuro</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+    </div>
+
+    <div id="modal-reliquia" class="modal escondido">
+        <div class="conteudo-modal cartao-vidro">
+            <span class="fechar-modal" onclick="fecharModal()">&times;</span>
+            <div id="corpo-modal"></div>
+        </div>
+    </div>
+</section>
 
             <!-- Áudios e modais -->
             <audio id="audio-alerta-cuidado" preload="auto">
@@ -713,7 +774,7 @@
     <!-- Tela de login -->
     <div id="tela-login">
         <div class="login-container">
-            <h1 class="login-logo">Santuário</h1>
+            <h1 class="login-logo texto-ouro-vivo">Santuário</h1>
             <input type="email" id="login-email" class="login-input" placeholder="E-mail">
             <input type="password" id="login-senha" class="login-input" placeholder="Senha">
             <button id="btn-login-confirmar" class="btn-entrar">Acessar</button>
@@ -729,6 +790,8 @@
         <button onclick="fecharEmergencia()" class="btn-emergencia-ok">Entendido</button>
     </div>
 </div>
+
+<div class="fio-de-ouro"></div>
 
 </body>
 </html>

@@ -26,8 +26,18 @@ messaging.onBackgroundMessage((payload) => {
 });
 
 // Código de Cache (O que você já tinha)
-const CACHE_NAME = 'santuario-v6';
-const urlsParaCache = ['/', '/index.html', '/style.css', '/script.js', '/manifest.json'];
+const CACHE_NAME = 'santuario-v7'; // Versão atualizada para forçar o recarregamento
+const urlsParaCache = [
+    '/', 
+    '/index.html', 
+    '/style.css', 
+    '/script.js', 
+    '/manifest.json',
+    '/assets/ambient.mp3',
+    '/assets/sons/mf/regar.mp3',
+    '/assets/alerta.mp3',
+    'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'
+];
 
 self.addEventListener('install', e => {
     e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsParaCache)));

@@ -165,8 +165,52 @@ function atualizarMotorDoTempo() {
     }
 }
 
-// 2. CONFIGURAÇÃO DA PLANILHA EXTERNA
+// 2. CONFIGURAÇÃO DA PLANILHA EXTERNA E MÁQUINA DE ESCREVER
 const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?output=csv";
+
+// Função mágica que digita o texto e adiciona o Vidro Embaçado
+function digitarTexto(elemento, texto, velocidade = 40) {
+    elemento.innerHTML = '';
+    elemento.classList.add('cursor-piscante');
+    // Já começa com o texto embaçado
+    elemento.classList.add('texto-embacado'); 
+    
+    let i = 0;
+    function digitar() {
+        if (i < texto.length) {
+            elemento.innerHTML += texto.charAt(i);
+            i++;
+            setTimeout(digitar, velocidade);
+        } else {
+            setTimeout(() => elemento.classList.remove('cursor-piscante'), 2000);
+            
+            // --- INÍCIO DA LÓGICA DO VIDRO EMBAÇADO ---
+            let tempoToque;
+            const desembaçarVidro = (e) => {
+                if(e.type === 'touchstart') e.preventDefault();
+                // A Thamiris precisa segurar o dedo por 1 segundo para começar a limpar
+                tempoToque = setTimeout(() => {
+                    elemento.classList.add('revelado');
+                    // Vibra bem levinho para avisar que ela conseguiu ler
+                    if (navigator.vibrate) navigator.vibrate([30]); 
+                }, 1000);
+            };
+            
+            const cancelarDesembaçar = () => {
+                clearTimeout(tempoToque);
+            };
+
+            // Adiciona os eventos de toque
+            elemento.addEventListener('touchstart', desembaçarVidro, {passive: false});
+            elemento.addEventListener('touchend', cancelarDesembaçar);
+            elemento.addEventListener('mousedown', desembaçarVidro);
+            elemento.addEventListener('mouseup', cancelarDesembaçar);
+            elemento.addEventListener('mouseleave', cancelarDesembaçar);
+            // --- FIM DA LÓGICA DO VIDRO EMBAÇADO ---
+        }
+    }
+    setTimeout(digitar, 2500); 
+}
 
 async function carregarDadosExternos() {
     try {
@@ -190,7 +234,12 @@ async function carregarDadosExternos() {
         if (configHoje) {
             const elFrase = document.getElementById("frase-do-dia");
             if (elFrase) {
-                elFrase.innerHTML = `<div class="container-frase"><span class="aspas-decorativa">“</span><p class="texto-itálico">${configHoje.frase}</p><span class="aspas-decorativa">”</span></div>`;
+                // Estrutura o HTML vazio com o ID para a máquina de escrever achar
+                elFrase.innerHTML = `<div class="container-frase"><span class="aspas-decorativa">“</span><p class="texto-itálico" id="texto-maquina-escrever"></p><span class="aspas-decorativa">”</span></div>`;
+                
+                // Chama a magia da máquina de escrever
+                const elementoTexto = document.getElementById('texto-maquina-escrever');
+                digitarTexto(elementoTexto, configHoje.frase);
             }
             window.PALAVRA_DO_DIA = configHoje.palavra;
             if (localStorage.getItem('santuario_vitoria_dia') === hojeFormatado) {
@@ -202,36 +251,57 @@ async function carregarDadosExternos() {
     }
 }
 
-// 3. NAVEGAÇÃO SPA
+// 3. NAVEGAÇÃO SPA COM TRANSIÇÕES SUAVES
 function configurarNavegacao() {
     const botoesMenu = document.querySelectorAll('.item-menu');
     const todasAsTelas = document.querySelectorAll('.tela');
+    let trocandoTela = false; // Trava de segurança para evitar cliques duplos
 
     botoesMenu.forEach(botao => {
         botao.addEventListener('click', (evento) => {
             evento.preventDefault();
             const telaAlvo = botao.getAttribute('data-alvo');
             
-            if (telaAlvo === telaAtual) return;
+            // Se já estiver na tela, ou se a animação ainda estiver rodando, não faz nada
+            if (telaAlvo === telaAtual || trocandoTela) return;
 
+            trocandoTela = true; // Trava a tela para iniciar a mágica
             const telaAnterior = telaAtual;
 
+            // 1. Atualiza a cor do botão do menu instantaneamente
             botoesMenu.forEach(b => b.classList.remove('ativo'));
             botao.classList.add('ativo');
 
-            todasAsTelas.forEach(tela => tela.classList.add('escondido'));
-            const elementoTela = document.getElementById(telaAlvo);
-            if (elementoTela) elementoTela.classList.remove('escondido');
-
-            telaAtual = telaAlvo;
-
-            if (telaAlvo === 'jogos') {
-                playAudioJogos();
-            } else if (telaAnterior === 'jogos') {
-                pauseAudioJogos();
+            // 2. Aplica o efeito "Fade Out" na tela que está ativa agora
+            const telaAtiva = document.getElementById(telaAtual);
+            if (telaAtiva) {
+                telaAtiva.classList.add('saindo');
             }
 
-            atualizarDinamicaHome();
+            // 3. Espera 300 milissegundos (o tempo exato da animação do CSS sumirSuave)
+            setTimeout(() => {
+                // Esconde todas as telas e limpa a classe de animação
+                todasAsTelas.forEach(tela => {
+                    tela.classList.add('escondido');
+                    tela.classList.remove('saindo');
+                });
+
+                // Mostra a tela nova (ela fará o Fade In automaticamente pelo seu CSS original)
+                const elementoTela = document.getElementById(telaAlvo);
+                if (elementoTela) elementoTela.classList.remove('escondido');
+
+                telaAtual = telaAlvo;
+
+                // Lógica de áudio (mantida intacta)
+                if (telaAlvo === 'jogos') {
+                    playAudioJogos();
+                } else if (telaAnterior === 'jogos') {
+                    pauseAudioJogos();
+                }
+
+                atualizarDinamicaHome();
+                trocandoTela = false; // Destrava a tela para ela poder clicar de novo
+            }, 300);
         });
     });
 }
@@ -513,56 +583,69 @@ function obterEmojiClima(condicao, sunrise, sunset) {
     return `<span class="${classe}">${emoji}</span>`;
 }
 
-async function atualizarClima() {
-    const elJoão = document.getElementById("temp-usuario");
-    const elThamiris = document.getElementById("temp-thamiris");
-    const elMensagem = document.getElementById("texto-mensagem-clima");
-    const elIconeClima = document.getElementById("icone-clima");
+// VARIÁVEIS GLOBAIS DO CLIMA UNIFICADO
+window.dadosClima = { joao: null, thamiris: null };
+window.climaExibido = 'thamiris'; // O app abre focando nela por padrão ❤️
 
+async function atualizarClima() {
     try {
+        // Busca os dois climas
         const resJ = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Colombo,BR&units=metric&appid=${API_KEY}`);
         const resT = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Goiania,BR&units=metric&appid=${API_KEY}`);
 
-        if (!resJ.ok || !resT.ok) throw new Error('Erro na API');
+        if (resJ.ok) window.dadosClima.joao = await resJ.json();
+        if (resT.ok) window.dadosClima.thamiris = await resT.json();
 
-        const dJ = await resJ.json();
-        const dT = await resT.json();
-
-        if (dJ.main && elJoão) {
-            elJoão.innerHTML = `${Math.round(dJ.main.temp)}°C ${obterEmojiClima(dJ.weather[0].main, dJ.sys.sunrise, dJ.sys.sunset)}`;
+        // Atualiza as temperaturas nos botões
+        if (window.dadosClima.joao) {
+            document.getElementById("mini-temp-joao").innerText = `${Math.round(window.dadosClima.joao.main.temp)}°C`;
         }
-        if (dT.main && elThamiris) {
-            elThamiris.innerHTML = `${Math.round(dT.main.temp)}°C ${obterEmojiClima(dT.weather[0].main, dT.sys.sunrise, dT.sys.sunset)}`;
-        }
-
-        if (dT.main && elMensagem) {
-            const condicao = dT.weather[0].main;
-            const temp = Math.round(dT.main.temp);
-            elMensagem.innerText = gerarMensagemClima(condicao, temp);
+        if (window.dadosClima.thamiris) {
+            document.getElementById("mini-temp-thamiris").innerText = `${Math.round(window.dadosClima.thamiris.main.temp)}°C`;
         }
 
-        if (dT.main && elIconeClima) {
-            const condicao = dT.weather[0].main;
-            let icone = '⛅';
-            switch (condicao) {
-                case 'Clear': icone = '☀️'; break;
-                case 'Clouds': icone = '☁️'; break;
-                case 'Rain': icone = '🌧️'; break;
-                case 'Thunderstorm': icone = '⛈️'; break;
-                case 'Snow': icone = '❄️'; break;
-                case 'Mist': case 'Fog': case 'Haze': icone = '🌫️'; break;
-                default: icone = '⛅';
-            }
-            elIconeClima.innerText = icone;
-        }
+        // Dispara a visualização
+        alternarVisaoClima(window.climaExibido);
 
     } catch (e) {
-        if (elJoão) elJoão.innerHTML = "❌ Indisponível";
-        if (elThamiris) elThamiris.innerHTML = "❌ Indisponível";
-        if (elMensagem) elMensagem.innerText = "❌ Clima indisponível no momento";
-        if (elIconeClima) elIconeClima.innerText = '❓';
+        console.error("Erro na API de Clima", e);
+        document.getElementById("texto-mensagem-clima").innerText = "❌ Clima indisponível no momento";
     }
 }
+
+// Função chamada quando você clica nos botões (Colombo / Goiânia)
+window.alternarVisaoClima = function(pessoa) {
+    window.climaExibido = pessoa;
+    const dados = window.dadosClima[pessoa];
+    
+    // Atualiza o visual dos botões
+    document.getElementById('btn-view-thamiris').classList.remove('ativo');
+    document.getElementById('btn-view-joao').classList.remove('ativo');
+    document.getElementById(`btn-view-${pessoa}`).classList.add('ativo');
+
+    if (!dados) return;
+
+    // Calcula dia/noite e condição
+    const agora = Math.floor(Date.now() / 1000);
+    const eNoite = agora < dados.sys.sunrise || agora > dados.sys.sunset;
+    const condicao = dados.weather[0].main;
+    const temp = Math.round(dados.main.temp);
+
+    // Atualiza a frase
+    const elMensagem = document.getElementById("texto-mensagem-clima");
+    if (elMensagem) {
+        if (pessoa === 'thamiris') {
+            elMensagem.innerText = gerarMensagemClima(condicao, temp);
+        } else {
+            elMensagem.innerText = `Faz ${temp}°C em Colombo. O clima aqui espera por você.`;
+        }
+    }
+
+    // Manda a ordem para o motor 3D transformar a garrafa
+    if (typeof window.mudarClimaOrbe === 'function') {
+        window.mudarClimaOrbe(condicao, eNoite);
+    }
+};
 
 function gerarMensagemClima(condicao, temperatura) {
     const mensagens = {
@@ -712,19 +795,21 @@ function regarPlanta() {
         }
 
         const somRega = new Audio('assets/sons/mf/regar.mp3');
-somRega.volume = 0.4;
-somRega.play().catch(e => console.log('Áudio bloqueado:', e));
+        somRega.volume = 0.4;
+        somRega.play().catch(e => console.log('Áudio bloqueado:', e));
 
-function animarRega(elemento) {
-    for (let i = 0; i < 5; i++) {
-        const gota = document.createElement('div');
-        gota.className = 'gota';
-        gota.style.left = Math.random() * 40 + 'px';
-        gota.style.top = '-10px';
-        elemento.appendChild(gota);
-        setTimeout(() => gota.remove(), 600);
-    }
-}
+        // As gotas agora caem no topo da árvore 3D
+        function animarRega(elemento) {
+            if (!elemento) return;
+            for (let i = 0; i < 5; i++) {
+                const gota = document.createElement('div');
+                gota.className = 'gota';
+                gota.style.left = (Math.random() * 40 + 30) + '%'; // Centraliza as gotas
+                gota.style.top = '5%';
+                elemento.appendChild(gota);
+                setTimeout(() => gota.remove(), 600);
+            }
+        }
 
         const ontem = new Date();
         ontem.setDate(agora.getDate() - 1);
@@ -745,53 +830,43 @@ function animarRega(elemento) {
             mostrarToast(`💦 Planta regada por ${window.MEU_NOME}!`);
         }
 
-        const emoji = document.getElementById("emoji-planta");
-emoji.classList.add('regando');
-setTimeout(() => emoji.classList.remove('regando'), 800);
-
         dados.diaUltimaRegada = hoje;
         dados.ultimaRegada = agora.getTime();
 
         set(refJardim, dados);
-        animarRega(document.getElementById('emoji-planta'));
+        // Faz chover dentro do canvas 3D
+        animarRega(document.getElementById('prisma-3d'));
     });
 }
 
 function renderizarPlanta() {
     const barra = document.getElementById("progresso-crescimento");
-    const emoji = document.getElementById("emoji-planta");
     const texto = document.getElementById("status-texto");
     const aviso = document.getElementById("aviso-regada");
-    const btn = document.getElementById("btn-regar");
     const contadorCiclos = document.getElementById('contador-ciclos');
     
     if (contadorCiclos) contadorCiclos.innerText = `🌱 Ciclos completados: ${statusPlanta.ciclos || 0}`;
-    if (!barra || !emoji || !texto) return;
+    
+    // Agora o sistema não trava mais procurando pelo emoji que deletamos!
+    if (!barra || !texto) return; 
     
     barra.style.width = statusPlanta.nivel + "%";
 
     if (statusPlanta.nivel <= 0) {
-        emoji.innerText = "🌱";
         texto.innerText = "Um novo ciclo se inicia. Cuidem juntos.";
     } else if (statusPlanta.nivel < 25) {
-        emoji.innerText = "🌿";
         texto.innerText = "As raízes estão se firmando.";
     } else if (statusPlanta.nivel < 50) {
-        emoji.innerText = "🌳";
         texto.innerText = "Crescimento contínuo e forte.";
     } else if (statusPlanta.nivel < 90) {
-        emoji.innerText = "🍃";
         texto.innerText = "A folhagem já provê abrigo e paz.";
     } else {
-        emoji.innerText = "🌸";
         texto.innerText = "Prestes a florescer um novo marco!";
     }
 
     if (statusPlanta.diaUltimaRegada === new Date().toLocaleDateString('pt-BR')) {
-        if (btn) btn.style.opacity = "0.5";
         if (aviso) aviso.innerText = "Solo nutrido por hoje. Descansem.";
     } else {
-        if (btn) btn.style.opacity = "1";
         if (aviso) aviso.innerText = "A planta aguarda a água de um de vocês.";
     }
 }
@@ -1033,19 +1108,16 @@ function abrirReliquia(event, tipo) {
         const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
-            <div class="modal-ceu" id="modal-ceu-container">
-                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">🌕</span>
-                <p>"${textoCeu}"</p>
+            <div class="modal-ceu" id="modal-ceu-container" style="padding: 10px;">
+                <div id="galaxia-3d" style="width: 100%; height: 220px; border-radius: 12px; overflow: hidden; background: #020111;"></div>
+                <p style="margin-top: 15px; font-style: italic; color: #e0e0e0; font-size: 0.95rem;">"${textoCeu}"</p>
+                <small style="color: #D4AF37; opacity: 0.5; font-size: 0.7rem; display: block; margin-top: 10px;">Toque e deslize para girar a galáxia</small>
             </div>`;
-        const container = document.getElementById('modal-ceu-container');
-        for (let i = 0; i < 5; i++) {
-            const estrela = document.createElement('div');
-            estrela.className = 'estrela-cadente';
-            estrela.style.top = Math.random() * 100 + '%';
-            estrela.style.left = Math.random() * 100 + '%';
-            estrela.style.animationDelay = Math.random() * 2 + 's';
-            container.appendChild(estrela);
-        }
+        
+        // Dá um pequeno atraso de 100ms para o HTML carregar na tela, e então liga o motor 3D da galáxia
+        setTimeout(() => {
+            if (typeof window.inicializarGalaxia3D === 'function') window.inicializarGalaxia3D();
+        }, 100);
     } else if (tipo === 'cartas') {
         const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
         corpo.innerHTML = `
@@ -1112,6 +1184,17 @@ function abrirJogo(tipo) {
                 window.iniciarJulgamento();
             }
         }
+        // --- NOVA PARTE PARA O SOLO FÉRTIL (PRISMA) ---
+        if (tipo === 'jardim') {
+            // Dá um atraso de 100 milissegundos para a tela aparecer, 
+            // assim o 3D consegue medir o tamanho real da tela (que não será mais zero)
+            setTimeout(() => {
+                if (typeof window.inicializarPrisma3D === 'function') {
+                    window.inicializarPrisma3D();
+                }
+            }, 100);
+        }
+        // ----------------------------------------------
     }
     document.body.classList.add('modo-jogo-ativo');
     document.body.classList.add('jogo-aberto');
@@ -1269,44 +1352,10 @@ async function carregarLeis() {
 
 // 10. DINÂMICA DA HOME
 function atualizarDinamicaHome() {
-    const elStreak = document.getElementById("streak-jardim");
-    const elAtalhoCofre = document.getElementById("atalho-cofre");
-    const txtStreak = document.getElementById("texto-streak");
+    // Agora a função cuida exclusivamente da liberação visual das relíquias do Cofre
     const hoje = new Date().toLocaleDateString('pt-BR');
-
-    let dadosPlanta = { sequencia: 0 };
-    const dadosSalvos = localStorage.getItem('statusPlanta_v2');
-    if (dadosSalvos) {
-        try {
-            dadosPlanta = JSON.parse(dadosSalvos);
-        } catch (e) {
-            console.warn('Dados da planta corrompidos ao atualizar home. Ignorando...');
-            localStorage.removeItem('statusPlanta_v2');
-        }
-    }
-
-    if (elStreak) {
-        if (dadosPlanta.sequencia > 0) {
-            elStreak.classList.remove("escondido");
-            if (txtStreak) txtStreak.innerText = `${dadosPlanta.sequencia} ${dadosPlanta.sequencia === 1 ? 'dia' : 'dias'} de florescimento`;
-            const icone = elStreak.querySelector('.icone-badge');
-            if (icone) {
-                if (dadosPlanta.sequencia >= 7) icone.innerText = "🔥";
-                else if (dadosPlanta.sequencia >= 3) icone.innerText = "🌿";
-                else icone.innerText = "🌱";
-            }
-        } else {
-            elStreak.classList.add("escondido");
-        }
-    }
-
     const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
-
-    if (elAtalhoCofre) {
-        if (ganhouHoje) elAtalhoCofre.classList.remove("escondido");
-        else elAtalhoCofre.classList.add("escondido");
-    }
-
+    
     const msgCofre = document.getElementById('msg-cofre');
     const itensCofre = document.querySelectorAll('.item-cofre');
 
@@ -1795,9 +1844,172 @@ async function salvarTokenFCM() {
 }
 
 // ==========================================
+// MENSAGEM SURPRESA (UMA VEZ POR DIA)
+// ==========================================
+
+// Função que verifica e atualiza o estado do botão (data atual vs. localStorage)
+function verificarEstadoBotaoSurpresa() {
+    const btn = document.getElementById('btn-surpresa');
+    const textoEl = document.getElementById('texto-surpresa');
+    if (!btn) return;
+
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const hojeStr = `${ano}-${mes}-${dia}`;
+
+    const ultimaData = localStorage.getItem('surpresa_ultima_data');
+    const ultimaMensagem = localStorage.getItem('surpresa_mensagem_dia');
+
+    if (ultimaData === hojeStr) {
+        // Já usou hoje: desabilita o botão e exibe a mensagem (se houver)
+        btn.classList.add('btn-desativado');
+        if (textoEl && ultimaMensagem) {
+            textoEl.innerText = ultimaMensagem;
+            textoEl.style.opacity = 1;
+        }
+    } else {
+        // Novo dia: habilita o botão e limpa a mensagem
+        btn.classList.remove('btn-desativado');
+        if (textoEl) {
+            textoEl.innerText = ''; // ou uma mensagem padrão, se desejar
+        }
+    }
+}
+
+// Função principal chamada ao clicar no botão
+window.mostrarMensagemSurpresa = function() {
+    const btn = document.getElementById('btn-surpresa');
+    const textoEl = document.getElementById('texto-surpresa');
+    if (!btn || !textoEl) return;
+
+    // Se já estiver desabilitado, não faz nada
+    if (btn.classList.contains('btn-desativado')) return;
+
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const hojeStr = `${ano}-${mes}-${dia}`;
+
+    // Lista de mensagens (personalize à vontade)
+    const mensagens = [
+        "Você é a pessoa mais incrível que eu já conheci.",
+        "Mesmo longe, meu coração bate por você.",
+        "Hoje o dia foi mais bonito porque você existe.",
+        "Saudade é o amor que está longe, mas não vai embora.",
+        "Você é o meu pensamento favorito.",
+        "Obrigado por fazer parte da minha vida.",
+        "Se eu pudesse, te traria pra perto agora.",
+        "Você ilumina meus dias mesmo à distância.",
+        "Amo cada detalhe seu.",
+        "Nosso amor é a coisa mais linda que já senti."
+    ];
+
+    // Escolhe uma mensagem aleatória
+    const mensagem = mensagens[Math.floor(Math.random() * mensagens.length)];
+
+    // Armazena a data e a mensagem
+    localStorage.setItem('surpresa_ultima_data', hojeStr);
+    localStorage.setItem('surpresa_mensagem_dia', mensagem);
+
+    // Exibe a mensagem com fade suave
+    textoEl.innerText = mensagem;
+    textoEl.style.opacity = 0;
+    textoEl.style.transition = 'opacity 0.5s';
+    setTimeout(() => {
+        textoEl.style.opacity = 1;
+    }, 10);
+
+    // Desabilita o botão
+    btn.classList.add('btn-desativado');
+};
+
+// ==========================================
 // BOOT DO SISTEMA
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
+    // ==========================================
+    // INICIALIZAÇÃO DAS MÁGICAS UI/UX SUPREMAS
+    // ==========================================
+
+    // --- 1. REMOVER SPLASH SCREEN ---
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+        setTimeout(() => {
+            splash.classList.add('oculto');
+            // Remove o código do HTML após sumir para deixar o app leve
+            setTimeout(() => splash.remove(), 1000); 
+        }, 2500); // A tela de abertura fica por 2.5 segundos
+    }
+
+    // --- 2. RASTRO DE LUZ (MAGIC TOUCH TRAIL) ---
+    const criarRastro = (e) => {
+        // Pega a posição exata do dedo na tela ou do mouse
+        const x = e.clientX || (e.touches && e.touches[0].clientX);
+        const y = e.clientY || (e.touches && e.touches[0].clientY);
+        if (x === undefined || y === undefined) return;
+
+        const rastro = document.createElement('div');
+        rastro.className = 'rastro-luz';
+        rastro.style.left = `${x}px`;
+        rastro.style.top = `${y}px`;
+        document.body.appendChild(rastro);
+
+        // O rastro some sozinho em menos de 1 segundo
+        setTimeout(() => rastro.remove(), 800);
+    };
+    window.addEventListener('mousemove', criarRastro);
+    window.addEventListener('touchmove', criarRastro, {passive: true});
+
+    // --- 3. EFEITO RIPPLE NOS BOTÕES (ONDAS NA ÁGUA) ---
+    // Pega todos os botões e itens clicáveis do app
+    const elementosClicaveis = document.querySelectorAll('button, .item-menu, .btn-acao, .item-jogo, .item-cofre');
+    elementosClicaveis.forEach(btn => {
+        btn.classList.add('btn-ripple'); // Prepara o botão para a onda
+        
+        btn.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            // Calcula exatamente onde o dedo tocou dentro do botão
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX) || rect.left + rect.width/2;
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY) || rect.top + rect.height/2;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            const circulo = document.createElement('span');
+            circulo.classList.add('ripple-onda');
+            
+            // Define o tamanho da onda baseado no tamanho do botão
+            const diametro = Math.max(this.clientWidth, this.clientHeight);
+            circulo.style.width = circulo.style.height = `${diametro}px`;
+            circulo.style.left = `${x - diametro/2}px`;
+            circulo.style.top = `${y - diametro/2}px`;
+            
+            this.appendChild(circulo);
+            // Limpa a onda depois que a animação termina
+            setTimeout(() => circulo.remove(), 600);
+        });
+    });
+
+    // --- MELHORIA: EFEITO PARALLAX NAS PARTÍCULAS ---
+    const particulas = document.querySelector('.particulas');
+    if (particulas) {
+        // Lógica para quando ela estiver no celular (usando o giroscópio)
+        window.addEventListener('deviceorientation', (e) => {
+            // O e.gamma lê a inclinação para os lados, o e.beta lê para frente/trás
+            const x = Math.min(Math.max(e.gamma, -30), 30); 
+            const y = Math.min(Math.max(e.beta - 45, -30), 30); 
+            particulas.style.transform = `translate(${x * 0.5}px, ${y * 0.5}px)`;
+        });
+
+        // Lógica para se vocês abrirem no computador (usando o mouse)
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            particulas.style.transform = `translate(${x}px, ${y}px)`;
+        });
+    }
     setInterval(atualizarMotorDoTempo, 1000);
     atualizarMotorDoTempo();
     atualizarDinamicaHome();
@@ -1810,6 +2022,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-mute-jogos')?.addEventListener('click', toggleMuteJogos);
     atualizarBotoesMute();
+    // Verifica o estado do botão de mensagem surpresa agora
+    verificarEstadoBotaoSurpresa();
+
+// E a cada minuto, verifica se o dia mudou (para reativar à meia‑noite)
+    setInterval(verificarEstadoBotaoSurpresa, 60000);
 
     // ==========================================
 // Ícone de temas - abrir/fechar seletor
@@ -1853,5 +2070,1363 @@ if (temaIcon && temaSelector) {
             window.SantuarioApp.conectar();
         }
     });
-});
+
+
+    // --- MELHORIA UX: O TOQUE SECRETO (EASTER EGG) ---
+    const timerSecreto = document.getElementById('timer-principal');
+    let timerPressionado; // Variável que vai contar o tempo do dedo na tela
+
+    if (timerSecreto) {
+        // Frases que ela pode descobrir ao segurar o dedo (Você pode adicionar quantas quiser!)
+        const segredos = [
+            "Você descobriu um segredo: Eu te amo mais do que ontem! 💖",
+            "Mesmo de olhos fechados, é o seu rosto que eu vejo. ✨",
+            "Colombo e Goiânia nunca estiveram tão perto. 🌍",
+            "Continue segurando minha mão, mesmo de longe. 🤝",
+            "Cada segundo desse contador valeu a pena por te conhecer. ⏳"
+        ];
+
+        // Função que acontece se ela segurar por 3 segundos
+        const revelarSegredo = () => {
+            // Escolhe uma frase aleatória
+            const fraseSorteada = segredos[Math.floor(Math.random() * segredos.length)];
+            
+            // Usa o seu sistema de "Toast" (aquela notificação que sobe na tela) para mostrar a frase
+            mostrarToast(fraseSorteada);
+
+            // Efeito visual de confetes (que você já tem instalado)
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 80,
+                    spread: 100,
+                    origin: { y: 0.5 },
+                    colors: ['#D4AF37', '#ff6b6b', '#ffffff'] // Dourado, vermelho claro e branco
+                });
+            }
+            
+            // Faz o celular vibrar suavemente (como se fosse um batimento de coração)
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 100, 50]); 
+            }
+        };
+
+        // Quando ela ENCOSTAR o dedo (ou clicar com o mouse)
+        const iniciarToque = (e) => {
+            // Evita que a tela dê zoom no celular
+            if (e.type === 'touchstart') { e.preventDefault(); }
+            // Começa a contar 3 segundos (3000 milissegundos)
+            timerPressionado = setTimeout(revelarSegredo, 3000);
+            // Dá um efeitinho visual de que o botão está afundando
+            timerSecreto.style.transform = 'scale(0.95)';
+            timerSecreto.style.opacity = '0.7';
+            timerSecreto.style.transition = 'all 3s ease'; // Transição lenta para dar suspense
+        };
+
+        // Quando ela TIRAR o dedo (ou soltar o clique)
+        const cancelarToque = () => {
+            // Cancela o cronômetro se ela soltar antes dos 3 segundos
+            clearTimeout(timerPressionado);
+            // Volta o texto ao normal instantaneamente
+            timerSecreto.style.transform = 'scale(1)';
+            timerSecreto.style.opacity = '1';
+            timerSecreto.style.transition = 'all 0.2s ease';
+        };
+
+        // Adiciona os "escutadores" para o celular (touch) e computador (mouse)
+        timerSecreto.addEventListener('touchstart', iniciarToque, {passive: false});
+        timerSecreto.addEventListener('touchend', cancelarToque);
+        timerSecreto.addEventListener('touchcancel', cancelarToque); // Caso ela arraste o dedo
+
+        timerSecreto.addEventListener('mousedown', iniciarToque);
+        timerSecreto.addEventListener('mouseup', cancelarToque);
+        timerSecreto.addEventListener('mouseleave', cancelarToque);
+    }
+
+    // ==========================================
+    // INICIALIZAÇÃO DA JANELA VIVA
+    // ==========================================
+
+    // --- 1. CICLO CIRCADIANO (Mudança de Fundo por Hora) ---
+    const atualizarCicloDia = () => {
+        const hora = new Date().getHours();
+        const body = document.body;
+        
+        // Limpa as classes antigas
+        body.classList.remove('manha', 'tarde', 'crepusculo', 'noite');
+        
+        // Define a nova classe baseada na hora local dela
+        if (hora >= 5 && hora < 12) {
+            body.classList.add('manha'); // 05h às 11h59
+        } else if (hora >= 12 && hora < 17) {
+            body.classList.add('tarde'); // 12h às 16h59
+        } else if (hora >= 17 && hora < 19) {
+            body.classList.add('crepusculo'); // 17h às 18h59
+        } else {
+            body.classList.add('noite'); // 19h às 04h59
+        }
+    };
+    atualizarCicloDia(); // Roda assim que o app abre
+    setInterval(atualizarCicloDia, 60000); // Checa de 1 em 1 minuto se a hora mudou
+
+    // --- 2. OURO VIVO NA FRASE DO DIA ---
+    // Precisamos adicionar a classe de ouro no texto que é digitado ao vivo
+    const observarFraseDia = new MutationObserver(() => {
+        const textoMaquina = document.getElementById('texto-maquina-escrever');
+        if (textoMaquina && !textoMaquina.classList.contains('texto-ouro-vivo')) {
+            textoMaquina.classList.add('texto-ouro-vivo');
+        }
+    });
+    const elFrase = document.getElementById('frase-do-dia');
+    if (elFrase) {
+        // Fica observando para adicionar o brilho assim que a máquina começar a escrever
+        observarFraseDia.observe(elFrase, { childList: true, subtree: true });
+    }
+
+    // --- 3. REFLEXO DE CRISTAL NOS CARTÕES DE VIDRO ---
+    const ativarReflexo = () => {
+        const cartoes = document.querySelectorAll('.cartao-vidro');
+        // Escolhe um cartão aleatório para dar o reflexo (para não ficar artificial)
+        const cartaoSorteado = cartoes[Math.floor(Math.random() * cartoes.length)];
+        
+        if (cartaoSorteado) {
+            cartaoSorteado.classList.add('reflexo-ativo');
+            // Remove a classe depois que a luz passar, para poder acontecer de novo
+            setTimeout(() => {
+                cartaoSorteado.classList.remove('reflexo-ativo');
+            }, 1000);
+        }
+    };
+    
+    // O reflexo acontece sozinho de tempos em tempos (a cada 6 segundos)
+    setInterval(ativarReflexo, 6000);
+
+    // E também acontece quando ela inclinar o celular (reaproveitando seu evento de deviceorientation)
+    let ultimoTempoReflexo = 0;
+    window.addEventListener('deviceorientation', (e) => {
+        const agora = Date.now();
+        // Se ela mexer muito o celular (movimento brusco de mais de 10 graus) e já passou 2 segundos do último reflexo
+        if ((Math.abs(e.gamma) > 10 || Math.abs(e.beta) > 10) && agora - ultimoTempoReflexo > 2000) {
+            ativarReflexo();
+            ultimoTempoReflexo = agora;
+        }
+    });
+
+    // ==========================================
+    // UI/UX NÍVEL DEUS: O GLOBO 3D (THREE.JS)
+    // ==========================================
+    
+    window.inicializarGlobo3D = () => {
+        const container = document.getElementById('globo-3d');
+        if (!container || typeof THREE === 'undefined') return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); 
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio); 
+        renderer.domElement.style.display = 'block';
+        renderer.domElement.style.margin = '0 auto';
+        container.appendChild(renderer.domElement);
+
+        const raioTerra = 5;
+        const geometriaTerra = new THREE.SphereGeometry(raioTerra, 32, 32);
+        const materialTerra = new THREE.MeshBasicMaterial({ 
+            color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.15 
+        });
+        const planeta = new THREE.Mesh(geometriaTerra, materialTerra);
+        scene.add(planeta);
+
+        const sistemaGlobal = new THREE.Group();
+        sistemaGlobal.add(planeta);
+        scene.add(sistemaGlobal);
+
+        const latColombo = -25.2917; const lonColombo = -49.2242;
+        const latGoiania = -16.6869; const lonGoiania = -49.2648;
+
+        const calcPosFromLatLon = (lat, lon, raio) => {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            const x = -(raio * Math.sin(phi) * Math.cos(theta));
+            const z = (raio * Math.sin(phi) * Math.sin(theta));
+            const y = (raio * Math.cos(phi));
+            return new THREE.Vector3(x, y, z);
+        };
+
+        const posColombo = calcPosFromLatLon(latColombo, lonColombo, raioTerra);
+        const posGoiania = calcPosFromLatLon(latGoiania, lonGoiania, raioTerra);
+
+        const geometriaCidade = new THREE.SphereGeometry(0.15, 16, 16);
+        const materialCidade = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
+        const pontoColombo = new THREE.Mesh(geometriaCidade, materialCidade);
+        pontoColombo.position.copy(posColombo);
+        sistemaGlobal.add(pontoColombo);
+
+        const pontoGoiania = new THREE.Mesh(geometriaCidade, materialCidade);
+        pontoGoiania.position.copy(posGoiania);
+        sistemaGlobal.add(pontoGoiania);
+
+        const pontoMedio = posColombo.clone().lerp(posGoiania, 0.5);
+        pontoMedio.normalize().multiplyScalar(raioTerra + 1.5); 
+
+        const curva = new THREE.QuadraticBezierCurve3(posColombo, pontoMedio, posGoiania);
+        const geometriaCurva = new THREE.BufferGeometry().setFromPoints(curva.getPoints(50));
+        const materialCurva = new THREE.LineBasicMaterial({ color: 0xff6b6b, linewidth: 2 });
+        sistemaGlobal.add(new THREE.Line(geometriaCurva, materialCurva));
+
+        camera.position.set(0, 0, 13);
+        sistemaGlobal.rotation.y = -0.8; 
+        sistemaGlobal.rotation.x = 0.2; 
+
+        // Sono Quântico
+        let globoVisivel = false;
+        const observerGlobo = new IntersectionObserver((entries) => { globoVisivel = entries[0].isIntersecting; });
+        observerGlobo.observe(container);
+
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!globoVisivel) return;
+            sistemaGlobal.rotation.y += 0.005;
+            renderer.render(scene, camera);
+        };
+
+        window.addEventListener('resize', () => {
+            if(container.clientWidth > 0) {
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+            }
+        });
+        animar();
+    };
+
+    // ==========================================
+    // UI/UX NÍVEL DEUS: AS 3 JÓIAS 3D
+    // ==========================================
+
+    // --- 1. O CORAÇÃO DE CRISTAL ---
+    window.ritmoCoracao = 1;      
+    window.corCoracao = 0xff6b6b; 
+
+    const enviarMoodOriginal = window.enviarMood;
+    window.enviarMood = function(estado) {
+        if (estado === 'ansiosa') { window.ritmoCoracao = 3.5; window.corCoracao = 0xf39c12; } 
+        else if (estado === 'cansada') { window.ritmoCoracao = 0.5; window.corCoracao = 0x3498db; } 
+        else if (estado === 'triste') { window.ritmoCoracao = 0.8; window.corCoracao = 0x8e44ad; } 
+        else if (estado === 'radiante') { window.ritmoCoracao = 2; window.corCoracao = 0xf1c40f; } 
+        else if (estado === 'apaixonada') { window.ritmoCoracao = 2.5; window.corCoracao = 0xff6b6b; } 
+        else { window.ritmoCoracao = 1.5; window.corCoracao = 0xffffff; } 
+        
+        if (enviarMoodOriginal) enviarMoodOriginal(estado);
+    };
+
+    window.inicializarCoracao3D = () => {
+        const container = document.getElementById('coracao-3d');
+        if (!container || typeof THREE === 'undefined') return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.domElement.style.display = 'block';
+        renderer.domElement.style.margin = '0 auto';
+        container.appendChild(renderer.domElement);
+
+        const coracao = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(2, 0), 
+            new THREE.MeshBasicMaterial({ color: window.corCoracao, wireframe: true, transparent: true, opacity: 0.8 })
+        );
+        scene.add(coracao);
+        camera.position.z = 7;
+
+        let coracaoVisivel = false;
+        const observerCoracao = new IntersectionObserver((entries) => { coracaoVisivel = entries[0].isIntersecting; });
+        observerCoracao.observe(container);
+
+        let tempo = 0;
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!coracaoVisivel) return; 
+
+            tempo += 0.05 * window.ritmoCoracao;
+            coracao.material.color.setHex(window.corCoracao);
+            const batimento = 1 + Math.pow(Math.sin(tempo), 4) * 0.2;
+            coracao.scale.set(batimento, batimento, batimento);
+            coracao.rotation.y += 0.01;
+            coracao.rotation.x += 0.005;
+            
+            renderer.render(scene, camera);
+        };
+        animar();
+    };
+
+    // --- 2. A ÁRVORE DA VIDA (FRACTAL PROCEDURAL) ---
+    window.inicializarPrisma3D = () => {
+        const container = document.getElementById('prisma-3d');
+        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.domElement.style.display = 'block';
+        container.appendChild(renderer.domElement);
+
+        camera.position.set(0, 2, 7);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const luzD = new THREE.DirectionalLight(0xffd700, 1.5);
+        luzD.position.set(5, 10, 5);
+        scene.add(luzD);
+        const luzAura = new THREE.PointLight(0xff6b6b, 2, 8);
+        luzAura.position.set(0, 2, 0);
+        scene.add(luzAura);
+
+        const arvoreGroup = new THREE.Group();
+        arvoreGroup.position.y = -1.5; 
+        scene.add(arvoreGroup);
+
+        let pulsoRegador = 1;
+        container.addEventListener('click', () => {
+            pulsoRegador = 1.15; 
+            if (navigator.vibrate) navigator.vibrate([40, 60, 40]); 
+        });
+
+        const matTronco = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.3, metalness: 0.8 }); 
+        const matFolha = new THREE.MeshBasicMaterial({ color: 0xff6b6b, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending }); 
+        const matSemente = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.2, metalness: 0.5, emissive: 0x1abc9c }); 
+
+        let sistemaPetalas;
+        const particulasCount = 80;
+        const petalasGeo = new THREE.BufferGeometry();
+        const petalasPos = new Float32Array(particulasCount * 3);
+
+        const nivel = window.statusPlanta ? window.statusPlanta.nivel : 0;
+        let maxProfundidade = 0;
+        if (nivel > 5) maxProfundidade = 1;  
+        if (nivel > 25) maxProfundidade = 2; 
+        if (nivel > 50) maxProfundidade = 3; 
+        if (nivel > 80) maxProfundidade = 4; 
+        if (nivel >= 100) maxProfundidade = 5; 
+
+        function criarGalho(comprimento, espessuraBase, profundidadeAtual) {
+            const galhoGrupo = new THREE.Group();
+            const galhoGeo = new THREE.CylinderGeometry(espessuraBase * 0.65, espessuraBase, comprimento, 6);
+            galhoGeo.translate(0, comprimento / 2, 0); 
+            galhoGrupo.add(new THREE.Mesh(galhoGeo, matTronco));
+
+            if (profundidadeAtual < maxProfundidade) {
+                for(let i = 0; i < 3; i++) {
+                    const galhoFilho = criarGalho(comprimento * 0.75, espessuraBase * 0.65, profundidadeAtual + 1);
+                    galhoFilho.position.y = comprimento; 
+                    galhoFilho.rotation.y = ((Math.PI * 2) / 3) * i + (Math.random() * 0.4 - 0.2);
+                    galhoFilho.rotation.z = 0.5 + (Math.random() * 0.3);
+                    galhoFilho.rotation.x = (Math.random() * 0.4 - 0.2);
+                    galhoGrupo.add(galhoFilho);
+                }
+            } else {
+                if (maxProfundidade > 1) { 
+                    const folha = new THREE.Mesh(new THREE.SphereGeometry(espessuraBase * 3, 5, 5), matFolha);
+                    folha.position.y = comprimento;
+                    galhoGrupo.add(folha);
+                }
+            }
+            return galhoGrupo;
+        }
+
+        let semente;
+        if (maxProfundidade === 0) {
+            semente = new THREE.Mesh(new THREE.OctahedronGeometry(0.5, 0), matSemente);
+            semente.position.y = 1;
+            arvoreGroup.add(semente);
+        } else {
+            arvoreGroup.add(criarGalho(1.5, 0.25, 1));
+            if (maxProfundidade >= 4) {
+                for(let i=0; i<particulasCount; i++) {
+                    petalasPos[i*3] = (Math.random() - 0.5) * 6; 
+                    petalasPos[i*3+1] = Math.random() * 6;       
+                    petalasPos[i*3+2] = (Math.random() - 0.5) * 6; 
+                }
+                petalasGeo.setAttribute('position', new THREE.BufferAttribute(petalasPos, 3));
+                sistemaPetalas = new THREE.Points(petalasGeo, new THREE.PointsMaterial({ color: 0xffb7c5, size: 0.1, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }));
+                arvoreGroup.add(sistemaPetalas);
+            }
+        }
+
+        let arvoreVisivel = false;
+        const observerArvore = new IntersectionObserver((entries) => { arvoreVisivel = entries[0].isIntersecting; });
+        observerArvore.observe(container);
+
+        let tempo = 0;
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!arvoreVisivel) return; 
+
+            tempo += 0.01;
+            arvoreGroup.rotation.y += 0.003;
+            arvoreGroup.position.y = -1.5 + Math.sin(tempo) * 0.1;
+
+            pulsoRegador += (1 - pulsoRegador) * 0.1; 
+            arvoreGroup.scale.set(pulsoRegador, pulsoRegador, pulsoRegador);
+
+            if (maxProfundidade === 0 && semente) {
+                const pulso = 1 + Math.sin(tempo * 3) * 0.2;
+                semente.scale.set(pulso, pulso, pulso);
+                semente.rotation.x += 0.01; semente.rotation.y += 0.02;
+            }
+
+            if (sistemaPetalas) {
+                const pos = sistemaPetalas.geometry.attributes.position.array;
+                for(let i=1; i<pos.length; i+=3) {
+                    pos[i] -= 0.02; 
+                    pos[i-1] += Math.sin(tempo + i) * 0.01; 
+                    if (pos[i] < -1.5) { pos[i] = 4 + Math.random() * 2; }
+                }
+                sistemaPetalas.geometry.attributes.position.needsUpdate = true;
+            }
+            renderer.render(scene, camera);
+        };
+        
+        window.addEventListener('resize', () => {
+            if(container.clientWidth > 0) {
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+            }
+        });
+        animar();
+    };
+
+    // --- 3. A GALÁXIA PARTICULAR ---
+    window.inicializarGalaxia3D = () => {
+        const container = document.getElementById('galaxia-3d');
+        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const particulasCount = 2000;
+        const posicoes = new Float32Array(particulasCount * 3);
+        const cores = new Float32Array(particulasCount * 3);
+        const colorBase = new THREE.Color(0xD4AF37); 
+
+        for(let i = 0; i < particulasCount; i++) {
+            const i3 = i * 3;
+            const raio = Math.random() * 6;
+            const angulo = raio * 3 + (Math.random() * Math.PI * 2);
+            
+            posicoes[i3] = Math.cos(angulo) * raio + ((Math.random() - 0.5) * 0.8);
+            posicoes[i3+1] = ((Math.random() - 0.5) * 0.3) * (raio * 0.5); 
+            posicoes[i3+2] = Math.sin(angulo) * raio + ((Math.random() - 0.5) * 0.8);
+
+            const mixedColor = colorBase.clone();
+            mixedColor.lerp(new THREE.Color(0x3498db), Math.random() * (raio / 6));
+            cores[i3] = mixedColor.r; cores[i3+1] = mixedColor.g; cores[i3+2] = mixedColor.b;
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(posicoes, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(cores, 3));
+
+        const galaxia = new THREE.Points(geometry, new THREE.PointsMaterial({
+            size: 0.05, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+        }));
+        scene.add(galaxia);
+
+        camera.position.set(0, 4, 7);
+        camera.lookAt(0,0,0);
+
+        let interacaoX = 0, interacaoY = 0;
+        const moverGalaxia = (e) => {
+            const rect = container.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            interacaoX = ((clientX - rect.left) / container.clientWidth) * 2 - 1;
+            interacaoY = -((clientY - rect.top) / container.clientHeight) * 2 + 1;
+        };
+        container.addEventListener('mousemove', moverGalaxia);
+        container.addEventListener('touchmove', moverGalaxia, {passive: true});
+
+        let galaxiaVisivel = false;
+        const observer = new IntersectionObserver((entries) => { galaxiaVisivel = entries[0].isIntersecting; });
+        observer.observe(container);
+
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!galaxiaVisivel) return;
+            galaxia.rotation.y += 0.003 + (interacaoX * 0.02);
+            galaxia.rotation.x = interacaoY * 0.2;
+            renderer.render(scene, camera);
+        };
+        animar();
+    };
+
+    // ==========================================
+    // UI/UX NÍVEL DEUS: ORBE DA SINCRONIA (APOGEU)
+    // ==========================================
+    window.inicializarOrbeClima = () => {
+        const container = document.getElementById('orbe-clima-3d');
+        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputEncoding = THREE.sRGBEncoding; 
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        container.appendChild(renderer.domElement);
+
+        camera.position.z = 6.5;
+
+        // Estúdio de Luz (Reflexo do Vidro)
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        pmremGenerator.compileEquirectangularShader();
+        const envScene = new THREE.Scene();
+        envScene.background = new THREE.Color(0x111111);
+        const envLight1 = new THREE.DirectionalLight(0xffffff, 5); envLight1.position.set(5, 5, 5); envScene.add(envLight1);
+        const envLight2 = new THREE.DirectionalLight(0x3498db, 3); envLight2.position.set(-5, -5, -5); envScene.add(envLight2);
+        const ambienteTextura = pmremGenerator.fromScene(envScene).texture;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+        const orbGroup = new THREE.Group();
+        scene.add(orbGroup);
+
+        // O Cristal
+        const orbeVidro = new THREE.Mesh(new THREE.SphereGeometry(2.1, 64, 64), new THREE.MeshPhysicalMaterial({
+            color: 0xffffff, metalness: 0.1, roughness: 0.05, envMap: ambienteTextura,
+            envMapIntensity: 2.0, clearcoat: 1.0, clearcoatRoughness: 0.05,
+            transparent: true, opacity: 0.25, depthWrite: false 
+        }));
+        orbGroup.add(orbeVidro);
+
+        const haloMaterial = new THREE.MeshBasicMaterial({ color: 0x3498db, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false });
+        orbGroup.add(new THREE.Mesh(new THREE.SphereGeometry(2.25, 32, 32), haloMaterial));
+
+        const interiorGroup = new THREE.Group();
+        orbGroup.add(interiorGroup);
+
+        // Sol, Lua, Luz, Nuvens, Chuva, Estrelas, Raio
+        const solGroup = new THREE.Group();
+        const nucleoSol = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+        const aura1 = new THREE.Mesh(new THREE.SphereGeometry(0.75, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
+        const aura2 = new THREE.Mesh(new THREE.SphereGeometry(1.1, 32, 32), new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false }));
+        solGroup.add(nucleoSol); solGroup.add(aura1); solGroup.add(aura2);
+        solGroup.position.y = 0.2; solGroup.visible = false; interiorGroup.add(solGroup);
+
+        const lua = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.8, metalness: 0.2 }));
+        lua.position.set(-0.5, 0.5, -0.5); lua.visible = false; interiorGroup.add(lua);
+
+        const luzInterna = new THREE.PointLight(0xffffff, 1.5, 10); interiorGroup.add(luzInterna);
+
+        const nuvensGroup = new THREE.Group();
+        const nuvensMateriais = [];
+        for(let i=0; i<5; i++) {
+            const nuvem = new THREE.Group();
+            const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthWrite: false });
+            nuvensMateriais.push(mat);
+            for(let j=0; j<5; j++){
+                const bolha = new THREE.Mesh(new THREE.SphereGeometry(0.3 + Math.random()*0.2, 16, 16), mat);
+                bolha.position.set((Math.random()-0.5)*0.7, (Math.random()-0.5)*0.3, (Math.random()-0.5)*0.7);
+                nuvem.add(bolha);
+            }
+            nuvem.position.set((Math.random()-0.5)*1.8, Math.random()*0.5 + 0.2, (Math.random()-0.5)*1.8);
+            nuvensGroup.add(nuvem);
+        }
+        nuvensGroup.visible = false; interiorGroup.add(nuvensGroup);
+
+        const rainGeo = new THREE.BufferGeometry();
+        const rainPoints = [];
+        for(let i=0; i<150; i++) {
+            const x = (Math.random() - 0.5) * 3; const y = (Math.random() - 0.5) * 3; const z = (Math.random() - 0.5) * 3;
+            rainPoints.push(new THREE.Vector3(x, y, z)); rainPoints.push(new THREE.Vector3(x, y - 0.2, z)); 
+        }
+        rainGeo.setFromPoints(rainPoints);
+        const chuva = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6, depthWrite: false }));
+        chuva.visible = false; interiorGroup.add(chuva);
+
+        const estrelasGeo = new THREE.BufferGeometry();
+        const estrelasPos = new Float32Array(300 * 3);
+        for(let i=0; i<300*3; i++) estrelasPos[i] = (Math.random() - 0.5) * 3;
+        estrelasGeo.setAttribute('position', new THREE.BufferAttribute(estrelasPos, 3));
+        const estrelas = new THREE.Points(estrelasGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); 
+        estrelas.visible = false; interiorGroup.add(estrelas);
+
+        const flashLight = new THREE.PointLight(0xaaaaff, 0, 10); flashLight.position.set(0, 1, 0); interiorGroup.add(flashLight);
+
+        window.mudarClimaOrbe = (condicao, eNoite) => {
+            solGroup.visible = false; lua.visible = false; nuvensGroup.visible = false; chuva.visible = false; estrelas.visible = false;
+            orbGroup.scale.set(0.8, 0.8, 0.8);
+
+            if (condicao === 'Rain' || condicao === 'Thunderstorm' || condicao === 'Drizzle') {
+                nuvensMateriais.forEach(m => m.color.setHex(0x555555)); haloMaterial.color.setHex(0x555555);
+                nuvensGroup.visible = true; chuva.visible = true; luzInterna.color.setHex(0x444455);
+                window.climaAtivo = condicao;
+            } else if (condicao === 'Clouds') {
+                nuvensMateriais.forEach(m => m.color.setHex(eNoite ? 0x606060 : 0xffffff)); haloMaterial.color.setHex(eNoite ? 0x2c3e50 : 0xbdc3c7);
+                nuvensGroup.visible = true; if(eNoite) lua.visible = true;
+                luzInterna.color.setHex(eNoite ? 0xaaaaaa : 0xffffff);
+                window.climaAtivo = 'nuvens';
+            } else {
+                if (eNoite) { lua.visible = true; estrelas.visible = true; haloMaterial.color.setHex(0x0a0a2a); luzInterna.color.setHex(0x8888aa); window.climaAtivo = 'noite'; } 
+                else { solGroup.visible = true; haloMaterial.color.setHex(0xf1c40f); luzInterna.color.setHex(0xffd700); window.climaAtivo = 'sol'; }
+            }
+        };
+
+        // CORREÇÃO DA CONDIÇÃO DE CORRIDA: Se o clima já foi baixado da internet, atualiza o Orbe na mesma hora!
+        if (window.dadosClima && window.dadosClima[window.climaExibido]) {
+            const dados = window.dadosClima[window.climaExibido];
+            const eNoite = Math.floor(Date.now()/1000) < dados.sys.sunrise || Math.floor(Date.now()/1000) > dados.sys.sunset;
+            window.mudarClimaOrbe(dados.weather[0].main, eNoite);
+        }
+
+        window.addEventListener('resize', () => {
+            if(container.clientWidth > 0) {
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+            }
+        });
+
+        let orbeVisivel = false;
+        const observer = new IntersectionObserver((entries) => { orbeVisivel = entries[0].isIntersecting; });
+        observer.observe(container);
+
+        let tempo = 0;
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!orbeVisivel) return; 
+            tempo += 0.01;
+            
+            if (orbGroup.scale.x < 1) { orbGroup.scale.x += 0.01; orbGroup.scale.y += 0.01; orbGroup.scale.z += 0.01; }
+            orbGroup.rotation.y += 0.002;
+            interiorGroup.position.y = Math.sin(tempo) * 0.05;
+
+            if (window.climaAtivo === 'Rain' || window.climaAtivo === 'Thunderstorm' || window.climaAtivo === 'Drizzle') {
+                const pos = chuva.geometry.attributes.position.array;
+                for(let i=1; i<pos.length; i+=3) {
+                    pos[i] -= 0.15; if (pos[i] < -1.5) pos[i] = 1.5;
+                }
+                chuva.geometry.attributes.position.needsUpdate = true;
+                nuvensGroup.rotation.y -= 0.002;
+                flashLight.intensity = (window.climaAtivo === 'Thunderstorm' || Math.random() > 0.995) ? Math.random() * 5 : Math.max(0, flashLight.intensity - 0.2);
+            }
+            else if (window.climaAtivo === 'nuvens') nuvensGroup.rotation.y += 0.001;
+            else if (window.climaAtivo === 'sol') {
+                aura1.scale.setScalar(1 + Math.sin(tempo * 3) * 0.1);
+                aura2.scale.setScalar(1 + Math.sin(tempo * 2) * 0.15);
+                nucleoSol.rotation.y += 0.01;
+            }
+            else if (window.climaAtivo === 'noite') estrelas.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+        };
+        animar();
+    };
+
+    // ==========================================
+    // UI/UX NÍVEL TITÃ: O OCEANO DE FIOS DE OURO
+    // ==========================================
+    window.inicializarOceanoQuantico = () => {
+        const container = document.getElementById('oceano-quantico-3d');
+        if (!container || typeof THREE === 'undefined') return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.set(0, 5, 20); camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const oceanSize = 120; const segments = 50; 
+        const geometry = new THREE.PlaneGeometry(oceanSize, oceanSize, segments, segments);
+        geometry.rotateX(-Math.PI / 2); 
+
+        scene.add(new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xD4AF37, size: 0.15, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending })));
+        scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(geometry), new THREE.LineBasicMaterial({ color: 0xD4AF37, transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending })));
+
+        let worldMouseX = 1000, worldMouseZ = 1000;
+        const mapearToque = (e) => {
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+            if(x !== undefined && y !== undefined) {
+                worldMouseX = (x / window.innerWidth) * 60 - 30; 
+                worldMouseZ = (y / window.innerHeight) * 40 - 15; 
+            }
+        };
+        
+        window.addEventListener('mousemove', mapearToque);
+        window.addEventListener('touchmove', mapearToque, {passive: true});
+        const limparToque = () => { worldMouseX = 1000; worldMouseZ = 1000; };
+        window.addEventListener('mouseleave', limparToque);
+        window.addEventListener('touchend', limparToque);
+
+        const clock = new THREE.Clock();
+        let telaAtiva = true;
+        document.addEventListener("visibilitychange", () => { telaAtiva = !document.hidden; });
+
+        let ultimoFrame = 0; const intervaloFrame = 1000 / 30; 
+
+        const animar = (tempoAtual) => {
+            requestAnimationFrame(animar);
+            if (!telaAtiva) return; 
+            if (tempoAtual - ultimoFrame < intervaloFrame) return;
+            ultimoFrame = tempoAtual;
+
+            const time = clock.getElapsedTime() * 0.8; 
+            const positions = geometry.attributes.position.array;
+
+            for(let i = 0; i < geometry.attributes.position.count; i++) {
+                const px = positions[i * 3]; const pz = positions[i * 3 + 2]; 
+                let y = Math.sin(px * 0.2 + time) * Math.cos(pz * 0.2 + time) * 1.5;
+                const dist = Math.sqrt(Math.pow(px - worldMouseX, 2) + Math.pow(pz - worldMouseZ, 2));
+                if (dist < 8) y -= Math.cos(dist * Math.PI / 8) * 2 + 2; 
+                positions[i * 3 + 1] = y; 
+            }
+            
+            geometry.attributes.position.needsUpdate = true;
+            camera.position.x = Math.sin(time * 0.1) * 3;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        };
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+        animar(0);
+    };
+
+// ==========================================
+    // UI/UX NÍVEL TITÃ: ECOS DO SANTUÁRIO (ÁUDIO 3D)
+    // ==========================================
+    
+    // Variáveis Globais do Áudio
+    window.ecoAudioContext = null;
+    window.ecoAnalyser = null;
+    window.ecoDataArray = null;
+    let mediaRecorder;
+    let audioChunks = [];
+    let audioAtual = new Audio();
+    
+    window.inicializarEco3D = () => {
+        const container = document.getElementById('eco-3d');
+        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        camera.position.z = 5;
+
+        // A Esfera de Fios de Ouro (A Alma do Áudio)
+        // Usamos Icosahedron com muitos detalhes para termos vértices suficientes para distorcer
+        const geometry = new THREE.IcosahedronGeometry(1.5, 12);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xD4AF37, 
+            wireframe: true, 
+            transparent: true, 
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const esferaEco = new THREE.Mesh(geometry, material);
+        scene.add(esferaEco);
+
+        // Salva a posição original dos vértices para podermos deformar e voltar ao normal
+        const positionAttribute = geometry.attributes.position;
+        const vertexOriginals = [];
+        for (let i = 0; i < positionAttribute.count; i++) {
+            vertexOriginals.push(new THREE.Vector3().fromBufferAttribute(positionAttribute, i));
+        }
+
+        // Sono Quântico (Economia de Bateria)
+        let ecoVisivel = false;
+        const observerEco = new IntersectionObserver((entries) => { ecoVisivel = entries[0].isIntersecting; });
+        observerEco.observe(container);
+
+        let tempo = 0;
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!ecoVisivel) return;
+
+            tempo += 0.01;
+            esferaEco.rotation.y += 0.005;
+            esferaEco.rotation.x += 0.002;
+
+            // FÍSICA DO SOM: Distorce os vértices se houver áudio tocando ou gravando
+            if (window.ecoAnalyser && window.ecoDataArray) {
+                window.ecoAnalyser.getByteFrequencyData(window.ecoDataArray);
+                
+                // Pega a média de volume das frequências
+                let soma = 0;
+                for(let i=0; i < window.ecoDataArray.length; i++) soma += window.ecoDataArray[i];
+                let mediaVolume = soma / window.ecoDataArray.length;
+                
+                // Brilho reage ao volume
+                material.opacity = 0.3 + (mediaVolume / 255) * 0.7;
+                material.color.setHex(mediaVolume > 150 ? 0xffffff : 0xD4AF37); // Fica branco nos picos altos
+
+                // Deformação da malha 3D
+                const positions = geometry.attributes.position;
+                for (let i = 0; i < positions.count; i++) {
+                    const vertex = vertexOriginals[i].clone();
+                    // Cria uma distorção baseada na frequência específica daquele vértice + ruído matemático
+                    const distorcao = 1 + (window.ecoDataArray[i % window.ecoDataArray.length] / 255) * 0.5;
+                    vertex.multiplyScalar(distorcao);
+                    positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
+                }
+                positions.needsUpdate = true;
+            } else {
+                // Respiração normal se estiver em silêncio
+                const pos = geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const vertex = vertexOriginals[i].clone();
+                    vertex.multiplyScalar(1 + Math.sin(tempo * 2 + vertex.y) * 0.05);
+                    pos.setXYZ(i, vertex.x, vertex.y, vertex.z);
+                }
+                pos.needsUpdate = true;
+                material.color.setHex(0xD4AF37);
+                material.opacity = 0.4;
+            }
+
+            renderer.render(scene, camera);
+        };
+        animar();
+
+        // Buscar se já tem um eco salvo no banco ao iniciar
+        if(window.SantuarioApp && window.SantuarioApp.modulos) {
+            const { db, ref, onValue } = window.SantuarioApp.modulos;
+            onValue(ref(db, 'eco_diario'), (snapshot) => {
+                const dados = snapshot.val();
+                if (dados && dados.audioBase64) {
+                    window.audioCarregado = dados.audioBase64;
+                    document.getElementById('btn-ouvir-eco').style.display = 'block';
+                    document.getElementById('status-eco').innerText = `Eco deixado por ${dados.autor} às ${dados.hora}`;
+                    document.getElementById('status-eco').style.color = "#2ecc71";
+                }
+            });
+        }
+    };
+
+    // --- FUNÇÕES DE GRAVAÇÃO E PLAYBACK DE ÁUDIO ---
+
+    window.iniciarGravacao = async () => {
+        const btnGravar = document.getElementById('btn-gravar-eco');
+        const status = document.getElementById('status-eco');
+        
+        try {
+            // Pede permissão e abre o microfone
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // Configura o Analisador Web Audio para o 3D ler a voz em tempo real!
+            window.ecoAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = window.ecoAudioContext.createMediaStreamSource(stream);
+            window.ecoAnalyser = window.ecoAudioContext.createAnalyser();
+            window.ecoAnalyser.fftSize = 64; // Resolução das ondas
+            source.connect(window.ecoAnalyser);
+            window.ecoDataArray = new Uint8Array(window.ecoAnalyser.frequencyBinCount);
+
+            // Inicia o gravador
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+            mediaRecorder.start();
+
+            btnGravar.style.background = "#ff6b6b";
+            btnGravar.style.color = "#fff";
+            btnGravar.style.transform = "scale(1.2)";
+            status.innerText = "Capturando a sua voz... (Solte para enviar)";
+            status.style.color = "#ff6b6b";
+
+        } catch (err) {
+            status.innerText = "Permissão de microfone negada.";
+            console.error(err);
+        }
+    };
+
+    window.pararGravacao = () => {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+            const status = document.getElementById('status-eco');
+            const btnGravar = document.getElementById('btn-gravar-eco');
+            
+            btnGravar.style.background = "rgba(0,0,0,0.5)";
+            btnGravar.style.color = "var(--cor-primaria)";
+            btnGravar.style.transform = "scale(1)";
+            status.innerText = "Compactando e enviando para o espaço...";
+
+            // Desliga a leitura do microfone para o 3D
+            if (mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track => track.stop());
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                
+                // Converte o arquivo de som para Texto Base64 para caber no Realtime DB
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = () => {
+                    const base64Audio = reader.result;
+                    
+                    // Envia para o Firebase
+                    if(window.SantuarioApp && window.SantuarioApp.modulos) {
+                        const { db, ref, set } = window.SantuarioApp.modulos;
+                        const agora = new Date();
+                        set(ref(db, 'eco_diario'), {
+                            audioBase64: base64Audio,
+                            autor: window.MEU_NOME,
+                            hora: `${agora.getHours().toString().padStart(2, '0')}:${agora.getMinutes().toString().padStart(2, '0')}`,
+                            timestamp: agora.getTime()
+                        }).then(() => {
+                            status.innerText = "Sua voz chegou ao destino.";
+                            status.style.color = "#2ecc71";
+                            // Limpa o analisador
+                            window.ecoAnalyser = null;
+                        });
+                    }
+                };
+            };
+        }
+    };
+
+    window.tocarEco = () => {
+        if (!window.audioCarregado) return;
+        
+        // Configura o áudio
+        audioAtual.src = window.audioCarregado;
+        audioAtual.play();
+
+        // Configura o Analisador para o 3D reagir ao áudio gravado!
+        if (!window.ecoAudioContext) {
+            window.ecoAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Evita reconectar a mesma fonte 2 vezes e travar
+        if (!window.sourceAtual) {
+            window.sourceAtual = window.ecoAudioContext.createMediaElementSource(audioAtual);
+            window.ecoAnalyser = window.ecoAudioContext.createAnalyser();
+            window.ecoAnalyser.fftSize = 64;
+            window.sourceAtual.connect(window.ecoAnalyser);
+            window.ecoAnalyser.connect(window.ecoAudioContext.destination); // Manda o som pra caixa de som do celular
+            window.ecoDataArray = new Uint8Array(window.ecoAnalyser.frequencyBinCount);
+        }
+
+        // Retoma o contexto caso o navegador tenha bloqueado
+        if (window.ecoAudioContext.state === 'suspended') {
+            window.ecoAudioContext.resume();
+        }
+
+        const status = document.getElementById('status-eco');
+        status.innerText = "Escutando...";
+        
+        audioAtual.onended = () => {
+            status.innerText = "Eco finalizado.";
+            window.ecoAnalyser = null; // A esfera para de pular
+        };
+    };
+
+// ==========================================
+    // UI/UX NÍVEL TITÃ: A BÚSSOLA DO DESTINO (GIROSCÓPIO 3D)
+    // ==========================================
+    
+    window.agulhaBussola = null;
+    window.anguloAlvoBussola = 0;
+    
+    window.inicializarBussola3D = () => {
+        const container = document.getElementById('bussola-3d');
+        if (!container || typeof THREE === 'undefined' || container.innerHTML.indexOf('canvas') !== -1) return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        // Insere o canvas ANTES do overlay de botão
+        container.insertBefore(renderer.domElement, container.firstChild);
+
+        camera.position.set(0, 5, 0); // Câmera olhando de cima para baixo
+        camera.lookAt(0, 0, 0);
+
+        // Luzes Mágicas
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const luzDirecional = new THREE.DirectionalLight(0xffd700, 1.5);
+        luzDirecional.position.set(5, 10, 2);
+        scene.add(luzDirecional);
+
+        // O Anel da Bússola
+        const anelGeo = new THREE.TorusGeometry(1.5, 0.05, 16, 64);
+        const anelMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 0.8, roughness: 0.2 });
+        const anel = new THREE.Mesh(anelGeo, anelMat);
+        anel.rotation.x = Math.PI / 2;
+        scene.add(anel);
+
+        // A Agulha de Ouro
+        const agulhaGroup = new THREE.Group();
+        
+        // Parte Norte (Aponta para o amor) - Vermelha/Dourada
+        const agulhaNorteGeo = new THREE.ConeGeometry(0.2, 1.4, 4);
+        const agulhaNorteMat = new THREE.MeshStandardMaterial({ color: 0xff6b6b, metalness: 0.5, roughness: 0.3 });
+        const agulhaNorte = new THREE.Mesh(agulhaNorteGeo, agulhaNorteMat);
+        agulhaNorte.position.z = -0.7;
+        agulhaNorte.rotation.x = Math.PI / 2;
+        agulhaNorte.rotation.y = Math.PI / 4; // Deixa a base do cone reta
+        agulhaGroup.add(agulhaNorte);
+
+        // Parte Sul (Contrapeso) - Prata Escura
+        const agulhaSulGeo = new THREE.ConeGeometry(0.2, 1.4, 4);
+        const agulhaSulMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8, roughness: 0.4 });
+        const agulhaSul = new THREE.Mesh(agulhaSulGeo, agulhaSulMat);
+        agulhaSul.position.z = 0.7;
+        agulhaSul.rotation.x = -Math.PI / 2;
+        agulhaSul.rotation.y = Math.PI / 4;
+        agulhaGroup.add(agulhaSul);
+
+        // Eixo central
+        const eixo = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.2, 16), new THREE.MeshStandardMaterial({ color: 0xD4AF37 }));
+        agulhaGroup.add(eixo);
+
+        scene.add(agulhaGroup);
+        window.agulhaBussola = agulhaGroup;
+
+        // Sono Quântico
+        let bussolaVisivel = false;
+        const observerBussola = new IntersectionObserver((entries) => { bussolaVisivel = entries[0].isIntersecting; });
+        observerBussola.observe(container);
+
+        let tempo = 0;
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!bussolaVisivel) return;
+
+            tempo += 0.02;
+            
+            // Flutuação suave da bússola inteira
+            anel.position.y = Math.sin(tempo) * 0.1;
+            agulhaGroup.position.y = Math.sin(tempo) * 0.1;
+
+            // Rotação suave da agulha em direção ao alvo usando interpolação (suavidade)
+            // A matemática garante que ela não dê uma volta completa estranha ao passar pelo eixo 0/360
+            let diferenca = window.anguloAlvoBussola - agulhaGroup.rotation.y;
+            while (diferenca < -Math.PI) diferenca += Math.PI * 2;
+            while (diferenca > Math.PI) diferenca -= Math.PI * 2;
+            
+            agulhaGroup.rotation.y += diferenca * 0.05; // Velocidade da agulha
+
+            renderer.render(scene, camera);
+        };
+        animar();
+    };
+
+    // --- MATEMÁTICA GEOGRÁFICA E SENSORES ---
+
+    window.ativarSensoresBussola = () => {
+        const overlay = document.getElementById('overlay-bussola');
+        const status = document.getElementById('status-bussola');
+        const textoAlvo = document.getElementById('texto-alvo-bussola');
+
+        // Coordenadas Fixas
+        const latColombo = -25.2917; const lonColombo = -49.2242;
+        const latGoiania = -16.6869; const lonGoiania = -49.2648;
+        
+        let latAlvo = window.souJoao ? latGoiania : latColombo;
+        let lonAlvo = window.souJoao ? lonGoiania : lonColombo;
+
+        if(textoAlvo) textoAlvo.innerText = window.souJoao ? "Apontando para Goiânia (Thamiris)" : "Apontando para Colombo (João)";
+
+        // Matemática Esférica (Haversine)
+        const calcularBearing = (lat1, lon1, lat2, lon2) => {
+            const toRad = deg => deg * Math.PI / 180;
+            const toDeg = rad => rad * 180 / Math.PI;
+            const dLon = toRad(lon2 - lon1);
+            lat1 = toRad(lat1); lat2 = toRad(lat2);
+            const y = Math.sin(dLon) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+            return (toDeg(Math.atan2(y, x)) + 360) % 360;
+        };
+
+        // Pedido de Permissão (Especial para iOS 13+)
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        if(overlay) overlay.style.display = 'none';
+                        iniciarRastreamento(latAlvo, lonAlvo, calcularBearing);
+                    } else {
+                        status.innerText = "Permissão magnética negada pelo iPhone.";
+                    }
+                })
+                .catch(console.error);
+        } else {
+            // Android e navegadores modernos
+            if(overlay) overlay.style.display = 'none';
+            iniciarRastreamento(latAlvo, lonAlvo, calcularBearing);
+        }
+    };
+
+    function iniciarRastreamento(latAlvo, lonAlvo, calcularBearing) {
+        const status = document.getElementById('status-bussola');
+        status.innerText = "Calibrando satélites...";
+        let bearingAlvo = 0;
+
+        // O Motor do Giroscópio
+        const iniciarGiroscopio = () => {
+            let sensorDetectado = false;
+
+            const orientacaoHandler = (event) => {
+                let compass;
+                // Detecta iPhone (webkitCompassHeading) ou Android (alpha)
+                if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+                    compass = event.webkitCompassHeading;
+                    sensorDetectado = true;
+                } else if (event.alpha !== null && event.alpha !== undefined) {
+                    compass = 360 - event.alpha;
+                    sensorDetectado = true;
+                }
+
+                if (sensorDetectado) {
+                    let anguloFinal = (bearingAlvo - compass) * (Math.PI / 180);
+                    window.anguloAlvoBussola = anguloFinal;
+                    status.innerText = "Sincronizado e apontando.";
+                }
+            };
+
+            // Escuta as variações magnéticas da Terra
+            window.addEventListener('deviceorientationabsolute', orientacaoHandler, true);
+            window.addEventListener('deviceorientation', orientacaoHandler, true);
+
+            // Trava de segurança: Se o sensor não responder em 2.5 segundos, avisa que é PC
+            setTimeout(() => {
+                if (!sensorDetectado) {
+                    status.innerText = "⚠️ Seu aparelho não possui Bússola/Magnetômetro.";
+                }
+            }, 2500);
+        };
+
+        // Pega a Localização GPS primeiro
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                bearingAlvo = calcularBearing(position.coords.latitude, position.coords.longitude, latAlvo, lonAlvo);
+                iniciarGiroscopio();
+            }, (err) => {
+                status.innerText = "GPS desligado. Usando rota estimada.";
+                const latAtual = window.souJoao ? -25.2917 : -16.6869;
+                const lonAtual = window.souJoao ? -49.2242 : -49.2648;
+                bearingAlvo = calcularBearing(latAtual, lonAtual, latAlvo, lonAlvo);
+                iniciarGiroscopio();
+            }, { enableHighAccuracy: true });
+        } else {
+            status.innerText = "Navegador sem suporte a GPS.";
+        }
+    }
+
+// ==========================================
+// CARROSSEL DE HORIZONTES - MOTOR BLINDADO
+// ==========================================
+window.inicializarCarrossel3D = () => {
+    const container = document.getElementById('carrossel-3d');
+    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    camera.position.z = 5;
+    scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+
+    const carrosselGroup = new THREE.Group();
+    scene.add(carrosselGroup);
+
+    const geometriaQuadro = new THREE.PlaneGeometry(2, 2.5);
+    const texturaCarregador = new THREE.TextureLoader();
+    let quadros = [];
+    let timerCliqueLongo;
+
+    const construirCarrossel = (fotosArray) => {
+        while(carrosselGroup.children.length > 0){ carrosselGroup.remove(carrosselGroup.children[0]); }
+        quadros = [];
+        const corTema = getComputedStyle(document.documentElement).getPropertyValue('--cor-primaria').trim() || "#D4AF37";
+
+        if (!fotosArray || fotosArray.length === 0) {
+            const matVazio = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+            const quadro = new THREE.Mesh(geometriaQuadro, matVazio);
+            const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: new THREE.Color(corTema) }));
+            quadro.add(borda);
+            carrosselGroup.add(quadro);
+            quadros.push(quadro);
+            return;
+        }
+
+        const raio = Math.max(3, fotosArray.length * 0.7);
+        const anguloPasso = (Math.PI * 2) / fotosArray.length;
+
+        fotosArray.forEach((fotoBase64, index) => {
+            texturaCarregador.load(fotoBase64, (textura) => {
+                const material = new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide, transparent: true });
+                const quadro = new THREE.Mesh(geometriaQuadro, material);
+                const angulo = index * anguloPasso;
+                quadro.position.set(Math.sin(angulo) * raio, 0, Math.cos(angulo) * raio);
+                quadro.rotation.y = angulo;
+                quadro.userData = { index: index }; 
+
+                const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: 0xD4AF37 }));
+                quadro.add(borda);
+                carrosselGroup.add(quadro);
+                quadros.push(quadro);
+            });
+        });
+    };
+
+    // Lógica de Interação
+    let isDragging = false, previousX = 0, velocidadeGiro = 0.005;
+
+    const iniciarAoTocar = (e) => {
+        isDragging = true;
+        const x = e.clientX || (e.touches && e.touches[0].clientX);
+        const y = e.clientY || (e.touches && e.touches[0].clientY);
+        previousX = x;
+        velocidadeGiro = 0;
+
+        // Clique Longo para Apagar
+        const rect = container.getBoundingClientRect();
+        const mouse = new THREE.Vector2(
+            ((x - rect.left) / container.clientWidth) * 2 - 1,
+            -((y - rect.top) / container.clientHeight) * 2 + 1
+        );
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(quadros);
+
+        if (intersects.length > 0 && intersects[0].object.userData.index !== undefined) {
+            timerCliqueLongo = setTimeout(() => {
+                window.confirmarExclusaoFoto(intersects[0].object.userData.index);
+            }, 1200);
+        }
+    };
+
+    const moverAoTocar = (e) => {
+        if (!isDragging) return;
+        const x = e.clientX || (e.touches && e.touches[0].clientX);
+        const delta = x - previousX;
+        carrosselGroup.rotation.y += delta * 0.01;
+        velocidadeGiro = delta * 0.002;
+        previousX = x;
+        clearTimeout(timerCliqueLongo);
+    };
+
+    const finalizarToque = () => {
+        isDragging = false;
+        clearTimeout(timerCliqueLongo);
+    };
+
+    container.addEventListener('mousedown', iniciarAoTocar);
+    window.addEventListener('mousemove', moverAoTocar);
+    window.addEventListener('mouseup', finalizarToque);
+    container.addEventListener('touchstart', iniciarAoTocar, {passive: true});
+    window.addEventListener('touchmove', moverAoTocar, {passive: false});
+    window.addEventListener('touchend', finalizarToque);
+
+    if(window.SantuarioApp?.modulos) {
+        const { db, ref, onValue } = window.SantuarioApp.modulos;
+        onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
+            const dados = snapshot.val();
+            construirCarrossel(Array.isArray(dados) ? dados : []);
+        });
+    }
+
+    const animar = () => {
+        requestAnimationFrame(animar);
+        carrosselGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
+        if (!isDragging) {
+            carrosselGroup.rotation.y += velocidadeGiro;
+            velocidadeGiro = velocidadeGiro * 0.95 + 0.005 * 0.05;
+        }
+        renderer.render(scene, camera);
+    };
+    animar();
+};
+
+window.confirmarExclusaoFoto = (index) => {
+    if (confirm("Deseja apagar esta foto específica?")) {
+        const { db, ref, get, set } = window.SantuarioApp.modulos;
+        const r = ref(db, 'horizontes/fotos');
+        get(r).then(s => {
+            let f = s.val() || [];
+            f.splice(index, 1);
+            set(r, f);
+        });
+    }
+};
+
+window.limparCarrosselHorizontes = () => {
+    if (confirm("Apagar TODAS as fotos da galeria?")) {
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        set(ref(db, 'horizontes/fotos'), null);
+    }
+};
+
+window.processarFotoHorizonte = (event) => {
+    const file = event.target.files[0];
+    if (!file || !window.SantuarioApp?.modulos) return;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const scale = Math.min(600 / img.width, 800 / img.height, 1);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL('image/jpeg', 0.7);
+            const { db, ref, get, set } = window.SantuarioApp.modulos;
+            const r = ref(db, 'horizontes/fotos');
+            get(r).then(s => {
+                let f = s.val() || [];
+                f.push(base64);
+                if(f.length > 8) f.shift();
+                set(r, f);
+            });
+        };
+    };
+};
+
+    // ==========================================
+    // INICIALIZADOR GLOBAL MESTRE (O BOOT)
+    // ==========================================
+    window.addEventListener('load', () => {
+        if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D();
+        if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D();
+        if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima();
+        if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico();
+        if(typeof inicializarEco3D === 'function') inicializarEco3D();
+        if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
+        if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D(); // <--- AGORA VAI LIGAR!
+    });
+
+}); 
 }

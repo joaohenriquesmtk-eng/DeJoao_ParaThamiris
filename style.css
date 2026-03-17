@@ -90,11 +90,23 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     color: #666;
     text-decoration: none;
-    transition: 0.3s;
+    transition: all 0.2s ease;
+    
+    /* A MÁGICA DO CLIQUE ARREDONDADO */
+    border-radius: 20px;         /* Transforma a caixa numa pílula suave */
+    overflow: hidden;            /* Corta qualquer efeito quadrado que tente vazar */
+    position: relative;          /* Segura os efeitos dentro do botão */
+    padding: 6px 12px;           /* Dá um "respiro" para o efeito não esmagar o ícone */
 }
 
+/* O efeito visual redondo quando ela tocar no botão */
+.item-menu:active {
+    background-color: rgba(212, 175, 55, 0.15); /* Fundo dourado translúcido */
+    transform: scale(0.92);                     /* Leve pulso para dentro */
+}
 .item-menu.ativo {
     color: var(--cor-primaria);
 }
@@ -2308,22 +2320,39 @@ body.modo-jogo-ativo .tela {
     z-index: 0;
 }
 
+/* --- MELHORIA UI: POEIRA ESTELAR / VAGALUMES --- */
 .particula {
     position: absolute;
-    width: 2px;
-    height: 2px;
-    background-color: rgba(212, 175, 55, 0.6);
+    /* Tamanhos variados para criar profundidade */
+    width: 3px;
+    height: 3px;
+    background-color: #D4AF37; /* Dourado do Santuário */
     border-radius: 50%;
-    box-shadow: 0 0 4px rgba(212, 175, 55, 0.8);
-    animation: flutuarParticula 15s infinite linear;
+    /* O "glow" brilhante em volta da bolinha */
+    box-shadow: 0 0 8px 2px rgba(212, 175, 55, 0.6);
+    /* Animação nova: flutuando e piscando (fading) */
+    animation: magiaVagalume 12s infinite ease-in-out;
+    opacity: 0; /* Começa invisível */
 }
 
-@keyframes flutuarParticula {
+@keyframes magiaVagalume {
     0% {
-        transform: translateY(0) translateX(0);
+        transform: translateY(10dvh) translateX(0) scale(0.5);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.8; /* Acende a luzinha */
+    }
+    50% {
+        transform: translateY(-40dvh) translateX(30px) scale(1.2);
+        opacity: 0.4;
+    }
+    80% {
+        opacity: 0.8; /* Acende de novo */
     }
     100% {
-        transform: translateY(-100dvh) translateX(20px);
+        transform: translateY(-100dvh) translateX(-20px) scale(0.5);
+        opacity: 0; /* Apaga sumindo no topo */
     }
 }
 
@@ -2525,78 +2554,6 @@ body.jogo-aberto #btn-mute-jogos {
 /* Ajuste para que o conteúdo da tela Leis não fique atrás do menu inferior */
 #leis {
     padding-bottom: calc(85px + 20px); /* 85px do menu + 20px extra */
-}
-
-/* ==========================================
-   CARTÃO DA SAUDAÇÃO - DESTAQUE ESPECIAL
-========================================== */
-.cartao-saudacao {
-    position: relative;
-    background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(255, 255, 255, 0.05));
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    animation: brilhoSaudacao 3s infinite alternate ease-in-out;
-}
-
-/* Efeito de borda gradiente animada */
-.cartao-saudacao::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, #D4AF37, #f9e076, #D4AF37, #b38b2c);
-    background-size: 300% 300%;
-    border-radius: 26px; /* Ajuste para coincidir com o border-radius do cartao-vidro (24px) + 2px */
-    z-index: -1;
-    animation: bordaGradiente 6s ease infinite;
-}
-
-/* Animação de brilho pulsante */
-@keyframes brilhoSaudacao {
-    0% {
-        box-shadow: 0 0 5px rgba(212, 175, 55, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-    100% {
-        box-shadow: 0 0 25px rgba(212, 175, 55, 0.8), 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-}
-
-/* Animação do gradiente na borda */
-@keyframes bordaGradiente {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-/* Pequeno detalhe: uma estrela ou brilho no canto (opcional) */
-.cartao-saudacao::after {
-    content: '✨';
-    position: absolute;
-    top: -10px;
-    right: -5px;
-    font-size: 20px;
-    color: #D4AF37;
-    opacity: 0.7;
-    animation: girarEstrela 4s linear infinite;
-    filter: drop-shadow(0 0 5px gold);
-}
-
-@keyframes girarEstrela {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-#mensagem-clima {
-    font-style: italic;
-    border-left: 3px solid var(--cor-primaria);
 }
 
 /* ==========================================
@@ -4113,4 +4070,421 @@ body.modo-alerta {
 @keyframes pular {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
+}
+
+/* --- MELHORIA: TRANSIÇÃO SUAVE PARA O PARALLAX --- */
+.particulas {
+    transition: transform 0.1s ease-out;
+    will-change: transform; /* Avisa o navegador para processar isso mais rápido */
+}
+
+/* --- MELHORIA: ANIMAÇÃO DE SAÍDA DE TELA (FADE OUT) --- */
+.saindo {
+    animation: sumirSuave 0.3s ease-in forwards !important;
+}
+
+@keyframes sumirSuave {
+    from { 
+        opacity: 1; 
+        transform: translateY(0); 
+        filter: blur(0); 
+    }
+    to { 
+        opacity: 0; 
+        transform: translateY(-15px); 
+        filter: blur(4px); 
+    }
+}
+
+
+/* --- MELHORIA UI: A RESPIRAÇÃO DOS CARTÕES DE VIDRO --- */
+/* Isso fará as caixas pulsarem devagar, criando aconchego */
+.cartao-vidro {
+    /* Mantém o seu design original, mas adicionamos a animação */
+    animation: respiracaoSantuario 6s infinite alternate ease-in-out;
+}
+
+@keyframes respiracaoSantuario {
+    0% {
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 0px rgba(212, 175, 55, 0);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    100% {
+        /* O brilho dourado se expande levemente */
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.15);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+}
+
+/* ==========================================
+   MEGA ATUALIZAÇÃO UI/UX SUPREMA
+========================================== */
+
+/* 1. SPLASH SCREEN (Abertura) */
+#splash-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--cor-fundo); z-index: 99999;
+    display: flex; justify-content: center; align-items: center;
+    transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+}
+#splash-screen.oculto { opacity: 0; visibility: hidden; }
+.splash-conteudo { text-align: center; animation: pulsarSplash 2.5s infinite alternate ease-in-out; }
+.splash-coracao { font-size: 4.5rem; filter: drop-shadow(0 0 20px rgba(212,175,55,0.8)); display: block; margin-bottom: 15px;}
+.splash-titulo { font-family: 'Playfair Display', serif; color: var(--cor-primaria); font-size: 3rem; font-style: italic; letter-spacing: 3px; text-shadow: 0 0 10px rgba(212,175,55,0.3);}
+@keyframes pulsarSplash { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
+
+/* 2. RASTRO DE LUZ (Poeira Estelar nos Dedos) */
+.rastro-luz {
+    position: absolute; width: 5px; height: 5px;
+    background: #D4AF37; border-radius: 50%; pointer-events: none;
+    box-shadow: 0 0 12px 3px rgba(212,175,55,0.9); z-index: 99998;
+    animation: rastroSumindo 0.8s ease-out forwards;
+}
+@keyframes rastroSumindo { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
+
+/* 3. EFEITO RIPPLE (A Onda na Água ao Clicar) */
+.btn-ripple { position: relative; overflow: hidden; }
+.ripple-onda {
+    position: absolute; border-radius: 50%; transform: scale(0);
+    animation: rippleAnim 0.6s linear; background: rgba(255, 255, 255, 0.4); pointer-events: none;
+}
+@keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+/* 4. MÁQUINA DE ESCREVER (Cursor Piscante) */
+.cursor-piscante::after {
+    content: '|'; animation: piscarCursor 0.8s infinite; color: var(--cor-primaria); font-weight: bold; margin-left: 3px;
+}
+@keyframes piscarCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ==========================================
+   UI/UX SUPREMA: A JANELA VIVA
+========================================== */
+
+/* 1. TRANSIÇÃO DO CICLO DO TEMPO */
+body {
+    /* Garante que a troca de clima/hora seja super suave (5 segundos) */
+    transition: background 5s ease-in-out; 
+}
+/* Cores do fundo baseadas no horário (mantendo a elegância escura) */
+body.manha { background: radial-gradient(circle at top right, #2a1f1a, var(--cor-fundo)); }
+body.tarde { background: radial-gradient(circle at top right, #1a242c, var(--cor-fundo)); }
+body.crepusculo { background: radial-gradient(circle at top right, #2c1624, var(--cor-fundo)); }
+body.noite { background: radial-gradient(circle at top right, var(--cor-fundo), #050505); }
+
+/* 2. OURO VIVO (Shimmering Text) */
+.texto-ouro-vivo {
+    /* Cria um degradê dourado com feixes de luz branca no meio */
+    background: linear-gradient(110deg, #D4AF37 20%, #FFFDE7 40%, #FFFFFF 50%, #FFFDE7 60%, #D4AF37 80%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: brilhoOuro 4s linear infinite;
+    display: inline-block;
+}
+@keyframes brilhoOuro {
+    to { background-position: 200% center; }
+}
+
+/* 3. REFLEXO DE CRISTAL NOS CARTÕES */
+.cartao-vidro {
+    position: relative;
+    overflow: hidden; /* Não deixa o reflexo vazar para fora do cartão */
+}
+/* A camada de luz invisível que fica por cima do vidro */
+.cartao-vidro::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    transition: left 0.3s ease-out;
+    pointer-events: none; /* Para não atrapalhar os cliques dela */
+    z-index: 10;
+}
+/* Quando ativada pelo JS, a luz atravessa o cartão */
+.cartao-vidro.reflexo-ativo::before {
+    left: 200%;
+    transition: left 1s ease-in-out;
+}
+
+/* ==========================================
+   UI/UX POÉTICA: O TATO E A DISTÂNCIA
+========================================== */
+
+/* 1. O FIO DE OURO (Rodapé) */
+.fio-de-ouro {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.03); /* Linha quase invisível */
+    z-index: 99999;
+    pointer-events: none; /* Para não bloquear cliques */
+}
+/* O pulso de luz que viaja pelo fio */
+.fio-de-ouro::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150px;
+    width: 150px;
+    height: 100%;
+    /* O brilho dourado nas pontas, sumindo no meio */
+    background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+    animation: viajarFio 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes viajarFio {
+    0% { left: -150px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+}
+
+/* 2. A AURA DO SANTUÁRIO (Respiração da Borda) */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    /* Começa invisível */
+    box-shadow: inset 0 0 10px rgba(212, 175, 55, 0);
+    pointer-events: none;
+    z-index: 99998;
+    animation: respiracaoBorda 8s infinite alternate ease-in-out;
+}
+@keyframes respiracaoBorda {
+    0% { box-shadow: inset 0 0 10px rgba(212, 175, 55, 0); }
+    100% { box-shadow: inset 0 0 40px rgba(212, 175, 55, 0.15); } /* Expande o brilho interno */
+}
+
+/* 3. O VIDRO EMBAÇADO (Névoa sobre a Frase do Dia) */
+.texto-embacado {
+    /* Aplica um borrado forte */
+    filter: blur(6px);
+    opacity: 0.7;
+    transition: filter 2.5s ease-out, opacity 2.5s ease-out; /* O desembaçar é lento e gostoso */
+    cursor: pointer;
+    user-select: none;
+}
+/* Quando o JS adicionar essa classe, a névoa some */
+.texto-embacado.revelado {
+    filter: blur(0px);
+    opacity: 1;
+}
+
+/* ==========================================
+   UI/UX NÍVEL DEUS: FÍSICA E LUZ
+========================================== */
+
+/* 1. LANTERNA DO CORAÇÃO (Spotlight Tátil) */
+body {
+    /* Preparando o corpo do app para receber a luz variável do mouse/dedo */
+    --x-luz: 50%;
+    --y-luz: 50%;
+    /* Substitui a cor de fundo por uma que reage à posição do dedo */
+    background: radial-gradient(circle at var(--x-luz) var(--y-luz), rgba(212, 175, 55, 0.08) 0%, var(--cor-fundo) 50%, #050505 100%) !important;
+}
+
+/* 2. ESTRELAS CADENTES */
+.estrela-cadente {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px #D4AF37, 0 0 20px 4px #FFF;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+}
+/* O rastro longo da estrela */
+.estrela-cadente::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 150px;
+    height: 1px;
+    background: linear-gradient(90deg, #D4AF37, transparent);
+}
+
+/* 3. PREPARAÇÃO PARA OS CARTÕES MAGNÉTICOS */
+.cartao-vidro {
+    /* Define a perspectiva 3D para o cartão poder girar */
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    /* Evita que o cartão trave a tela */
+    will-change: transform;
+}
+
+/* ==========================================
+   BOTÕES DO ORBE DA SINCRONIA
+========================================== */
+.btn-clima-toggle {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    color: #aaa;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--fonte-padrao);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.btn-clima-toggle:hover {
+    background: rgba(52, 152, 219, 0.2);
+    color: #fff;
+}
+.btn-clima-toggle.ativo {
+    background: linear-gradient(145deg, #3498db, #2980b9);
+    color: #fff;
+    border-color: #3498db;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+    transform: scale(1.05);
+}
+
+/* RESTAURAÇÃO DO BRILHO DA SAUDAÇÃO */
+.saudacao-animada {
+    background: linear-gradient(-45deg, rgba(212, 175, 55, 0.05), rgba(0, 0, 0, 0.3), rgba(212, 175, 55, 0.1), rgba(0, 0, 0, 0.4));
+    background-size: 400% 400%;
+    animation: gradienteSaudacao 15s ease infinite;
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+@keyframes gradienteSaudacao {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Botão desativado (para mensagem surpresa) */
+.btn-desativado {
+    opacity: 0.4 !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    filter: grayscale(0.8) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* ==========================================
+   CARTÃO DE SAUDAÇÃO PRESTIGE - VERSÃO COMPACTA
+========================================== */
+.cartao-saudacao {
+    position: relative;
+    /* Fundo Dourado Sólido */
+    background: #D4AF37 !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 28px;
+    
+    /* Centralização do Texto */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    
+    /* ALTURA AJUSTADA: Reduzido de 120px para 85px */
+    min-height: 85px; 
+    /* PADDING AJUSTADO: Reduzido de 30px para 15px nas laterais */
+    padding: 15px 25px;
+    
+    margin: 15px;
+    overflow: hidden;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4), 
+                inset 0 0 25px rgba(0, 0, 0, 0.15) !important;
+    z-index: 1;
+}
+
+/* EFEITO SEDA: Ondulação de Luz Orgânica */
+.cartao-saudacao::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    /* Gradientes que simulam dobras de tecido de seda branca sobre o ouro */
+    background: radial-gradient(circle at center, 
+        rgba(255, 255, 255, 0.25) 0%, 
+        rgba(255, 255, 255, 0) 50%
+    );
+    background-size: 50% 50%;
+    /* Movimento fluido e lento */
+    animation: fluxoDeSeda 15s infinite linear;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* BRILHO DE DIAMANTE: Um feixe que corta o vidro ocasionalmente */
+.cartao-saudacao::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 120%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent
+    );
+    transform: skewX(-30deg);
+    animation: reflexoLuxo 7s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+}
+
+/* TIPOGRAFIA ELITE */
+#saudacao-personalizada {
+    font-family: 'Playfair Display', serif !important; 
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 600;
+    /* Letras em tom "Ebony" para contraste máximo sobre o ouro */
+    color: #121212 !important; 
+    margin: 0;
+    position: relative;
+    z-index: 3; /* Acima da seda e do brilho */
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+}
+
+/* EMOJI SELO REAL: Girando no Canto Superior Direito */
+.estrela-canto {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    font-size: 24px;
+    z-index: 5;
+    /* Filtro para dar profundidade ao emoji */
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    /* Animação de Rotação Perpétua */
+    animation: giroSelo 6s infinite linear;
+    display: inline-block;
+}
+
+/* --- MOTOR DE ANIMAÇÃO --- */
+
+/* Movimento da seda em 8 (infinito) */
+@keyframes fluxoDeSeda {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-20%, -10%); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Brilho que passa pelo cartão */
+@keyframes reflexoLuxo {
+    0% { left: -150%; }
+    20% { left: 150%; }
+    100% { left: 150%; }
+}
+
+/* Rotação elegante da estrela */
+@keyframes giroSelo {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }

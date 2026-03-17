@@ -68,7 +68,7 @@ window.SantuarioApp.conectar = function() {
     onValue(refMoodParceiro, (snapshot) => {
         const dados = snapshot.val();
         if (dados) {
-            atualizarTelaPeloMood(dados.estado, dados.timestamp);
+            atualizarTelaPeloMood(dados.estado, dados.timestamp, dados.mensagem);
         }
     });
 
@@ -1464,9 +1464,8 @@ window.enviarMood = function(estado) {
     mostrarToast(`Seu coração falou. O sinal foi enviado para o espaço...`);
 };
 
-window.atualizarTelaPeloMood = function(estado, timestamp) {
+window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
     const statusEl = document.getElementById('status-parceiro');
-    
     if (!statusEl) return;
 
     // Cálculo exato de tempo
@@ -1481,33 +1480,32 @@ window.atualizarTelaPeloMood = function(estado, timestamp) {
     document.body.classList.remove('modo-cansada');
     document.body.classList.remove('modo-alerta');
 
-    let mensagem = "";
-if (estado === 'radiante') {
-    mensagem = `✨ ${window.NOME_PARCEIRO} está radiante ${tempoTexto}.`;
-} else if (estado === 'ansiosa') {
-    mensagem = `🌪️ A mente da ${window.NOME_PARCEIRO} acelerou ${tempoTexto}.`;
-} else if (estado === 'triste') {
-    mensagem = `🌧️ O dia da ${window.NOME_PARCEIRO} escureceu ${tempoTexto}.`;
-} else if (estado === 'cansada') {
-    mensagem = `🔋 ${window.NOME_PARCEIRO} está esgotada ${tempoTexto}.`;
-} else if (estado === 'saudade') {
-    mensagem = `🥺 ${window.NOME_PARCEIRO} está com saudade ${tempoTexto}.`;
-} else if (estado === 'apaixonada') {
-    mensagem = `💖 ${window.NOME_PARCEIRO} está apaixonada ${tempoTexto}!`;
-}
-if (dados.mensagem) {
-    mensagem += ` Ela escreveu: "${dados.mensagem}"`;
-}
-statusEl.innerHTML = mensagem;
-    
-    statusEl.innerHTML = mensagem;
+    let mensagemTexto = "";
+    if (estado === 'radiante') {
+        mensagemTexto = `✨ ${window.NOME_PARCEIRO} está radiante ${tempoTexto}.`;
+    } else if (estado === 'ansiosa') {
+        mensagemTexto = `🌪️ A mente da ${window.NOME_PARCEIRO} acelerou ${tempoTexto}.`;
+    } else if (estado === 'triste') {
+        mensagemTexto = `🌧️ O dia da ${window.NOME_PARCEIRO} escureceu ${tempoTexto}.`;
+    } else if (estado === 'cansada') {
+        mensagemTexto = `🔋 ${window.NOME_PARCEIRO} está esgotada ${tempoTexto}.`;
+        document.body.classList.add('modo-cansada');
+    } else if (estado === 'saudade') {
+        mensagemTexto = `🥺 ${window.NOME_PARCEIRO} está com saudade ${tempoTexto}.`;
+    } else if (estado === 'apaixonada') {
+        mensagemTexto = `💖 ${window.NOME_PARCEIRO} está apaixonada ${tempoTexto}!`;
+    }
+
+    if (mensagem) {
+        mensagemTexto += ` Ela escreveu: "${mensagem}"`;
+    }
+
+    statusEl.innerHTML = mensagemTexto;
 
     // ==========================================
     // SISTEMA DE ALERTA MÁXIMO (A MÁGICA)
     // ==========================================
-    // Só dispara se for uma mensagem dela para você (e não uma velha que você acabou de carregar)
     if (window.souJoao && minutosAtras <= 5 && ['triste', 'ansiosa', 'cansada'].includes(estado)) {
-        // A trava de segurança impede que o alarme toque duas vezes para a mesma crise
         if (window.ultimoAlertaCuidado !== timestamp) {
             window.ultimoAlertaCuidado = timestamp;
             dispararAlarmeCuidado(estado);

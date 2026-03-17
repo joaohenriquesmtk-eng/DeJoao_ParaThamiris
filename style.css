@@ -3090,10 +3090,11 @@ body.modo-alerta {
 .main-area {
     flex: 1;
     display: flex;
-    min-height: 0; /* importante para evitar overflow */
+    min-height: 0;
+    height: 100%; /* ← O Segredo: Trava a altura para respeitar o tamanho exato da tela */
+    overflow: hidden; /* ← Força qualquer vazamento a ficar contido aqui dentro */
 }
 
-/* Área da grade (esquerda) - agora ocupará toda a altura */
 .grade-area {
     flex: 1;
     display: flex;
@@ -3101,26 +3102,28 @@ body.modo-alerta {
     padding: 15px;
     background: rgba(0, 0, 0, 0.2);
     min-width: 0;
+    overflow-y: auto; /* ← Se a fazenda for grande demais para a tela deitada, ela vai rolar suavemente */
 }
 
-.grade-area .cerca {
-    border: 10px double #8B5A2B;
-    border-radius: 30px;
-    background: #5D3A1A;
+.painel-area {
+    width: 300px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(212, 175, 55, 0.3);
     padding: 15px;
-    box-shadow: inset 0 0 0 3px #FFD700, 0 6px 0 #3D2A0A;
-    flex: 1; /* ocupa todo o espaço disponível */
-    display: flex;
-    width: 100%;
-    min-height: 0; /* essencial para que o flex child possa encolher */
+    overflow-y: auto; /* ← O scroll dos menus voltará a funcionar magicamente */
+    flex-shrink: 0;
+    height: 100%; /* ← Garante que o painel pare na borda da tela */
+    padding-bottom: 40px; 
 }
 
 #mf-grade {
     display: grid;
-    grid-auto-rows: 1fr; /* cada linha ocupa altura igual, preenchendo a altura total */
+    grid-auto-rows: 1fr;
     gap: 8px;
     width: 100%;
-    height: 100%; /* ocupa toda a altura da .cerca */
+    height: max-content; /* ← Remova o '100%' e use max-content. Assim a grade cresce o necessário sem quebrar o layout */
     min-height: 0;
 }
 
@@ -3898,4 +3901,188 @@ body.modo-alerta {
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+/* ==========================================
+   MINI FAZENDA - LAYOUT CORRIGIDO
+========================================== */
+#container-minifazenda {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    background-color: var(--cor-fundo);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+#container-minifazenda.oculto {
+    display: none !important;
+}
+
+.conteudo-minifazenda {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden; /* evita vazamentos */
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+    height: 60px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.top-bar-left {
+    display: flex;
+    gap: 10px;
+}
+
+.top-bar-left .btn-voltar,
+.top-bar-left .btn-info,
+.top-bar-left .btn-mute-jogo {
+    background: transparent;
+    border: 2px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+    border-radius: 30px;
+    padding: 6px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.top-bar-left .btn-info,
+.top-bar-left .btn-mute-jogo {
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+}
+.top-bar-left button:hover {
+    background: var(--cor-primaria);
+    color: #000;
+}
+
+.top-bar-right {
+    display: flex;
+    gap: 15px;
+    font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+.top-bar-right .recurso {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px 12px;
+    border-radius: 30px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    font-size: 0.95rem;
+}
+
+/* ÁREA PRINCIPAL (grade + painel) */
+.main-area {
+    flex: 1;
+    display: flex;
+    min-height: 0; /* ESSENCIAL para que os filhos respeitem a altura */
+    overflow: hidden;
+}
+
+/* Área da grade (esquerda) */
+.grade-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    min-width: 0;
+    min-height: 0; /* importante */
+    overflow: hidden;
+}
+
+.grade-area .cerca {
+    border: 10px double #8B5A2B;
+    border-radius: 30px;
+    background: #5D3A1A;
+    padding: 15px;
+    box-shadow: inset 0 0 0 3px #FFD700, 0 6px 0 #3D2A0A;
+    flex: 1; /* ocupa todo o espaço disponível */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0; /* essencial */
+    overflow: hidden;
+}
+
+#mf-grade {
+    flex: 1; /* ocupa toda a altura da .cerca */
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    min-height: 0; /* permite encolher */
+    height: auto;  /* em vez de 100% fixo */
+    /* O número de colunas será definido pelo JS */
+}
+
+/* Slots ocupam 100% da célula */
+.slot-fazenda {
+    background: #8B5A2B;
+    background-image: radial-gradient(circle at 30% 30%, #A56B3A 10%, transparent 15%),
+                      linear-gradient(135deg, #7B4A2A 20%, #9B6B3A 80%);
+    border: 4px solid #5D3A1A;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 5vw, 2.5rem);
+    cursor: pointer;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(212, 175, 55, 0.3);
+    color: #fff;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s, box-shadow 0.2s;
+    width: 100%;
+    height: 100%; /* ocupa toda a célula */
+}
+.slot-fazenda:hover {
+    transform: scale(1.02);
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 6px 12px rgba(0, 0, 0, 0.6), 0 0 0 3px #D4AF37;
+    border-color: #D4AF37;
+}
+.slot-fazenda.crescendo {
+    opacity: 0.7;
+    animation: respiracao-crescimento 2s infinite ease-in-out;
+}
+.slot-fazenda.pronto {
+    animation: pulsar-pronto 1.5s infinite alternate ease-in-out;
+    box-shadow: inset 0 -4px 0 #3D2A0A, 0 4px 12px rgba(46, 204, 113, 0.6), 0 0 0 3px #2ecc71;
+}
+
+/* Painel lateral (direita) */
+.painel-area {
+    width: 300px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 15px;
+    overflow-y: auto; /* rolagem vertical */
+    flex-shrink: 0;
+    height: 100%; /* garante que o overflow funcione */
+}
+
+.painel-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }

@@ -1513,144 +1513,114 @@ window.enviarMood = function(estado) {
     mostrarToast(`Seu coração falou. O sinal foi enviado para o espaço...`);
 };
 
-window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
-    const statusEl = document.getElementById('status-parceiro');
-    if (!statusEl) return;
-    
-    // FUNÇÃO QUE FAZ O ALERTA APARECER NA TELA
-window.exibirAlertaEmergencia = function(estado, mensagem) {
-    const modal = document.getElementById('modal-emergencia');
-    const titulo = document.getElementById('emergencia-titulo');
-    const texto = document.getElementById('emergencia-mensagem');
-
-    if (modal && titulo && texto) {
-        // Define o título com o estado atual (ex: TRISTE, ANSIOSA)
-        titulo.innerText = `Alerta: ${estado.toUpperCase()}`;
-        
-        // Define a mensagem de apoio
-        texto.innerText = mensagem || "O Santuário detectou um estado crítico. Verifique como seu parceiro está agora.";
-        
-        // Remove a classe que esconde o modal para ele aparecer
-        modal.classList.remove('escondido');
-
-        // Faz o celular vibrar (se estiver no Android/Chrome)
-        if ("vibrate" in navigator) {
-            navigator.vibrate([200, 100, 200]);
-        }
-    } else {
-        console.error("Erro: Elementos do modal de emergência não encontrados no HTML.");
-    }
-};
-
-// FUNÇÃO PARA FECHAR O ALERTA
-window.fecharEmergencia = function() {
-    const modal = document.getElementById('modal-emergencia');
-    if (modal) {
-        modal.classList.add('escondido');
-    }
-};
-
-    // Cálculo exato de tempo
-    const minutosAtras = Math.floor((Date.now() - timestamp) / 60000);
-    let tempoTexto = minutosAtras < 1 ? "agora mesmo" : `há ${minutosAtras} minutos`;
-    if (minutosAtras >= 60) {
-        const horas = Math.floor(minutosAtras / 60);
-        tempoTexto = `há ${horas} hora(s)`;
-    }
-
-    // Limpa estados visuais anteriores
-    document.body.classList.remove('modo-cansada');
-    document.body.classList.remove('modo-alerta');
-
-    let mensagemTexto = "";
-    if (estado === 'radiante') {
-        mensagemTexto = `✨ ${window.NOME_PARCEIRO} está radiante ${tempoTexto}.`;
-    } else if (estado === 'ansiosa') {
-        mensagemTexto = `🌪️ A mente da ${window.NOME_PARCEIRO} acelerou ${tempoTexto}.`;
-    } else if (estado === 'triste') {
-        mensagemTexto = `🌧️ O dia da ${window.NOME_PARCEIRO} escureceu ${tempoTexto}.`;
-    } else if (estado === 'cansada') {
-        mensagemTexto = `🔋 ${window.NOME_PARCEIRO} está esgotada ${tempoTexto}.`;
-        document.body.classList.add('modo-cansada');
-    } else if (estado === 'saudade') {
-        mensagemTexto = `🥺 ${window.NOME_PARCEIRO} está com saudade ${tempoTexto}.`;
-    } else if (estado === 'apaixonada') {
-        mensagemTexto = `💖 ${window.NOME_PARCEIRO} está apaixonada ${tempoTexto}!`;
-    }
-
-    if (mensagem) {
-        mensagemTexto += ` Ela escreveu: "${mensagem}"`;
-    }
-
-    statusEl.innerHTML = mensagemTexto;
-    
-
+// ==========================================
+    // TERMÔMETRO DO CUIDADO SUPREMO & POST-ITS
     // ==========================================
-    // SISTEMA DE ALERTA MÁXIMO (A MÁGICA)
-    // ==========================================
-    if (window.souJoao && minutosAtras <= 5 && ['triste', 'ansiosa', 'cansada'].includes(estado)) {
-        if (window.ultimoAlertaCuidado !== timestamp) {
-            window.ultimoAlertaCuidado = timestamp;
-            dispararAlarmeCuidado(estado);
-        }
-    }
 
-    const estadosCriticos = ['ansiosa', 'ansioso', 'triste', 'cansada', 'cansado', 'com saudade'];
-    
-    // Se você for o João e o estado dela for crítico, dispara o alerta visual
-    if (estadosCriticos.includes(estado.toLowerCase())) {
-        exibirAlertaEmergencia(estado, mensagem); // Função que abre o modal vermelho
+    window.enviarMood = function(estado) {
+        if (!window.SantuarioApp.inicializado || !window.MEU_NOME) return;
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        
+        const texto = document.getElementById('input-mood').value.trim();
+        
+        const refMeuMood = ref(db, 'moods/' + window.MEU_NOME.toLowerCase());
+        set(refMeuMood, {
+            estado: estado,
+            mensagem: texto || null,
+            timestamp: Date.now() // O Firebase gera um ID único do exato momento
+        });
+
+        document.getElementById('input-mood').value = '';
+        mostrarToast(`Seu coração falou. O sinal foi enviado para o espaço...`);
+    };
+
+    window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
+        const statusEl = document.getElementById('status-parceiro');
+        if (!statusEl) return;
+
+        const minutosAtras = Math.floor((Date.now() - timestamp) / 60000);
+        let tempoTexto = minutosAtras < 1 ? "agora mesmo" : `há ${minutosAtras} minutos`;
+        if (minutosAtras >= 60) {
+            const horas = Math.floor(minutosAtras / 60);
+            tempoTexto = `há ${horas} hora(s)`;
+        }
+
+        document.body.classList.remove('modo-cansada');
+        document.body.classList.remove('modo-alerta');
+
+        let mensagemTexto = "";
+        const estadoLower = estado.toLowerCase();
+
+        if (estadoLower === 'radiante') {
+            mensagemTexto = `✨ ${window.NOME_PARCEIRO} está radiante ${tempoTexto}.`;
+        } else if (estadoLower === 'ansiosa' || estadoLower === 'ansioso') {
+            mensagemTexto = `🌪️ A mente da ${window.NOME_PARCEIRO} acelerou ${tempoTexto}.`;
+        } else if (estadoLower === 'triste') {
+            mensagemTexto = `🌧️ O dia da ${window.NOME_PARCEIRO} escureceu ${tempoTexto}.`;
+        } else if (estadoLower === 'cansada' || estadoLower === 'cansado') {
+            mensagemTexto = `🔋 ${window.NOME_PARCEIRO} está esgotada ${tempoTexto}.`;
+            document.body.classList.add('modo-cansada');
+        } else if (estadoLower === 'saudade' || estadoLower === 'com saudade') {
+            mensagemTexto = `🥺 ${window.NOME_PARCEIRO} está com saudade ${tempoTexto}.`;
+        } else if (estadoLower === 'apaixonada' || estadoLower === 'apaixonado') {
+            mensagemTexto = `💖 ${window.NOME_PARCEIRO} está apaixonada ${tempoTexto}!`;
+        }
+
+        if (mensagem) {
+            mensagemTexto += ` Ela escreveu: "${mensagem}"`;
+        }
+
+        statusEl.innerHTML = mensagemTexto;
+
+        // ==========================================
+        // TRAVA DE SEGURANÇA (O ALERTA SÓ APARECE UMA VEZ)
+        // ==========================================
+        const estadosCriticos = ['ansiosa', 'ansioso', 'triste', 'cansada', 'cansado', 'saudade', 'com saudade'];
+
+        // Se você for o João e o estado for crítico...
+        if (window.souJoao && estadosCriticos.includes(estadoLower)) {
+            // O celular checa: "Eu já fechei o alerta com esse ID de horário?"
+            const alertaResolvido = localStorage.getItem('alerta_resolvido_timestamp');
+            
+            if (alertaResolvido !== timestamp.toString()) {
+                window.exibirAlertaEmergencia(estado, mensagem, timestamp);
+            }
+        }
+    };
+
+    window.exibirAlertaEmergencia = function(estado, mensagem, timestamp) {
         const modal = document.getElementById('modal-emergencia');
         const titulo = document.getElementById('emergencia-titulo');
         const texto = document.getElementById('emergencia-mensagem');
 
-        titulo.innerText = `A Thamiris está ${estado.toUpperCase()}`;
-        texto.innerText = mensagem || "Ela precisa de você agora. Dê uma atenção especial.";
-        modal.classList.remove('escondido');
-        
-        // Toca um som de alerta discreto se quiser
-        const audio = new Audio('assets/alerta.mp3'); 
-        audio.play().catch(() => console.log("Áudio bloqueado pelo navegador"));
-    }
-};
+        if (modal && titulo && texto) {
+            // Injeta o ID único do alerta direto no HTML da tela
+            modal.dataset.timestampAtual = timestamp.toString();
 
-window.fecharEmergencia = () => {
-    document.getElementById('modal-emergencia').classList.add('escondido');
-};
+            titulo.innerText = `A ${window.NOME_PARCEIRO} está ${estado.toUpperCase()}`;
+            texto.innerText = mensagem || "Ela precisa de você agora. Dê uma atenção especial.";
+            
+            modal.classList.remove('escondido');
 
-window.dispararAlarmeCuidado = function(estado) {
-    // 1. Vibração agressiva (Padrão SOS: 3 curtas, 3 longas, 3 curtas)
-    if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100, 50, 100, 200, 300, 100, 300, 100, 300, 200, 100, 50, 100, 50, 100]);
-    }
+            if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+            
+            const audio = new Audio('assets/alerta.mp3'); 
+            audio.play().catch(() => console.log("Áudio bloqueado"));
+        }
+    };
 
-    // 2. Toca Som de Notificação Urgente
-    const audio = document.getElementById('audio-alerta-cuidado');
-    if (audio) {
-        audio.volume = 1.0;
-        audio.play().catch(e => console.log('Áudio bloqueado pelo navegador', e));
-    }
-
-    // 3. Trava a tela com o Modal Vermelho
-    const modal = document.getElementById('modal-cuidado');
-    const txtCuidado = document.getElementById('texto-alerta-cuidado');
-    if (modal && txtCuidado) {
-        if (estado === 'ansiosa') txtCuidado.innerText = `A mente da ${window.NOME_PARCEIRO} está acelerada. Mande um áudio com a sua voz agora.`;
-        if (estado === 'triste') txtCuidado.innerText = `A ${window.NOME_PARCEIRO} não está bem. Interrompa o que puder e vá até ela.`;
-        if (estado === 'cansada') txtCuidado.innerText = `A bateria da ${window.NOME_PARCEIRO} acabou. Ofereça colo e silêncio.`;
-        modal.classList.remove('escondido');
-    }
-    
-    // 4. Pisca as bordas do app de vermelho
-    document.body.classList.add('modo-alerta');
-};
-
-window.fecharModalCuidado = function() {
-    document.getElementById('modal-cuidado').classList.add('escondido');
-    document.body.classList.remove('modo-alerta');
-    // Envia um pulso mágico de volta como confirmação de que você "recebeu o chamado"
-    if (typeof enviarPulso === 'function') enviarPulso();
-};
+    window.fecharEmergencia = function() {
+        const modal = document.getElementById('modal-emergencia');
+        if (modal) {
+            modal.classList.add('escondido');
+            
+            // O PULO DO GATO: Salva no celular que esse alerta específico já foi atendido!
+            const timestamp = modal.dataset.timestampAtual;
+            if (timestamp) {
+                localStorage.setItem('alerta_resolvido_timestamp', timestamp);
+            }
+        }
+    };
 
 window.enviarPostit = function() {
     if (!window.SantuarioApp.inicializado || !window.MEU_NOME) return;
@@ -3053,46 +3023,44 @@ if (temaIcon && temaSelector) {
     
     window.inicializarBussola3D = () => {
         const container = document.getElementById('bussola-3d');
-        if (!container || typeof THREE === 'undefined' || container.innerHTML.indexOf('canvas') !== -1) return;
+        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+
+        // TRUQUE TITÃ: Fallback de tamanho caso a aba esteja escondida
+        let largura = container.clientWidth || (window.innerWidth - 60);
+        let altura = container.clientHeight || 200;
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(largura, altura);
         renderer.setPixelRatio(window.devicePixelRatio);
-        // Insere o canvas ANTES do overlay de botão
         container.insertBefore(renderer.domElement, container.firstChild);
 
-        camera.position.set(0, 5, 0); // Câmera olhando de cima para baixo
+        camera.position.set(0, 5, 0);
         camera.lookAt(0, 0, 0);
 
-        // Luzes Mágicas
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.9));
         const luzDirecional = new THREE.DirectionalLight(0xffd700, 1.5);
         luzDirecional.position.set(5, 10, 2);
         scene.add(luzDirecional);
 
-        // O Anel da Bússola
         const anelGeo = new THREE.TorusGeometry(1.5, 0.05, 16, 64);
         const anelMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 0.8, roughness: 0.2 });
         const anel = new THREE.Mesh(anelGeo, anelMat);
         anel.rotation.x = Math.PI / 2;
         scene.add(anel);
 
-        // A Agulha de Ouro
         const agulhaGroup = new THREE.Group();
         
-        // Parte Norte (Aponta para o amor) - Vermelha/Dourada
         const agulhaNorteGeo = new THREE.ConeGeometry(0.2, 1.4, 4);
         const agulhaNorteMat = new THREE.MeshStandardMaterial({ color: 0xff6b6b, metalness: 0.5, roughness: 0.3 });
         const agulhaNorte = new THREE.Mesh(agulhaNorteGeo, agulhaNorteMat);
         agulhaNorte.position.z = -0.7;
         agulhaNorte.rotation.x = Math.PI / 2;
-        agulhaNorte.rotation.y = Math.PI / 4; // Deixa a base do cone reta
+        agulhaNorte.rotation.y = Math.PI / 4;
         agulhaGroup.add(agulhaNorte);
 
-        // Parte Sul (Contrapeso) - Prata Escura
         const agulhaSulGeo = new THREE.ConeGeometry(0.2, 1.4, 4);
         const agulhaSulMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8, roughness: 0.4 });
         const agulhaSul = new THREE.Mesh(agulhaSulGeo, agulhaSulMat);
@@ -3101,14 +3069,12 @@ if (temaIcon && temaSelector) {
         agulhaSul.rotation.y = Math.PI / 4;
         agulhaGroup.add(agulhaSul);
 
-        // Eixo central
         const eixo = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.2, 16), new THREE.MeshStandardMaterial({ color: 0xD4AF37 }));
         agulhaGroup.add(eixo);
 
         scene.add(agulhaGroup);
         window.agulhaBussola = agulhaGroup;
 
-        // Sono Quântico
         let bussolaVisivel = false;
         const observerBussola = new IntersectionObserver((entries) => { bussolaVisivel = entries[0].isIntersecting; });
         observerBussola.observe(container);
@@ -3116,21 +3082,28 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            
+            // AUTO-AJUSTE: Se a aba abrir e a div ganhar tamanho real, a câmera se ajusta!
+            if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
+                largura = container.clientWidth;
+                altura = container.clientHeight || 200;
+                camera.aspect = largura / altura;
+                camera.updateProjectionMatrix();
+                renderer.setSize(largura, altura);
+            }
+
             if (!bussolaVisivel) return;
 
             tempo += 0.02;
-            
-            // Flutuação suave da bússola inteira
             anel.position.y = Math.sin(tempo) * 0.1;
             agulhaGroup.position.y = Math.sin(tempo) * 0.1;
 
-            // Rotação suave da agulha em direção ao alvo usando interpolação (suavidade)
-            // A matemática garante que ela não dê uma volta completa estranha ao passar pelo eixo 0/360
-            let diferenca = window.anguloAlvoBussola - agulhaGroup.rotation.y;
-            while (diferenca < -Math.PI) diferenca += Math.PI * 2;
-            while (diferenca > Math.PI) diferenca -= Math.PI * 2;
-            
-            agulhaGroup.rotation.y += diferenca * 0.05; // Velocidade da agulha
+            if (window.anguloAlvoBussola !== undefined && window.anguloAlvoBussola !== null) {
+                let diferenca = window.anguloAlvoBussola - agulhaGroup.rotation.y;
+                while (diferenca < -Math.PI) diferenca += Math.PI * 2;
+                while (diferenca > Math.PI) diferenca -= Math.PI * 2;
+                agulhaGroup.rotation.y += diferenca * 0.05; 
+            }
 
             renderer.render(scene, camera);
         };
@@ -3240,180 +3213,292 @@ if (temaIcon && temaSelector) {
     }
 
 // ==========================================
-// CARROSSEL DE HORIZONTES - MOTOR BLINDADO
-// ==========================================
-window.inicializarCarrossel3D = () => {
-    const container = document.getElementById('carrossel-3d');
-    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+    // UI/UX NÍVEL TITÃ: CARROSSEL DE HORIZONTES (GALERIA 3D)
+    // ==========================================
+    
+    window.inicializarCarrossel3D = () => {
+        const container = document.getElementById('carrossel-3d');
+        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
+        let largura = container.clientWidth || (window.innerWidth - 60);
+        let altura = container.clientHeight || 250;
 
-    camera.position.z = 5;
-    scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, largura / altura, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(largura, altura);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
 
-    const carrosselGroup = new THREE.Group();
-    scene.add(carrosselGroup);
+        camera.position.set(0, 0, 5);
+        scene.add(new THREE.AmbientLight(0xffffff, 1.5));
 
-    const geometriaQuadro = new THREE.PlaneGeometry(2, 2.5);
-    const texturaCarregador = new THREE.TextureLoader();
-    let quadros = [];
-    let timerCliqueLongo;
+        const carrosselGroup = new THREE.Group();
+        scene.add(carrosselGroup);
 
-    const construirCarrossel = (fotosArray) => {
-        while(carrosselGroup.children.length > 0){ carrosselGroup.remove(carrosselGroup.children[0]); }
-        quadros = [];
-        const corTema = getComputedStyle(document.documentElement).getPropertyValue('--cor-primaria').trim() || "#D4AF37";
+        const geometriaQuadro = new THREE.PlaneGeometry(2, 2.5);
+        const texturaCarregador = new THREE.TextureLoader();
+        let quadros = [];
+        let timerCliqueLongo;
 
-        if (!fotosArray || fotosArray.length === 0) {
-            const matVazio = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
-            const quadro = new THREE.Mesh(geometriaQuadro, matVazio);
-            const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: new THREE.Color(corTema) }));
-            quadro.add(borda);
-            carrosselGroup.add(quadro);
-            quadros.push(quadro);
-            return;
-        }
+        const construirCarrossel = (fotosArray) => {
+            while(carrosselGroup.children.length > 0){ carrosselGroup.remove(carrosselGroup.children[0]); }
+            quadros = [];
+            const corTema = getComputedStyle(document.documentElement).getPropertyValue('--cor-primaria').trim() || "#D4AF37";
 
-        const raio = Math.max(3, fotosArray.length * 0.7);
-        const anguloPasso = (Math.PI * 2) / fotosArray.length;
-
-        fotosArray.forEach((fotoBase64, index) => {
-            texturaCarregador.load(fotoBase64, (textura) => {
-                const material = new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide, transparent: true });
-                const quadro = new THREE.Mesh(geometriaQuadro, material);
-                const angulo = index * anguloPasso;
-                quadro.position.set(Math.sin(angulo) * raio, 0, Math.cos(angulo) * raio);
-                quadro.rotation.y = angulo;
-                quadro.userData = { index: index }; 
-
-                const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: 0xD4AF37 }));
+            if (!fotosArray || fotosArray.length === 0) {
+                const matVazio = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+                const quadro = new THREE.Mesh(geometriaQuadro, matVazio);
+                const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: new THREE.Color(corTema) }));
                 quadro.add(borda);
                 carrosselGroup.add(quadro);
                 quadros.push(quadro);
+                return;
+            }
+
+            const raio = Math.max(3, fotosArray.length * 0.7);
+            const anguloPasso = (Math.PI * 2) / fotosArray.length;
+
+            fotosArray.forEach((fotoBase64, index) => {
+                texturaCarregador.load(fotoBase64, (textura) => {
+                    const material = new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide, transparent: true });
+                    const quadro = new THREE.Mesh(geometriaQuadro, material);
+                    const angulo = index * anguloPasso;
+                    quadro.position.set(Math.sin(angulo) * raio, 0, Math.cos(angulo) * raio);
+                    quadro.rotation.y = angulo;
+                    quadro.userData = { index: index }; 
+
+                    const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: 0xD4AF37 }));
+                    quadro.add(borda);
+                    carrosselGroup.add(quadro);
+                    quadros.push(quadro);
+                });
             });
-        });
-    };
+        };
 
-    // Lógica de Interação
-    let isDragging = false, previousX = 0, velocidadeGiro = 0.005;
+        let isDragging = false, previousX = 0, velocidadeGiro = 0.005;
 
-    const iniciarAoTocar = (e) => {
-        isDragging = true;
-        const x = e.clientX || (e.touches && e.touches[0].clientX);
-        const y = e.clientY || (e.touches && e.touches[0].clientY);
-        previousX = x;
-        velocidadeGiro = 0;
+        const iniciarAoTocar = (e) => {
+            isDragging = true;
+            const x = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
+            const y = e.clientY || (e.touches && e.touches.length > 0 ? e.touches[0].clientY : undefined);
+            if (x === undefined || y === undefined) return;
+            
+            previousX = x;
+            velocidadeGiro = 0;
 
-        // Clique Longo para Apagar
-        const rect = container.getBoundingClientRect();
-        const mouse = new THREE.Vector2(
-            ((x - rect.left) / container.clientWidth) * 2 - 1,
-            -((y - rect.top) / container.clientHeight) * 2 + 1
-        );
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(quadros);
+            const rect = container.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((x - rect.left) / container.clientWidth) * 2 - 1,
+                -((y - rect.top) / container.clientHeight) * 2 + 1
+            );
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(quadros);
 
-        if (intersects.length > 0 && intersects[0].object.userData.index !== undefined) {
-            timerCliqueLongo = setTimeout(() => {
-                window.confirmarExclusaoFoto(intersects[0].object.userData.index);
-            }, 1200);
+            if (intersects.length > 0 && intersects[0].object.userData.index !== undefined) {
+                timerCliqueLongo = setTimeout(() => {
+                    window.confirmarExclusaoFoto(intersects[0].object.userData.index);
+                }, 1200);
+            }
+        };
+
+        const moverAoTocar = (e) => {
+            if (!isDragging) return;
+            const x = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
+            if (x === undefined) return;
+            
+            const delta = x - previousX;
+            carrosselGroup.rotation.y += delta * 0.01;
+            velocidadeGiro = delta * 0.002;
+            previousX = x;
+            clearTimeout(timerCliqueLongo);
+        };
+
+        const finalizarToque = () => {
+            isDragging = false;
+            clearTimeout(timerCliqueLongo);
+        };
+
+        container.addEventListener('mousedown', iniciarAoTocar);
+        window.addEventListener('mousemove', moverAoTocar);
+        window.addEventListener('mouseup', finalizarToque);
+        container.addEventListener('touchstart', iniciarAoTocar, {passive: true});
+        window.addEventListener('touchmove', moverAoTocar, {passive: false});
+        window.addEventListener('touchend', finalizarToque);
+
+        if(window.SantuarioApp && window.SantuarioApp.modulos) {
+            const { db, ref, onValue } = window.SantuarioApp.modulos;
+            onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
+                const dados = snapshot.val();
+                construirCarrossel(Array.isArray(dados) ? dados : []);
+            });
         }
+
+        const animar = () => {
+            requestAnimationFrame(animar);
+            
+            // AUTO-AJUSTE: Garante que o carrossel se ajusta à tela do A55
+            if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
+                largura = container.clientWidth;
+                altura = container.clientHeight || 250;
+                camera.aspect = largura / altura;
+                camera.updateProjectionMatrix();
+                renderer.setSize(largura, altura);
+            }
+            
+            carrosselGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
+            if (!isDragging) {
+                carrosselGroup.rotation.y += velocidadeGiro;
+                velocidadeGiro = velocidadeGiro * 0.95 + 0.005 * 0.05;
+            }
+            renderer.render(scene, camera);
+        };
+        animar();
     };
 
-    const moverAoTocar = (e) => {
-        if (!isDragging) return;
-        const x = e.clientX || (e.touches && e.touches[0].clientX);
-        const delta = x - previousX;
-        carrosselGroup.rotation.y += delta * 0.01;
-        velocidadeGiro = delta * 0.002;
-        previousX = x;
-        clearTimeout(timerCliqueLongo);
-    };
-
-    const finalizarToque = () => {
-        isDragging = false;
-        clearTimeout(timerCliqueLongo);
-    };
-
-    container.addEventListener('mousedown', iniciarAoTocar);
-    window.addEventListener('mousemove', moverAoTocar);
-    window.addEventListener('mouseup', finalizarToque);
-    container.addEventListener('touchstart', iniciarAoTocar, {passive: true});
-    window.addEventListener('touchmove', moverAoTocar, {passive: false});
-    window.addEventListener('touchend', finalizarToque);
-
-    if(window.SantuarioApp?.modulos) {
-        const { db, ref, onValue } = window.SantuarioApp.modulos;
-        onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
-            const dados = snapshot.val();
-            construirCarrossel(Array.isArray(dados) ? dados : []);
-        });
-    }
-
-    const animar = () => {
-        requestAnimationFrame(animar);
-        carrosselGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
-        if (!isDragging) {
-            carrosselGroup.rotation.y += velocidadeGiro;
-            velocidadeGiro = velocidadeGiro * 0.95 + 0.005 * 0.05;
-        }
-        renderer.render(scene, camera);
-    };
-    animar();
-};
-
-window.confirmarExclusaoFoto = (index) => {
-    if (confirm("Deseja apagar esta foto específica?")) {
-        const { db, ref, get, set } = window.SantuarioApp.modulos;
-        const r = ref(db, 'horizontes/fotos');
-        get(r).then(s => {
-            let f = s.val() || [];
-            f.splice(index, 1);
-            set(r, f);
-        });
-    }
-};
-
-window.limparCarrosselHorizontes = () => {
-    if (confirm("Apagar TODAS as fotos da galeria?")) {
-        const { db, ref, set } = window.SantuarioApp.modulos;
-        set(ref(db, 'horizontes/fotos'), null);
-    }
-};
-
-window.processarFotoHorizonte = (event) => {
-    const file = event.target.files[0];
-    if (!file || !window.SantuarioApp?.modulos) return;
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const scale = Math.min(600 / img.width, 800 / img.height, 1);
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const base64 = canvas.toDataURL('image/jpeg', 0.7);
+    window.confirmarExclusaoFoto = (index) => {
+        if (confirm("Deseja apagar esta foto específica?")) {
             const { db, ref, get, set } = window.SantuarioApp.modulos;
             const r = ref(db, 'horizontes/fotos');
             get(r).then(s => {
                 let f = s.val() || [];
-                f.push(base64);
-                if(f.length > 8) f.shift();
+                f.splice(index, 1);
                 set(r, f);
             });
+        }
+    };
+
+    window.limparCarrosselHorizontes = () => {
+        if (confirm("Apagar TODAS as fotos da galeria?")) {
+            const { db, ref, set } = window.SantuarioApp.modulos;
+            set(ref(db, 'horizontes/fotos'), null);
+        }
+    };
+
+    window.processarFotoHorizonte = (event) => {
+        const file = event.target.files[0];
+        const status = document.getElementById('status-carrossel');
+        const btn = document.getElementById('btn-add-foto');
+
+        if (!file) return;
+
+        if(status) {
+            status.innerText = "⏳ Compactando foto na memória...";
+            status.style.color = "var(--cor-primaria)";
+        }
+        if(btn) { btn.disabled = true; btn.style.opacity = "0.5"; }
+
+        if (!window.SantuarioApp || !window.SantuarioApp.modulos) {
+            if(status) { status.innerText = "❌ Erro: Santuário offline."; status.style.color = "#ff6b6b"; }
+            if(btn) { btn.disabled = false; btn.style.opacity = "1"; }
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const scale = Math.min(600 / img.width, 800 / img.height, 1);
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+                
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const base64 = canvas.toDataURL('image/jpeg', 0.6);
+                
+                if(status) status.innerText = "🚀 Transmitindo para o horizonte...";
+
+                const { db, ref, get, set } = window.SantuarioApp.modulos;
+                const r = ref(db, 'horizontes/fotos');
+                
+                get(r).then(s => {
+                    let f = s.val() || [];
+                    f.push(base64);
+                    if(f.length > 8) f.shift(); 
+                    return set(r, f);
+                }).then(() => {
+                    if(status) {
+                        status.innerText = "✅ Visão compartilhada com sucesso!";
+                        status.style.color = "#2ecc71";
+                        setTimeout(() => { status.innerText = ""; status.style.color = "var(--cor-primaria)"; }, 4000);
+                    }
+                }).catch(err => {
+                    console.error("Erro ao salvar foto:", err);
+                    if(status) { status.innerText = "❌ Ocorreu um erro no envio."; status.style.color = "#ff6b6b"; }
+                }).finally(() => {
+                    if(btn) { btn.disabled = false; btn.style.opacity = "1"; }
+                    event.target.value = ''; 
+                });
+            };
+            img.onerror = () => {
+                if(status) status.innerText = "❌ Arquivo de imagem inválido.";
+                if(btn) { btn.disabled = false; btn.style.opacity = "1"; }
+            };
         };
     };
-};
+
+    // ==========================================
+    // SISTEMA DE ALERTA INTELIGENTE (MEMÓRIA DIÁRIA)
+    // ==========================================
+    window.mostrarAlertaEmergencia = (estado, nomeParceiro) => {
+        const modal = document.getElementById('modal-emergencia');
+        const titulo = document.getElementById('emergencia-titulo');
+        const mensagem = document.getElementById('emergencia-mensagem');
+        
+        if (!modal) return;
+
+        // O TRUQUE: Cria uma "chave de memória" combinando o estado e a data de hoje
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+        const chaveAlerta = `alerta_visto_${estado}_${dataHoje}`;
+
+        // Se o seu celular lembrar que você já fechou esse alerta HOJE, ele cancela a exibição!
+        if (localStorage.getItem(chaveAlerta) === 'sim') {
+            return; 
+        }
+
+        let msg = "";
+        let cor = "#ff6b6b";
+        
+        // Personalização da mensagem
+        if (estado === 'cansado' || estado === 'cansada') { 
+            if (window.souJoao) {
+                msg = `${nomeParceiro} está CANSADA. Ela precisa de você agora. Dê uma atenção especial.`; 
+            } else {
+                msg = `${nomeParceiro} está CANSADO. Ele precisa de você agora. Dê uma atenção especial.`; 
+            }
+            cor = "#f39c12"; 
+        } else if (estado === 'triste') {
+            msg = `${nomeParceiro} está TRISTE. Vá dar um abraço ou mande uma mensagem de carinho.`;
+            cor = "#3498db";
+        } else if (estado === 'doente') {
+            msg = `${nomeParceiro} está DOENTE. Precisa de cuidados e muito mimo hoje.`;
+            cor = "#e74c3c";
+        } else {
+            msg = `${nomeParceiro} ativou um alerta de atenção.`;
+        }
+
+        if(titulo) titulo.style.color = cor;
+        if(mensagem) mensagem.innerText = msg;
+        
+        // Mostra o modal na tela
+        modal.classList.remove('escondido');
+
+        // Configura o botão para fechar e GRAVAR NA MEMÓRIA que você já atendeu o chamado
+        const btnFechar = document.getElementById('btn-fechar-emergencia') || modal.querySelector('button');
+        if (btnFechar) {
+            btnFechar.onclick = () => {
+                modal.classList.add('escondido');
+                // Salva no celular que já viu, para não incomodar mais hoje com o mesmo estado
+                localStorage.setItem(chaveAlerta, 'sim'); 
+            };
+        }
+    };
 
     // ==========================================
     // INICIALIZADOR GLOBAL MESTRE (O BOOT)

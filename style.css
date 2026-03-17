@@ -4372,34 +4372,33 @@ body {
 }
 
 /* ==========================================
-   CARTÃO DE SAUDAÇÃO PRESTIGE - VERSÃO COMPACTA
+   CARTÃO DE SAUDAÇÃO PRESTIGE - OURO LÍQUIDO
 ========================================== */
 .cartao-saudacao {
     position: relative;
-    /* Fundo Dourado Sólido */
-    background: #D4AF37 !important;
+    /* Fundo Dourado Sólido Premium */
+    background: #D4AF37 !important; 
     border: 2px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 28px;
     
-    /* Centralização do Texto */
+    /* Centralização Absoluta do Texto */
     display: flex !important;
     align-items: center;
     justify-content: center;
     text-align: center;
     
-    /* ALTURA AJUSTADA: Reduzido de 120px para 85px */
-    min-height: 85px; 
-    /* PADDING AJUSTADO: Reduzido de 30px para 15px nas laterais */
-    padding: 15px 25px;
-    
+    /* Altura Reduzida e Elegante */
+    min-height: 80px; 
     margin: 15px;
+    padding: 15px 35px; /* Espaço lateral para não bater no emoji */
+    
     overflow: hidden;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4), 
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 
                 inset 0 0 25px rgba(0, 0, 0, 0.15) !important;
     z-index: 1;
 }
 
-/* EFEITO SEDA: Ondulação de Luz Orgânica */
+/* EFEITO SEDA: Ondulação Orgânica e Suave */
 .cartao-saudacao::before {
     content: '';
     position: absolute;
@@ -4407,84 +4406,84 @@ body {
     left: -100%;
     width: 300%;
     height: 300%;
-    /* Gradientes que simulam dobras de tecido de seda branca sobre o ouro */
+    /* Gradiente que simula o brilho do cetim movendo-se */
     background: radial-gradient(circle at center, 
-        rgba(255, 255, 255, 0.25) 0%, 
-        rgba(255, 255, 255, 0) 50%
+        rgba(255, 255, 255, 0.22) 0%, 
+        rgba(255, 255, 255, 0) 60%
     );
     background-size: 50% 50%;
-    /* Movimento fluido e lento */
-    animation: fluxoDeSeda 15s infinite linear;
+    /* Movimento de seda fluida */
+    animation: sedaMovimento 18s infinite linear;
     pointer-events: none;
     z-index: 1;
 }
 
-/* BRILHO DE DIAMANTE: Um feixe que corta o vidro ocasionalmente */
+/* REFLEXO DE LUXO: Um feixe de luz que atravessa o vidro */
 .cartao-saudacao::after {
     content: '';
     position: absolute;
     top: 0;
     left: -150%;
-    width: 120%;
+    width: 100%;
     height: 100%;
     background: linear-gradient(
         90deg, 
         transparent, 
-        rgba(255, 255, 255, 0.4), 
+        rgba(255, 255, 255, 0.3), 
         transparent
     );
     transform: skewX(-30deg);
-    animation: reflexoLuxo 7s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    animation: reflexoPrestige 8s infinite cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 2;
 }
 
-/* TIPOGRAFIA ELITE */
+/* TIPOGRAFIA ELEGANTE */
 #saudacao-personalizada {
     font-family: 'Playfair Display', serif !important; 
     font-style: italic;
-    font-size: 1.5rem;
+    font-size: 1.35rem; /* Ajustado para a nova altura */
     font-weight: 600;
-    /* Letras em tom "Ebony" para contraste máximo sobre o ouro */
+    /* Texto em tom Ébano para contraste luxuoso sobre o ouro */
     color: #121212 !important; 
     margin: 0;
     position: relative;
-    z-index: 3; /* Acima da seda e do brilho */
-    letter-spacing: -0.3px;
+    z-index: 3;
+    letter-spacing: -0.2px;
     line-height: 1.2;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
-/* EMOJI SELO REAL: Girando no Canto Superior Direito */
+/* SELO REAL ANIMADO: Girando no Canto Superior Direito */
 .estrela-canto {
     position: absolute;
-    top: -10px;
-    right: -8px;
-    font-size: 24px;
+    top: 10px;
+    right: 12px;
+    font-size: 22px;
     z-index: 5;
-    /* Filtro para dar profundidade ao emoji */
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-    /* Animação de Rotação Perpétua */
-    animation: giroSelo 6s infinite linear;
+    /* Rotação perpétua e elegante */
+    animation: rotacionarSelo 6s infinite linear;
     display: inline-block;
 }
 
-/* --- MOTOR DE ANIMAÇÃO --- */
+/* --- MOTORES DE ANIMAÇÃO --- */
 
-/* Movimento da seda em 8 (infinito) */
-@keyframes fluxoDeSeda {
+/* Movimento da Seda */
+@keyframes sedaMovimento {
     0% { transform: translate(0, 0); }
-    50% { transform: translate(-20%, -10%); }
+    50% { transform: translate(-15%, -15%); }
     100% { transform: translate(0, 0); }
 }
 
-/* Brilho que passa pelo cartão */
-@keyframes reflexoLuxo {
+/* Brilho que percorre o vidro */
+@keyframes reflexoPrestige {
     0% { left: -150%; }
-    20% { left: 150%; }
+    25% { left: 150%; }
     100% { left: 150%; }
 }
 
-/* Rotação elegante da estrela */
-@keyframes giroSelo {
+/* Rotação do Emoji */
+@keyframes rotacionarSelo {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }

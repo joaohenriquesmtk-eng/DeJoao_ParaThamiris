@@ -26,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
 });
 
 // Código de Cache (O que você já tinha)
-const CACHE_NAME = 'santuario-v5';
+const CACHE_NAME = 'santuario-v6';
 const urlsParaCache = ['/', '/index.html', '/style.css', '/script.js', '/manifest.json'];
 
 self.addEventListener('install', e => {

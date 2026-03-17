@@ -1515,10 +1515,11 @@ window.atualizarTelaPeloMood = function(estado, timestamp, mensagem) {
         }
     }
 
-    const estadosCriticos = ['ansiosa', 'triste', 'cansada', 'com saudade'];
+    const estadosCriticos = ['ansiosa', 'ansioso', 'triste', 'cansada', 'cansado', 'com saudade'];
     
     // Se você for o João e o estado dela for crítico, dispara o alerta visual
-    if (window.souJoao && estadosCriticos.includes(estado.toLowerCase())) {
+    if (estadosCriticos.includes(estado.toLowerCase())) {
+        exibirAlertaEmergencia(estado, mensagem); // Função que abre o modal vermelho
         const modal = document.getElementById('modal-emergencia');
         const titulo = document.getElementById('emergencia-titulo');
         const texto = document.getElementById('emergencia-mensagem');

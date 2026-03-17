@@ -11,67 +11,39 @@ exports.enviarNotificacaoMood = onValueCreated(
     async (event) => {
         const snapshot = event.data;
         const mood = snapshot.val();
-        const userId = event.params.userId;
+        const remetenteId = event.params.userId; // Quem mudou o humor
 
-        if (userId === 'joao') {
-            console.log('Mood do João ignorado (não notificar ele mesmo)');
-            return;
-        }
-        if (userId !== 'thamiris') return;
+        // Define quem vai RECEBER a notificação
+        const destinatarioId = (remetenteId === 'joao') ? 'thamiris' : 'joao';
+        const nomeRemetente = (remetenteId === 'joao') ? 'João' : 'Thamiris';
 
-        const snapshotToken = await admin.database().ref('/fcmTokens/joao').once('value');
-        const tokenJoao = snapshotToken.val();
+        // Busca o token de quem vai receber
+        const snapshotToken = await admin.database().ref(`/fcmTokens/${destinatarioId}`).once('value');
+        const tokenDestino = snapshotToken.val();
 
-        if (!tokenJoao) {
-            console.log('Token do João não encontrado');
+        if (!tokenDestino) {
+            console.log(`Token de ${destinatarioId} não encontrado.`);
             return;
         }
 
         const estado = mood.estado;
-        let titulo = '🌪️ Alerta de Cuidado';
-        let corpo = '';
+        let titulo = `🌪️ Alerta de Cuidado: ${nomeRemetente}`;
+        let corpo = `${nomeRemetente} está se sentindo ${estado}.`;
 
-        if (estado === 'ansiosa') {
-            corpo = 'A mente da Thamiris está acelerada. Mande um áudio agora.';
+        // Personalização rápida das mensagens
+        if (estado === 'ansiosa' || estado === 'ansioso') {
+            corpo = `A mente de ${nomeRemetente} está acelerada. Mande um carinho.`;
         } else if (estado === 'triste') {
-            corpo = 'Thamiris não está bem. Interrompa o que puder e vá até ela.';
-        } else if (estado === 'cansada') {
-            corpo = 'A bateria da Thamiris acabou. Ofereça colo e silêncio.';
-        } else {
-            return;
+            corpo = `${nomeRemetente} não está bem. Que tal uma mensagem agora?`;
         }
 
         const message = {
-    notification: {
-        title: titulo,
-        body: corpo,
-    },
-    // Regras para o Android acordar a tela
-    android: {
-        priority: 'high',
-        notification: {
-            sound: 'default',
-            priority: 'high',
-            channelId: 'emergencia', // Canal de alta importância
-        }
-    },
-    // Regras para iPhone/Web
-    webpush: {
-        headers: {
-            Urgency: 'high'
-        }
-    },
-    token: tokenJoao
-};
+            notification: { title: titulo, body: corpo },
+            android: { priority: 'high' },
+            token: tokenDestino
+        };
 
-return admin.messaging().send(message);
-
-        try {
-            await admin.messaging().sendToDevice(tokenJoao, payload);
-            console.log('Notificação enviada com sucesso para João');
-        } catch (error) {
-            console.error('Erro ao enviar notificação:', error);
-        }
+        return admin.messaging().send(message);
     }
 );
 

@@ -12,6 +12,37 @@ window.souJoao = false;
 window.MEU_NOME = "";
 window.NOME_PARCEIRO = "";
 
+// ==========================================
+// MÁQUINA ENIGMA (CRIPTOGRAFIA DE PONTA-A-PONTA)
+// ==========================================
+window.SantuarioCrypto = {
+    chave: "SANTUARIO_AMOR_BLINDADO_2026", // A chave secreta que só os seus celulares conhecem
+    
+    codificar: function(texto) {
+        if (!texto) return texto;
+        let codificado = encodeURIComponent(texto); // Protege os Emojis e Acentos
+        let res = "";
+        for (let i = 0; i < codificado.length; i++) {
+            res += String.fromCharCode(codificado.charCodeAt(i) ^ this.chave.charCodeAt(i % this.chave.length));
+        }
+        return btoa(res); // Transforma em um Hash seguro para o Banco de Dados
+    },
+    
+    decodificar: function(hash) {
+        if (!hash) return hash;
+        try {
+            let decodificado = atob(hash); // Tenta abrir o Hash
+            let res = "";
+            for (let i = 0; i < decodificado.length; i++) {
+                res += String.fromCharCode(decodificado.charCodeAt(i) ^ this.chave.charCodeAt(i % this.chave.length));
+            }
+            return decodeURIComponent(res); // Revela os Emojis e o Texto
+        } catch(e) {
+            return hash; // Se for um post-it antigo (antes da atualização), ele mostra o texto normal
+        }
+    }
+};
+
 window.SantuarioApp = window.SantuarioApp || {};
 window.SantuarioApp.inicializado = false;
 window.SantuarioApp.modulos = null;
@@ -83,7 +114,7 @@ window.SantuarioApp.conectar = function() {
                     <span class="postit-autor">${p.autor}</span>
                     <span style="font-size: 0.65rem; opacity: 0.6; font-weight: normal;">${dataFormatada}</span>
                 </div>
-                <div style="font-size: 0.95rem; margin-bottom: 8px;">${p.mensagem}</div>
+                <div style="font-size: 0.95rem; margin-bottom: 8px;">${window.SantuarioCrypto.decodificar(p.mensagem)}</div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end;"></div>
             `;
             if (p.autor === window.MEU_NOME) {
@@ -122,6 +153,9 @@ window.enviarPulso = function() {
     const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     const refMeuContador = ref(db, 'pulsosContador/' + window.MEU_NOME.toLowerCase() + '/' + hoje);
     runTransaction(refMeuContador, (valorAtual) => (valorAtual || 0) + 1);
+    // Registra o pulso para a Ofensiva Diária
+    localStorage.setItem('pulso_enviado_dia', hoje);
+    if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
 
     const btn = document.getElementById("btn-pulso");
     if(btn) {
@@ -242,6 +276,7 @@ window.regarPlanta = function() {
 
         set(refJardim, dados);
         window.statusPlanta = dados;
+        if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
         if(typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
     });
 };

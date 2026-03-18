@@ -31,8 +31,8 @@ window.RadarDePerformance = {
     }
 };
 
-// Liga o radar assim que o app carrega
-window.addEventListener('load', () => window.RadarDePerformance.iniciar());
+// Liga o radar assim que o app avisa que o 3D foi injetado
+window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar());
 
 
     // ==========================================
@@ -135,7 +135,7 @@ window.addEventListener('load', () => window.RadarDePerformance.iniciar());
     window.corCoracao = 0xff6b6b; 
 
     // Espera o sistema inteiro carregar antes de interceptar os cliques
-    window.addEventListener('load', () => {
+    window.addEventListener('motor3DPronto', () => {
         const enviarMoodOriginal = window.enviarMood;
         window.enviarMood = function(estado) {
             if (estado === 'ansiosa') { window.ritmoCoracao = 3.5; window.corCoracao = 0xf39c12; } 

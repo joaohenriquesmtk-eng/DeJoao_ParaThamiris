@@ -274,6 +274,7 @@ confetti({
     spread: 70,
     origin: { y: 0.6 }
 });
+    if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
     inicializarTermo();
     liberarCofreVisual();
     atualizarDinamicaHome();
@@ -422,20 +423,23 @@ window.alternarVisaoClima = function(pessoa) {
     window.climaExibido = pessoa;
     const dados = window.dadosClima[pessoa];
     
-    // Atualiza o visual dos botões
+    // 1. ATUALIZAÇÃO VISUAL DOS BOTÕES (REMOVE O AZUL, ATIVA O OURO)
+    // Remove a classe 'ativo' de ambos primeiro
     document.getElementById('btn-view-thamiris').classList.remove('ativo');
     document.getElementById('btn-view-joao').classList.remove('ativo');
-    document.getElementById(`btn-view-${pessoa}`).classList.add('ativo');
+    
+    // Adiciona a classe 'ativo' apenas no que foi clicado
+    const btnAtivo = document.getElementById(`btn-view-${pessoa}`);
+    if (btnAtivo) btnAtivo.classList.add('ativo');
 
     if (!dados) return;
 
-    // Calcula dia/noite e condição
+    // 2. LÓGICA DE EXIBIÇÃO (MANTÉM O QUE JÁ FUNCIONAVA)
     const agora = Math.floor(Date.now() / 1000);
     const eNoite = agora < dados.sys.sunrise || agora > dados.sys.sunset;
     const condicao = dados.weather[0].main;
     const temp = Math.round(dados.main.temp);
 
-    // Atualiza a frase
     const elMensagem = document.getElementById("texto-mensagem-clima");
     if (elMensagem) {
         if (pessoa === 'thamiris') {
@@ -445,7 +449,6 @@ window.alternarVisaoClima = function(pessoa) {
         }
     }
 
-    // Manda a ordem para o motor 3D transformar a garrafa
     if (typeof window.mudarClimaOrbe === 'function') {
         window.mudarClimaOrbe(condicao, eNoite);
     }
@@ -967,6 +970,7 @@ async function carregarLeis() {
 
 // 10. DINÂMICA DA HOME
 function atualizarDinamicaHome() {
+    if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
     // Agora a função cuida exclusivamente da liberação visual das relíquias do Cofre
     const hoje = new Date().toLocaleDateString('pt-BR');
     const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
@@ -1173,7 +1177,7 @@ window.enviarPostit = function() {
     
     set(refNovoPostit, {
     autor: window.MEU_NOME,
-    mensagem: texto,
+    mensagem: window.SantuarioCrypto.codificar(textoDaMensagem), // <--- BLINDAGEM AQUI
     timestamp: idUnico,
     fixado: false,
     curtidas: 0
@@ -1430,4 +1434,134 @@ window.mostrarMensagemSurpresa = function() {
 
     // Desabilita o botão
     btn.classList.add('btn-desativado');
+};
+
+// ==========================================
+// MOTOR DE OFENSIVA (STREAK & DIAMANTE)
+// ==========================================
+window.verificarRitualDoDia = function() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    
+    // As 3 Tarefas do Ritual
+    const termoOk = localStorage.getItem('santuario_vitoria_dia') === hoje;
+    const plantaOk = window.statusPlanta && window.statusPlanta.diaUltimaRegada === hoje;
+    const pulsoOk = localStorage.getItem('pulso_enviado_dia') === hoje;
+
+    let streak = parseInt(localStorage.getItem('ritual_streak') || '0');
+    let ultimoDia = localStorage.getItem('ritual_ultimo_dia');
+
+    // 1. Checa se vocês esqueceram de jogar ontem (Zera a ofensiva)
+    if (ultimoDia && ultimoDia !== hoje) {
+        const ontem = new Date();
+        ontem.setDate(ontem.getDate() - 1);
+        if (ultimoDia !== ontem.toLocaleDateString('pt-BR')) {
+            streak = 0; // Perdeu a ofensiva!
+            localStorage.setItem('ritual_streak', streak);
+        }
+    }
+
+    // 2. Checa se acabou de completar o ritual de hoje!
+    if (termoOk && plantaOk && pulsoOk && ultimoDia !== hoje) {
+        streak++;
+        localStorage.setItem('ritual_ultimo_dia', hoje);
+        localStorage.setItem('ritual_streak', streak);
+        
+        if (streak === 7 && typeof window.mostrarToast === 'function') {
+            window.mostrarToast("💎 OFENSIVA 7 DIAS! Tema Diamante Desbloqueado na Paleta!");
+            if(typeof confetti === 'function') confetti({colors: ['#00e5ff', '#ffffff'], particleCount: 150});
+        } else if (typeof window.mostrarToast === 'function') {
+            window.mostrarToast(`🔥 Ritual do Dia Completo! Ofensiva: ${streak} dia(s).`);
+        }
+    }
+
+    // 3. Atualiza a Tela de Temas (Libera ou Bloqueia o Diamante)
+    const btnDiamante = document.getElementById('btn-tema-diamante');
+    if (btnDiamante) {
+        if (streak >= 7) {
+            btnDiamante.classList.remove('escondido');
+            btnDiamante.innerText = `💎 Diamante (🔥 ${streak} dias)`;
+        } else {
+            btnDiamante.classList.add('escondido');
+            // Se estava usando o diamante e quebrou o combo, o app tira o tema dela!
+            if (localStorage.getItem('santuario_tema') === 'diamante') {
+                if(typeof aplicarTema === 'function') aplicarTema('dourado');
+            }
+        }
+    }
+};
+
+// ==========================================
+// O LIVRO DE OURO (CÁPSULA DO TEMPO / WRAPPED)
+// ==========================================
+let toquesNoTimer = 0;
+let storyAtual = 1;
+
+window.addEventListener('load', () => {
+    // 1. O Código Hacker (Tocar 7 vezes no timer para forçar a abertura)
+    const timerElemento = document.getElementById("timer-principal");
+    if (timerElemento) {
+        timerElemento.addEventListener('pointerdown', () => {
+            toquesNoTimer++;
+            if (toquesNoTimer === 7) {
+                document.getElementById('btn-capsula').classList.remove('escondido');
+                if(typeof window.mostrarToast === 'function') window.mostrarToast("✨ Cheat Code: Livro de Ouro Destrancado!");
+                if(window.Haptics) window.Haptics.sucesso();
+            }
+        });
+    }
+
+    // 2. O Gatilho Real (29 de Outubro)
+    const hoje = new Date();
+    if (hoje.getMonth() === 9 && hoje.getDate() === 29) { // No JavaScript, Janeiro é 0, então Outubro é 9
+        const btn = document.getElementById('btn-capsula');
+        if (btn) btn.classList.remove('escondido');
+    }
+});
+
+window.abrirCapsulaDoTempo = () => {
+    const modal = document.getElementById('modal-capsula');
+    if (!modal) return;
+
+    // Calcula os dias exatos de namoro lendo a sua variável global
+    const diferenca = new Date().getTime() - dataInicio;
+    const diasJuntos = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+    
+    // Injeta as estatísticas reais do Firebase/Cache
+    document.getElementById('dado-dias').innerText = diasJuntos;
+    document.getElementById('dado-ciclos').innerText = window.statusPlanta ? window.statusPlanta.ciclos || 0 : 0;
+    document.getElementById('dado-streak').innerText = localStorage.getItem('ritual_streak') || 0;
+
+    storyAtual = 1;
+    atualizarTelasStory();
+    modal.classList.remove('escondido');
+    
+    if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ff6b6b'], particleCount: 100});
+};
+
+window.mudarStory = (direcao) => {
+    storyAtual += direcao;
+    atualizarTelasStory();
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+function atualizarTelasStory() {
+    for (let i = 1; i <= 4; i++) {
+        const tela = document.getElementById(`story-${i}`);
+        if (tela) {
+            if (i === storyAtual) {
+                tela.classList.remove('escondido');
+            } else {
+                tela.classList.add('escondido');
+            }
+        }
+    }
+    
+    document.getElementById('btn-story-prev').style.display = storyAtual === 1 ? 'none' : 'block';
+    document.getElementById('btn-story-next').style.display = storyAtual === 4 ? 'none' : 'block';
+    document.getElementById('btn-story-fechar').style.display = storyAtual === 4 ? 'block' : 'none';
+}
+
+window.fecharCapsula = () => {
+    document.getElementById('modal-capsula').classList.add('escondido');
+    if(window.Haptics) window.Haptics.toqueLeve();
 };

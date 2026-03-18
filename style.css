@@ -33,6 +33,27 @@
     --cor-fundo: #1a0f1a;
 }
 
+/* Estado Ativo (Selecionado) para botões de cidade */
+.btn-cidade-ativo {
+    background: var(--cor-primaria) !important;
+    color: #000 !important; /* Texto preto para contrastar com o fundo ouro */
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); /* Brilho ouro */
+}
+
+/* Tema Diamante (Secreto - Desbloqueável via Streak) */
+.tema-diamante {
+    --cor-primaria: #00e5ff;
+    --cor-fundo: #000a12;
+    --cor-vidro: rgba(0, 229, 255, 0.05);
+}
+.tema-diamante .texto-ouro-vivo {
+    background: linear-gradient(90deg, #00e5ff, #ffffff, #00e5ff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: brilho-ouro 3s linear infinite;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5022,4 +5043,12 @@ body.aura-ansiosa {
     0%, 100% { transform: scale(1) rotate(0); opacity: 0.9; }
     15% { transform: scale(1.3) rotate(-10deg); opacity: 1; filter: drop-shadow(0 0 15px #ff6b6b); }
     30% { transform: scale(1.15) rotate(10deg); opacity: 1; }
+}
+
+/* Estado Ativo para botões de cidade (Sintonia Atmosférica) */
+.btn-clima-toggle.ativo {
+    background: var(--cor-primaria) !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    border-color: var(--cor-primaria) !important;
 }

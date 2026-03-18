@@ -32,10 +32,6 @@
 </head>
 <body>
 
-    <div id="pull-refresh-container" class="pull-refresh">
-        <div class="pull-icon">✨</div>
-    </div>
-
     <div id="fundo-climatico" class="fundo-climatico"></div>
 
     <div id="aviso-offline" class="aviso-offline escondido">
@@ -65,6 +61,8 @@
                     <div id="timer-principal" class="toque-secreto" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace; cursor: pointer; user-select: none;">
                         00d 00h 00m 00s
                     </div>
+                    
+                    <button id="btn-capsula" class="btn-acao escondido" style="margin-top: 15px; width: 100%; background: linear-gradient(45deg, #D4AF37, #ffb7c5); color: #000; font-weight: bold; border: none; font-size: 1.1rem; box-shadow: 0 0 20px rgba(212,175,55,0.4);" onclick="abrirCapsulaDoTempo()">✨ Abrir Livro de Ouro ✨</button>
                 </div>
 
 <div class="cartao-vidro cartao-saudacao" style="text-align: center; margin-top: 5px;">
@@ -194,6 +192,7 @@
             <button class="btn-tema" data-tema="rosa">🌸 Rosa Suave</button>
             <button class="btn-tema" data-tema="verde">🌿 Verde Esmeralda</button>
             <button class="btn-tema" data-tema="roxo">🔮 Roxo Real</button>
+            <button class="btn-tema escondido" id="btn-tema-diamante" data-tema="diamante">💎 Diamante (🔥 7 dias)</button>
         </div>
     </div>
 </div>
@@ -849,6 +848,43 @@
         </div>
     </div>
 
+    <div id="modal-capsula" class="modal-overlay escondido" style="z-index: 9999; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);">
+        <div class="cartao-vidro" style="width: 90%; max-width: 400px; height: 75vh; position: relative; overflow: hidden; padding: 0;">
+            
+            <div id="story-1" class="story-tela">
+                <h3 style="color: #aaa; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px;">Capítulo 1</h3>
+                <div class="story-numero-gigante texto-ouro-vivo" id="dado-dias">0</div>
+                <p style="font-size: 1.2rem; font-family: 'Playfair Display', serif; color: #fff;">Dias construindo nosso universo particular.</p>
+            </div>
+
+            <div id="story-2" class="story-tela escondido">
+                <h3 style="color: #aaa; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px;">Capítulo 2</h3>
+                <div class="story-numero-gigante" style="color: #2ecc71; text-shadow: 0 0 15px rgba(46,204,113,0.5);">🌳</div>
+                <h2 style="font-size: 2rem; color: #fff; margin-bottom: 5px;" id="dado-ciclos">0</h2>
+                <p style="font-size: 1.1rem; font-family: 'Playfair Display', serif; color: #ccc;">Ciclos completos no nosso Solo Fértil. Nossas raízes estão indestrutíveis.</p>
+            </div>
+
+            <div id="story-3" class="story-tela escondido">
+                <h3 style="color: #aaa; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px;">Capítulo 3</h3>
+                <div class="story-numero-gigante" style="color: #00e5ff; text-shadow: 0 0 15px rgba(0,229,255,0.5);">💎</div>
+                <h2 style="font-size: 2rem; color: #fff; margin-bottom: 5px;" id="dado-streak">0</h2>
+                <p style="font-size: 1.1rem; font-family: 'Playfair Display', serif; color: #ccc;">É a sua maior ofensiva de rituais diários do amor.</p>
+            </div>
+
+            <div id="story-4" class="story-tela escondido">
+                <div class="story-numero-gigante" style="color: #ff6b6b; animation: pulsarAnsiedade 1s infinite alternate;">❤️</div>
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--cor-primaria);">Feliz Aniversário!</h3>
+                <p style="font-size: 1rem; color: #fff; margin-top: 15px; font-style: italic;">"O nosso Santuário é a prova de que a distância é apenas um detalhe quando a alma está conectada."</p>
+            </div>
+
+            <div style="position: absolute; bottom: 25px; width: 100%; display: flex; justify-content: center; gap: 15px;">
+                <button id="btn-story-prev" class="story-btn-navegacao" onclick="mudarStory(-1)" style="display: none;">◀ Voltar</button>
+                <button id="btn-story-next" class="story-btn-navegacao" onclick="mudarStory(1)">Avançar ▶</button>
+                <button id="btn-story-fechar" class="btn-acao" onclick="fecharCapsula()" style="display: none; padding: 10px 25px; font-weight: bold;">Guardar no Coração</button>
+            </div>
+        </div>
+    </div>
+
     <div id="dynamic-island" class="ilha-dinamica">
         <span id="island-icon" class="island-icon">✨</span>
         <span id="island-text" class="island-text">Mensagem</span>
@@ -858,7 +894,6 @@
 
     <script src="core.js"></script>
     <script src="ui.js"></script>
-    <script src="graficos3d.js"></script>
     <script src="tribunal.js"></script>
     <script src="julgamento.js"></script>
     <script src="minifazenda_novo.js"></script>

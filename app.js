@@ -162,7 +162,8 @@ window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             splash.classList.add('oculto');
             // Remove o código do HTML após sumir para deixar o app leve
-            setTimeout(() => splash.remove(), 1000); 
+            setTimeout(() => splash.remove(), 1000);
+            window.injetarMotor3D(); // <--- CHAMA O 3D DEPOIS QUE A TELA APARECEU
         }, 2500); // A tela de abertura fica por 2.5 segundos
     }
 
@@ -566,57 +567,95 @@ if (temaIcon && temaSelector) {
 
 
 
-    // ==========================================
+// ==========================================
     // INICIALIZADOR GLOBAL MESTRE (O BOOT)
     // ==========================================
+    
+    // FASE 1: Motores Leves (Iniciam instantaneamente com a tela)
     window.addEventListener('load', () => {
+        if(typeof ativarVidroMagnetico === 'function') ativarVidroMagnetico();
+        if(typeof ativarParticulasDeToque === 'function') ativarParticulasDeToque();
+        if(typeof ativarBottomSheets === 'function') ativarBottomSheets();
+        if(typeof configurarModoOffline === 'function') configurarModoOffline();
+
+        // RADAR DE COMANDOS DA TELA DE BLOQUEIO
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.comando === 'disparar_pulso_remoto') {
+                    setTimeout(() => {
+                        if(typeof window.enviarPulso === 'function') {
+                            window.enviarPulso();
+                            mostrarToast("💖 Pulso enviado direto da notificação!");
+                        }
+                    }, 1000); 
+                }
+            });
+        }
+
+        // ==========================================
+        // CENTRAL DE COMANDOS DA SIRI (DEEP LINKS)
+        // ==========================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const acaoSiri = urlParams.get('acao');
+        
+        if (acaoSiri) {
+            // Espera 3 segundos para o Firebase e a Identidade carregarem totalmente
+            setTimeout(() => {
+                if (acaoSiri === 'pulso' || acaoSiri === 'disparar_pulso_remoto') {
+                    if(typeof window.enviarPulso === 'function') {
+                        window.enviarPulso();
+                        if(typeof window.mostrarToast === 'function') window.mostrarToast("💖 Pulso enviado pela Siri/Atalho!");
+                    }
+                } 
+                else if (acaoSiri === 'mood') {
+                    const sentimento = urlParams.get('tipo') || 'saudade';
+                    // Simula o preenchimento invisível e o envio
+                    const inputMood = document.getElementById('input-mood');
+                    if (inputMood) inputMood.value = "Enviado por comando de voz 🎙️";
+                    if(typeof window.enviarMood === 'function') window.enviarMood(sentimento);
+                } 
+                else if (acaoSiri === 'cofre') {
+                    // Força o clique na aba do cofre
+                    const abaCofre = document.querySelector('[data-alvo="cofre"]');
+                    if (abaCofre) abaCofre.click();
+                }
+
+                // O PULO DO GATO: Limpa a URL depois de executar, para não repetir se ela atualizar a página
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }, 3000); 
+        }
+    });
+
+    // FASE 2: A MÁGICA (Os motores pesados aguardam o Lazy Load terminar de baixar o 3D!)
+    window.addEventListener('motor3DPronto', () => {
         if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D();
         if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D();
         if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima();
         if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico();
         if(typeof inicializarEco3D === 'function') inicializarEco3D();
         if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
-        if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D(); // <--- AGORA VAI LIGAR!
         if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
-        if(typeof ativarVidroMagnetico === 'function') ativarVidroMagnetico();
-        if(typeof ativarPullToRefresh === 'function') ativarPullToRefresh();
-        if(typeof ativarParticulasDeToque === 'function') ativarParticulasDeToque();
-        // LIGA O MOTOR DE ARRASTAR MODAIS
-        if(typeof ativarBottomSheets === 'function') ativarBottomSheets();
-        
-        // LIGA O RADAR OFFLINE
-        if(typeof configurarModoOffline === 'function') configurarModoOffline();
-        // ==========================================
-    // RADAR DE COMANDOS DA TELA DE BLOQUEIO
-    // ==========================================
-    
-    // 1. Escuta se a ordem veio com o app já aberto em segundo plano
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('message', (event) => {
-            if (event.data && event.data.comando === 'disparar_pulso_remoto') {
-                setTimeout(() => {
-                    if(typeof window.enviarPulso === 'function') {
-                        window.enviarPulso();
-                        mostrarToast("💖 Pulso enviado direto da notificação!");
-                    }
-                }, 1000); // Dá 1 segundo para o Firebase respirar
-            }
-        });
-    }
-
-    // 2. Escuta se a ordem veio pela URL (App estava fechado)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('acao') === 'disparar_pulso_remoto') {
-        // Espera o Firebase conectar e a identidade ser carregada (3 segundos)
-        setTimeout(() => {
-            if(typeof window.enviarPulso === 'function') {
-                window.enviarPulso();
-                mostrarToast("💖 Pulso enviado direto da notificação!");
-                // Limpa a URL para o pulso não disparar de novo se atualizar a página
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }, 3000); 
-    }
     });
 
-});
+}); // Fecha o DOMContentLoaded
+
+
+
+// ==========================================
+// INJEÇÃO LAZY LOAD (MOTOR 3D)
+// ==========================================
+window.injetarMotor3D = function() {
+    if (document.getElementById('motor-3d-script')) return; // Evita carregar duas vezes
+    
+    const script = document.createElement('script');
+    script.src = 'graficos3d.js';
+    script.id = 'motor-3d-script';
+    
+    script.onload = () => {
+        console.log("🚀 GPU Ativada: Motor 3D injetado via Lazy Load!");
+        // Emite um sinal global avisando que o 3D chegou na área
+        window.dispatchEvent(new Event('motor3DPronto'));
+    };
+    
+    document.body.appendChild(script); // Dispara o download em segundo plano
+};

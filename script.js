@@ -13,6 +13,212 @@ window.souJoao = false;
 window.MEU_NOME = "";
 window.NOME_PARCEIRO = "";
 
+// Variáveis globais (serão preenchidas pelo login)
+window.usuarioLogado = null;
+window.souJoao = false;
+window.MEU_NOME = "";
+window.NOME_PARCEIRO = "";
+
+// ==========================================
+// MOTOR TÁTIL SÊNIOR (ILUSÃO FÍSICA)
+// ==========================================
+window.Haptics = {
+    toqueLeve: () => { if(navigator.vibrate) navigator.vibrate(10); }, // Tique muito sutil
+    toqueForte: () => { if(navigator.vibrate) navigator.vibrate(30); }, // Confirmação
+    sucesso: () => { if(navigator.vibrate) navigator.vibrate([20, 50, 20]); }, // Tique-tique
+    erro: () => { if(navigator.vibrate) navigator.vibrate([40, 50, 40, 50, 60]); } // Tum-Tum grave
+};
+
+// Aplicando magicamente a todos os botões do aplicativo de uma vez:
+window.addEventListener('load', () => {
+    document.querySelectorAll('button, .item-menu, .item-cofre').forEach(btn => {
+        btn.addEventListener('touchstart', window.Haptics.toqueLeve, {passive: true});
+    });
+});
+
+// ==========================================
+// 1. GERADOR DE PARTÍCULAS (STARDUST RIPPLE)
+// ==========================================
+window.ativarParticulasDeToque = () => {
+    // Função que desenha a luz no eixo X e Y
+    const criarParticula = (x, y) => {
+        const particula = document.createElement('div');
+        particula.className = 'particula-toque';
+        particula.style.left = `${x}px`;
+        particula.style.top = `${y}px`;
+        
+        document.body.appendChild(particula);
+
+        // O Lixeiro: Remove a div invisível após a animação acabar para não travar a memória RAM
+        setTimeout(() => {
+            particula.remove();
+        }, 600);
+    };
+
+    // Sensor de toque na tela (Celular)
+    document.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+            criarParticula(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }, { passive: true });
+
+    // Sensor de clique do mouse (PC/Testes)
+    document.addEventListener('mousedown', (e) => {
+        criarParticula(e.clientX, e.clientY);
+    });
+};
+
+// ==========================================
+// 7. MOTOR DE ÁUDIO ESPACIAL (WEB AUDIO API)
+// ==========================================
+window.MotorDeAudio = {
+    ctx: null,
+    filtro: null,
+    musica: null,
+    iniciado: false,
+
+    iniciar: function() {
+        if (this.iniciado) return;
+
+        // Tenta pegar a música de fundo existente ou cria uma invisível
+        this.musica = document.getElementById('audio-ambiente') || new Audio('assets/ambient.mp3');
+        this.musica.loop = true;
+        this.musica.volume = 0.5;
+
+        // Cria o Contexto de Áudio (A Mesa de Som do Navegador)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+
+        // Cria o "Abafador" (Filtro Passa-Baixa / Lowpass)
+        this.filtro = this.ctx.createBiquadFilter();
+        this.filtro.type = 'lowpass';
+        this.filtro.frequency.value = 20000; // 20kHz: Totalmente aberto (som limpo)
+
+        // Conecta os cabos invisíveis: Música -> Filtro -> Alto-falante do Celular
+        const track = this.ctx.createMediaElementSource(this.musica);
+        track.connect(this.filtro).connect(this.ctx.destination);
+
+        this.iniciado = true;
+        this.musica.play().catch(e => console.log("Áudio bloqueado até o usuário interagir."));
+    },
+
+    // Efeito de "Mergulho": Abafa o som cortando os agudos
+    abafar: function() {
+        if (!this.iniciado) return;
+        // Desce a frequência para 600Hz em 0.3 segundos (Cria a sensação de som atrás da porta)
+        this.filtro.frequency.setTargetAtTime(600, this.ctx.currentTime, 0.3);
+        this.musica.volume = 0.2;
+    },
+
+    // Efeito de "Retorno": Abre o som novamente
+    focar: function() {
+        if (!this.iniciado) return;
+        // Sobe a frequência de volta para o limite da audição humana
+        this.filtro.frequency.setTargetAtTime(20000, this.ctx.currentTime, 0.3);
+        this.musica.volume = 0.5;
+    }
+};
+
+// REGRA DOS NAVEGADORES: O áudio espacial só pode ser ativado no PRIMEIRO TOQUE na tela
+document.addEventListener('touchstart', () => {
+    if (window.MotorDeAudio && !window.MotorDeAudio.iniciado) window.MotorDeAudio.iniciar();
+}, { once: true, passive: true });
+document.addEventListener('mousedown', () => {
+    if (window.MotorDeAudio && !window.MotorDeAudio.iniciado) window.MotorDeAudio.iniciar();
+}, { once: true });
+
+
+// ==========================================
+// 2. MOTOR BOTTOM SHEET (SWIPE TO CLOSE)
+// ==========================================
+window.ativarBottomSheets = () => {
+    const sheets = document.querySelectorAll('.bottom-sheet');
+    
+    sheets.forEach(sheet => {
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+        const overlay = sheet.parentElement; 
+
+        // 1. Dedo encostou na aba
+        sheet.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            sheet.style.transition = 'none'; // Desliga a animação para o vidro grudar no dedo
+        }, { passive: true });
+
+        // 2. Dedo está puxando para baixo
+        sheet.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            
+            // Só permite arrastar o vidro para BAIXO, nunca para cima
+            if (deltaY > 0) {
+                sheet.style.transform = `translateY(${deltaY}px)`;
+            }
+        }, { passive: true });
+
+        // 3. Dedo soltou a tela
+        sheet.addEventListener('touchend', () => {
+            isDragging = false;
+            sheet.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)'; // Liga a animação de novo
+            
+            const deltaY = currentY - startY;
+            
+            // Se puxou mais de 100 pixels pra baixo, fecha o modal de vez!
+            if (deltaY > 100) {
+                sheet.style.transform = `translateY(100%)`;
+                
+                setTimeout(() => {
+                    // Integração com a sua função original de fechar!
+                    if (overlay.id === 'modal-emergencia' && typeof fecharEmergencia === 'function') {
+                        fecharEmergencia();
+                    } else {
+                        overlay.classList.add('escondido');
+                    }
+                    // Reseta para quando abrir da próxima vez
+                    setTimeout(() => sheet.style.transform = '', 100);
+                }, 300); 
+            } else {
+                // Se puxou só um pouquinho e soltou, dá o Efeito Mola (volta pro topo)
+                sheet.style.transform = 'translateY(0)';
+            }
+        });
+    });
+};
+
+// ==========================================
+// 4. MOTOR DE TIPOGRAFIA CINEMATOGRÁFICA
+// ==========================================
+window.animarTextoCinematografico = (elemento) => {
+    if (!elemento) return;
+    
+    // Captura o texto puro
+    const texto = elemento.innerText || elemento.textContent;
+    elemento.innerHTML = ''; // Esvazia a div original
+    
+    // Quebra o texto usando os espaços
+    const palavras = texto.split(' ');
+    
+    palavras.forEach((palavra, index) => {
+        const span = document.createElement('span');
+        span.innerText = palavra + ' ';
+        span.className = 'palavra-revelada';
+        
+        // A MÁGICA: Cada palavra atrasa 40 milissegundos em relação à anterior
+        span.style.animationDelay = `${index * 0.04}s`; 
+        
+        elemento.appendChild(span);
+    });
+};
+
+// ==========================================
+// SISTEMA PARA O PULSO (usa Firebase)
+// ==========================================
+window.SantuarioApp = window.SantuarioApp || {};
+window.SantuarioApp.inicializado = false;
+
 if (window.__SANTUARIO_SCRIPT_CARREGADO) {
     console.warn('Script já carregado.');
 } else {
@@ -251,57 +457,66 @@ async function carregarDadosExternos() {
     }
 }
 
-// 3. NAVEGAÇÃO SPA COM TRANSIÇÕES SUAVES
+// 3. NAVEGAÇÃO SPA COM TRANSIÇÕES NÍVEL "APPLE" (View Transitions API)
 function configurarNavegacao() {
     const botoesMenu = document.querySelectorAll('.item-menu');
     const todasAsTelas = document.querySelectorAll('.tela');
-    let trocandoTela = false; // Trava de segurança para evitar cliques duplos
+    let trocandoTela = false; // Trava de segurança
 
     botoesMenu.forEach(botao => {
-        botao.addEventListener('click', (evento) => {
+        botao.addEventListener('click', async (evento) => {
             evento.preventDefault();
             const telaAlvo = botao.getAttribute('data-alvo');
             
-            // Se já estiver na tela, ou se a animação ainda estiver rodando, não faz nada
+            // Se já estiver na tela ou a animação estiver rodando, ignora
             if (telaAlvo === telaAtual || trocandoTela) return;
-
-            trocandoTela = true; // Trava a tela para iniciar a mágica
+            trocandoTela = true;
             const telaAnterior = telaAtual;
 
-            // 1. Atualiza a cor do botão do menu instantaneamente
-            botoesMenu.forEach(b => b.classList.remove('ativo'));
-            botao.classList.add('ativo');
+            // A função exata de troca de classes no DOM
+            const atualizarDOM = () => {
+                botoesMenu.forEach(b => b.classList.remove('ativo'));
+                botao.classList.add('ativo');
 
-            // 2. Aplica o efeito "Fade Out" na tela que está ativa agora
-            const telaAtiva = document.getElementById(telaAtual);
-            if (telaAtiva) {
-                telaAtiva.classList.add('saindo');
-            }
-
-            // 3. Espera 300 milissegundos (o tempo exato da animação do CSS sumirSuave)
-            setTimeout(() => {
-                // Esconde todas as telas e limpa a classe de animação
                 todasAsTelas.forEach(tela => {
                     tela.classList.add('escondido');
-                    tela.classList.remove('saindo');
+                    tela.classList.remove('saindo'); // Limpa a classe velha
                 });
 
-                // Mostra a tela nova (ela fará o Fade In automaticamente pelo seu CSS original)
                 const elementoTela = document.getElementById(telaAlvo);
                 if (elementoTela) elementoTela.classList.remove('escondido');
 
                 telaAtual = telaAlvo;
 
-                // Lógica de áudio (mantida intacta)
-                if (telaAlvo === 'jogos') {
-                    playAudioJogos();
-                } else if (telaAnterior === 'jogos') {
-                    pauseAudioJogos();
-                }
+                // Lógicas específicas de cada tela
+                // ... dentro da função atualizarDOM na configuração de navegação
+if (telaAlvo === 'jogos') {
+    if (typeof playAudioJogos === 'function') playAudioJogos();
+} else if (telaAnterior === 'jogos') {
+    if (typeof pauseAudioJogos === 'function') pauseAudioJogos();
+}
 
-                atualizarDinamicaHome();
-                trocandoTela = false; // Destrava a tela para ela poder clicar de novo
-            }, 300);
+// --- ADICIONE ISTO AQUI EMBAIXO ---
+if (telaAlvo === 'cofre') {
+    if (window.MotorDeAudio) window.MotorDeAudio.abafar(); // Som fica místico no cofre
+} else if (telaAnterior === 'cofre') {
+    if (window.MotorDeAudio) window.MotorDeAudio.focar(); // Som volta ao normal na Home
+}
+            };
+
+            // A MÁGICA: Se o celular suportar a View Transitions API
+            if (document.startViewTransition) {
+                const transicao = document.startViewTransition(() => atualizarDOM());
+                await transicao.finished; // Espera a animação gráfica terminar
+            } else {
+                // FALLBACK: Para celulares muito antigos, mantém o seu efeito antigo
+                const telaAtiva = document.getElementById(telaAnterior);
+                if (telaAtiva) telaAtiva.classList.add('saindo');
+                await new Promise(r => setTimeout(r, 300));
+                atualizarDOM();
+            }
+
+            trocandoTela = false; // Libera o clique novamente
         });
     });
 }
@@ -1545,25 +1760,40 @@ window.enviarMood = function(estado) {
             tempoTexto = `há ${horas} hora(s)`;
         }
 
-        document.body.classList.remove('modo-cansada');
-        document.body.classList.remove('modo-alerta');
+        // 1. LIMPEZA SEGURA
+        document.body.classList.remove('modo-cansada', 'modo-alerta', 'aura-triste', 'aura-apaixonada', 'aura-ansiosa');
+        const fundoClima = document.getElementById('fundo-climatico');
+        if (fundoClima) fundoClima.className = 'fundo-climatico';
 
         let mensagemTexto = "";
         const estadoLower = estado.toLowerCase();
 
+        // 2. LIGAÇÃO DAS AURAS, CLIMA E LOTTIE
         if (estadoLower === 'radiante') {
             mensagemTexto = `✨ ${window.NOME_PARCEIRO} está radiante ${tempoTexto}.`;
+            if (fundoClima) fundoClima.classList.add('fundo-estrelado');
+            window.LottieManager.play('radiante');
         } else if (estadoLower === 'ansiosa' || estadoLower === 'ansioso') {
             mensagemTexto = `🌪️ A mente da ${window.NOME_PARCEIRO} acelerou ${tempoTexto}.`;
+            document.body.classList.add('aura-ansiosa'); 
+            window.LottieManager.play('ansiosa');
         } else if (estadoLower === 'triste') {
             mensagemTexto = `🌧️ O dia da ${window.NOME_PARCEIRO} escureceu ${tempoTexto}.`;
+            document.body.classList.add('aura-triste'); 
+            if (fundoClima) fundoClima.classList.add('fundo-chuva');
+            window.LottieManager.play('triste');
         } else if (estadoLower === 'cansada' || estadoLower === 'cansado') {
             mensagemTexto = `🔋 ${window.NOME_PARCEIRO} está esgotada ${tempoTexto}.`;
             document.body.classList.add('modo-cansada');
+            window.LottieManager.play('cansada');
         } else if (estadoLower === 'saudade' || estadoLower === 'com saudade') {
             mensagemTexto = `🥺 ${window.NOME_PARCEIRO} está com saudade ${tempoTexto}.`;
+            window.LottieManager.play('saudade');
         } else if (estadoLower === 'apaixonada' || estadoLower === 'apaixonado') {
             mensagemTexto = `💖 ${window.NOME_PARCEIRO} está apaixonada ${tempoTexto}!`;
+            document.body.classList.add('aura-apaixonada'); 
+            if (fundoClima) fundoClima.classList.add('fundo-estrelado');
+            window.LottieManager.play('apaixonada');
         }
 
         if (mensagem) {
@@ -1594,13 +1824,19 @@ window.enviarMood = function(estado) {
         const texto = document.getElementById('emergencia-mensagem');
 
         if (modal && titulo && texto) {
-            // Injeta o ID único do alerta direto no HTML da tela
             modal.dataset.timestampAtual = timestamp.toString();
 
             titulo.innerText = `A ${window.NOME_PARCEIRO} está ${estado.toUpperCase()}`;
             texto.innerText = mensagem || "Ela precisa de você agora. Dê uma atenção especial.";
             
             modal.classList.remove('escondido');
+
+            // Coloque isto perto do final da função, antes ou depois do vibrador:
+            if (window.MotorDeAudio) window.MotorDeAudio.abafar();
+
+            // --- AQUI ACONTECE A MÁGICA CINEMATOGRÁFICA ---
+            window.animarTextoCinematografico(texto);
+            // ----------------------------------------------
 
             if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
             
@@ -1613,6 +1849,9 @@ window.enviarMood = function(estado) {
         const modal = document.getElementById('modal-emergencia');
         if (modal) {
             modal.classList.add('escondido');
+
+            // Traz o som de volta!
+            if (window.MotorDeAudio) window.MotorDeAudio.focar();
             
             // O PULO DO GATO: Salva no celular que esse alerta específico já foi atendido!
             const timestamp = modal.dataset.timestampAtual;
@@ -3108,6 +3347,13 @@ if (temaIcon && temaSelector) {
             renderer.render(scene, camera);
         };
         animar();
+
+        // Tira o Esqueleto Cintilante após o motor 3D aquecer e dar o primeiro frame (800ms)
+        const esqueletoBussola = document.getElementById('esqueleto-bussola');
+        if (esqueletoBussola) {
+            setTimeout(() => esqueletoBussola.classList.add('esqueleto-oculto'), 800);
+        }
+        
     };
 
     // --- MATEMÁTICA GEOGRÁFICA E SENSORES ---
@@ -3332,6 +3578,12 @@ if (temaIcon && temaSelector) {
             onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
                 const dados = snapshot.val();
                 construirCarrossel(Array.isArray(dados) ? dados : []);
+
+                // O FIREBASE ENTREGOU AS FOTOS! Derrete o Esqueleto Cintilante!
+                const esqueletoCarrossel = document.getElementById('esqueleto-carrossel');
+                if (esqueletoCarrossel) {
+                    setTimeout(() => esqueletoCarrossel.classList.add('esqueleto-oculto'), 600);
+                }
             });
         }
 
@@ -3501,6 +3753,232 @@ if (temaIcon && temaSelector) {
     };
 
     // ==========================================
+    // SISTEMA NEURAL: SANTUÁRIO NA MENTE (OFFLINE)
+    // ==========================================
+    window.configurarModoOffline = () => {
+        const aviso = document.getElementById('aviso-offline');
+        
+        // Lista de IDs de botões que precisam de internet para funcionar
+        const elementosParaCongelar = [
+            'btn-pulso', 
+            'btn-gravar-eco', 
+            'btn-add-foto', 
+            'input-mood'
+        ];
+
+        const atualizarEstadoConexao = () => {
+            if (navigator.onLine) {
+                // VOLTOU A INTERNET: O Santuário respira novamente
+                if (aviso) aviso.classList.add('escondido');
+                
+                elementosParaCongelar.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.remove('desativado-offline');
+                });
+
+                // Tenta reconectar a comunicação em tempo real
+                if (window.SantuarioApp && typeof window.SantuarioApp.conectar === 'function') {
+                    console.log("Internet restaurada. Reconectando ao núcleo...");
+                }
+            } else {
+                // CAIU A INTERNET: Ativa o modo "Santuário na Mente"
+                if (aviso) aviso.classList.remove('escondido');
+                
+                elementosParaCongelar.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('desativado-offline');
+                });
+            }
+        };
+
+        // Os "ouvidos" do JavaScript para a placa de rede do celular
+        window.addEventListener('online', atualizarEstadoConexao);
+        window.addEventListener('offline', atualizarEstadoConexao);
+        
+        // Faz a checagem inicial assim que o app abre
+        atualizarEstadoConexao();
+    };
+
+    // ==========================================
+    // MOTOR DO VIDRO MAGNÉTICO + GLARE (NÍVEL 9)
+    // ==========================================
+    window.ativarVidroMagnetico = () => {
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                // 1. Cálculo para a inclinação do Cartão (3D)
+                const tiltX = Math.min(Math.max((e.beta || 0) - 45, -10), 10); 
+                const tiltY = Math.min(Math.max(e.gamma || 0, -10), 10);
+                
+                // 2. Cálculo para a posição do Brilho (Glare)
+                // Multiplicamos por valores maiores para a luz correr mais rápido que o vidro
+                const glareX = (e.gamma || 0) * 1.5;
+                const glareY = ((e.beta || 0) - 45) * 1.5;
+
+                // Injeta as variáveis CSS no documento
+                document.documentElement.style.setProperty('--tilt-x', `${tiltX / -2}deg`);
+                document.documentElement.style.setProperty('--tilt-y', `${tiltY / 2}deg`);
+                
+                // Variáveis do Brilho
+                document.documentElement.style.setProperty('--glare-x', `${glareX}`);
+                document.documentElement.style.setProperty('--glare-y', `${glareY}`);
+            });
+        }
+    };
+
+    // ==========================================
+    // 3. MOTOR DA ILHA DINÂMICA
+    // ==========================================
+    window.toastTimer = null; // Variável global para controlar o tempo
+
+    window.mostrarToast = (mensagem, icone = "✨") => {
+        const ilha = document.getElementById('dynamic-island');
+        if (!ilha) return;
+
+        const textoEl = document.getElementById('island-text');
+        const iconeEl = document.getElementById('island-icon');
+
+        // Personaliza o ícone dependendo da mensagem
+        if (mensagem.toLowerCase().includes('pulso')) icone = "💖";
+        if (mensagem.toLowerCase().includes('erro')) icone = "❌";
+
+        textoEl.innerText = mensagem;
+        iconeEl.innerText = icone;
+
+        // Feedback Tátil (Se já tivermos instalado o Haptics no passo anterior)
+        if (window.Haptics && window.Haptics.toqueLeve) window.Haptics.toqueLeve();
+
+        // Expande a ilha!
+        ilha.classList.add('ativa');
+
+        // Se já tinha um aviso rodando, zera o cronômetro para não fechar na cara
+        if (window.toastTimer) clearTimeout(window.toastTimer);
+
+        // Encolhe a ilha e some depois de 3 segundos
+        window.toastTimer = setTimeout(() => {
+            ilha.classList.remove('ativa');
+        }, 3000);
+    };
+
+    // ==========================================
+// 8. MOTOR PULL-TO-REFRESH MÍSTICO
+// ==========================================
+window.ativarPullToRefresh = () => {
+    const container = document.getElementById('pull-refresh-container');
+    const icone = container.querySelector('.pull-icon');
+    
+    let startY = 0;
+    let pulling = false;
+
+    // 1. Dedo encostou no topo da tela
+    document.addEventListener('touchstart', (e) => {
+        // Só ativa se estiver no topo absoluto da página
+        if (window.scrollY === 0) {
+            startY = e.touches[0].clientY;
+            pulling = true;
+            container.style.transition = 'none'; // Gruda no dedo
+        }
+    }, { passive: true });
+
+    // 2. Arrastando para baixo
+    document.addEventListener('touchmove', (e) => {
+        if (!pulling) return;
+        
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+
+        if (diff > 0 && diff < 150) {
+            container.style.opacity = Math.min(diff / 80, 1);
+            container.style.transform = `translateY(${Math.min(diff - 80, 0)}px)`;
+            
+            // Muda o ícone conforme a força
+            icone.innerText = diff > 100 ? "🌀" : "✨";
+        }
+    }, { passive: true });
+
+    // 3. Soltou o dedo
+    document.addEventListener('touchend', async () => {
+        if (!pulling) return;
+        pulling = false;
+
+        const currentTransform = new WebKitCSSMatrix(getComputedStyle(container).transform).m42;
+        
+        // Gatilho: Se passou do ponto (diff > 100 aprox), sincroniza!
+        if (currentTransform >= -20) {
+            container.style.transition = 'transform 0.3s ease';
+            container.style.transform = 'translateY(15px)'; // Para um pouco abaixo do topo
+            icone.classList.add('sincronizando');
+            icone.innerText = "🌀";
+
+            // Feedback Tátil de Sênior
+            if (window.Haptics) window.Haptics.toqueForte();
+
+            // --- AÇÃO REAL: Sincroniza com o Firebase ---
+            if (typeof window.atualizarDinamicaHome === 'function') {
+                await window.atualizarDinamicaHome(); 
+            }
+            
+            // Simula um tempo de "respiração" do app
+            setTimeout(() => {
+                icone.classList.remove('sincronizando');
+                icone.innerText = "✅";
+                if (window.Haptics) window.Haptics.sucesso();
+                
+                setTimeout(() => {
+                    container.style.transform = 'translateY(-100%)';
+                    container.style.opacity = '0';
+                }, 800);
+            }, 1500);
+
+        } else {
+            // Se não puxou o suficiente, recolhe a aba
+            container.style.transition = 'transform 0.3s ease';
+            container.style.transform = 'translateY(-100%)';
+            container.style.opacity = '0';
+        }
+    });
+};
+
+
+// ==========================================
+// 10. MOTOR DE MICRO-INTERAÇÕES LOTTIE
+// ==========================================
+window.LottieManager = {
+    instancia: null,
+    
+    play: (mood) => {
+        const container = document.getElementById('lottie-mood-container');
+        if (!container) return;
+
+        // Limpa a animação anterior
+        if (window.LottieManager.instancia) {
+            window.LottieManager.instancia.destroy();
+        }
+
+        // Mapeamento de animações (Links públicos de alta qualidade)
+        const animações = {
+            'radiante': 'https://fonts.gstatic.com/s/i/short-term/release/googlestars/sparkles/default/24px.svg', // Placeholder ou JSON real
+            'triste': 'https://assets5.lottiefiles.com/packages/lf20_96py93xa.json', // Chuva
+            'apaixonada': 'https://assets5.lottiefiles.com/packages/lf20_02m6o2pw.json', // Coração batendo
+            'ansiosa': 'https://assets10.lottiefiles.com/packages/lf20_T69r0P.json', // Redemoinho/Mente
+            'cansada': 'https://assets3.lottiefiles.com/packages/lf20_i9mxcD.json' // Bateria acabando
+        };
+
+        const url = animações[mood.toLowerCase()];
+        if (!url) return;
+
+        window.LottieManager.instancia = lottie.loadAnimation({
+            container: container,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: url
+        });
+    }
+};
+
+
+
+    // ==========================================
     // INICIALIZADOR GLOBAL MESTRE (O BOOT)
     // ==========================================
     window.addEventListener('load', () => {
@@ -3511,6 +3989,47 @@ if (temaIcon && temaSelector) {
         if(typeof inicializarEco3D === 'function') inicializarEco3D();
         if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
         if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D(); // <--- AGORA VAI LIGAR!
+        if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
+        if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        if(typeof ativarVidroMagnetico === 'function') ativarVidroMagnetico();
+        if(typeof ativarPullToRefresh === 'function') ativarPullToRefresh();
+        if(typeof ativarParticulasDeToque === 'function') ativarParticulasDeToque();
+        // LIGA O MOTOR DE ARRASTAR MODAIS
+        if(typeof ativarBottomSheets === 'function') ativarBottomSheets();
+        
+        // LIGA O RADAR OFFLINE
+        if(typeof configurarModoOffline === 'function') configurarModoOffline();
+        // ==========================================
+    // RADAR DE COMANDOS DA TELA DE BLOQUEIO
+    // ==========================================
+    
+    // 1. Escuta se a ordem veio com o app já aberto em segundo plano
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.comando === 'disparar_pulso_remoto') {
+                setTimeout(() => {
+                    if(typeof window.enviarPulso === 'function') {
+                        window.enviarPulso();
+                        mostrarToast("💖 Pulso enviado direto da notificação!");
+                    }
+                }, 1000); // Dá 1 segundo para o Firebase respirar
+            }
+        });
+    }
+
+    // 2. Escuta se a ordem veio pela URL (App estava fechado)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('acao') === 'disparar_pulso_remoto') {
+        // Espera o Firebase conectar e a identidade ser carregada (3 segundos)
+        setTimeout(() => {
+            if(typeof window.enviarPulso === 'function') {
+                window.enviarPulso();
+                mostrarToast("💖 Pulso enviado direto da notificação!");
+                // Limpa a URL para o pulso não disparar de novo se atualizar a página
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }, 3000); 
+    }
     });
 
 }); 

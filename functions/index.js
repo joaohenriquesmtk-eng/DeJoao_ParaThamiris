@@ -37,9 +37,34 @@ exports.enviarNotificacaoMood = onValueCreated(
             corpo = `${nomeRemetente} não está bem. Que tal uma mensagem agora?`;
         }
 
+        // --- A NOVA MÁGICA: NOTIFICAÇÃO COM BOTÕES ---
         const message = {
-            notification: { title: titulo, body: corpo },
-            android: { priority: 'high' },
+            notification: { 
+                title: titulo, 
+                body: corpo 
+            },
+            android: { 
+                priority: 'high' 
+            },
+            webpush: {
+                fcmOptions: {
+                    link: "/" // Ao clicar, abre o Santuário
+                },
+                notification: {
+                    icon: "/assets/icons/icon-192.png", // Puxa o ícone dourado do seu app
+                    vibrate: [200, 100, 200],
+                    actions: [
+                        {
+                            action: "enviar_pulso",
+                            title: "💖 Enviar Pulso"
+                        },
+                        {
+                            action: "abrir_app",
+                            title: "🌌 Abrir Santuário"
+                        }
+                    ]
+                }
+            },
             token: tokenDestino
         };
 

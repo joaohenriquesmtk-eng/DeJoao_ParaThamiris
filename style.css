@@ -4487,3 +4487,427 @@ body {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ==========================================
+   TRANSIÇÕES NÍVEL APPLE (VIEW TRANSITIONS API)
+========================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.4s;
+    /* Curva de aceleração estilo iOS (rápido no começo, suave no final) */
+    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* A tela que está saindo afunda e some */
+::view-transition-old(root) {
+    animation-name: fade-out-apple, scale-down-apple;
+}
+
+/* A tela que está entrando vem de cima e aparece */
+::view-transition-new(root) {
+    animation-name: fade-in-apple, scale-up-apple;
+}
+
+@keyframes fade-in-apple { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+@keyframes fade-out-apple { 
+    from { opacity: 1; } 
+    to { opacity: 0; } 
+}
+@keyframes scale-up-apple { 
+    from { transform: scale(0.96); } 
+    to { transform: scale(1); } 
+}
+@keyframes scale-down-apple { 
+    from { transform: scale(1); } 
+    to { transform: scale(1.04); } 
+}
+
+/* ==========================================
+   MODO OFFLINE (SANTUÁRIO NA MENTE)
+========================================== */
+.aviso-offline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(10, 15, 26, 0.85); /* Vidro escuro */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--cor-primaria);
+    z-index: 10000; /* Fica por cima de absolutamente tudo */
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    padding-top: max(15px, env(safe-area-inset-top)); /* Respeita o notch do iPhone/Android */
+    gap: 15px;
+    transform: translateY(0);
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+}
+
+.aviso-offline.escondido {
+    transform: translateY(-100%);
+}
+
+.icone-offline {
+    font-size: 2rem;
+    animation: flutuarOffline 3s ease-in-out infinite;
+}
+
+.texto-offline strong {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 3px;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.texto-offline p {
+    font-size: 0.75rem;
+    color: #ccc;
+    margin: 0;
+    line-height: 1.2;
+}
+
+@keyframes flutuarOffline {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* A mágica que congela os botões sem internet */
+.desativado-offline {
+    opacity: 0.3 !important;
+    pointer-events: none !important; /* Impede o clique */
+    filter: grayscale(100%);
+    transition: all 0.3s ease;
+}
+
+/* ==========================================
+   9. BRILHO DE REFLEXO (GLARE EFFECT)
+========================================== */
+.cartao-vidro {
+    position: relative;
+    overflow: hidden; /* Garante que o brilho não vaze */
+    transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+}
+
+/* A CAMADA DE LUZ (GLARE) */
+.cartao-vidro::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* Um feixe de luz linear e suave */
+    background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0) 30%,
+        rgba(255, 255, 255, 0.15) 45%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.15) 55%,
+        rgba(255, 255, 255, 0) 70%,
+        transparent 100%
+    );
+    /* A mágica: a luz corre no sentido oposto à inclinação para simular reflexo real */
+    transform: translateX(calc(var(--glare-x, 0) * 1%)) translateY(calc(var(--glare-y, 0) * 1%));
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ==========================================
+   AURA EMOCIONAL (FUNDO VIVO)
+========================================== */
+body {
+    transition: background-color 1.5s ease, box-shadow 1.5s ease;
+}
+
+body.aura-triste {
+    background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%);
+    box-shadow: inset 0 0 100px rgba(52, 152, 219, 0.2);
+}
+
+body.aura-apaixonada {
+    background: radial-gradient(circle at top, #2d111d 0%, #090909 100%);
+    box-shadow: inset 0 0 150px rgba(232, 67, 147, 0.15);
+}
+
+body.aura-ansiosa {
+    background: radial-gradient(circle at center, #1a1a0f 0%, #090909 100%);
+    animation: pulsarAnsiedade 2s infinite alternate;
+}
+
+@keyframes pulsarAnsiedade {
+    0% { box-shadow: inset 0 0 20px rgba(243, 156, 18, 0.1); }
+    100% { box-shadow: inset 0 0 80px rgba(243, 156, 18, 0.3); }
+}
+
+/* ==========================================
+   1. PARTÍCULAS DE TOQUE (STARDUST RIPPLE)
+========================================== */
+.particula-toque {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none; /* Deixa o clique atravessar a luz para não travar os botões */
+    transform: translate(-50%, -50%) scale(0);
+    /* A cor da partícula puxa magicamente a variável do seu tema! */
+    background: radial-gradient(circle, var(--cor-primaria) 0%, transparent 70%);
+    mix-blend-mode: screen; 
+    z-index: 99999; /* Por cima de absolutamente tudo */
+    animation: explosaoEstelar 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes explosaoEstelar {
+    0% {
+        width: 10px;
+        height: 10px;
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+/* ==========================================
+   2. BOTTOM SHEET MODALS (PADRÃO iOS)
+========================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100vw; /* Força a largura exata da tela */
+    height: 100vh; /* Força a altura exata da tela */
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 99999;
+    opacity: 1;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    align-items: flex-end; 
+    justify-content: center; /* A TRAVA: Garante que a aba fique no meio perfeito da tela */
+    box-sizing: border-box;
+}
+
+/* Quando o fundo está escondido, a aba desce 100% para fora da tela */
+.modal-overlay.escondido {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-overlay.escondido .bottom-sheet {
+    transform: translateY(100%); 
+}
+
+.bottom-sheet {
+    width: 100%;
+    box-sizing: border-box; /* A MÁGICA AQUI: Impede que o padding empurre o centro da tela */
+    max-height: 90dvh; 
+    background: rgba(15, 20, 30, 0.85); 
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 30px 30px 0 0; 
+    padding: 15px 25px 40px 25px; 
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow-y: auto;
+    will-change: transform;
+}
+
+/* A pílulazinha cinza no topo (igual iPhone) */
+.drag-handle {
+    width: 50px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    margin: 0 auto 25px auto;
+    cursor: grab;
+}
+
+/* ==========================================
+   3. ILHA DINÂMICA (ESTILO iPHONE)
+========================================== */
+.ilha-dinamica {
+    position: fixed;
+    top: max(15px, env(safe-area-inset-top)); /* Fica no topo, respeitando a câmera do celular */
+    left: 50%;
+    transform: translateX(-50%) scale(0.5) translateY(-50px);
+    background: #000000;
+    color: #ffffff;
+    padding: 6px 16px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 999999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    opacity: 0;
+    /* Aqui está o segredo: A curva de aceleração que cria o efeito "Mola" (Bounce) */
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* Quando a classe 'ativa' entra, a mola estica e a pílula cresce */
+.ilha-dinamica.ativa {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+    padding: 12px 24px;
+}
+
+.island-icon {
+    font-size: 1.1rem;
+}
+
+.island-text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ==========================================
+   4. TIPOGRAFIA CINEMATOGRÁFICA (TEXT REVEAL)
+========================================== */
+.palavra-revelada {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(12px) rotate(1deg); /* Começa levemente caída */
+    filter: blur(4px); /* Tinta borrada */
+    animation: revelarPalavra 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    white-space: pre-wrap; /* Mantém os espaços corretos */
+}
+
+@keyframes revelarPalavra {
+    0% {
+        opacity: 0;
+        transform: translateY(12px) rotate(1deg);
+        filter: blur(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotate(0);
+        filter: blur(0); /* Fica nítida */
+    }
+}
+
+/* ==========================================
+   5. FUNDO CLIMÁTICO VIVO
+========================================== */
+.fundo-climatico {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh;
+    z-index: -1; /* Fica afundado atrás de todo o aplicativo */
+    pointer-events: none; /* Deixa você clicar nas coisas através dele */
+    transition: opacity 1.5s ease;
+    opacity: 0; /* Começa invisível */
+}
+
+/* O Véu de Estrelas (Para Radiante e Apaixonada) */
+.fundo-estrelado {
+    opacity: 1;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 60px 80px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 120px 40px, rgba(212, 175, 55, 0.8), rgba(0,0,0,0)), /* Estrela Dourada */
+        radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0,0,0,0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: estrelasPiscando 4s infinite alternate;
+}
+
+@keyframes estrelasPiscando {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.8; transform: scale(1.02); }
+}
+
+/* A Chuva Melancólica (Para Triste) */
+.fundo-chuva {
+    opacity: 0.6;
+    /* Desenha os fios de chuva em um ângulo de 160 graus */
+    background-image: linear-gradient(160deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0) 50%);
+    background-size: 20px 100px;
+    animation: chuvaCaindo 0.6s linear infinite;
+}
+
+@keyframes chuvaCaindo {
+    0% { background-position: 0 0; }
+    100% { background-position: 10vw 100vh; } /* A chuva cai do topo até o chão */
+}
+
+/* ==========================================
+   6. SKELETON LOADERS CINTILANTES
+========================================== */
+.esqueleto-cintilante {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 20, 30, 0.8); /* Vidro escuro base */
+    border-radius: inherit; /* Copia o arredondamento da caixa pai */
+    z-index: 10;
+    overflow: hidden;
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* O feixe de luz dourada que varre o elemento da esquerda para a direita */
+.esqueleto-cintilante::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
+    animation: cintilar 1.5s infinite;
+}
+
+@keyframes cintilar {
+    100% { left: 100%; }
+}
+
+/* A classe que o JavaScript vai usar para derreter o esqueleto quando o 3D carregar */
+.esqueleto-oculto {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================
+   8. PULL-TO-REFRESH MÍSTICO
+========================================== */
+.pull-refresh {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    pointer-events: none; /* Não atrapalha cliques */
+    transform: translateY(-100%); /* Começa escondido acima da tela */
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
+    opacity: 0;
+}
+
+.pull-icon {
+    font-size: 1.8rem;
+    color: var(--cor-primaria);
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.4));
+}
+
+/* Animação de Sincronia (Giro infinito) */
+.pull-icon.sincronizando {
+    animation: girarMistico 1s linear infinite;
+}
+
+@keyframes girarMistico {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

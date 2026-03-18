@@ -53,3 +53,46 @@ self.addEventListener('fetch', e => {
     if (e.request.method !== 'GET') return;
     e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
 });
+
+// ==========================================
+// INTERCEPTADOR DE NOTIFICAÇÕES RICAS (AÇÕES)
+// ==========================================
+
+self.addEventListener('notificationclick', function(event) {
+    // Fecha a notificação automaticamente ao clicar
+    event.notification.close();
+
+    // SE O USUÁRIO CLICAR NO BOTÃO DE AÇÃO "ENVIAR PULSO"
+    if (event.action === 'enviar_pulso') {
+        event.waitUntil(
+            clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+                // 1. Se o aplicativo já estiver aberto em alguma aba em segundo plano
+                for (var i = 0; i < windowClients.length; i++) {
+                    var client = windowClients[i];
+                    if (client.url && 'focus' in client) {
+                        client.focus();
+                        // Manda uma ordem telepática para o script.js disparar o pulso
+                        client.postMessage({ comando: 'disparar_pulso_remoto' });
+                        return;
+                    }
+                }
+                // 2. Se o aplicativo estiver totalmente fechado
+                if (clients.openWindow) {
+                    // Abre o app passando uma ordem secreta na URL
+                    return clients.openWindow('/?acao=disparar_pulso_remoto');
+                }
+            })
+        );
+    } else {
+        // Se clicar apenas na notificação normal (não no botão), só abre o app
+        event.waitUntil(
+            clients.matchAll({ type: 'window' }).then(windowClients => {
+                if (windowClients.length > 0) {
+                    windowClients[0].focus();
+                } else {
+                    clients.openWindow('/');
+                }
+            })
+        );
+    }
+});

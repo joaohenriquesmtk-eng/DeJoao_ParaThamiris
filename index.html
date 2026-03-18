@@ -16,7 +16,8 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <!-- Import map primeiro -->
     <script type="importmap">
@@ -30,6 +31,20 @@
     </script>
 </head>
 <body>
+
+    <div id="pull-refresh-container" class="pull-refresh">
+        <div class="pull-icon">✨</div>
+    </div>
+
+    <div id="fundo-climatico" class="fundo-climatico"></div>
+
+    <div id="aviso-offline" class="aviso-offline escondido">
+        <span class="icone-offline">🌌</span>
+        <div class="texto-offline">
+            <strong>Santuário na Mente</strong>
+            <p>A conexão se perdeu no espaço, mas as memórias continuam aqui.</p>
+        </div>
+    </div>
 
     <div id="oceano-quantico-3d" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; overflow: hidden;"></div>
 
@@ -113,7 +128,10 @@
         <button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
         <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:10px; padding:8px; border-radius:10px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3);"></textarea>
     </div>
-    <div id="status-parceiro" style="margin-top: 15px; font-size: 0.9rem; font-style: italic; color: #ddd; min-height: 20px;">
+
+    <div id="lottie-mood-container" style="width: 100px; height: 100px; margin: 0 auto; display: flex; align-items: center; justify-content: center;"></div>
+    
+    <div id="status-parceiro" style="margin-top: 10px; font-size: 0.95rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">
         Aguardando a sintonia do outro lado...
     </div>
 </div>
@@ -193,6 +211,9 @@
                 </div>
 
                 <!-- Áudio ambiente -->
+                 <audio id="audio-ambiente" loop preload="auto">
+    <source src="assets/ambient.mp3" type="audio/mpeg">
+</audio>
 <audio id="audio-jogos" loop preload="auto">
     <source src="assets/ambient.mp3" type="audio/mpeg">
 </audio>
@@ -588,6 +609,9 @@
         <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;" id="texto-alvo-bussola">Apontando para o seu amor.</p>
         
         <div id="bussola-3d" style="width: 100%; height: 200px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); position: relative;">
+            
+            <div id="esqueleto-bussola" class="esqueleto-cintilante"></div>
+            
             <div id="overlay-bussola" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10;">
                 <button id="btn-ativar-bussola" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="ativarSensoresBussola()">
                     🧭 Sincronizar Bússola
@@ -601,7 +625,11 @@
         <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
         <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
         
-        <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;"></div>
+        <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;">
+            
+            <div id="esqueleto-carrossel" class="esqueleto-cintilante"></div>
+
+        </div>
         
         <div style="display: flex; gap: 10px; justify-content: center;">
             <input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
@@ -782,14 +810,25 @@
         </div>
     </div>
 
-    <div id="modal-emergencia" class="modal-emergencia escondido">
-    <div class="emergencia-conteudo">
-        <div class="emergencia-icone">⚠️</div>
-        <h2 id="emergencia-titulo">Alerta de Cuidado</h2>
-        <p id="emergencia-mensagem"></p>
-        <button onclick="fecharEmergencia()" class="btn-emergencia-ok">Entendido</button>
+    <div id="modal-emergencia" class="modal-overlay escondido">
+        <div class="bottom-sheet" id="sheet-emergencia">
+            <div class="drag-handle"></div> <div class="emergencia-conteudo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center;">
+                <div class="emergencia-icone" style="font-size: 3.5rem; margin-bottom: 10px; animation: pulsarAnsiedade 2s infinite alternate;">⚠️</div>
+                
+                <h2 id="emergencia-titulo" style="font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0 0 10px 0; padding: 0; width: 100%;">Alerta de Cuidado</h2>
+                <p id="emergencia-mensagem" style="margin: 0 0 25px 0; padding: 0; color: #ccc; font-size: 1rem; width: 100%;"></p>
+                
+                <button id="btn-fechar-emergencia" class="btn-acao" style="width: 100%; padding: 15px; background: rgba(212, 175, 55, 0.15); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 15px; font-size: 1.1rem; font-weight: bold;" onclick="fecharEmergencia()">
+                    Já vou!
+                </button>
+            </div>
+        </div>
     </div>
-</div>
+
+    <div id="dynamic-island" class="ilha-dinamica">
+        <span id="island-icon" class="island-icon">✨</span>
+        <span id="island-text" class="island-text">Mensagem</span>
+    </div>
 
 <div class="fio-de-ouro"></div>
 

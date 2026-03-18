@@ -17,7 +17,8 @@ window.RadarDePerformance = {
         }, { threshold: 0.05 });
 
         // Componentes que exigem GPU pesada
-        const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d'];
+        // Componentes que exigem GPU pesada
+        const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d', 'coracao-3d', 'prisma-3d'];
         pesados.forEach(id => {
             const el = document.getElementById(id);
             if (el) observer.observe(el);
@@ -133,17 +134,20 @@ window.addEventListener('load', () => window.RadarDePerformance.iniciar());
     window.ritmoCoracao = 1;      
     window.corCoracao = 0xff6b6b; 
 
-    const enviarMoodOriginal = window.enviarMood;
-    window.enviarMood = function(estado) {
-        if (estado === 'ansiosa') { window.ritmoCoracao = 3.5; window.corCoracao = 0xf39c12; } 
-        else if (estado === 'cansada') { window.ritmoCoracao = 0.5; window.corCoracao = 0x3498db; } 
-        else if (estado === 'triste') { window.ritmoCoracao = 0.8; window.corCoracao = 0x8e44ad; } 
-        else if (estado === 'radiante') { window.ritmoCoracao = 2; window.corCoracao = 0xf1c40f; } 
-        else if (estado === 'apaixonada') { window.ritmoCoracao = 2.5; window.corCoracao = 0xff6b6b; } 
-        else { window.ritmoCoracao = 1.5; window.corCoracao = 0xffffff; } 
-        
-        if (enviarMoodOriginal) enviarMoodOriginal(estado);
-    };
+    // Espera o sistema inteiro carregar antes de interceptar os cliques
+    window.addEventListener('load', () => {
+        const enviarMoodOriginal = window.enviarMood;
+        window.enviarMood = function(estado) {
+            if (estado === 'ansiosa') { window.ritmoCoracao = 3.5; window.corCoracao = 0xf39c12; } 
+            else if (estado === 'cansada') { window.ritmoCoracao = 0.5; window.corCoracao = 0x3498db; } 
+            else if (estado === 'triste') { window.ritmoCoracao = 0.8; window.corCoracao = 0x8e44ad; } 
+            else if (estado === 'radiante') { window.ritmoCoracao = 2; window.corCoracao = 0xf1c40f; } 
+            else if (estado === 'apaixonada') { window.ritmoCoracao = 2.5; window.corCoracao = 0xff6b6b; } 
+            else { window.ritmoCoracao = 1.5; window.corCoracao = 0xffffff; } 
+            
+            if (enviarMoodOriginal) enviarMoodOriginal(estado);
+        };
+    });
 
     window.inicializarCoracao3D = () => {
         const container = document.getElementById('coracao-3d');

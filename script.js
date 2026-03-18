@@ -1353,35 +1353,32 @@ const BIBLIOTECA_RELIQUIAS = {
     ]
 };
 
-function abrirReliquia(event, tipo) {
+window.abrirReliquia = function(event, tipo) {
     if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
         mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
         return;
     }
-    event.currentTarget
+    
     const iconeClicado = event.currentTarget.querySelector('.icone-reliquia');
     if (iconeClicado) {
         iconeClicado.classList.add('abrindo-bau');
-        setTimeout(() => {
-            iconeClicado.classList.remove('abrindo-bau');
-        }, 300);
+        setTimeout(() => iconeClicado.classList.remove('abrindo-bau'), 300);
     }
     const modal = document.getElementById('modal-reliquia');
     const corpo = document.getElementById('corpo-modal');
     if (!modal || !corpo) return;
 
-    const agora = new Date();
-    const inicioAno = new Date(agora.getFullYear(), 0, 0);
-    const diff = agora - inicioAno;
-    const diaDoAno = Math.floor(diff / (1000 * 60 * 60 * 24));
+    // Guarda os elementos 3D vivos na gaveta ANTES de limpar o modal!
+    fecharModal(true); 
 
-    corpo.innerHTML = '';
+    const agora = new Date();
+    const diaDoAno = Math.floor((agora - new Date(agora.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
 
     if (tipo === 'musica') {
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 5px; font-family: 'Playfair Display', serif;">Nossa Trilha</h3>
             <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Sincronia de Almas</p>
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
     } else if (tipo === 'ceu') {
         const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
         corpo.innerHTML = `
@@ -1389,13 +1386,8 @@ function abrirReliquia(event, tipo) {
             <div class="modal-ceu" id="modal-ceu-container" style="padding: 10px;">
                 <div id="galaxia-3d" style="width: 100%; height: 220px; border-radius: 12px; overflow: hidden; background: #020111;"></div>
                 <p style="margin-top: 15px; font-style: italic; color: #e0e0e0; font-size: 0.95rem;">"${textoCeu}"</p>
-                <small style="color: #D4AF37; opacity: 0.5; font-size: 0.7rem; display: block; margin-top: 10px;">Toque e deslize para girar a galáxia</small>
             </div>`;
-        
-        // Dá um pequeno atraso de 100ms para o HTML carregar na tela, e então liga o motor 3D da galáxia
-        setTimeout(() => {
-            if (typeof window.inicializarGalaxia3D === 'function') window.inicializarGalaxia3D();
-        }, 100);
+        setTimeout(() => { if (typeof window.inicializarGalaxia3D === 'function') window.inicializarGalaxia3D(); }, 100);
     } else if (tipo === 'cartas') {
         const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
         corpo.innerHTML = `
@@ -1403,35 +1395,38 @@ function abrirReliquia(event, tipo) {
             <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 25px; position: relative;">
                 <span style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); font-size: 24px;">✉️</span>
                 <p style="font-style:italic; font-size: 1.1rem; line-height: 1.6; margin-top: 10px;">"${textoSemente}"</p>
-                <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; text-align: right;">
-                    <p style="font-family: 'Playfair Display', serif; color: var(--cor-primaria);">Com amor,<br>${NOME_PARCEIRO}</p>
-                </div>
             </div>`;
     } else if (tipo === 'encontro') {
         const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
-        corpo.innerHTML = `
-            <div class="bilhete-dourado">
-                <div class="bilhete-dourado-inner">
-                    <div class="bilhete-header">Voucher Vitalício</div>
-                    <div class="bilhete-corpo">
-                        Vale para:
-                        <div class="bilhete-destaque">${v.t}</div>
-                        ${v.d}
-                    </div>
-                    <div style="margin-top: 20px; font-size: 0.7rem; opacity: 0.5; font-family: monospace;">
-                        ID: ${v.c}-${diaDoAno}-2026
-                    </div>
-                </div>
-            </div>`;
+        corpo.innerHTML = `<div class="bilhete-dourado"><div class="bilhete-dourado-inner"><div class="bilhete-header">Voucher Vitalício</div><div class="bilhete-corpo">Vale para:<div class="bilhete-destaque">${v.t}</div>${v.d}</div></div></div>`;
+    } 
+    // SE FOR UM ITEM DA GAVETA (Ecos, Bussola, Carrossel)
+    else if (['ecos', 'bussola', 'carrossel'].includes(tipo)) {
+        const template = document.getElementById(`cartao-${tipo}`);
+        if(template) corpo.appendChild(template);
+        // Desperta os motores 3D (se existirem)
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 100); 
     }
 
     modal.classList.remove('escondido');
-}
+};
 
-function fecharModal() {
-    document.getElementById('modal-reliquia').classList.add('escondido');
-    document.getElementById('corpo-modal').innerHTML = '';
-}
+window.fecharModal = function(apenasLimpar = false) {
+    const modal = document.getElementById('modal-reliquia');
+    const corpo = document.getElementById('corpo-modal');
+    const gaveta = document.getElementById('reliquias-templates');
+    
+    // Resgata os cartões complexos antes de limpar o HTML
+    if (gaveta && corpo) {
+        ['ecos', 'bussola', 'carrossel'].forEach(id => {
+            const el = document.getElementById(`cartao-${id}`);
+            if (el && corpo.contains(el)) gaveta.appendChild(el);
+        });
+    }
+    
+    if (corpo) corpo.innerHTML = '';
+    if (!apenasLimpar && modal) modal.classList.add('escondido');
+};
 
 // ==========================================
 // 8. HUB DE JOGOS & SINCRONIA
@@ -2558,6 +2553,7 @@ if (temaIcon && temaSelector) {
 
         const animar = () => {
             requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
             if (!globoVisivel) return;
             sistemaGlobal.rotation.y += 0.005;
             renderer.render(scene, camera);
@@ -2621,6 +2617,7 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('coracao-3d')) return;
             if (!coracaoVisivel) return; 
 
             tempo += 0.05 * window.ritmoCoracao;
@@ -2737,6 +2734,7 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('prisma-3d')) return;
             if (!arvoreVisivel) return; 
 
             tempo += 0.01;
@@ -2978,6 +2976,7 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('orbe-clima-3d')) return;
             if (!orbeVisivel) return; 
             tempo += 0.01;
             
@@ -3139,6 +3138,7 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('eco-3d')) return;
             if (!ecoVisivel) return;
 
             tempo += 0.01;
@@ -3214,12 +3214,20 @@ if (temaIcon && temaSelector) {
             window.ecoAudioContext = new (window.AudioContext || window.webkitAudioContext)();
             const source = window.ecoAudioContext.createMediaStreamSource(stream);
             window.ecoAnalyser = window.ecoAudioContext.createAnalyser();
-            window.ecoAnalyser.fftSize = 64; // Resolução das ondas
+            window.ecoAnalyser.fftSize = 64; 
             source.connect(window.ecoAnalyser);
             window.ecoDataArray = new Uint8Array(window.ecoAnalyser.frequencyBinCount);
 
-            // Inicia o gravador
-            mediaRecorder = new MediaRecorder(stream);
+            // A MÁGICA CROSS-PLATFORM (A55 vs IPHONE):
+            let opcoes = {};
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                opcoes = { mimeType: 'audio/webm;codecs=opus' }; // Padrão Android (A55)
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                opcoes = { mimeType: 'audio/mp4' }; // Padrão Apple (iPhone 14 Pro Max)
+            }
+
+            // Inicia o gravador com o formato perfeito para o aparelho
+            mediaRecorder = new MediaRecorder(stream, opcoes);
             audioChunks = [];
             mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
             mediaRecorder.start();
@@ -3247,13 +3255,14 @@ if (temaIcon && temaSelector) {
             btnGravar.style.transform = "scale(1)";
             status.innerText = "Compactando e enviando para o espaço...";
 
-            // Desliga a leitura do microfone para o 3D
+            // Desliga a leitura do microfone para poupar bateria
             if (mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track => track.stop());
 
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                // Cria o arquivo baseando-se no que o aparelho gravou (WebM ou MP4)
+                const tipoReal = mediaRecorder.mimeType || 'audio/mp4';
+                const audioBlob = new Blob(audioChunks, { type: tipoReal }); 
                 
-                // Converte o arquivo de som para Texto Base64 para caber no Realtime DB
                 const reader = new FileReader();
                 reader.readAsDataURL(audioBlob);
                 reader.onloadend = () => {
@@ -3271,7 +3280,6 @@ if (temaIcon && temaSelector) {
                         }).then(() => {
                             status.innerText = "Sua voz chegou ao destino.";
                             status.style.color = "#2ecc71";
-                            // Limpa o analisador
                             window.ecoAnalyser = null;
                         });
                     }
@@ -3384,7 +3392,7 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
-            
+            if (!window.RadarDePerformance.podeAnimar('bussola-3d')) return;
             // AUTO-AJUSTE: Se a aba abrir e a div ganhar tamanho real, a câmera se ajusta!
             if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
                 largura = container.clientWidth;
@@ -3652,6 +3660,7 @@ if (temaIcon && temaSelector) {
 
         const animar = () => {
             requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('carrossel-3d')) return;
             
             // AUTO-AJUSTE: Garante que o carrossel se ajusta à tela do A55
             if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
@@ -4039,6 +4048,41 @@ window.LottieManager = {
     }
 };
 
+// ==========================================
+// MOTOR DE OTIMIZAÇÃO (RADAR 3D)
+// ==========================================
+window.RadarDePerformance = {
+    elementosVisiveis: new Set(),
+    
+    iniciar: () => {
+        // Observa se os componentes pesados estão na tela
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    window.RadarDePerformance.elementosVisiveis.add(entry.target.id);
+                } else {
+                    window.RadarDePerformance.elementosVisiveis.delete(entry.target.id);
+                }
+            });
+        }, { threshold: 0.05 });
+
+        // Componentes que exigem GPU pesada
+        const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d'];
+        pesados.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+    },
+
+    // Retorna true APENAS se a aba atual está aberta E se o elemento rolou pra tela
+    podeAnimar: (id) => {
+        return window.RadarDePerformance.elementosVisiveis.has(id);
+    }
+};
+
+// Liga o radar assim que o app carrega
+window.addEventListener('load', () => window.RadarDePerformance.iniciar());
+
 
 
     // ==========================================
@@ -4052,7 +4096,6 @@ window.LottieManager = {
         if(typeof inicializarEco3D === 'function') inicializarEco3D();
         if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
         if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D(); // <--- AGORA VAI LIGAR!
-        if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
         if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
         if(typeof ativarVidroMagnetico === 'function') ativarVidroMagnetico();
         if(typeof ativarPullToRefresh === 'function') ativarPullToRefresh();

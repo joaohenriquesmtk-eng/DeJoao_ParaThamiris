@@ -151,18 +151,18 @@
 </div>
 
                 <div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
-                    <h3 style="color: #3498db; font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
                     <p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
                     
                     <div id="orbe-clima-3d" style="width: 100%; height: 230px; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;"></div>
                     
-                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 15px; padding: 15px 10px 10px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--cor-primaria); border-radius: 15px; padding: 15px 10px 10px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
                         
                         <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
-                            <button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')">
+                            <button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">
                                 Goiânia <span id="mini-temp-thamiris" style="color: #f1c40f;">--°C</span>
                             </button>
-                            <button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')">
+                            <button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">
                                 Colombo <span id="mini-temp-joao" style="color: #f1c40f;">--°C</span>
                             </button>
                         </div>
@@ -626,83 +626,40 @@
         </p>
     </div>
 
-    <div class="cartao-vidro" id="cartao-ecos" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Ecos do Santuário</h3>
-        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">O som atravessa o espaço e o tempo.</p>
-        
-        <div id="eco-3d" style="width: 100%; height: 180px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);"></div>
-        
-        <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
-            <button id="btn-gravar-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); transition: all 0.3s;" onmousedown="iniciarGravacao()" onmouseup="pararGravacao()" ontouchstart="iniciarGravacao()" ontouchend="pararGravacao()">
-                🎙️
-            </button>
-            <button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">
-                ▶️
-            </button>
-        </div>
-        <p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
-    </div>
-
-    <div class="cartao-vidro" id="cartao-bussola" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">A Bússola do Destino</h3>
-        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;" id="texto-alvo-bussola">Apontando para o seu amor.</p>
-        
-        <div id="bussola-3d" style="width: 100%; height: 200px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); position: relative;">
-            
-            <div id="esqueleto-bussola" class="esqueleto-cintilante"></div>
-            
-            <div id="overlay-bussola" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10;">
-                <button id="btn-ativar-bussola" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="ativarSensoresBussola()">
-                    🧭 Sincronizar Bússola
-                </button>
-            </div>
-        </div>
-        <p id="status-bussola" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 5px; height: 15px;"></p>
-    </div>
-
-    <div class="cartao-vidro" id="cartao-carrossel" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
-        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
-        
-        <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;">
-            
-            <div id="esqueleto-carrossel" class="esqueleto-cintilante"></div>
-
-        </div>
-        
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
-            <button id="btn-add-foto" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(0,0,0,0.5);" onclick="document.getElementById('input-foto-horizonte').click()">
-                📸 Adicionar
-            </button>
-            <button class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,0.1);" onclick="limparCarrosselHorizontes()">
-                🗑️ Limpar Tudo
-            </button>
-        </div>
-        
-        <p id="status-carrossel" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
-        <p style="font-size: 0.6rem; color: #666;">Segure uma foto para apagá-la individualmente.</p>
-    </div>
-
     <div class="grade-cofre" id="grade-reliquias">
-        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'musica')">
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'musica')">
             <span class="icone-reliquia">🎵</span>
-            <p>Nossa Trilha</p>
+            <p class="titulo-reliquia">Nossa Trilha</p>
             <small class="status-reliquia">Trancado</small>
         </div>
-        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'ceu')">
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'ceu')">
             <span class="icone-reliquia">🌌</span>
-            <p>Mesmo Céu</p>
+            <p class="titulo-reliquia">Mesmo Céu</p>
             <small class="status-reliquia">Trancado</small>
         </div>
-        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'cartas')">
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'cartas')">
             <span class="icone-reliquia">✉️</span>
-            <p>Sementes</p>
+            <p class="titulo-reliquia">Sementes</p>
             <small class="status-reliquia">Trancado</small>
         </div>
-        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'encontro')">
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'encontro')">
             <span class="icone-reliquia">🎟️</span>
-            <p>O Futuro</p>
+            <p class="titulo-reliquia">O Futuro</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'ecos')">
+            <span class="icone-reliquia">🎙️</span>
+            <p class="titulo-reliquia">Nossos Ecos</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'bussola')">
+            <span class="icone-reliquia">🧭</span>
+            <p class="titulo-reliquia">A Bússola</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'carrossel')">
+            <span class="icone-reliquia">📸</span>
+            <p class="titulo-reliquia">Horizontes</p>
             <small class="status-reliquia">Trancado</small>
         </div>
     </div>
@@ -711,6 +668,45 @@
         <div class="conteudo-modal cartao-vidro">
             <span class="fechar-modal" onclick="fecharModal()">&times;</span>
             <div id="corpo-modal"></div>
+        </div>
+    </div>
+
+    <div id="reliquias-templates" style="display: none;">
+        <div id="cartao-ecos" style="text-align: center; width: 100%;">
+            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Ecos do Santuário</h3>
+            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">O som atravessa o espaço e o tempo.</p>
+            <div id="eco-3d" style="width: 100%; height: 180px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);"></div>
+            <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+                <button id="btn-gravar-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onmousedown="iniciarGravacao()" onmouseup="pararGravacao()" ontouchstart="iniciarGravacao()" ontouchend="pararGravacao()">🎙️</button>
+                <button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">▶️</button>
+            </div>
+            <p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+        </div>
+
+        <div id="cartao-bussola" style="text-align: center; width: 100%;">
+            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">A Bússola do Destino</h3>
+            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;" id="texto-alvo-bussola">Apontando para o seu amor.</p>
+            <div id="bussola-3d" style="width: 100%; height: 200px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); position: relative;">
+                <div id="esqueleto-bussola" class="esqueleto-cintilante"></div>
+                <div id="overlay-bussola" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10;">
+                    <button id="btn-ativar-bussola" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="ativarSensoresBussola()">🧭 Sincronizar Bússola</button>
+                </div>
+            </div>
+            <p id="status-bussola" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 5px; height: 15px;"></p>
+        </div>
+
+        <div id="cartao-carrossel" style="text-align: center; width: 100%;">
+            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
+            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
+            <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;">
+                <div id="esqueleto-carrossel" class="esqueleto-cintilante"></div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
+                <button id="btn-add-foto" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(0,0,0,0.5);" onclick="document.getElementById('input-foto-horizonte').click()">📸 Adicionar</button>
+                <button class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,0.1);" onclick="limparCarrosselHorizontes()">🗑️ Limpar</button>
+            </div>
+            <p id="status-carrossel" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
         </div>
     </div>
 </section>

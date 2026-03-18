@@ -68,6 +68,10 @@ body {
     padding: 20px;
     margin: 15px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    /* Delega o peso do vidro fosco (blur) direto para o chip de vídeo (GPU) */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 /* ===== MENU INFERIOR ===== */
@@ -594,46 +598,45 @@ body.modo-jogo-ativo .tela {
     margin-bottom: 10px;
 }
 
-/* Cofre */
+/* ==========================================
+   GRADE DO COFRE (PADRÃO OURO)
+========================================== */
 .grade-cofre {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    padding: 15px;
+    padding: 5px;
+    margin-bottom: 20px;
 }
 
 .item-cofre {
-    position: relative;
-    background: var(--cor-vidro);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 25px 10px;
     text-align: center;
-    transition: all 0.5s;
-    overflow: hidden;
+    cursor: pointer;
+    /* .cartao-vidro já dá o vidro, aqui definimos a interação do botão */
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s;
+    user-select: none;
+}
+
+.item-cofre:active {
+    transform: scale(0.92) translateZ(0);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
 }
 
 .item-cofre.bloqueado {
-    filter: grayscale(1) blur(1px);
-    opacity: 0.4;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    pointer-events: none;
+    opacity: 0.6;
+    filter: grayscale(100%);
+    pointer-events: none; /* Intocável até ganhar o Termo */
 }
 
-.item-cofre:not(.bloqueado)::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -150%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
-    transform: rotate(45deg);
-    transition: 0.8s;
-}
-
-.item-cofre:not(.bloqueado):hover::after {
-    left: 100%;
+.icone-reliquia {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 5px 10px rgba(212, 175, 55, 0.5));
 }
 
 .status-reliquia {

@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Santuário</title>
-<link rel="stylesheet" href="style.css">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Santuário">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Santuário</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Santuário">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-<!-- Import map primeiro -->
-<script type="importmap">
-{
-"imports": {
-"@firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
-"@firebase/database": "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js",
-"@firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
-}
-}
-</script>
+    
+    <!-- Import map primeiro -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+          "@firebase/database": "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js",
+          "@firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
+        }
+      }
+    </script>
 </head>
 <body>
 
@@ -47,136 +46,135 @@
         </div>
     </div>
 
-<div id="oceano-quantico-3d" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; overflow: hidden;"></div>
+    <div id="oceano-quantico-3d" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; overflow: hidden;"></div>
 
-<div id="splash-screen">
-<div class="splash-conteudo">
-<span class="splash-coracao">💛</span>
-<h1 class="splash-titulo texto-ouro-vivo">Santuário</h1>
-</div>
-</div>
+    <div id="splash-screen">
+        <div class="splash-conteudo">
+            <span class="splash-coracao">💛</span>
+            <h1 class="splash-titulo texto-ouro-vivo">Santuário</h1>
+        </div>
+    </div>
 
-<div id="app-shell">
-<main id="conteudo-principal">
-
-<section id="home" class="tela ativo">
-<div class="cartao-vidro" style="text-align: center;">
-<h2 style="color: var(--cor-primaria); font-weight: 300;">Santuário</h2>
-<p style="opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">Conexão Vital Estabelecida há:</p>
-<div id="timer-principal" class="toque-secreto" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace; cursor: pointer; user-select: none;">
-00d 00h 00m 00s
-</div>
-</div>
+    <div id="app-shell">
+        <main id="conteudo-principal">
+            
+            <section id="home" class="tela ativo">
+                <div class="cartao-vidro" style="text-align: center;">
+                    <h2 style="color: var(--cor-primaria); font-weight: 300;">Santuário</h2>
+                    <p style="opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">Conexão Vital Estabelecida há:</p>
+                    <div id="timer-principal" class="toque-secreto" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace; cursor: pointer; user-select: none;">
+                        00d 00h 00m 00s
+                    </div>
+                </div>
 
 <div class="cartao-vidro cartao-saudacao" style="text-align: center; margin-top: 5px;">
-<span class="estrela-canto">✨</span>
-<p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: #000000;"></p>
+    <span class="estrela-canto">✨</span>
+    <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: #000000;"></p>
 </div>
 
 <div class="cartao-vidro" style="margin-top: 20px; padding: 10px; display: flex; flex-direction: column; align-items: center;">
-<h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 5px;">A Nossa Conexão</h3>
-<p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px; text-align: center;">Onde quer que você esteja, a luz nos encontra.</p>
+                <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 5px;">A Nossa Conexão</h3>
+                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px; text-align: center;">Onde quer que você esteja, a luz nos encontra.</p>
+                
+                <div id="globo-3d" style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);"></div>
+            </div>
 
-<div id="globo-3d" style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);"></div>
+                <div class="particulas">
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particula" style="top: 50%; left: 50%; animation-delay: 2s;"></div>
+    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
+    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
+    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <!-- adicione quantas quiser -->
 </div>
 
-<div class="particulas">
-<div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-<div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-<div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-<div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-<div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-<div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-<div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-<div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-<div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-<div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-<div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-<div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-<div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-<div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-<div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-<div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-<div class="particula" style="top: 50%; left: 50%; animation-delay: 2s;"></div>
-<div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-<div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-<div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-<div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-<!-- adicione quantas quiser -->
-</div>
+                <div class="cartao-vidro" id="frase-do-dia">
+                    <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
+                </div>
 
-<div class="cartao-vidro" id="frase-do-dia">
-<p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
-</div>
+                <div class="area-pulso" style="position: relative;">
+                    <button id="btn-pulso" onclick="enviarPulso()">
+                        <span id="icone-semente" class="icone-pulso">🌱</span>
+                    </button>
+                    <p id="contador-pulso">Você pensou nele hoje?</p>
+                    <span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
+                </div>
 
-<div class="area-pulso" style="position: relative;">
-<button id="btn-pulso" onclick="enviarPulso()">
-<span id="icone-semente" class="icone-pulso">🌱</span>
-</button>
-<p id="contador-pulso">Você pensou nele hoje?</p>
-<span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
-</div>
-
-<div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 20px;">
-<h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Como está seu coração agora?</h4>
-<div id="coracao-3d" style="width: 100%; height: 130px; margin-bottom: 10px;"></div>
-<div class="botoes-mood">
-<button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
-<button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
-<button class="btn-mood" onclick="enviarMood('triste')">🌧️ Triste</button>
-<button class="btn-mood" onclick="enviarMood('cansada')">🔋 Cansada</button>
-<button class="btn-mood" onclick="enviarMood('saudade')">🥺 Com saudade</button>
-<button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
-<textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:10px; padding:8px; border-radius:10px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3);"></textarea>
-</div>
-    <div id="status-parceiro" style="margin-top: 15px; font-size: 0.9rem; font-style: italic; color: #ddd; min-height: 20px;">
+                <div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 20px;">
+    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Como está seu coração agora?</h4>
+    <div id="coracao-3d" style="width: 100%; height: 130px; margin-bottom: 10px;"></div>
+    <div class="botoes-mood">
+        <button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
+        <button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
+        <button class="btn-mood" onclick="enviarMood('triste')">🌧️ Triste</button>
+        <button class="btn-mood" onclick="enviarMood('cansada')">🔋 Cansada</button>
+        <button class="btn-mood" onclick="enviarMood('saudade')">🥺 Com saudade</button>
+        <button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
+        <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:10px; padding:8px; border-radius:10px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3);"></textarea>
+    </div>
 
     <div id="lottie-mood-container" style="width: 100px; height: 100px; margin: 0 auto; display: flex; align-items: center; justify-content: center;"></div>
     
     <div id="status-parceiro" style="margin-top: 10px; font-size: 0.95rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">
-Aguardando a sintonia do outro lado...
-</div>
+        Aguardando a sintonia do outro lado...
+    </div>
 </div>
 
 <div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px;">
-<h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; text-align: center;">Mural de Recados</h4>
-<div id="area-postits" class="area-postits">
-</div>
-<div style="display: flex; gap: 10px; margin-top: 15px;">
-<input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none;">
-<button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 10px 15px;">📌 Fixar</button>
-</div>
-</div>
-
-<div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
-<h3 style="color: #3498db; font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
-<p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
-
-<div id="orbe-clima-3d" style="width: 100%; height: 230px; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;"></div>
-
-<div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 15px; padding: 15px 10px 10px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
-
-<div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
-<button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')">
-Goiânia <span id="mini-temp-thamiris" style="color: #f1c40f;">--°C</span>
-</button>
-<button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')">
-Colombo <span id="mini-temp-joao" style="color: #f1c40f;">--°C</span>
-</button>
+    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; text-align: center;">Mural de Recados</h4>
+    <div id="area-postits" class="area-postits">
+        </div>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none;">
+        <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 10px 15px;">📌 Fixar</button>
+    </div>
 </div>
 
-<p id="texto-mensagem-clima" style="font-weight: bold; font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #fff; line-height: 1.4; min-height: 45px; display: flex; align-items: center; justify-content: center;">🌤️ Sincronizando satélites...</p>
-</div>
-</div>
+                <div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
+                    <h3 style="color: #3498db; font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
+                    <p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
+                    
+                    <div id="orbe-clima-3d" style="width: 100%; height: 230px; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;"></div>
+                    
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 15px; padding: 15px 10px 10px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
+                        
+                        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
+                            <button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')">
+                                Goiânia <span id="mini-temp-thamiris" style="color: #f1c40f;">--°C</span>
+                            </button>
+                            <button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')">
+                                Colombo <span id="mini-temp-joao" style="color: #f1c40f;">--°C</span>
+                            </button>
+                        </div>
 
-<!-- NOVO: Botão de Mensagem Surpresa -->
-<div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
-<button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 12px 20px;">✨ Mensagem Surpresa</button>
-<p id="texto-surpresa" style="font-style: italic; margin-top: 15px; font-size: 1rem; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
-</div>
+                        <p id="texto-mensagem-clima" style="font-weight: bold; font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #fff; line-height: 1.4; min-height: 45px; display: flex; align-items: center; justify-content: center;">🌤️ Sincronizando satélites...</p>
+                    </div>
+                </div>
 
-<div style="text-align: center; margin-top: 10px;">
-<button id="btn-verificar-atualizacao" style="background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 8px 16px; border-radius: 20px; font-size: 12px;">🔄 Verificar atualização</button>
+                <!-- NOVO: Botão de Mensagem Surpresa -->
+                    <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
+                        <button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 12px 20px;">✨ Mensagem Surpresa</button>
+                        <p id="texto-surpresa" style="font-style: italic; margin-top: 15px; font-size: 1rem; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 10px;">
+    <button id="btn-verificar-atualizacao" style="background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 8px 16px; border-radius: 20px; font-size: 12px;">🔄 Verificar atualização</button>
 </div>
 
 <!-- Ícone flutuante para abrir o seletor de temas -->
@@ -184,641 +182,634 @@ Colombo <span id="mini-temp-joao" style="color: #f1c40f;">--°C</span>
 
 <!-- Seletor de temas (inicialmente escondido) -->
 <div id="tema-selector" class="tema-selector escondido">
-<div class="cartao-vidro" style="padding: 15px;">
-<h4 style="color: var(--cor-primaria); margin-bottom: 10px; text-align: center;">Escolha seu tema</h4>
-<div class="botoes-temas">
-<button class="btn-tema" data-tema="dourado">✨ Dourado</button>
-<button class="btn-tema" data-tema="azul">🌙 Azul Noturno</button>
-<button class="btn-tema" data-tema="rosa">🌸 Rosa Suave</button>
-<button class="btn-tema" data-tema="verde">🌿 Verde Esmeralda</button>
-<button class="btn-tema" data-tema="roxo">🔮 Roxo Real</button>
-</div>
-</div>
-</div>
-
-</section> 
-
-<section id="leis" class="tela escondido">
-<div class="cartao-vidro header-leis" style="text-align: center;">
-<h3 style="color: var(--cor-primaria);">Vade Mecum do Afeto</h3>
-<p class="subtitulo-lei" style="font-size: 12px; opacity: 0.8; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase;">Edição Especial: João & Thamiris</p>
-</div>
-<div class="lista-leis"></div>
-</section>
-
-<section id="jogos" class="tela escondido">
-<div id="header-jogos-main" class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
-<h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Oásis de Conexão</h3>
-<p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Sincronize mentes e corações</p>
+    <div class="cartao-vidro" style="padding: 15px;">
+        <h4 style="color: var(--cor-primaria); margin-bottom: 10px; text-align: center;">Escolha seu tema</h4>
+        <div class="botoes-temas">
+            <button class="btn-tema" data-tema="dourado">✨ Dourado</button>
+            <button class="btn-tema" data-tema="azul">🌙 Azul Noturno</button>
+            <button class="btn-tema" data-tema="rosa">🌸 Rosa Suave</button>
+            <button class="btn-tema" data-tema="verde">🌿 Verde Esmeralda</button>
+            <button class="btn-tema" data-tema="roxo">🔮 Roxo Real</button>
+        </div>
+    </div>
 </div>
 
-<!-- Áudio ambiente -->
+            </section> 
+
+            <section id="leis" class="tela escondido">
+                <div class="cartao-vidro header-leis" style="text-align: center;">
+                    <h3 style="color: var(--cor-primaria);">Vade Mecum do Afeto</h3>
+                    <p class="subtitulo-lei" style="font-size: 12px; opacity: 0.8; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase;">Edição Especial: João & Thamiris</p>
+                </div>
+                <div class="lista-leis"></div>
+            </section>
+
+            <section id="jogos" class="tela escondido">
+                <div id="header-jogos-main" class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Oásis de Conexão</h3>
+                    <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Sincronize mentes e corações</p>
+                </div>
+
+                <!-- Áudio ambiente -->
                  <audio id="audio-ambiente" loop preload="auto">
     <source src="assets/ambient.mp3" type="audio/mpeg">
 </audio>
 <audio id="audio-jogos" loop preload="auto">
-<source src="assets/ambient.mp3" type="audio/mpeg">
+    <source src="assets/ambient.mp3" type="audio/mpeg">
 </audio>
 
 <!-- Botão de mute -->
 <button id="btn-mute-jogos" class="btn-mute escondido" title="Ativar/desativar música">🔊</button>
 
 <div id="menu-jogos" class="grade-jogos">
-<div class="item-jogo" onclick="abrirJogo('termo')">
-<img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
-<p>Termo do Santuário</p>
-</div>
+    <div class="item-jogo" onclick="abrirJogo('termo')">
+        <img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
+        <p>Termo do Santuário</p>
+    </div>
 
-
-<div class="item-jogo" onclick="abrirJogo('tribunal')">
-<img src="assets/icones-jogos/tribunal.png" alt="Tribunal do Afeto" class="icone-jogo-img">
-<p>Tribunal do Afeto</p>
-</div>
-<div class="item-jogo" onclick="abrirJogo('sincronia')">
-<img src="assets/icones-jogos/sincronia.png" alt="Sincronia" class="icone-jogo-img">
-<p>Match de Sincronia</p>
-</div>
-<div class="item-jogo" onclick="abrirJogo('minifazenda')">
-<img src="assets/icones-jogos/minifazenda.png" alt="Mini Fazenda" class="icone-jogo-img">
-<p>Mini Fazenda</p>
-</div>
-<div class="item-jogo" onclick="abrirJogo('jardim')">
-<img src="assets/icones-jogos/jardim.png" alt="Solo Fértil" class="icone-jogo-img">
-<p>Nosso Solo Fértil</p>
-</div>
-<div class="item-jogo" onclick="abrirJogo('julgamento')">
-<img src="assets/icones-jogos/julgamento.png" alt="Julgamento da Safra" class="icone-jogo-img">
-<p>Julgamento da Safra</p>
-</div>
+    
+    <div class="item-jogo" onclick="abrirJogo('tribunal')">
+        <img src="assets/icones-jogos/tribunal.png" alt="Tribunal do Afeto" class="icone-jogo-img">
+        <p>Tribunal do Afeto</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('sincronia')">
+        <img src="assets/icones-jogos/sincronia.png" alt="Sincronia" class="icone-jogo-img">
+        <p>Match de Sincronia</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('minifazenda')">
+        <img src="assets/icones-jogos/minifazenda.png" alt="Mini Fazenda" class="icone-jogo-img">
+        <p>Mini Fazenda</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('jardim')">
+        <img src="assets/icones-jogos/jardim.png" alt="Solo Fértil" class="icone-jogo-img">
+        <p>Nosso Solo Fértil</p>
+    </div>
+    <div class="item-jogo" onclick="abrirJogo('julgamento')">
+        <img src="assets/icones-jogos/julgamento.png" alt="Julgamento da Safra" class="icone-jogo-img">
+        <p>Julgamento da Safra</p>
+    </div>
 </div>
 
 <!-- Botão de mute na tela Jogos (fora dos jogos) -->
-<button id="btn-mute-jogos-tela" class="btn-mute-jogo" onclick="toggleMuteJogos()" title="Ativar/desativar música">🔊</button>
+                <button id="btn-mute-jogos-tela" class="btn-mute-jogo" onclick="toggleMuteJogos()" title="Ativar/desativar música">🔊</button>
 
 
 <!-- TRIBUNAL DO AFETO -->
 <div id="container-tribunal" class="escondido">
-<div class="cartao-vidro" style="padding: 15px;">
-<!-- Cabeçalho com botão voltar e instruções -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-<button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-<div style="display: flex; gap: 8px;">
-<button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
-<button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-</div>
+    <div class="cartao-vidro" style="padding: 15px;">
+        <!-- Cabeçalho com botão voltar e instruções -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <div style="display: flex; gap: 8px;">
+        <button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
+        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+    </div>
 </div>
 <h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Tribunal do Afeto</h2>
 
-<!-- Instruções do Tribunal -->
-<div id="instrucoes-tribunal" class="escondido cartao-instrucoes">
-<h4>Como Julgar</h4>
-<ul>
-<li>Você recebe 8 cartas com valores numéricos.</li>
-<li>O caso exige uma soma <b>exata</b> (meta).</li>
-<li>Clique nas cartas para somar até atingir a meta.</li>
-<li><span style="color: #2ecc71; font-weight: bold;">Se acertar</span> → ganha estrelas e avança.</li>
-<li><span style="color: #e74c3c; font-weight: bold;">Se ultrapassar</span> → perde uma estrela e o caso.</li>
-<li>A cada 3 casos vencidos, o nível sobe.</li>
-</ul>
-</div>
+        <!-- Instruções do Tribunal -->
+        <div id="instrucoes-tribunal" class="escondido cartao-instrucoes">
+            <h4>Como Julgar</h4>
+            <ul>
+                <li>Você recebe 8 cartas com valores numéricos.</li>
+                <li>O caso exige uma soma <b>exata</b> (meta).</li>
+                <li>Clique nas cartas para somar até atingir a meta.</li>
+                <li><span style="color: #2ecc71; font-weight: bold;">Se acertar</span> → ganha estrelas e avança.</li>
+                <li><span style="color: #e74c3c; font-weight: bold;">Se ultrapassar</span> → perde uma estrela e o caso.</li>
+                <li>A cada 3 casos vencidos, o nível sobe.</li>
+            </ul>
+        </div>
 
-<!-- Painel de status -->
+        <!-- Painel de status -->
 <div class="painel-recursos">
-<span>📊 Nível <span id="tribunal-nivel">1</span></span>
-<span>⭐ Estrelas <span id="tribunal-estrelas">2</span></span>
-<span>📚 Resolvidos <span id="tribunal-casos">0</span></span>
-<span>💔 Perdidos <span id="tribunal-perdidos">0</span></span>
+    <span>📊 Nível <span id="tribunal-nivel">1</span></span>
+    <span>⭐ Estrelas <span id="tribunal-estrelas">2</span></span>
+    <span>📚 Resolvidos <span id="tribunal-casos">0</span></span>
+    <span>💔 Perdidos <span id="tribunal-perdidos">0</span></span>
 </div>
 
-<!-- Caso atual -->
+        <!-- Caso atual -->
 <div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
-<h3 id="tribunal-titulo-caso" style="color: #FFD700; margin-bottom: 5px;">⚖️ Caso #<span id="tribunal-numero-caso">1</span></h3>
-<p id="tribunal-descricao-caso" style="font-style: italic; margin-bottom: 10px;"></p>
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px;">
-<span>🎯 Meta: <span id="tribunal-meta">0</span> pts</span>
-<span>📊 Máx: <span id="tribunal-max">0</span> pts</span>
-<span>🏆 Sua: <span id="tribunal-pontos">0</span> pts</span>
-</div>
-</div>
-
-<!-- Mão de cartas -->
-<div style="margin: 15px 0 5px; text-align: center;">
-<span style="color: #FFD700; font-weight: bold;">🃏 Suas cartas:</span>
-</div>
-<div id="tribunal-mao" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; min-height: 140px;">
-<!-- Cartas serão inseridas aqui -->
+    <h3 id="tribunal-titulo-caso" style="color: #FFD700; margin-bottom: 5px;">⚖️ Caso #<span id="tribunal-numero-caso">1</span></h3>
+    <p id="tribunal-descricao-caso" style="font-style: italic; margin-bottom: 10px;"></p>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px;">
+        <span>🎯 Meta: <span id="tribunal-meta">0</span> pts</span>
+        <span>📊 Máx: <span id="tribunal-max">0</span> pts</span>
+        <span>🏆 Sua: <span id="tribunal-pontos">0</span> pts</span>
+    </div>
 </div>
 
-<!-- Botões de ação -->
-<div style="display: flex; gap: 10px; margin-top: 10px;">
-<button id="tribunal-btn-julgar" class="btn-acao" style="flex:1;">⚖️ Julgar</button>
-<button id="tribunal-btn-dica" class="btn-acao" style="flex:1;">💡 Dica</button>
-<button id="tribunal-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+        <!-- Mão de cartas -->
+        <div style="margin: 15px 0 5px; text-align: center;">
+            <span style="color: #FFD700; font-weight: bold;">🃏 Suas cartas:</span>
+        </div>
+        <div id="tribunal-mao" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; min-height: 140px;">
+            <!-- Cartas serão inseridas aqui -->
+        </div>
+
+        <!-- Botões de ação -->
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+    <button id="tribunal-btn-julgar" class="btn-acao" style="flex:1;">⚖️ Julgar</button>
+    <button id="tribunal-btn-dica" class="btn-acao" style="flex:1;">💡 Dica</button>
+    <button id="tribunal-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
 </div>
-</div>
+    </div>
 </div>
 
-<div id="container-termo" class="escondido">
-<div class="cartao-vidro">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-<button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-<div style="display: flex; gap: 8px;">
-<button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
-<button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+                <div id="container-termo" class="escondido">
+                    <div class="cartao-vidro">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <div style="display: flex; gap: 8px;">
+        <button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
+        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+    </div>
 </div>
-</div>
-<h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin-bottom: 15px; text-align: center;">Termo do Santuário</h3>
+                        <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin-bottom: 15px; text-align: center;">Termo do Santuário</h3>
+                        
+                        <div id="instrucoes-termo" class="escondido cartao-instrucoes">
+                            <h4>Como Jogar</h4>
+                            <ul>
+                                <li>Adivinhe a palavra secreta em 6 tentativas.</li>
+                                <li><span style="background:var(--cor-agronomia); padding:2px 5px; border-radius:3px; color:white; font-size:10px;">VERDE</span> Letra e posição certas.</li>
+                                <li><span style="background:#c9b458; padding:2px 5px; border-radius:3px; color:white; font-size:10px;">AMARELO</span> Letra certa, posição errada.</li>
+                                <li>Vença para liberar as relíquias de hoje!</li>
+                            </ul>
+                        </div>
 
-<div id="instrucoes-termo" class="escondido cartao-instrucoes">
-<h4>Como Jogar</h4>
-<ul>
-<li>Adivinhe a palavra secreta em 6 tentativas.</li>
-<li><span style="background:var(--cor-agronomia); padding:2px 5px; border-radius:3px; color:white; font-size:10px;">VERDE</span> Letra e posição certas.</li>
-<li><span style="background:#c9b458; padding:2px 5px; border-radius:3px; color:white; font-size:10px;">AMARELO</span> Letra certa, posição errada.</li>
-<li>Vença para liberar as relíquias de hoje!</li>
-</ul>
-</div>
+                        <div id="tabuleiro-termo"></div>
+                        <div id="teclado-termo"></div>
+                        <button id="btn-verificar" class="btn-acao">Verificar</button>
+                    </div>
+                </div>
 
-<div id="tabuleiro-termo"></div>
-<div id="teclado-termo"></div>
-<button id="btn-verificar" class="btn-acao">Verificar</button>
-</div>
-</div>
+                <div id="termo-reset-container" class="escondido" style="text-align: center; margin-top: 20px;">
+                    <button onclick="resetarTermo()" class="btn-refresh">
+                        <span style="font-size: 1.5rem;">↻</span>
+                        <p style="font-size: 10px; text-transform: uppercase; margin-top: 5px;">Tentar Novamente</p>
+                    </button>
+                </div>
 
-<div id="termo-reset-container" class="escondido" style="text-align: center; margin-top: 20px;">
-<button onclick="resetarTermo()" class="btn-refresh">
-<span style="font-size: 1.5rem;">↻</span>
-<p style="font-size: 10px; text-transform: uppercase; margin-top: 5px;">Tentar Novamente</p>
-</button>
+                <div id="container-sincronia" class="escondido" style="padding-top: 10px; text-align: center;">
+                    <div class="cartao-vidro">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <div style="display: flex; gap: 8px;">
+        <button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
+        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+    </div>
 </div>
+                        <div class="header-jogos" style="margin-bottom: 20px;">
+                            <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; font-size: 1.5rem; margin: 0;">Match de Sincronia</h3>
+                            <p class="subtitulo-lei" style="letter-spacing: 2px; margin-top: 5px; font-size: 0.7rem;">UMA PERGUNTA, DOIS MUNDOS</p>
+                        </div>
 
-<div id="container-sincronia" class="escondido" style="padding-top: 10px; text-align: center;">
-<div class="cartao-vidro">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-<button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-<div style="display: flex; gap: 8px;">
-<button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
-<button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-</div>
-</div>
-<div class="header-jogos" style="margin-bottom: 20px;">
-<h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; font-size: 1.5rem; margin: 0;">Match de Sincronia</h3>
-<p class="subtitulo-lei" style="letter-spacing: 2px; margin-top: 5px; font-size: 0.7rem;">UMA PERGUNTA, DOIS MUNDOS</p>
-</div>
+                        <div id="instrucoes-sincronia" class="escondido cartao-instrucoes">
+                            <h4>Como Jogar</h4>
+                            <ul>
+                                <li>Este é um teste de telepatia amorosa.</li>
+                                <li>Leia a reflexão gerada na tela.</li>
+                                <li>Ambos devem enviar a resposta ao mesmo tempo no WhatsApp.</li>
+                                <li>Veja se os corações estão em sintonia!</li>
+                            </ul>
+                        </div>
 
-<div id="instrucoes-sincronia" class="escondido cartao-instrucoes">
-<h4>Como Jogar</h4>
-<ul>
-<li>Este é um teste de telepatia amorosa.</li>
-<li>Leia a reflexão gerada na tela.</li>
-<li>Ambos devem enviar a resposta ao mesmo tempo no WhatsApp.</li>
-<li>Veja se os corações estão em sintonia!</li>
-</ul>
-</div>
+                        <div class="cartao-vidro" style="min-height: 180px; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.2);">
+                            <div id="area-pergunta">
+                                <p id="texto-pergunta" class="texto-itálico" style="font-size: 1.2rem; padding: 0 10px; line-height: 1.6;">Carregando...</p>
+                            </div>
+                        </div>
+                        <button class="btn-acao" onclick="gerarNovaPergunta()">Nova Reflexão</button>
+                    </div>
+                </div>
 
-<div class="cartao-vidro" style="min-height: 180px; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.2);">
-<div id="area-pergunta">
-<p id="texto-pergunta" class="texto-itálico" style="font-size: 1.2rem; padding: 0 10px; line-height: 1.6;">Carregando...</p>
-</div>
-</div>
-<button class="btn-acao" onclick="gerarNovaPergunta()">Nova Reflexão</button>
-</div>
-</div>
-
-<!-- MINI FAZENDA -->
+                <!-- MINI FAZENDA -->
 <div id="container-minifazenda" class="escondido">
-<div id="aviso-orientacao" class="aviso-orientacao escondido">
-<p>🔄 Por favor, vire o celular para jogar no modo paisagem.</p>
-</div>
-<div id="conteudo-minifazenda" class="conteudo-minifazenda">
-<!-- BARRA SUPERIOR -->
-<div class="top-bar">
-<div class="top-bar-left">
-<button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-<button class="btn-info" onclick="toggleInstrucoesMiniFazenda()">❓</button>
-<button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-</div>
-<div class="top-bar-right">
-<span class="recurso">💰 <span id="mf-dinheiro">50</span></span>
-<span class="recurso">📊 Nível <span id="mf-nivel">1</span></span>
-<span class="recurso">⭐ EXP <span id="mf-exp">0</span>/<span id="mf-exp-prox">50</span></span>
-</div>
-</div>
+    <div id="aviso-orientacao" class="aviso-orientacao escondido">
+        <p>🔄 Por favor, vire o celular para jogar no modo paisagem.</p>
+    </div>
+    <div id="conteudo-minifazenda" class="conteudo-minifazenda">
+        <!-- BARRA SUPERIOR -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+                <button class="btn-info" onclick="toggleInstrucoesMiniFazenda()">❓</button>
+                <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+            </div>
+            <div class="top-bar-right">
+                <span class="recurso">💰 <span id="mf-dinheiro">50</span></span>
+                <span class="recurso">📊 Nível <span id="mf-nivel">1</span></span>
+                <span class="recurso">⭐ EXP <span id="mf-exp">0</span>/<span id="mf-exp-prox">50</span></span>
+            </div>
+        </div>
 
-<!-- ÁREA PRINCIPAL -->
-<div class="main-area">
-<!-- Grade de plantio -->
-<div class="grade-area">
-<div class="cerca">
-<div id="mf-grade" class="mf-grade"></div>
-</div>
-</div>
+        <!-- ÁREA PRINCIPAL -->
+        <div class="main-area">
+            <!-- Grade de plantio -->
+            <div class="grade-area">
+                <div class="cerca">
+                    <div id="mf-grade" class="mf-grade"></div>
+                </div>
+            </div>
 
-<!-- Painel lateral -->
-<div class="painel-area">
-<div class="painel-conteudo">
-<!-- Instruções -->
-<div id="instrucoes-minifazenda" class="escondido cartao-instrucoes">
-<h4>🌱 Como Cuidar da Fazenda</h4>
-<ul>
-<li><strong>Plantio:</strong> Compre sementes com o dinheiro (💰). Plante nos quadrados vazios (➕).</li>
-<li>Cada planta tem um tempo de crescimento. Quando pronta (brilhando verde), clique para colher.</li>
-<li>Ao colher, você ganha dinheiro e experiência (⭐). Suba de nível para expandir a fazenda.</li>
-</ul>
-<h4 style="margin-top: 15px;">🐾 Animais</h4>
-<ul>
-<li><strong>Comprar:</strong> Na aba "Animais", compre animais com dinheiro.</li>
-<li><strong>Felicidade:</strong> Cada animal tem um círculo colorido que indica seu estado:
-<span style="display: inline-block; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; margin: 0 4px;"></span> Alta (≥70%),
-<span style="display: inline-block; width: 12px; height: 12px; background: #f39c12; border-radius: 50%; margin: 0 4px;"></span> Média (30-69%),
-<span style="display: inline-block; width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; margin: 0 4px;"></span> Baixa (<30%).
-</li>
-<li><strong>Alimentar:</strong> Clique no ícone de maçã (🍎) no card do animal para alimentá‑lo (custa 5💰). A felicidade aumenta.</li>
-<li>Animais felizes podem produzir recursos no futuro (em breve).</li>
-</ul>
-</div>
+            <!-- Painel lateral -->
+            <div class="painel-area">
+                <div class="painel-conteudo">
+                    <!-- Instruções -->
+                    <div id="instrucoes-minifazenda" class="escondido cartao-instrucoes">
+                        <h4>🌱 Como Cuidar da Fazenda</h4>
+                        <ul>
+                            <li><strong>Plantio:</strong> Compre sementes com o dinheiro (💰). Plante nos quadrados vazios (➕).</li>
+                            <li>Cada planta tem um tempo de crescimento. Quando pronta (brilhando verde), clique para colher.</li>
+                            <li>Ao colher, você ganha dinheiro e experiência (⭐). Suba de nível para expandir a fazenda.</li>
+                        </ul>
+                        <h4 style="margin-top: 15px;">🐾 Animais</h4>
+                        <ul>
+                            <li><strong>Comprar:</strong> Na aba "Animais", compre animais com dinheiro.</li>
+                            <li><strong>Felicidade:</strong> Cada animal tem um círculo colorido que indica seu estado:
+                                <span style="display: inline-block; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; margin: 0 4px;"></span> Alta (≥70%),
+                                <span style="display: inline-block; width: 12px; height: 12px; background: #f39c12; border-radius: 50%; margin: 0 4px;"></span> Média (30-69%),
+                                <span style="display: inline-block; width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; margin: 0 4px;"></span> Baixa (<30%).
+                            </li>
+                            <li><strong>Alimentar:</strong> Clique no ícone de maçã (🍎) no card do animal para alimentá‑lo (custa 5💰). A felicidade aumenta.</li>
+                            <li>Animais felizes podem produzir recursos no futuro (em breve).</li>
+                        </ul>
+                    </div>
 
-<!-- Abas -->
-<div class="painel-abas">
-<button class="aba-ativa" data-aba="cultivo">🌱 Cultivo</button>
-<button data-aba="animais">🐾 Animais</button>
-<button data-aba="conquistas">🏆 Conquistas</button>
-</div>
+                    <!-- Abas -->
+                    <div class="painel-abas">
+                        <button class="aba-ativa" data-aba="cultivo">🌱 Cultivo</button>
+                        <button data-aba="animais">🐾 Animais</button>
+                        <button data-aba="conquistas">🏆 Conquistas</button>
+                    </div>
 
-<!-- Conteúdo Cultivo -->
-<div id="aba-cultivo" class="aba-conteudo">
-<div class="deposito-area collapsible-section">
-<div class="section-header">
-<span class="deposito-titulo">🌱 Suas sementes:</span>
-<button class="collapse-btn" id="collapseSementesBtn">▼</button>
-</div>
-<div id="mf-deposito" class="deposito-lista"></div>
-</div>
+                    <!-- Conteúdo Cultivo -->
+                    <div id="aba-cultivo" class="aba-conteudo">
+                        <div class="deposito-area collapsible-section">
+                            <div class="section-header">
+                                <span class="deposito-titulo">🌱 Suas sementes:</span>
+                                <button class="collapse-btn" id="collapseSementesBtn">▼</button>
+                            </div>
+                            <div id="mf-deposito" class="deposito-lista"></div>
+                        </div>
 
-<div class="selecao-area">
-<span class="selecao-titulo">🌱 Escolha a semente:</span>
-<div class="botoes-sementes">
-<button class="btn-tipo-semente" data-tipo="0" title="Milho (10💰)">🌽 10💰</button>
-<button class="btn-tipo-semente" data-tipo="1" title="Cenoura (12💰)">🥕 12💰</button>
-<button class="btn-tipo-semente" data-tipo="2" title="Tomate (15💰)">🍅 15💰</button>
-<button class="btn-tipo-semente" data-tipo="3" title="Abóbora (20💰)">🎃 20💰</button>
-<button class="btn-tipo-semente" data-tipo="4" title="Morango (18💰)">🍓 18💰</button>
-<button class="btn-tipo-semente" data-tipo="5" title="Alface (8💰)">🥬 8💰</button>
-<button class="btn-tipo-semente" data-tipo="6" title="Girassol (25💰)">🌻 25💰</button>
-<button class="btn-tipo-semente" data-tipo="7" title="Batata (14💰)">🥔 14💰</button>
-</div>
-</div>
+                        <div class="selecao-area">
+                            <span class="selecao-titulo">🌱 Escolha a semente:</span>
+                            <div class="botoes-sementes">
+                                <button class="btn-tipo-semente" data-tipo="0" title="Milho (10💰)">🌽 10💰</button>
+                                <button class="btn-tipo-semente" data-tipo="1" title="Cenoura (12💰)">🥕 12💰</button>
+                                <button class="btn-tipo-semente" data-tipo="2" title="Tomate (15💰)">🍅 15💰</button>
+                                <button class="btn-tipo-semente" data-tipo="3" title="Abóbora (20💰)">🎃 20💰</button>
+                                <button class="btn-tipo-semente" data-tipo="4" title="Morango (18💰)">🍓 18💰</button>
+                                <button class="btn-tipo-semente" data-tipo="5" title="Alface (8💰)">🥬 8💰</button>
+                                <button class="btn-tipo-semente" data-tipo="6" title="Girassol (25💰)">🌻 25💰</button>
+                                <button class="btn-tipo-semente" data-tipo="7" title="Batata (14💰)">🥔 14💰</button>
+                            </div>
+                        </div>
 
-<div class="botoes-acao">
-<button id="mf-btn-comprar-semente" class="btn-acao">Comprar Semente <span id="mf-preco-semente">(10💰)</span></button>
-<button id="mf-btn-reiniciar" class="btn-refresh">Reiniciar</button>
-</div>
-</div>
+                        <div class="botoes-acao">
+                            <button id="mf-btn-comprar-semente" class="btn-acao">Comprar Semente <span id="mf-preco-semente">(10💰)</span></button>
+                            <button id="mf-btn-reiniciar" class="btn-refresh">Reiniciar</button>
+                        </div>
+                    </div>
 
-<!-- Conteúdo Animais -->
-<div id="aba-animais" class="aba-conteudo escondido">
-<div class="animais-area">
-<div id="mf-animais" class="animais-lista"></div>
-</div>
-<div class="compra-animais-area" style="margin-top: 15px;">
-<span class="compra-animais-titulo" style="display: block; color: #FFD700; font-weight: bold; margin-bottom: 10px; text-align: center;">🐾 Comprar animal:</span>
-<div class="botoes-animais">
-<button class="btn-tipo-animal" data-animal="0" title="Galinha (30💰)">🐔 30💰</button>
-<button class="btn-tipo-animal" data-animal="1" title="Vaca (50💰)">🐄 50💰</button>
-<button class="btn-tipo-animal" data-animal="2" title="Porco (40💰)">🐖 40💰</button>
-</div>
-</div>
-</div>
+                    <!-- Conteúdo Animais -->
+                    <div id="aba-animais" class="aba-conteudo escondido">
+                        <div class="animais-area">
+                            <div id="mf-animais" class="animais-lista"></div>
+                        </div>
+                        <div class="compra-animais-area" style="margin-top: 15px;">
+                            <span class="compra-animais-titulo" style="display: block; color: #FFD700; font-weight: bold; margin-bottom: 10px; text-align: center;">🐾 Comprar animal:</span>
+                            <div class="botoes-animais">
+                                <button class="btn-tipo-animal" data-animal="0" title="Galinha (30💰)">🐔 30💰</button>
+                                <button class="btn-tipo-animal" data-animal="1" title="Vaca (50💰)">🐄 50💰</button>
+                                <button class="btn-tipo-animal" data-animal="2" title="Porco (40💰)">🐖 40💰</button>
+                            </div>
+                        </div>
+                    </div>
 
-<!-- Conteúdo Conquistas -->
-<div id="aba-conquistas" class="aba-conteudo escondido">
-<div class="conquistas-area">
-<div id="mf-metas" class="metas-container" style="margin-bottom: 15px;"></div>
-<div id="mf-conquistas-lista" class="conquistas-lista"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div> <!-- fim conteudo-minifazenda -->
+                    <!-- Conteúdo Conquistas -->
+                    <div id="aba-conquistas" class="aba-conteudo escondido">
+                        <div class="conquistas-area">
+                            <div id="mf-metas" class="metas-container" style="margin-bottom: 15px;"></div>
+                            <div id="mf-conquistas-lista" class="conquistas-lista"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- fim conteudo-minifazenda -->
 </div> <!-- fim container-minifazenda -->
 
-<div id="container-jardim" class="escondido" style="padding-top: 10px; text-align: center;">
-<div class="cartao-vidro">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-<button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-<div style="display: flex; gap: 8px;">
-<button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
-<button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+                <div id="container-jardim" class="escondido" style="padding-top: 10px; text-align: center;">
+                    <div class="cartao-vidro">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <div style="display: flex; gap: 8px;">
+        <button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
+        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+    </div>
 </div>
-</div>
-<h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A;">Nosso Solo Fértil</h3>
-<div id="prisma-3d" style="width: 100%; height: 160px; margin-top: 10px;"></div>
+                        <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A;">Nosso Solo Fértil</h3>
+                        <div id="prisma-3d" style="width: 100%; height: 160px; margin-top: 10px;"></div>
 
-<div id="instrucoes-jardim" class="escondido cartao-instrucoes" style="border: 1px solid #D4AF37; box-shadow: 0 0 20px rgba(212,175,55,0.15); background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);">
-<h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 10px; text-align: center;">A Árvore da Vida</h4>
-<p style="font-size: 0.8rem; font-style: italic; color: #ccc; text-align: center; margin-bottom: 15px;">Um organismo matemático gerado pelo afeto.</p>
-<ul style="font-size: 0.85rem; line-height: 1.6; color: #eee; text-align: left; padding-left: 15px;">
-<li style="margin-bottom: 8px;"><b>A Conexão:</b> Toque diretamente na árvore para nutri-la. A água flui entre Goiânia e Colombo em tempo real.</li>
-<li style="margin-bottom: 8px;"><b>A Regra do Tempo:</b> A árvore só absorve água <b>1 vez por dia</b> (compartilhado entre vocês dois). A paciência fortalece as raízes.</li>
-<li style="margin-bottom: 8px;"><b>A Evolução:</b> Vocês começam com uma <i>Semente de Esmeralda</i>. A cada nível alcançado, a matemática gera novos troncos de ouro maciço. Como na natureza, <b>nenhuma árvore crescerá com o mesmo formato da anterior</b>.</li>
-<li style="margin-bottom: 8px;"><b>O Ápice:</b> Ao atingir o nível máximo, a árvore atinge a glória, emanando folhas de Sakura rosadas. Um ciclo é concluído e guardado na memória.</li>
-<li style="color: #ff6b6b; font-weight: bold;">⚠️ Atenção: Se a árvore ficar mais de 1 dia sem o toque de vocês, a sequência de dias é rompida.</li>
-</ul>
-</div>
+                        <div id="instrucoes-jardim" class="escondido cartao-instrucoes" style="border: 1px solid #D4AF37; box-shadow: 0 0 20px rgba(212,175,55,0.15); background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);">
+                            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 10px; text-align: center;">A Árvore da Vida</h4>
+                            <p style="font-size: 0.8rem; font-style: italic; color: #ccc; text-align: center; margin-bottom: 15px;">Um organismo matemático gerado pelo afeto.</p>
+                            <ul style="font-size: 0.85rem; line-height: 1.6; color: #eee; text-align: left; padding-left: 15px;">
+                                <li style="margin-bottom: 8px;"><b>A Conexão:</b> Toque diretamente na árvore para nutri-la. A água flui entre Goiânia e Colombo em tempo real.</li>
+                                <li style="margin-bottom: 8px;"><b>A Regra do Tempo:</b> A árvore só absorve água <b>1 vez por dia</b> (compartilhado entre vocês dois). A paciência fortalece as raízes.</li>
+                                <li style="margin-bottom: 8px;"><b>A Evolução:</b> Vocês começam com uma <i>Semente de Esmeralda</i>. A cada nível alcançado, a matemática gera novos troncos de ouro maciço. Como na natureza, <b>nenhuma árvore crescerá com o mesmo formato da anterior</b>.</li>
+                                <li style="margin-bottom: 8px;"><b>O Ápice:</b> Ao atingir o nível máximo, a árvore atinge a glória, emanando folhas de Sakura rosadas. Um ciclo é concluído e guardado na memória.</li>
+                                <li style="color: #ff6b6b; font-weight: bold;">⚠️ Atenção: Se a árvore ficar mais de 1 dia sem o toque de vocês, a sequência de dias é rompida.</li>
+                            </ul>
+                        </div>
 
-<div id="prisma-3d" style="width: 100%; height: 300px; margin-top: 10px; cursor: pointer; position: relative;" onclick="regarPlanta()"></div>
-<p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0px; margin-bottom: 20px;">Toque na árvore mágica para regá-la 💧</p>
+                        <div id="prisma-3d" style="width: 100%; height: 300px; margin-top: 10px; cursor: pointer; position: relative;" onclick="regarPlanta()"></div>
+                        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0px; margin-bottom: 20px;">Toque na árvore mágica para regá-la 💧</p>
 
-<div class="barra-vida" style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 12px; margin: 10px 20px; overflow: hidden;">
-<div id="progresso-crescimento" class="progresso" style="background: var(--cor-primaria); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
-</div>
-<p id="status-texto" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
-<p id="aviso-regada" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 15px;"></p>
-<p id="contador-ciclos">🌱 Ciclos completados: 0</p>
-</div>
-</div>
-<div id="container-julgamento" class="escondido">
-<div class="cartao-vidro">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-<button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-<div style="display: flex; gap: 8px;">
-<button class="btn-info" onclick="toggleInstrucoesJulgamento()">❓</button>
-<button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-</div>
+                        <div class="barra-vida" style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 12px; margin: 10px 20px; overflow: hidden;">
+                            <div id="progresso-crescimento" class="progresso" style="background: var(--cor-primaria); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+                        </div>
+                        <p id="status-texto" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
+                        <p id="aviso-regada" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 15px;"></p>
+                        <p id="contador-ciclos">🌱 Ciclos completados: 0</p>
+                    </div>
+                </div>
+                <div id="container-julgamento" class="escondido">
+    <div class="cartao-vidro">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+    <div style="display: flex; gap: 8px;">
+        <button class="btn-info" onclick="toggleInstrucoesJulgamento()">❓</button>
+        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+    </div>
 </div>
 <h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Julgamento da Safra</h2>
 
-<!-- Instruções -->
-<div id="instrucoes-julgamento" class="escondido cartao-instrucoes">
-<h4>Como Jogar</h4>
-<ul>
-<li>Combine 3 ou mais peças iguais para coletar provas.</li>
-<li>Cada combinação vale pontos e ajuda a resolver o caso.</li>
-<li>Complete a barra de objetivo para avançar de nível.</li>
-<li>Novos ícones aparecem conforme você progride.</li>
-</ul>
-</div>
+        <!-- Instruções -->
+        <div id="instrucoes-julgamento" class="escondido cartao-instrucoes">
+            <h4>Como Jogar</h4>
+            <ul>
+                <li>Combine 3 ou mais peças iguais para coletar provas.</li>
+                <li>Cada combinação vale pontos e ajuda a resolver o caso.</li>
+                <li>Complete a barra de objetivo para avançar de nível.</li>
+                <li>Novos ícones aparecem conforme você progride.</li>
+            </ul>
+        </div>
 
-<!-- Painel de status -->
-<div class="painel-recursos" style="background: #2c3e50; border-color: #d4af37;">
-<span>📊 Nível <span id="julgamento-nivel">1</span></span>
-<span>⭐ Pontos <span id="julgamento-pontos">0</span></span>
-<span>🎯 Meta <span id="julgamento-meta">100</span></span>
-</div>
+        <!-- Painel de status -->
+        <div class="painel-recursos" style="background: #2c3e50; border-color: #d4af37;">
+            <span>📊 Nível <span id="julgamento-nivel">1</span></span>
+            <span>⭐ Pontos <span id="julgamento-pontos">0</span></span>
+            <span>🎯 Meta <span id="julgamento-meta">100</span></span>
+        </div>
 
-<!-- Grade do jogo -->
-<div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
-<div id="julgamento-grade" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; padding: 10px;"></div>
-</div>
+        <!-- Grade do jogo -->
+        <div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
+            <div id="julgamento-grade" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; padding: 10px;"></div>
+        </div>
 
-<!-- Botões -->
-<div style="display: flex; gap: 10px; margin-top: 15px;">
-<button id="julgamento-btn-novo" class="btn-acao" style="flex:1;">Novo Caso</button>
-<button id="julgamento-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+        <!-- Botões -->
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="julgamento-btn-novo" class="btn-acao" style="flex:1;">Novo Caso</button>
+            <button id="julgamento-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+        </div>
+    </div>
 </div>
-</div>
-</div>
-</section>
+            </section>
 
-<section id="cofre" class="tela escondido">
-<div class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
-<h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Relíquias do Santuário</h3>
-<p id="msg-cofre" style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">
-Vença o desafio diário para desbloquear
-</p>
-</div>
+            <section id="cofre" class="tela escondido">
+    <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif;">Relíquias do Santuário</h3>
+        <p id="msg-cofre" style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">
+            Vença o desafio diário para desbloquear
+        </p>
+    </div>
 
-<div class="cartao-vidro" id="cartao-ecos" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-<h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Ecos do Santuário</h3>
-<p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">O som atravessa o espaço e o tempo.</p>
+    <div class="cartao-vidro" id="cartao-ecos" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Ecos do Santuário</h3>
+        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">O som atravessa o espaço e o tempo.</p>
+        
+        <div id="eco-3d" style="width: 100%; height: 180px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);"></div>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+            <button id="btn-gravar-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); transition: all 0.3s;" onmousedown="iniciarGravacao()" onmouseup="pararGravacao()" ontouchstart="iniciarGravacao()" ontouchend="pararGravacao()">
+                🎙️
+            </button>
+            <button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">
+                ▶️
+            </button>
+        </div>
+        <p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+    </div>
 
-<div id="eco-3d" style="width: 100%; height: 180px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);"></div>
-
-<div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
-<button id="btn-gravar-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); transition: all 0.3s;" onmousedown="iniciarGravacao()" onmouseup="pararGravacao()" ontouchstart="iniciarGravacao()" ontouchend="pararGravacao()">
-🎙️
-</button>
-<button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">
-▶️
-</button>
-</div>
-<p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
-</div>
-
-<div class="cartao-vidro" id="cartao-bussola" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-<h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">A Bússola do Destino</h3>
-<p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;" id="texto-alvo-bussola">Apontando para o seu amor.</p>
-
-<div id="bussola-3d" style="width: 100%; height: 200px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); position: relative;">
+    <div class="cartao-vidro" id="cartao-bussola" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">A Bússola do Destino</h3>
+        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;" id="texto-alvo-bussola">Apontando para o seu amor.</p>
+        
+        <div id="bussola-3d" style="width: 100%; height: 200px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); position: relative;">
             
             <div id="esqueleto-bussola" class="esqueleto-cintilante"></div>
             
-<div id="overlay-bussola" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10;">
-<button id="btn-ativar-bussola" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="ativarSensoresBussola()">
-🧭 Sincronizar Bússola
-</button>
-</div>
-</div>
-<p id="status-bussola" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 5px; height: 15px;"></p>
-</div>
+            <div id="overlay-bussola" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10;">
+                <button id="btn-ativar-bussola" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="ativarSensoresBussola()">
+                    🧭 Sincronizar Bússola
+                </button>
+            </div>
+        </div>
+        <p id="status-bussola" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 5px; height: 15px;"></p>
+    </div>
 
-<div class="cartao-vidro" id="cartao-carrossel" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-<h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
-<p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
-
-        <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;"></div>
+    <div class="cartao-vidro" id="cartao-carrossel" style="text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
+        <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
+        
         <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;">
             
             <div id="esqueleto-carrossel" class="esqueleto-cintilante"></div>
 
         </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
+            <button id="btn-add-foto" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(0,0,0,0.5);" onclick="document.getElementById('input-foto-horizonte').click()">
+                📸 Adicionar
+            </button>
+            <button class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,0.1);" onclick="limparCarrosselHorizontes()">
+                🗑️ Limpar Tudo
+            </button>
+        </div>
+        
+        <p id="status-carrossel" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+        <p style="font-size: 0.6rem; color: #666;">Segure uma foto para apagá-la individualmente.</p>
+    </div>
 
-<div style="display: flex; gap: 10px; justify-content: center;">
-<input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
-<button id="btn-add-foto" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(0,0,0,0.5);" onclick="document.getElementById('input-foto-horizonte').click()">
-📸 Adicionar
-</button>
-<button class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,0.1);" onclick="limparCarrosselHorizontes()">
-🗑️ Limpar Tudo
-</button>
-</div>
+    <div class="grade-cofre" id="grade-reliquias">
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'musica')">
+            <span class="icone-reliquia">🎵</span>
+            <p>Nossa Trilha</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'ceu')">
+            <span class="icone-reliquia">🌌</span>
+            <p>Mesmo Céu</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'cartas')">
+            <span class="icone-reliquia">✉️</span>
+            <p>Sementes</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+        <div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'encontro')">
+            <span class="icone-reliquia">🎟️</span>
+            <p>O Futuro</p>
+            <small class="status-reliquia">Trancado</small>
+        </div>
+    </div>
 
-<p id="status-carrossel" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
-<p style="font-size: 0.6rem; color: #666;">Segure uma foto para apagá-la individualmente.</p>
-</div>
-
-<div class="grade-cofre" id="grade-reliquias">
-<div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'musica')">
-<span class="icone-reliquia">🎵</span>
-<p>Nossa Trilha</p>
-<small class="status-reliquia">Trancado</small>
-</div>
-<div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'ceu')">
-<span class="icone-reliquia">🌌</span>
-<p>Mesmo Céu</p>
-<small class="status-reliquia">Trancado</small>
-</div>
-<div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'cartas')">
-<span class="icone-reliquia">✉️</span>
-<p>Sementes</p>
-<small class="status-reliquia">Trancado</small>
-</div>
-<div class="item-cofre bloqueado" onclick="abrirReliquia(event, 'encontro')">
-<span class="icone-reliquia">🎟️</span>
-<p>O Futuro</p>
-<small class="status-reliquia">Trancado</small>
-</div>
-</div>
-
-<div id="modal-reliquia" class="modal escondido">
-<div class="conteudo-modal cartao-vidro">
-<span class="fechar-modal" onclick="fecharModal()">&times;</span>
-<div id="corpo-modal"></div>
-</div>
-</div>
+    <div id="modal-reliquia" class="modal escondido">
+        <div class="conteudo-modal cartao-vidro">
+            <span class="fechar-modal" onclick="fecharModal()">&times;</span>
+            <div id="corpo-modal"></div>
+        </div>
+    </div>
 </section>
 
-<!-- Áudios e modais -->
-<audio id="audio-alerta-cuidado" preload="auto">
-<source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
-</audio>
-<div id="modal-cuidado" class="modal escondido">...</div>
+            <!-- Áudios e modais -->
+            <audio id="audio-alerta-cuidado" preload="auto">
+                <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+            </audio>
+            <div id="modal-cuidado" class="modal escondido">...</div>
 
-</main>
+        </main>
 
-<nav class="menu-inferior">
-<a href="#" class="item-menu ativo" data-alvo="home">🏛️<span>Home</span></a>
-<a href="#" class="item-menu" data-alvo="leis">⚖️<span>Leis</span></a>
-<a href="#" class="item-menu" data-alvo="jogos">🎮<span>Jogos</span></a>
-<a href="#" class="item-menu" data-alvo="cofre">🎁<span>Cofre</span></a>
-</nav>
-</div>
+        <nav class="menu-inferior">
+            <a href="#" class="item-menu ativo" data-alvo="home">🏛️<span>Home</span></a>
+            <a href="#" class="item-menu" data-alvo="leis">⚖️<span>Leis</span></a>
+            <a href="#" class="item-menu" data-alvo="jogos">🎮<span>Jogos</span></a>
+            <a href="#" class="item-menu" data-alvo="cofre">🎁<span>Cofre</span></a>
+        </nav>
+    </div>
 
-<!-- Script module do Firebase (deve vir antes dos outros scripts) -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
-import { getDatabase, ref, set, get, onValue, runTransaction, push } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js';
+    <!-- Script module do Firebase (deve vir antes dos outros scripts) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue, runTransaction, push } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+        import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js';
 
-const firebaseConfig = {
-apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
-authDomain: "santuario-jt.firebaseapp.com",
-databaseURL: "https://santuario-jt-default-rtdb.firebaseio.com",
-projectId: "santuario-jt",
-storageBucket: "santuario-jt.firebasestorage.app",
-messagingSenderId: "381433603925",
-appId: "1:381433603925:web:27d899e7fba589f2e231dc",
-measurementId: "G-QQXBNQ98S5"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
+            authDomain: "santuario-jt.firebaseapp.com",
+            databaseURL: "https://santuario-jt-default-rtdb.firebaseio.com",
+            projectId: "santuario-jt",
+            storageBucket: "santuario-jt.firebasestorage.app",
+            messagingSenderId: "381433603925",
+            appId: "1:381433603925:web:27d899e7fba589f2e231dc",
+            measurementId: "G-QQXBNQ98S5"
+        };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
 
-// Para o jogo Mini Fazenda
-window.SantuarioDB = db;
-window.SantuarioAuth = auth;
-window.SantuarioDB_Functions = { ref, set, get, onValue };
+        // Para o jogo Mini Fazenda
+        window.SantuarioDB = db;
+        window.SantuarioAuth = auth;
+        window.SantuarioDB_Functions = { ref, set, get, onValue };
 
-// Para o sistema de Pulso
-window.SantuarioApp = window.SantuarioApp || {};
-window.SantuarioApp.inicializado = true;
-window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction, push, messaging: getMessaging(app), getToken: getToken };
+        // Para o sistema de Pulso
+        window.SantuarioApp = window.SantuarioApp || {};
+        window.SantuarioApp.inicializado = true;
+        window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction, push, messaging: getMessaging(app), getToken: getToken };
 
-// IDs autorizados
-const IDS_AUTORIZADOS = {
-"Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",
-"meXVetR7D7b8d00Yuw8wjtRlpoi1": "thamiris"
-};
+        // IDs autorizados
+        const IDS_AUTORIZADOS = {
+            "Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",
+            "meXVetR7D7b8d00Yuw8wjtRlpoi1": "thamiris"
+        };
 
-// Função para liberar acesso
-function liberarAcesso(user) {
-const perfil = IDS_AUTORIZADOS[user.uid];
-if (!perfil) {
-console.error("Usuário não autorizado.");
-auth.signOut();
-return;
-}
-window.usuarioLogado = perfil;
-window.souJoao = (perfil === 'joao');
-window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
-window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
-localStorage.setItem('santuario_user_id', perfil);
-const telaLogin = document.getElementById('tela-login');
-if (telaLogin) telaLogin.style.display = 'none';
-window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { perfil } }));
-console.log(`Login bem-sucedido: ${window.MEU_NOME}`);
-}
+        // Função para liberar acesso
+        function liberarAcesso(user) {
+            const perfil = IDS_AUTORIZADOS[user.uid];
+            if (!perfil) {
+                console.error("Usuário não autorizado.");
+                auth.signOut();
+                return;
+            }
+            window.usuarioLogado = perfil;
+            window.souJoao = (perfil === 'joao');
+            window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
+            window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
+            localStorage.setItem('santuario_user_id', perfil);
+            const telaLogin = document.getElementById('tela-login');
+            if (telaLogin) telaLogin.style.display = 'none';
+            window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { perfil } }));
+            console.log(`Login bem-sucedido: ${window.MEU_NOME}`);
+        }
 
-// Lógica do botão de login
-const btnLogin = document.getElementById('btn-login-confirmar');
-if (btnLogin) {
-btnLogin.onclick = async () => {
-const email = document.getElementById('login-email').value.trim();
-const senha = document.getElementById('login-senha').value;
-const erroDiv = document.getElementById('login-mensagem-erro');
-try {
-await signInWithEmailAndPassword(auth, email, senha);
-} catch (error) {
-console.error("Erro no login:", error);
-if (erroDiv) erroDiv.innerText = "E-mail ou senha incorretos.";
-}
-};
-}
+        // Lógica do botão de login
+        const btnLogin = document.getElementById('btn-login-confirmar');
+        if (btnLogin) {
+            btnLogin.onclick = async () => {
+                const email = document.getElementById('login-email').value.trim();
+                const senha = document.getElementById('login-senha').value;
+                const erroDiv = document.getElementById('login-mensagem-erro');
+                try {
+                    await signInWithEmailAndPassword(auth, email, senha);
+                } catch (error) {
+                    console.error("Erro no login:", error);
+                    if (erroDiv) erroDiv.innerText = "E-mail ou senha incorretos.";
+                }
+            };
+        }
 
-// Monitora o estado de autenticação
-onAuthStateChanged(auth, (user) => {
-const telaLogin = document.getElementById('tela-login');
-if (user) {
-const perfilIdentificado = window.IDS_SANTUARIO?.[user.uid];
-if (perfilIdentificado) {
-window.usuarioLogado = perfilIdentificado;
-window.souJoao = (perfilIdentificado === 'joao');
-window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
-window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
-if (typeof registrarLogin === 'function') {
-registrarLogin(perfilIdentificado);
-} else {
-console.warn('Função registrarLogin não encontrada');
-}
-if (telaLogin) telaLogin.style.opacity = '0';
-setTimeout(() => { if (telaLogin) telaLogin.style.display = 'none'; }, 500);
-window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { user } }));
-} else {
-console.error("Acesso negado: UID não reconhecido.");
-auth.signOut();
-}
-} else {
-if (telaLogin) telaLogin.style.display = 'flex';
-}
-});
-</script>
+        // Monitora o estado de autenticação
+        onAuthStateChanged(auth, (user) => {
+            const telaLogin = document.getElementById('tela-login');
+            if (user) {
+                const perfilIdentificado = window.IDS_SANTUARIO?.[user.uid];
+                if (perfilIdentificado) {
+                    window.usuarioLogado = perfilIdentificado;
+                    window.souJoao = (perfilIdentificado === 'joao');
+                    window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
+                    window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
+                    if (typeof registrarLogin === 'function') {
+                        registrarLogin(perfilIdentificado);
+                    } else {
+                        console.warn('Função registrarLogin não encontrada');
+                    }
+                    if (telaLogin) telaLogin.style.opacity = '0';
+                    setTimeout(() => { if (telaLogin) telaLogin.style.display = 'none'; }, 500);
+                    window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { user } }));
+                } else {
+                    console.error("Acesso negado: UID não reconhecido.");
+                    auth.signOut();
+                }
+            } else {
+                if (telaLogin) telaLogin.style.display = 'flex';
+            }
+        });
+    </script>
 
-<script src="script.js"></script>
-<div id="toast-mensagem" class="toast escondido"></div>
-<script src="minifazenda_novo.js"></script>
-<script src="tribunal.js"></script>
-<script src="julgamento.js"></script>
+    <script src="script.js"></script>
+    <div id="toast-mensagem" class="toast escondido"></div>
+    <script src="minifazenda_novo.js"></script>
+    <script src="tribunal.js"></script>
+    <script src="julgamento.js"></script>
 
-<!-- Tela de login -->
-<div id="tela-login">
-<div class="login-container">
-<h1 class="login-logo texto-ouro-vivo">Santuário</h1>
-<input type="email" id="login-email" class="login-input" placeholder="E-mail">
-<input type="password" id="login-senha" class="login-input" placeholder="Senha">
-<button id="btn-login-confirmar" class="btn-entrar">Acessar</button>
-<div id="login-mensagem-erro" class="login-erro"></div>
-</div>
-</div>
+    <!-- Tela de login -->
+    <div id="tela-login">
+        <div class="login-container">
+            <h1 class="login-logo texto-ouro-vivo">Santuário</h1>
+            <input type="email" id="login-email" class="login-input" placeholder="E-mail">
+            <input type="password" id="login-senha" class="login-input" placeholder="Senha">
+            <button id="btn-login-confirmar" class="btn-entrar">Acessar</button>
+            <div id="login-mensagem-erro" class="login-erro"></div>
+        </div>
+    </div>
 
-    <div id="modal-emergencia" class="modal-emergencia escondido">
-    <div class="emergencia-conteudo">
-        <div class="emergencia-icone">⚠️</div>
-        <h2 id="emergencia-titulo">Alerta de Cuidado</h2>
-        <p id="emergencia-mensagem"></p>
-        <button onclick="fecharEmergencia()" class="btn-emergencia-ok">Entendido</button>
     <div id="modal-emergencia" class="modal-overlay escondido">
         <div class="bottom-sheet" id="sheet-emergencia">
             <div class="drag-handle"></div> <div class="emergencia-conteudo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center;">
@@ -837,9 +828,9 @@ if (telaLogin) telaLogin.style.display = 'flex';
     <div id="dynamic-island" class="ilha-dinamica">
         <span id="island-icon" class="island-icon">✨</span>
         <span id="island-text" class="island-text">Mensagem</span>
-</div>
-</div>
+    </div>
 
 <div class="fio-de-ouro"></div>
 
 </body>
+</html>

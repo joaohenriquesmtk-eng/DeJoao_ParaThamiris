@@ -1,7 +1,9 @@
 {
+  "id": "/",
   "name": "Santuário",
   "short_name": "Santuário",
   "description": "Um santuário digital exclusivo para João e Thamiris",
+  "lang": "pt-BR",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",

@@ -1,98 +1,99 @@
-importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
+// ==========================================
+// MOTOR OFFLINE SUPREMO (PWA SANTUÁRIO)
+// Versão: 1.0.0
+// ==========================================
 
-// Use EXATAMENTE o mesmo bloco que você pegou no Passo 1
-firebase.initializeApp({
-    apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
-    authDomain: "santuario-jt.firebaseapp.com",
-    databaseURL: "https://santuario-jt-default-rtdb.firebaseio.com",
-    projectId: "santuario-jt",
-    storageBucket: "santuario-jt.firebasestorage.app",
-    messagingSenderId: "381433603925",
-    appId: "1:381433603925:web:27d899e7fba589f2e231dc"
-});
+const CACHE_NAME = 'santuario-cache-v1';
 
-const messaging = firebase.messaging();
-
-// Captura a notificação quando o app está fechado
-messaging.onBackgroundMessage((payload) => {
-    console.log('Notificação recebida em background:', payload);
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/assets/icons/icon-192.png'
-    };
-    self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-// Código de Cache (O que você já tinha)
-const CACHE_NAME = 'santuario-v7'; // Versão atualizada para forçar o recarregamento
-const urlsParaCache = [
-    '/', 
-    '/index.html', 
-    '/style.css', 
-    '/script.js', 
+// A "Mochila de Sobrevivência": Tudo o que a app precisa para arrancar sem internet
+const ASSETS_TO_CACHE = [
+    '/',
+    '/index.html',
+    '/style.css',
+    '/core.js',
+    '/ui.js',
+    '/graficos3d.js',
+    '/app.js',
+    '/script.js',
+    '/tribunal.js',
+    '/julgamento.js',
+    '/minifazenda_novo.js',
     '/manifest.json',
+    '/assets/icone.png',
     '/assets/ambient.mp3',
-    '/assets/sons/mf/regar.mp3',
-    '/assets/alerta.mp3',
-    'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'
+    // Ícones dos Jogos
+    '/assets/icones-jogos/termo.png',
+    '/assets/icones-jogos/tribunal.png',
+    '/assets/icones-jogos/sincronia.png',
+    '/assets/icones-jogos/minifazenda.png',
+    '/assets/icones-jogos/jardim.png',
+    '/assets/icones-jogos/julgamento.png'
 ];
 
-self.addEventListener('install', e => {
-    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsParaCache)));
+// INSTALAÇÃO: A app baixa tudo para o disco rígido do telemóvel
+self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Força a atualização imediata sem ter de fechar a app
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                console.log('[Santuário SW] A carregar a mochila de sobrevivência...');
+                return cache.addAll(ASSETS_TO_CACHE);
+            })
+            .catch(err => console.error('[Santuário SW] Erro ao fazer cache:', err))
+    );
 });
 
-self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-});
-
-self.addEventListener('fetch', e => {
-    if (e.request.method !== 'GET') return;
-    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
-});
-
-// ==========================================
-// INTERCEPTADOR DE NOTIFICAÇÕES RICAS (AÇÕES)
-// ==========================================
-
-self.addEventListener('notificationclick', function(event) {
-    // Fecha a notificação automaticamente ao clicar
-    event.notification.close();
-
-    // SE O USUÁRIO CLICAR NO BOTÃO DE AÇÃO "ENVIAR PULSO"
-    if (event.action === 'enviar_pulso') {
-        event.waitUntil(
-            clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-                // 1. Se o aplicativo já estiver aberto em alguma aba em segundo plano
-                for (var i = 0; i < windowClients.length; i++) {
-                    var client = windowClients[i];
-                    if (client.url && 'focus' in client) {
-                        client.focus();
-                        // Manda uma ordem telepática para o script.js disparar o pulso
-                        client.postMessage({ comando: 'disparar_pulso_remoto' });
-                        return;
+// ATIVAÇÃO: A app limpa lixo de versões antigas
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('[Santuário SW] A apagar memórias antigas:', cacheName);
+                        return caches.delete(cacheName);
                     }
-                }
-                // 2. Se o aplicativo estiver totalmente fechado
-                if (clients.openWindow) {
-                    // Abre o app passando uma ordem secreta na URL
-                    return clients.openWindow('/?acao=disparar_pulso_remoto');
-                }
-            })
-        );
-    } else {
-        // Se clicar apenas na notificação normal (não no botão), só abre o app
-        event.waitUntil(
-            clients.matchAll({ type: 'window' }).then(windowClients => {
-                if (windowClients.length > 0) {
-                    windowClients[0].focus();
-                } else {
-                    clients.openWindow('/');
-                }
-            })
-        );
+                })
+            );
+        })
+    );
+    self.clients.claim(); // Assume o controlo imediato de todas as abas
+});
+
+// O INTERCETOR: O "Polícia de Trânsito" da sua Internet
+self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+
+    // REGRA 1: Ignora tudo o que não for GET (como envio de mensagens ao Firebase)
+    if (event.request.method !== 'GET') return;
+
+    // REGRA 2: Ignora o Firebase Database (Para as mensagens chegarem em tempo real)
+    if (url.hostname.includes('firestore.googleapis.com') || 
+        url.hostname.includes('identitytoolkit.googleapis.com') ||
+        url.hostname.includes('firebaseio.com')) {
+        return; 
     }
+
+    // REGRA 3: Estratégia "Stale-While-Revalidate" (Mostra o cache RÁPIDO, atualiza no fundo)
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            // Vai à internet procurar uma versão mais nova
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                // Se encontrou algo novo na internet, guarda no cache silenciosamente
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseToCache);
+                    });
+                }
+                return networkResponse;
+            }).catch(() => {
+                // Se estiver offline e a rede falhar, simplesmente falha silenciosamente
+                // porque o `cachedResponse` será devolvido logo abaixo.
+            });
+
+            // MAGIA: Devolve o Cache IMEDIATAMENTE. Se não existir no cache, espera a rede.
+            return cachedResponse || fetchPromise;
+        })
+    );
 });

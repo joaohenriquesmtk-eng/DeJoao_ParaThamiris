@@ -61,13 +61,21 @@ body {
 /* Efeito vidro */
 .cartao-vidro {
     background: var(--cor-vidro);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 20px;
-    margin: 15px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    
+    /* AS 3 MAGIAS DE PERFORMANCE AQUI: */
+    transform: translateZ(0); /* Manda pra GPU separada */
+    backface-visibility: hidden; /* Tira serrilhado de animação */
+    will-change: transform; /* Prepara a memória para os giros 3D */
+    
+    /* ... (resto dos seus códigos de reflexo que já colocamos antes) */
+    position: relative;
+    overflow: hidden;
 }
 
 /* ===== MENU INFERIOR ===== */
@@ -4722,6 +4730,8 @@ body.aura-ansiosa {
     position: relative;
     overflow-y: auto;
     will-change: transform;
+    transform: translateZ(0); 
+    backface-visibility: hidden;
 }
 
 /* A pílulazinha cinza no topo (igual iPhone) */

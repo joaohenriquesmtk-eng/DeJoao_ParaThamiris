@@ -37,11 +37,17 @@ window.addEventListener('load', () => {
 });
 
 // ==========================================
-// 1. GERADOR DE PARTÍCULAS (STARDUST RIPPLE)
+// 1. GERADOR DE PARTÍCULAS (COM TRAVA DE SEGURANÇA)
 // ==========================================
 window.ativarParticulasDeToque = () => {
-    // Função que desenha a luz no eixo X e Y
+    let ultimoToque = 0; // Memória de tempo
+
     const criarParticula = (x, y) => {
+        const agora = Date.now();
+        // A TRAVA: Só permite criar 1 partícula a cada 100 milissegundos
+        if (agora - ultimoToque < 100) return; 
+        ultimoToque = agora;
+
         const particula = document.createElement('div');
         particula.className = 'particula-toque';
         particula.style.left = `${x}px`;
@@ -49,23 +55,68 @@ window.ativarParticulasDeToque = () => {
         
         document.body.appendChild(particula);
 
-        // O Lixeiro: Remove a div invisível após a animação acabar para não travar a memória RAM
         setTimeout(() => {
             particula.remove();
         }, 600);
     };
 
-    // Sensor de toque na tela (Celular)
     document.addEventListener('touchstart', (e) => {
-        if (e.touches.length > 0) {
-            criarParticula(e.touches[0].clientX, e.touches[0].clientY);
-        }
+        if (e.touches.length > 0) criarParticula(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
 
-    // Sensor de clique do mouse (PC/Testes)
     document.addEventListener('mousedown', (e) => {
         criarParticula(e.clientX, e.clientY);
     });
+};
+
+// ==========================================
+// MOTOR DE OTIMIZAÇÃO (SMART SLEEP / OBSERVER)
+// ==========================================
+window.AppPerformance = {
+    isVisible: true,
+    elementosAtivos: new Set(),
+
+    iniciarRadar: () => {
+        // 1. Radar de Rolagem da Tela
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    window.AppPerformance.elementosAtivos.add(entry.target.id);
+                } else {
+                    window.AppPerformance.elementosAtivos.delete(entry.target.id);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Observa os elementos que pesam no celular
+        const pesados = ['bussola-3d', 'carrossel-3d', 'lottie-mood-container'];
+        pesados.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        // 2. Radar de Aplicativo Minimizado/Bloqueado
+        document.addEventListener('visibilitychange', () => {
+            window.AppPerformance.isVisible = document.visibilityState === 'visible';
+            
+            if (!window.AppPerformance.isVisible) {
+                // Se a tela apagou ou o app minimizou, congela as animações
+                if (window.LottieManager && window.LottieManager.instancia) {
+                    window.LottieManager.instancia.pause();
+                }
+            } else {
+                // Se voltou para o app, descongela
+                if (window.LottieManager && window.LottieManager.instancia) {
+                    window.LottieManager.instancia.play();
+                }
+            }
+        });
+    },
+
+    // A Trava que os gráficos vão usar para saber se podem rodar
+    podeRenderizar: (idElemento) => {
+        return window.AppPerformance.isVisible && window.AppPerformance.elementosAtivos.has(idElemento);
+    }
 };
 
 // ==========================================
@@ -3321,29 +3372,12 @@ if (temaIcon && temaSelector) {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
-            
-            // AUTO-AJUSTE: Se a aba abrir e a div ganhar tamanho real, a câmera se ajusta!
-            if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
-                largura = container.clientWidth;
-                altura = container.clientHeight || 200;
-                camera.aspect = largura / altura;
-                camera.updateProjectionMatrix();
-                renderer.setSize(largura, altura);
-            }
 
-            if (!bussolaVisivel) return;
+            // TRAVA QUÂNTICA: Se a bússola não está aparecendo na tela, PULA esse cálculo!
+            if (window.AppPerformance && !window.AppPerformance.podeRenderizar('bussola-3d')) return;
 
-            tempo += 0.02;
-            anel.position.y = Math.sin(tempo) * 0.1;
-            agulhaGroup.position.y = Math.sin(tempo) * 0.1;
-
-            if (window.anguloAlvoBussola !== undefined && window.anguloAlvoBussola !== null) {
-                let diferenca = window.anguloAlvoBussola - agulhaGroup.rotation.y;
-                while (diferenca < -Math.PI) diferenca += Math.PI * 2;
-                while (diferenca > Math.PI) diferenca -= Math.PI * 2;
-                agulhaGroup.rotation.y += diferenca * 0.05; 
-            }
-
+            // Se estiver na tela, continua o giro normal:
+            bussolaGroup.rotation.y += 0.01;
             renderer.render(scene, camera);
         };
         animar();
@@ -3589,21 +3623,15 @@ if (temaIcon && temaSelector) {
 
         const animar = () => {
             requestAnimationFrame(animar);
-            
-            // AUTO-AJUSTE: Garante que o carrossel se ajusta à tela do A55
-            if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
-                largura = container.clientWidth;
-                altura = container.clientHeight || 250;
-                camera.aspect = largura / altura;
-                camera.updateProjectionMatrix();
-                renderer.setSize(largura, altura);
-            }
-            
-            carrosselGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
+
+            // TRAVA QUÂNTICA: Se o carrossel não está na tela, PULA esse cálculo!
+            if (window.AppPerformance && !window.AppPerformance.podeRenderizar('carrossel-3d')) return;
+
+            // Se estiver na tela, continua o cálculo pesado e o giro normal:
             if (!isDragging) {
-                carrosselGroup.rotation.y += velocidadeGiro;
-                velocidadeGiro = velocidadeGiro * 0.95 + 0.005 * 0.05;
+                targetRotation += 0.002;
             }
+            carrosselGroup.rotation.y += (targetRotation - carrosselGroup.rotation.y) * 0.05;
             renderer.render(scene, camera);
         };
         animar();
@@ -3994,6 +4022,8 @@ window.LottieManager = {
         if(typeof ativarVidroMagnetico === 'function') ativarVidroMagnetico();
         if(typeof ativarPullToRefresh === 'function') ativarPullToRefresh();
         if(typeof ativarParticulasDeToque === 'function') ativarParticulasDeToque();
+        // LIGA O RADAR DE OTIMIZAÇÃO DE BATERIA
+        if(typeof window.AppPerformance.iniciarRadar === 'function') window.AppPerformance.iniciarRadar();
         // LIGA O MOTOR DE ARRASTAR MODAIS
         if(typeof ativarBottomSheets === 'function') ativarBottomSheets();
         

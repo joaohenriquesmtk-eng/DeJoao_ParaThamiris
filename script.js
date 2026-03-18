@@ -214,6 +214,47 @@ window.animarTextoCinematografico = (elemento) => {
 };
 
 // ==========================================
+// MOTOR DO PERGAMINHO (ABA LEIS)
+// ==========================================
+window.animarLeisEmCascata = () => {
+    const leis = document.querySelectorAll('.lei-item');
+    if (!leis.length) return;
+
+    leis.forEach((lei, index) => {
+        // Zera a animação primeiro (caso o usuário saia e volte para a aba)
+        lei.classList.remove('visivel');
+        
+        // Aplica o atraso em cascata: a primeira lei atrasa 0ms, a segunda 150ms, a terceira 300ms...
+        setTimeout(() => {
+            lei.classList.add('visivel');
+        }, index * 150); 
+    });
+};
+
+window.renovarVotos = () => {
+    // 1. Tique-tique forte do celular (Feedback Tátil Sênior)
+    if (window.Haptics) window.Haptics.sucesso();
+
+    // 2. Aciona a Ilha Dinâmica avisando que os votos foram renovados
+    if (typeof window.mostrarToast === 'function') {
+        window.mostrarToast("Votos renovados com sucesso!", "✍️");
+    }
+
+    // 3. Efeito visual extra no botão
+    const btn = document.getElementById('btn-renovar-votos');
+    if (btn) {
+        btn.style.transform = 'scale(0.95)';
+        btn.style.background = 'var(--cor-primaria)';
+        btn.style.color = '#000';
+        setTimeout(() => {
+            btn.style.transform = 'scale(1)';
+            btn.style.background = 'rgba(212, 175, 55, 0.1)';
+            btn.style.color = 'var(--cor-primaria)';
+        }, 300);
+    }
+};
+
+// ==========================================
 // SISTEMA PARA O PULSO (usa Firebase)
 // ==========================================
 window.SantuarioApp = window.SantuarioApp || {};
@@ -475,33 +516,48 @@ function configurarNavegacao() {
 
             // A função exata de troca de classes no DOM
             const atualizarDOM = () => {
+                // 1. Atualiza os botões do menu
                 botoesMenu.forEach(b => b.classList.remove('ativo'));
                 botao.classList.add('ativo');
 
+                // 2. Esconde todas as telas principais com segurança
                 todasAsTelas.forEach(tela => {
                     tela.classList.add('escondido');
-                    tela.classList.remove('saindo'); // Limpa a classe velha
+                    tela.classList.remove('saindo');
+                    tela.classList.remove('ativo');
                 });
 
+                // 3. Mostra apenas a tela que você clicou
                 const elementoTela = document.getElementById(telaAlvo);
-                if (elementoTela) elementoTela.classList.remove('escondido');
+                if (elementoTela) {
+                    elementoTela.classList.remove('escondido');
+                    elementoTela.classList.add('ativo');
+                }
 
                 telaAtual = telaAlvo;
 
-                // Lógicas específicas de cada tela
-                // ... dentro da função atualizarDOM na configuração de navegação
-if (telaAlvo === 'jogos') {
-    if (typeof playAudioJogos === 'function') playAudioJogos();
-} else if (telaAnterior === 'jogos') {
-    if (typeof pauseAudioJogos === 'function') pauseAudioJogos();
-}
+                // ==========================================
+                // LÓGICAS ESPECÍFICAS DE CADA TELA
+                // ==========================================
+                
+                // Áudio dos Jogos
+                if (telaAlvo === 'jogos') {
+                    if (typeof playAudioJogos === 'function') playAudioJogos();
+                } else if (telaAnterior === 'jogos') {
+                    if (typeof pauseAudioJogos === 'function') pauseAudioJogos();
+                }
 
-// --- ADICIONE ISTO AQUI EMBAIXO ---
-if (telaAlvo === 'cofre') {
-    if (window.MotorDeAudio) window.MotorDeAudio.abafar(); // Som fica místico no cofre
-} else if (telaAnterior === 'cofre') {
-    if (window.MotorDeAudio) window.MotorDeAudio.focar(); // Som volta ao normal na Home
-}
+                // Animação do Pergaminho
+                if (telaAlvo === 'leis') {
+                    if(typeof window.animarLeisEmCascata === 'function') window.animarLeisEmCascata();
+                }
+
+                // Áudio Espacial (Mesa de Som)
+                if (telaAlvo === 'cofre') {
+                    if (window.MotorDeAudio) window.MotorDeAudio.abafar(); 
+                } else if (telaAnterior === 'cofre') {
+                    if (window.MotorDeAudio) window.MotorDeAudio.focar(); 
+                }
             };
 
             // A MÁGICA: Se o celular suportar a View Transitions API
@@ -922,15 +978,20 @@ function enviarPulso() {
     runTransaction(refMeuContador, (valorAtual) => (valorAtual || 0) + 1);
 
     const btn = document.getElementById("btn-pulso");
-btn.classList.add('pulso-enviado');
-setTimeout(() => btn.classList.remove('pulso-enviado'), 1000);
+    if(btn) {
+        btn.classList.add('pulso-enviado');
+        setTimeout(() => btn.classList.remove('pulso-enviado'), 1000);
+        btn.classList.add("germinar");
+    }
+    
     const icone = document.getElementById("icone-semente");
     const feedback = document.getElementById("msg-feedback");
     const txtContador = document.getElementById("contador-pulso");
-    
 
-    if (icone) icone.innerText = "💖";
-    if (btn) btn.classList.add("germinar");
+    if (icone) {
+        icone.innerText = "💖";
+        icone.classList.add("pulsando-forte"); // <--- AQUI A MÁGICA: Liga a animação
+    }
     if (txtContador) txtContador.innerText = "Sintonia enviada pelo espaço...";
     if (feedback) {
         feedback.innerText = "Chegou lá!";
@@ -938,11 +999,13 @@ setTimeout(() => btn.classList.remove('pulso-enviado'), 1000);
     }
 
     setTimeout(() => {
-        if (icone) icone.innerText = "🌱";
+        if (icone) {
+            icone.innerText = "🌱";
+            icone.classList.remove("pulsando-forte"); // <--- DESLIGA A MÁGICA: Para de pulsar
+        }
         if (btn) btn.classList.remove("germinar");
         if (feedback) feedback.classList.remove("visivel");
     }, 2500);
-    
 }
 
 

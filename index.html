@@ -108,12 +108,16 @@
                     <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
                 </div>
 
-                <div class="area-pulso" style="position: relative;">
-                    <button id="btn-pulso" onclick="enviarPulso()">
-                        <span id="icone-semente" class="icone-pulso">🌱</span>
-                    </button>
-                    <p id="contador-pulso">Você pensou nele hoje?</p>
-                    <span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
+                <div class="cartao-vidro" style="text-align: center; margin-top: 20px; display: flex; flex-direction: column; align-items: center; padding: 25px 20px;">
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 20px;">Pulso de Vida</h3>
+                    
+                    <div class="area-pulso" style="position: relative; margin: 0; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                        <button id="btn-pulso" onclick="if(window.Haptics) window.Haptics.toqueForte(); enviarPulso()">
+                            <span id="icone-semente" class="icone-pulso">🌱</span>
+                        </button>
+                        <p id="contador-pulso" style="margin-top: 15px;">Você pensou nele hoje?</p>
+                        <span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
+                    </div>
                 </div>
 
                 <div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 20px;">
@@ -196,13 +200,37 @@
 
             </section> 
 
-            <section id="leis" class="tela escondido">
-                <div class="cartao-vidro header-leis" style="text-align: center;">
-                    <h3 style="color: var(--cor-primaria);">Vade Mecum do Afeto</h3>
-                    <p class="subtitulo-lei" style="font-size: 12px; opacity: 0.8; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase;">Edição Especial: João & Thamiris</p>
+            <div id="leis" class="tela escondido" style="padding: 20px; padding-bottom: 120px;">
+        
+        <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📜</div>
+            <h2 style="font-family: 'Playfair Display', serif; color: var(--cor-primaria); margin-bottom: 5px; font-size: 1.8rem;">O Pergaminho</h2>
+            <p style="color: #ccc; font-size: 0.85rem; margin-bottom: 25px; font-style: italic;">As leis inquebráveis do nosso Santuário.</p>
+
+            <div id="lista-leis" style="text-align: left;">
+                <div class="lei-item">
+                    <strong>I.</strong> Nunca dormir brigados, não importa a tempestade.
                 </div>
-                <div class="lista-leis"></div>
-            </section>
+                <div class="lei-item">
+                    <strong>II.</strong> O respeito mútuo está acima de qualquer emoção temporária.
+                </div>
+                <div class="lei-item">
+                    <strong>III.</strong> Celebrar as pequenas vitórias um do outro.
+                </div>
+                <div class="lei-item">
+                    <strong>IV.</strong> Sinceridade absoluta, mesmo quando for difícil falar.
+                </div>
+                <div class="lei-item">
+                    <strong>V.</strong> O amor é uma escolha diária e inegociável.
+                </div>
+            </div>
+
+            <button id="btn-renovar-votos" class="btn-acao" style="margin-top: 30px; width: 100%; padding: 15px; font-size: 1.1rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(212, 175, 55, 0.1); border-radius: 15px;" onclick="renovarVotos()">
+                ✍️ Renovar Votos
+            </button>
+        </div>
+
+    </div>
 
             <section id="jogos" class="tela escondido">
                 <div id="header-jogos-main" class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
@@ -221,33 +249,44 @@
 <!-- Botão de mute -->
 <button id="btn-mute-jogos" class="btn-mute escondido" title="Ativar/desativar música">🔊</button>
 
-<div id="menu-jogos" class="grade-jogos">
-    <div class="item-jogo" onclick="abrirJogo('termo')">
+<div id="menu-jogos" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 5px 10px; margin-bottom: 20px;">
+    
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('termo')">
         <img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
-        <p>Termo do Santuário</p>
+        <h4 class="titulo-jogo-grid">Termo do Santuário</h4>
+        <p class="desc-jogo-grid">Palavras do coração</p>
     </div>
 
-    
-    <div class="item-jogo" onclick="abrirJogo('tribunal')">
-        <img src="assets/icones-jogos/tribunal.png" alt="Tribunal do Afeto" class="icone-jogo-img">
-        <p>Tribunal do Afeto</p>
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('tribunal')">
+        <img src="assets/icones-jogos/tribunal.png" alt="Tribunal" class="icone-jogo-img">
+        <h4 class="titulo-jogo-grid">Tribunal do Afeto</h4>
+        <p class="desc-jogo-grid">Quem tem a razão?</p>
     </div>
-    <div class="item-jogo" onclick="abrirJogo('sincronia')">
+
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('sincronia')">
         <img src="assets/icones-jogos/sincronia.png" alt="Sincronia" class="icone-jogo-img">
-        <p>Match de Sincronia</p>
+        <h4 class="titulo-jogo-grid">Match de Sincronia</h4>
+        <p class="desc-jogo-grid">Conexão quântica</p>
     </div>
-    <div class="item-jogo" onclick="abrirJogo('minifazenda')">
+
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('minifazenda')">
         <img src="assets/icones-jogos/minifazenda.png" alt="Mini Fazenda" class="icone-jogo-img">
-        <p>Mini Fazenda</p>
+        <h4 class="titulo-jogo-grid">Mini Fazenda</h4>
+        <p class="desc-jogo-grid">Cultive o amor</p>
     </div>
-    <div class="item-jogo" onclick="abrirJogo('jardim')">
-        <img src="assets/icones-jogos/jardim.png" alt="Solo Fértil" class="icone-jogo-img">
-        <p>Nosso Solo Fértil</p>
+
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('jardim')">
+        <img src="assets/icones-jogos/jardim.png" alt="Jardim" class="icone-jogo-img">
+        <h4 class="titulo-jogo-grid">Nosso Solo Fértil</h4>
+        <p class="desc-jogo-grid">A Árvore da Vida</p>
     </div>
-    <div class="item-jogo" onclick="abrirJogo('julgamento')">
-        <img src="assets/icones-jogos/julgamento.png" alt="Julgamento da Safra" class="icone-jogo-img">
-        <p>Julgamento da Safra</p>
+
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('julgamento')">
+        <img src="assets/icones-jogos/julgamento.png" alt="Julgamento" class="icone-jogo-img">
+        <h4 class="titulo-jogo-grid">Julgamento da Safra</h4>
+        <p class="desc-jogo-grid">Combine as provas</p>
     </div>
+
 </div>
 
 <!-- Botão de mute na tela Jogos (fora dos jogos) -->

@@ -828,13 +828,6 @@
         });
     </script>
 
-    <script src="script.js"></script>
-    <div id="toast-mensagem" class="toast escondido"></div>
-    <script src="minifazenda_novo.js"></script>
-    <script src="tribunal.js"></script>
-    <script src="julgamento.js"></script>
-
-    <!-- Tela de login -->
     <div id="tela-login">
         <div class="login-container">
             <h1 class="login-logo texto-ouro-vivo">Santuário</h1>
@@ -847,15 +840,12 @@
 
     <div id="modal-emergencia" class="modal-overlay escondido">
         <div class="bottom-sheet" id="sheet-emergencia">
-            <div class="drag-handle"></div> <div class="emergencia-conteudo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center;">
+            <div class="drag-handle"></div> 
+            <div class="emergencia-conteudo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center;">
                 <div class="emergencia-icone" style="font-size: 3.5rem; margin-bottom: 10px; animation: pulsarAnsiedade 2s infinite alternate;">⚠️</div>
-                
                 <h2 id="emergencia-titulo" style="font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0 0 10px 0; padding: 0; width: 100%;">Alerta de Cuidado</h2>
                 <p id="emergencia-mensagem" style="margin: 0 0 25px 0; padding: 0; color: #ccc; font-size: 1rem; width: 100%;"></p>
-                
-                <button id="btn-fechar-emergencia" class="btn-acao" style="width: 100%; padding: 15px; background: rgba(212, 175, 55, 0.15); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 15px; font-size: 1.1rem; font-weight: bold;" onclick="fecharEmergencia()">
-                    Já vou!
-                </button>
+                <button id="btn-fechar-emergencia" class="btn-acao" style="width: 100%; padding: 15px; background: rgba(212, 175, 55, 0.15); border: 2px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 15px; font-size: 1.1rem; font-weight: bold;" onclick="fecharEmergencia()">Já vou!</button>
             </div>
         </div>
     </div>
@@ -865,7 +855,16 @@
         <span id="island-text" class="island-text">Mensagem</span>
     </div>
 
-<div class="fio-de-ouro"></div>
+    <div class="fio-de-ouro"></div>
+
+    <script src="core.js"></script>
+    <script src="ui.js"></script>
+    <script src="graficos3d.js"></script>
+    <script src="tribunal.js"></script>
+    <script src="julgamento.js"></script>
+    <script src="minifazenda_novo.js"></script>
+    <script src="script.js"></script> 
+    <script src="app.js"></script>
 
 </body>
 </html>

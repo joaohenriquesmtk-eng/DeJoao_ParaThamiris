@@ -1177,7 +1177,7 @@ window.enviarPostit = function() {
     
     set(refNovoPostit, {
     autor: window.MEU_NOME,
-    mensagem: window.SantuarioCrypto.codificar(textoDaMensagem), // <--- BLINDAGEM AQUI
+    mensagem: window.SantuarioCrypto.codificar(texto), // <--- Corrigido para 'texto'
     timestamp: idUnico,
     fixado: false,
     curtidas: 0
@@ -1564,4 +1564,92 @@ function atualizarTelasStory() {
 window.fecharCapsula = () => {
     document.getElementById('modal-capsula').classList.add('escondido');
     if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+// ==========================================
+// MOTOR DOS "NOSSOS ECOS" (GRAVAÇÃO DE ÁUDIO)
+// ==========================================
+let gravadorDeVoz;
+let fragmentosDeAudio = [];
+window.ecoRecebidoAudio = null; // Guardará o áudio que vem do Firebase
+
+window.iniciarGravacao = async function() {
+    try {
+        // Pede permissão e liga o microfone do celular
+        const fluxo = await navigator.mediaDevices.getUserMedia({ audio: true });
+        gravadorDeVoz = new MediaRecorder(fluxo);
+        fragmentosDeAudio = [];
+
+        // Vai guardando os pedacinhos da voz enquanto fala
+        gravadorDeVoz.ondataavailable = (e) => {
+            if (e.data.size > 0) fragmentosDeAudio.push(e.data);
+        };
+
+        // Quando soltar o botão, ele empacota tudo e envia
+        gravadorDeVoz.onstop = () => {
+            const blobAudio = new Blob(fragmentosDeAudio, { type: 'audio/webm' });
+            
+            // O Firebase RTDB não aceita arquivos "crus", então transformamos o áudio em texto (Base64)
+            const leitor = new FileReader();
+            leitor.readAsDataURL(blobAudio);
+            leitor.onloadend = () => {
+                const audioBase64 = leitor.result;
+                salvarEcoNoFirebase(audioBase64);
+            };
+        };
+
+        gravadorDeVoz.start();
+        document.getElementById('status-eco').innerText = "Gravando batimentos sonoros... 🎙️";
+        document.getElementById('btn-gravar-eco').style.boxShadow = "0 0 20px #ff6b6b";
+        document.getElementById('btn-gravar-eco').style.borderColor = "#ff6b6b";
+        
+        // Vibra levinho pra avisar que começou
+        if(window.Haptics) window.Haptics.toqueLeve();
+        
+    } catch (err) {
+        console.error("Erro ao acessar microfone:", err);
+        document.getElementById('status-eco').innerText = "Permissão de microfone negada!";
+    }
+};
+
+window.pararGravacao = function() {
+    if (gravadorDeVoz && gravadorDeVoz.state === "recording") {
+        gravadorDeVoz.stop();
+        // Desliga a "luz vermelha" do microfone do celular
+        gravadorDeVoz.stream.getTracks().forEach(track => track.stop());
+        
+        document.getElementById('status-eco').innerText = "Processando frequências...";
+        document.getElementById('btn-gravar-eco').style.boxShadow = "";
+        document.getElementById('btn-gravar-eco').style.borderColor = "var(--cor-primaria)";
+    }
+};
+
+function salvarEcoNoFirebase(base64) {
+    if (!window.SantuarioApp.modulos) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    // Salva na pasta do remetente
+    const refEco = ref(db, 'ecos_recentes/' + window.MEU_NOME.toLowerCase());
+    
+    set(refEco, {
+        audio: base64,
+        timestamp: Date.now()
+    }).then(() => {
+        document.getElementById('status-eco').innerText = "Voz enviada pelas estrelas! ✨";
+        if(window.Haptics) window.Haptics.sucesso();
+    });
+}
+
+window.tocarEco = function() {
+    if (window.ecoRecebidoAudio) {
+        window.ecoRecebidoAudio.play();
+        document.getElementById('status-eco').innerText = `Ouvindo a voz de ${window.NOME_PARCEIRO}... 🎵`;
+        
+        // Quando a voz terminar de tocar...
+        window.ecoRecebidoAudio.onended = () => {
+            document.getElementById('status-eco').innerText = "Eco finalizado. O silêncio voltou.";
+        };
+    } else {
+        document.getElementById('status-eco').innerText = "Nenhuma voz ecoando no momento.";
+    }
 };

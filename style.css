@@ -475,18 +475,19 @@ body.modo-jogo-ativo .tela {
 
 .feedback-pulso {
     position: absolute;
-    bottom: -25px;
+    bottom: 0px; /* Faz a mensagem nascer colada no texto acima dela */
     left: 50%;
     transform: translateX(-50%);
-    font-size: 10px;
+    font-size: 11px; /* Aumentei 1px para ela ler com mais conforto */
     color: var(--cor-primaria);
     opacity: 0;
-    transition: 0.5s;
+    transition: 0.5s ease-out; /* Deixa o movimento de descida mais suave */
+    white-space: nowrap; /* Garante que a frase nunca quebre em duas linhas */
 }
 
 .feedback-pulso.visivel {
     opacity: 1;
-    bottom: -35px;
+    bottom: -22px; /* Desce justinho até a borda de segurança do vidro, sem ser cortada */
 }
 
 /* Solo Fértil */
@@ -5051,4 +5052,82 @@ body.aura-ansiosa {
     color: #000 !important;
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
     border-color: var(--cor-primaria) !important;
+}
+
+/* ==========================================
+   NOVO PULSO DE VIDA - ORBE DE ENERGIA
+========================================== */
+#btn-pulso {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.1);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* O núcleo do Orbe (A luz central) */
+.orbe-nucleo {
+    width: 35px;
+    height: 35px;
+    background: radial-gradient(circle, #fff 0%, var(--cor-primaria) 40%, transparent 80%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--cor-primaria), 0 0 40px var(--cor-primaria);
+    animation: respiracaoOrbe 3s infinite alternate ease-in-out;
+    z-index: 3;
+}
+
+/* Os anéis giratórios em volta do núcleo */
+.orbe-anel {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    pointer-events: none;
+}
+
+.anel-interno {
+    width: 60px; height: 60px;
+    border-top: 2px solid var(--cor-primaria);
+    border-right: 2px solid rgba(212, 175, 55, 0.3);
+    animation: girarAnel 4s linear infinite;
+    z-index: 2;
+}
+
+.anel-externo {
+    width: 80px; height: 80px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.8);
+    border-left: 2px solid transparent;
+    animation: girarAnel 7s linear infinite reverse;
+    z-index: 1;
+}
+
+/* Animação quando o pulso é enviado (A explosão de luz) */
+.pulso-enviado .orbe-nucleo {
+    animation: explosaoOrbe 1s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+.pulso-enviado .anel-interno, .pulso-enviado .anel-externo {
+    border-color: #ff6b6b !important;
+    box-shadow: 0 0 15px #ff6b6b;
+}
+
+@keyframes respiracaoOrbe {
+    0% { transform: scale(0.9); opacity: 0.8; filter: hue-rotate(0deg); }
+    100% { transform: scale(1.2); opacity: 1; filter: hue-rotate(10deg); }
+}
+
+@keyframes girarAnel {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes explosaoOrbe {
+    0% { transform: scale(1); background: #fff; box-shadow: 0 0 50px #fff; }
+    50% { transform: scale(3); background: #ff6b6b; box-shadow: 0 0 80px #ff6b6b; opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
 }

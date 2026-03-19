@@ -133,7 +133,27 @@ window.SantuarioApp.conectar = function() {
         });
         if (postits.length > 0) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
     });
+
+    // --- RADAR DE ECOS (Escuta se a outra pessoa mandou áudio) ---
+    const refEcoParceiro = ref(db, 'ecos_recentes/' + window.NOME_PARCEIRO.toLowerCase());
+    onValue(refEcoParceiro, (snapshot) => {
+        const dados = snapshot.val();
+        const btnOuvir = document.getElementById('btn-ouvir-eco');
+        const statusEco = document.getElementById('status-eco');
+        
+        if (dados && dados.audio) {
+            // Constrói o áudio que veio da nuvem
+            window.ecoRecebidoAudio = new Audio(dados.audio);
+            if (btnOuvir) {
+                btnOuvir.style.display = 'inline-block'; // Revela o botão de Play
+                btnOuvir.style.animation = 'pulse-gold 2s infinite';
+            }
+            if (statusEco) statusEco.innerText = "Um novo eco chegou no espaço.";
+        }
+    });
 };
+
+
 
 // ==========================================
 // FUNÇÕES DO PULSO E JARDIM (FIREBASE)
@@ -159,19 +179,13 @@ window.enviarPulso = function() {
 
     const btn = document.getElementById("btn-pulso");
     if(btn) {
-        btn.classList.add('pulso-enviado');
-        setTimeout(() => btn.classList.remove('pulso-enviado'), 1000);
-        btn.classList.add("germinar");
+        btn.classList.add('pulso-enviado'); // Dispara a explosão de luz no CSS
+        setTimeout(() => btn.classList.remove('pulso-enviado'), 1500); // Reseta
     }
     
-    const icone = document.getElementById("icone-semente");
     const feedback = document.getElementById("msg-feedback");
     const txtContador = document.getElementById("contador-pulso");
 
-    if (icone) {
-        icone.innerText = "💖";
-        icone.classList.add("pulsando-forte");
-    }
     if (txtContador) txtContador.innerText = "Sintonia enviada pelo espaço...";
     if (feedback) {
         feedback.innerText = "Chegou lá!";
@@ -179,11 +193,6 @@ window.enviarPulso = function() {
     }
 
     setTimeout(() => {
-        if (icone) {
-            icone.innerText = "🌱";
-            icone.classList.remove("pulsando-forte");
-        }
-        if (btn) btn.classList.remove("germinar");
         if (feedback) feedback.classList.remove("visivel");
     }, 2500);
 };

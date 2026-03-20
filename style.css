@@ -838,32 +838,6 @@ body.modo-jogo-ativo .tela {
     background: rgba(212, 175, 55, 0.2);
 }
 
-/* Toast */
-.toast {
-    position: fixed;
-    bottom: 100px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    width: fit-content;
-    max-width: 90vw;
-    background: rgba(0, 0, 0, 0.8);
-    color: var(--cor-primaria);
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid var(--cor-primaria);
-    backdrop-filter: blur(10px);
-    z-index: 10000;
-    animation: fadeInOut 2s ease forwards;
-    pointer-events: none;
-    text-align: center;
-    white-space: normal;      /* ← permite quebrar linha */
-    word-wrap: break-word;    /* ← quebra palavras longas */
-    line-height: 1.4;         /* ← espaçamento entre linhas */
-}
-
 @keyframes fadeInOut {
     0% {
         opacity: 0;
@@ -5130,4 +5104,976 @@ body.aura-ansiosa {
     0% { transform: scale(1); background: #fff; box-shadow: 0 0 50px #fff; }
     50% { transform: scale(3); background: #ff6b6b; box-shadow: 0 0 80px #ff6b6b; opacity: 1; }
     100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* ==========================================
+   O ORÁCULO DE CRISTAL (TERMO PREMIUM)
+========================================== */
+#container-termo {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    /* Fundo místico profundo */
+    background: radial-gradient(circle at top, #1c1326 0%, #05030a 100%);
+    z-index: 100; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.conteudo-termo {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 80px 10px 30px 10px; overflow-y: auto; width: 100%;
+}
+
+/* O Pedestal do Motor 3D */
+.oraculo-pedestal {
+    position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto;
+    animation: flutuarOraculo 4s infinite alternate ease-in-out;
+}
+.brilho-oraculo {
+    position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 15px; background: #D4AF37; filter: blur(15px); opacity: 0.6;
+    animation: pulsarBrilhoOraculo 2s infinite alternate;
+}
+@keyframes flutuarOraculo { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+@keyframes pulsarBrilhoOraculo { 0% { opacity: 0.3; transform: translateX(-50%) scale(0.8); } 100% { opacity: 0.8; transform: translateX(-50%) scale(1.2); } }
+
+/* A Grade de Vidro Esculpido */
+.grade-oraculo {
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px;
+}
+.linha-termo {
+    display: flex; gap: 8px; justify-content: center;
+}
+
+.termo-quadrado {
+    width: 14vw; height: 14vw; max-width: 55px; max-height: 55px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 900; color: #fff;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    transition: transform 0.1s, border-color 0.2s;
+    /* Preparo para o 3D Flip */
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+/* Quando digita uma letra */
+.termo-quadrado.preenchido {
+    border-color: rgba(212, 175, 55, 0.6);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2), inset 0 0 15px rgba(212, 175, 55, 0.1);
+    animation: popLetra 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* As Cores do Destino (Com animação de Flip 3D) */
+.termo-quadrado.correta {
+    background: linear-gradient(145deg, #27ae60, #2ecc71) !important;
+    border-color: #2ecc71 !important;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.6), inset 0 0 15px rgba(255,255,255,0.4) !important;
+    color: #000 !important; text-shadow: none !important;
+}
+.termo-quadrado.presente {
+    background: linear-gradient(145deg, #d35400, #f1c40f) !important;
+    border-color: #f1c40f !important;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.5), inset 0 0 15px rgba(255,255,255,0.3) !important;
+    color: #000 !important;
+}
+.termo-quadrado.ausente {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-color: #222 !important;
+    color: #555 !important;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.9) !important;
+}
+
+/* A Mágica do Giro (Flip) */
+.anim-flip {
+    animation: flipOraculo 0.6s ease forwards;
+}
+
+@keyframes popLetra { 0% { transform: scale(0.8); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes flipOraculo {
+    0% { transform: rotateX(0deg); }
+    50% { transform: rotateX(90deg); opacity: 0; }
+    51% { opacity: 1; }
+    100% { transform: rotateX(0deg); }
+}
+
+/* Teclado Futurista */
+.teclado-oraculo {
+    display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 500px;
+}
+.teclado-linha { display: flex; justify-content: center; gap: 6px; }
+.tecla {
+    flex: 1; height: 45px; background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+    color: white; font-weight: bold; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; backdrop-filter: blur(5px);
+    transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.tecla:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+.tecla-larga { flex: 1.5; font-size: 1.2rem; background: rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.4); color: #D4AF37; }
+
+/* Status do Teclado (Sincronizado com a grade) */
+.tecla.correta { background: #2ecc71; color: #000; border-color: #27ae60; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
+.tecla.presente { background: #f39c12; color: #000; border-color: #e67e22; }
+.tecla.ausente { background: #111; color: #444; border-color: #000; opacity: 0.4; }
+
+.btn-verificar-oraculo {
+    width: 100%; background: linear-gradient(145deg, #D4AF37, #b5952f);
+    color: #000; font-weight: 900; letter-spacing: 1px; font-size: 1.2rem;
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+}
+
+.linha-termo {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+/* O Cubo de Cristal Base */
+.letra-quadrado {
+    width: min(60px, 15vw);
+    height: min(60px, 15vw);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: bold; color: #fff;
+    text-transform: uppercase;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.1), 0 5px 15px rgba(0,0,0,0.5);
+    
+    /* Prepara para girar */
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
+}
+
+/* A animação de giro (Flip) */
+.letra-quadrado.flip {
+    transform: rotateX(180deg);
+}
+
+/* O conteúdo dentro precisa desvirar para não ficar de cabeça para baixo */
+.letra-quadrado.flip span {
+    transform: rotateX(180deg);
+    display: block;
+}
+
+/* Cores após o giro */
+.letra-quadrado.correta {
+    background: linear-gradient(145deg, #2ecc71, #1e8449);
+    border-color: #2ecc71;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.4), inset 0 0 15px rgba(255,255,255,0.2);
+}
+
+.letra-quadrado.presente {
+    background: linear-gradient(145deg, #f1c40f, #d4ac0d);
+    border-color: #f1c40f;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.4), inset 0 0 15px rgba(255,255,255,0.2);
+}
+
+.letra-quadrado.ausente {
+    background: linear-gradient(145deg, #2c3e50, #1a252f);
+    border-color: #34495e;
+    opacity: 0.6;
+}
+
+/* Botão Dica de Amor */
+.btn-dica-amor {
+    background: linear-gradient(145deg, #ff6b6b, #c0392b);
+    border: 1px solid #ff9999;
+    color: white;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.btn-dica-amor:active { transform: scale(0.9); }
+
+.btn-verificar-oraculo {
+    max-width: 400px;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    margin-top: 10px;
+}
+
+
+/* ==========================================
+   TRIBUNAL DO AFETO (RPG JURÍDICO)
+========================================== */
+#container-tribunal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100dvh;
+    background: radial-gradient(circle at top, #2c1a1a 0%, var(--cor-fundo) 100%);
+    z-index: 100;
+    display: flex; flex-direction: column;
+}
+
+.conteudo-tribunal {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 20px 10px 100px 10px;
+    overflow-y: auto;
+}
+
+/* O Cartão do Caso (Parece um documento antigo) */
+.cartao-caso-rpg {
+    width: 100%; max-width: 450px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-left: 5px solid #D4AF37;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.cartao-caso-rpg h3 {
+    color: #FFD700;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.meta-painel {
+    display: flex; justify-content: space-between;
+    background: rgba(0,0,0,0.5);
+    padding: 10px; border-radius: 8px;
+    font-family: monospace; font-size: 1.1rem;
+}
+
+/* O Cartão da Testemunha (Efeito de Alerta) */
+.testemunha-card {
+    width: 100%; max-width: 450px;
+    display: flex; align-items: center; gap: 15px;
+    background: linear-gradient(145deg, rgba(231, 76, 60, 0.1), rgba(0,0,0,0.4));
+    border: 1px solid #e74c3c;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 15px;
+    animation: pulsarTestemunha 2s infinite alternate;
+}
+
+.testemunha-icone { font-size: 2.5rem; filter: drop-shadow(0 0 5px rgba(231,76,60,0.5)); }
+.testemunha-texto strong { color: #e74c3c; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+.testemunha-texto p { margin: 0; font-style: italic; font-size: 0.85rem; color: #ddd; }
+
+@keyframes pulsarTestemunha {
+    0% { box-shadow: 0 0 5px rgba(231, 76, 60, 0.1); }
+    100% { box-shadow: 0 0 15px rgba(231, 76, 60, 0.4); }
+}
+
+/* A Mesa de Cartas */
+.mesa-cartas-rpg {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%; max-width: 450px;
+    margin-top: auto;
+    margin-bottom: 20px;
+}
+
+/* O Martelo 3D e Botão de Julgar */
+.area-martelo {
+    width: 100%; max-width: 450px;
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: auto;
+}
+
+.martelo-icone {
+    font-size: 4rem;
+    margin-bottom: -15px; /* Sobrepõe o botão de leve */
+    z-index: 5;
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transform-origin: bottom right; /* Gira pela base do cabo do martelo */
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.6));
+}
+
+.btn-julgar-rpg {
+    font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;
+    background: linear-gradient(145deg, #D4AF37, #8B5A2B);
+    box-shadow: 0 6px 0 #5D3A1A, 0 10px 20px rgba(0,0,0,0.5);
+    transition: all 0.1s;
+}
+
+.btn-julgar-rpg:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #5D3A1A, 0 5px 10px rgba(0,0,0,0.5);
+}
+
+/* Animação do Martelo Batendo! */
+.batida-martelo {
+    animation: baterMartelo 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes baterMartelo {
+    0% { transform: rotate(0deg) scale(1); }
+    40% { transform: rotate(-30deg) scale(1.1); } /* Levanta o martelo */
+    80% { transform: rotate(45deg) scale(0.9); } /* Bate com força na tela! */
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Efeito quando a Dica de Amor revela uma carta */
+.carta-revelada-dica {
+    box-shadow: 0 0 20px #ff6b6b, inset 0 0 15px rgba(255, 107, 107, 0.5) !important;
+    border-color: #ff6b6b !important;
+    transform: scale(1.05);
+    animation: pulsarDica 1s infinite alternate;
+}
+
+@keyframes pulsarDica {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.4); }
+}
+
+/* O nome divertido da prova dentro da carta */
+.carta-nome-prova {
+    font-size: 0.65rem;
+    color: #D4AF37;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 5px;
+    line-height: 1.1;
+}
+
+/* Flash de Quebra de Vidro ao Vencer */
+.flash-vidro {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: white;
+    z-index: 999;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: sumirFlash 0.5s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+@keyframes sumirFlash {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.1); }
+}
+
+/* Animação de Punição: Clicou na Armadilha da Testemunha! */
+.tremida-erro {
+    animation: tremerObjecao 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.8), inset 0 0 10px rgba(231, 76, 60, 0.3) !important;
+}
+
+@keyframes tremerObjecao {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px) rotate(-2deg); }
+    40%, 80% { transform: translateX(8px) rotate(2deg); }
+}
+
+
+/* ==========================================
+   SINCRONIA QUÂNTICA (TELEPATIA)
+========================================== */
+#container-sincronia {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: radial-gradient(circle at center, #1a0b2e 0%, #000000 100%);
+    z-index: 100; display: flex; flex-direction: column;
+}
+
+/* ==========================================
+   CORREÇÃO DE SOBREPOSIÇÃO: SINCRONIA QUÂNTICA
+========================================== */
+.conteudo-sincronia {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Impede o esmagamento no topo */
+    padding: 80px 10px 30px 10px; /* 80px de respiro perfeito para a Top Bar */
+    overflow-y: auto;
+    width: 100%;
+}
+
+.area-orbe {
+    display: flex; flex-direction: column; align-items: center;
+    margin-top: 20px; width: 100%;
+}
+
+.status-texto {
+    font-family: monospace; font-size: 0.9rem; color: #888;
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 30px; text-align: center;
+    min-height: 20px;
+}
+
+/* --- A ORBE 3D --- */
+.orbe-container {
+    position: relative; width: 150px; height: 150px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px;
+}
+
+.orbe {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    transition: all 1s ease-in-out;
+    z-index: 10;
+}
+
+/* Orbe quando apenas 1 pessoa está online */
+.orbe-desconectada {
+    background: radial-gradient(circle at 30% 30%, #4a5568, #1a202c);
+    box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.1);
+    animation: pulsarLento 3s infinite alternate;
+}
+
+/* Orbe quando OS DOIS estão online */
+.orbe-conectada {
+    background: radial-gradient(circle at 30% 30%, #e056fd, #686de0);
+    box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5), 
+                0 0 30px rgba(224, 86, 253, 0.6), 
+                0 0 60px rgba(104, 109, 224, 0.4);
+    animation: pulsarForte 1.5s infinite alternate;
+}
+
+/* Orbe no momento da Revelação (Combinação Perfeita) */
+.orbe-sincronizada {
+    background: radial-gradient(circle at 30% 30%, #f6e58d, #f9ca24);
+    box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5), 
+                0 0 50px rgba(246, 229, 141, 1), 
+                0 0 100px rgba(249, 202, 36, 0.8);
+    transform: scale(1.2);
+}
+
+@keyframes pulsarLento { 0% { transform: scale(0.95); opacity: 0.7; } 100% { transform: scale(1.05); opacity: 1; } }
+@keyframes pulsarForte { 0% { transform: scale(0.9); filter: brightness(1); } 100% { transform: scale(1.1); filter: brightness(1.5); } }
+
+/* Os anéis orbitando a orbe */
+.anel-orbita {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.anel-1 { width: 160px; height: 160px; border-top-color: rgba(224, 86, 253, 0.5); animation: girar 8s linear infinite; }
+.anel-2 { width: 180px; height: 180px; border-bottom-color: rgba(104, 109, 224, 0.5); animation: girar 12s linear infinite reverse; }
+
+@keyframes girar { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* --- A PERGUNTA E OS CAMPOS --- */
+.tema-pergunta {
+    font-size: 1.2rem; font-style: italic; color: #fff;
+    text-align: center; max-width: 80%;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 20px; line-height: 1.4;
+}
+
+.area-telepatia { width: 100%; max-width: 400px; margin-top: auto; }
+
+.inputs-telepatia {
+    background: rgba(255,255,255,0.05); border-radius: 15px;
+    border: 1px solid rgba(155, 89, 182, 0.3); padding: 20px;
+    display: flex; flex-direction: column; gap: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.campo-jogador, .campo-parceiro { display: flex; flex-direction: column; gap: 8px; }
+.campo-jogador label, .campo-parceiro label { font-size: 0.8rem; color: #b2bec3; text-transform: uppercase; }
+
+#input-minha-palavra {
+    background: rgba(0,0,0,0.4); border: 1px solid #686de0;
+    color: white; padding: 12px; border-radius: 8px;
+    font-size: 1.1rem; text-align: center; outline: none; transition: all 0.3s;
+}
+#input-minha-palavra:focus { border-color: #e056fd; box-shadow: 0 0 15px rgba(224, 86, 253, 0.3); }
+
+.btn-travar {
+    background: linear-gradient(145deg, #686de0, #4834d4);
+    box-shadow: 0 4px 15px rgba(104, 109, 224, 0.4); border: none;
+}
+
+.status-parceira { font-style: italic; color: #aaa; text-align: center; padding: 10px; }
+.palavra-oculta { background: rgba(0,0,0,0.5); color: #e056fd; text-align: center; padding: 12px; border-radius: 8px; border: 1px dashed #e056fd; font-weight: bold; }
+.palavra-revelada { background: linear-gradient(145deg, #f6e58d, #f9ca24); color: #000; text-align: center; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; box-shadow: 0 0 15px rgba(246, 229, 141, 0.5); text-transform: uppercase; letter-spacing: 2px;}
+
+
+/* ==========================================
+   SIMULADOR AGRÍCOLA (MINI FAZENDA PRO)
+========================================== */
+#container-minifazenda {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: linear-gradient(to bottom, #1a2a6c, #112911, #0f1a0f);
+    z-index: 100; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.conteudo-fazenda {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 10px; overflow-y: auto; z-index: 5;
+}
+
+/* --- CLIMA DINÂMICO (Real Weather Sync) --- */
+.camada-clima {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 2; transition: opacity 2s ease;
+}
+
+.clima-chuva {
+    background: url('https://media.giphy.com/media/tOvtKihX8qWc/giphy.gif') center/cover;
+    opacity: 0.15; mix-blend-mode: screen;
+}
+
+.clima-noite { background: rgba(0, 5, 20, 0.7); }
+
+/* Vagalumes do Paraná/Goiás */
+#vagalumes-overlay {
+    position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 3;
+    background-image: radial-gradient(2px 2px at 20px 30px, #d4af37, rgba(0,0,0,0)),
+                      radial-gradient(2px 2px at 40px 70px, #fffdf2, rgba(0,0,0,0)),
+                      radial-gradient(2px 2px at 90px 40px, #d4af37, rgba(0,0,0,0));
+    background-repeat: repeat; background-size: 200px 200px;
+    animation: piscarVagalume 4s infinite alternate, flutuarVagalume 20s linear infinite;
+    opacity: 0.6;
+}
+
+@keyframes piscarVagalume { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; } }
+@keyframes flutuarVagalume { from { transform: translateY(0) translateX(0); } to { transform: translateY(-100px) translateX(50px); } }
+
+/* --- A GRADE DE PLANTAÇÃO & MANEJO DE SOLO --- */
+.grade-plantacao {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    width: 100%; max-width: 600px; margin: 20px 0;
+}
+
+.canteiro-pro {
+    background: linear-gradient(145deg, #3e2723, #21130d);
+    border: 2px solid #5d4037; border-radius: 12px;
+    height: 120px; position: relative; display: flex;
+    flex-direction: column; align-items: center; justify-content: flex-end;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8); transition: transform 0.2s;
+}
+.canteiro-pro:active { transform: scale(0.95); }
+
+/* Medidores Agronômicos */
+.medidores-solo {
+    position: absolute; top: 5px; left: 5px; right: 5px;
+    display: flex; flex-direction: column; gap: 3px;
+}
+
+.barra-medidor {
+    width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;
+}
+.preenchimento-ph { height: 100%; background: #e74c3c; width: 50%; border-radius: 2px; } /* Vermelho = Ácido, Verde = Ideal */
+.preenchimento-npk { height: 100%; background: #9b59b6; width: 30%; border-radius: 2px; } /* Roxo = Nutrientes */
+.preenchimento-agua { height: 100%; background: #3498db; width: 80%; border-radius: 2px; }
+
+/* Pragas */
+.alerta-praga {
+    position: absolute; top: -10px; right: -10px;
+    font-size: 1.5rem; animation: pulsarErro 1s infinite alternate; filter: drop-shadow(0 0 5px red);
+}
+
+/* --- ECONOMIA: SILO E BOLSA DE VALORES --- */
+.painel-economia-agricola {
+    display: flex; gap: 15px; width: 100%; max-width: 600px; margin-bottom: 20px;
+}
+
+.modulo-economia {
+    flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px; padding: 15px; backdrop-filter: blur(10px);
+}
+
+.modulo-economia h5 { color: #D4AF37; margin-bottom: 10px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 5px; }
+.item-estoque { font-family: monospace; font-size: 0.95rem; color: #fff; margin-bottom: 5px; }
+.item-mercado { 
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 8px; margin-bottom: 8px; cursor: pointer;
+}
+
+.preco-alta { color: #2ecc71; font-weight: bold; }
+.preco-baixa { color: #e74c3c; font-weight: bold; }
+.preco-neutro { color: #fff; }
+
+.btn-vender { background: #27ae60; color: white; border: none; padding: 4px 8px; border-radius: 5px; font-size: 0.75rem; }
+
+/* --- LOJA E INSUMOS --- */
+.loja-agricola-container {
+    width: 100%; max-width: 600px; background: rgba(20,20,20,0.8);
+    border-radius: 15px 15px 0 0; padding: 15px; margin-top: auto;
+}
+
+.abas-loja { display: flex; gap: 10px; margin-bottom: 15px; }
+.aba-btn {
+    flex: 1; background: transparent; border: 1px solid #D4AF37; color: #D4AF37;
+    padding: 8px; border-radius: 8px; transition: all 0.3s;
+}
+.aba-btn.ativa { background: #D4AF37; color: #000; font-weight: bold; }
+
+.item-loja-pro {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 10px;
+}
+.item-loja-pro button { background: #D4AF37; color: #000; border: none; padding: 5px 15px; border-radius: 8px; font-weight: bold; }
+
+/* Lotties da Pastagem */
+.area-pastagem { display: flex; justify-content: space-around; width: 100%; margin: 10px 0; }
+
+
+/* --- TRAVA DE ROTAÇÃO (LANDSCAPE ENFORCER) --- */
+.alerta-rotacao {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 15, 10, 0.98); z-index: 9999;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; color: white; padding: 20px;
+}
+
+.icone-celular-girando {
+    font-size: 5rem; animation: girarCelularAnim 2s infinite ease-in-out; margin-bottom: 20px;
+}
+
+@keyframes girarCelularAnim {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+    100% { transform: rotate(-90deg); }
+}
+
+/* A Magia Negra do CSS: Detecta a orientação física da tela do usuário! */
+@media screen and (orientation: portrait) {
+    /* Se estiver em pé (retrato), mostra o alerta e esconde todo o resto do jogo! */
+    #container-minifazenda:not(.escondido) .alerta-rotacao { display: flex !important; }
+    #container-minifazenda .top-bar, 
+    #container-minifazenda .conteudo-fazenda,
+    #container-minifazenda .camada-clima { display: none !important; }
+}
+
+
+/* --- ANIMATRONICS CSS 3D (Offline Safe) --- */
+.animatronic-fazenda {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%; width: 100px; height: 100px;
+    cursor: pointer; transition: transform 0.2s;
+}
+
+.animatronic-fazenda:active { transform: scale(0.9); }
+
+.emoji-3d {
+    font-size: 4rem;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.6));
+    animation: respiracaoAnimal 3s ease-in-out infinite alternate;
+}
+
+#maquina-trator .emoji-3d {
+    animation: vibracaoMotor 0.2s linear infinite; /* Trator ligado treme */
+}
+
+.status-animal {
+    font-size: 0.75rem; background: rgba(0,0,0,0.7);
+    padding: 2px 8px; border-radius: 10px; color: #fff;
+    margin-top: -10px; z-index: 5;
+}
+
+@keyframes respiracaoAnimal {
+    0% { transform: scaleY(1) translateY(0); }
+    100% { transform: scaleY(1.05) translateY(-5px); }
+}
+
+@keyframes vibracaoMotor {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    50% { transform: translate(-1px, -1px) rotate(-1deg); }
+    100% { transform: translate(1px, -1px) rotate(1deg); }
+}
+
+
+/* ==========================================
+   JULGAMENTO DA SAFRA (MATCH-3 NEON)
+========================================== */
+#container-julgamento {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: radial-gradient(circle at center, #2c0e37 0%, #0a0510 100%);
+    z-index: 100; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.conteudo-julgamento {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px; overflow: hidden;
+}
+
+/* Painel de Pontos */
+.painel-score-choque {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(155, 89, 182, 0.4);
+    border-radius: 15px; padding: 15px; text-align: center; width: 100%; max-width: 400px;
+    backdrop-filter: blur(10px); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.score-titulo { font-size: 0.8rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 2px; }
+.score-valor { font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 15px #9b59b6; font-family: monospace; }
+.score-meta { font-size: 0.85rem; color: #D4AF37; margin-top: 5px; }
+
+/* O Tabuleiro Magnético (Geometria 6x7 Corrigida) */
+.tabuleiro-match3 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* Exatas 6 Colunas */
+    grid-template-rows: repeat(7, 1fr);    /* Exatas 7 Linhas */
+    gap: 4px;
+    width: 95vw; max-width: 420px;
+    aspect-ratio: 6 / 7; /* Proporção Perfeita para 6x7 sem cortar em baixo! */
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px; border-radius: 15px;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(155, 89, 182, 0.2);
+    position: relative;
+    touch-action: none; /* ESSENCIAL: Impede que a tela do celular role para baixo quando a pessoa tentar arrastar uma joia! */
+}
+
+/* AS JOIAS 2.5D (Efeito Bloom) */
+.joia-cristal {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), rgba(0,0,0,0.4));
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    /* Ilusão 3D e Brilho (Bloom) da Joia */
+    box-shadow: inset 2px 2px 5px rgba(255,255,255,0.4), inset -2px -2px 5px rgba(0,0,0,0.6);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.joia-cristal:active { transform: scale(0.85); }
+
+/* Seleção */
+.joia-selecionada {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #fff, inset 0 0 10px #fff;
+    border: 2px solid white;
+    z-index: 5;
+    animation: pulsarJoia 1s infinite alternate;
+}
+
+/* A SEMENTE DOURADA (Nuke) */
+.semente-dourada {
+    background: radial-gradient(circle at center, #fff, #f1c40f, #e67e22) !important;
+    animation: sementeRadiante 0.5s infinite alternate !important;
+    border-radius: 50%; /* Ela é redonda e não quadrada */
+    box-shadow: 0 0 30px #f1c40f, inset 0 0 20px #fff !important;
+    font-size: clamp(2rem, 10vw, 3rem);
+}
+
+@keyframes pulsarJoia { 0% { filter: brightness(1); } 100% { filter: brightness(1.5); } }
+@keyframes sementeRadiante { 0% { transform: scale(1); box-shadow: 0 0 20px #f1c40f; } 100% { transform: scale(1.1); box-shadow: 0 0 50px #fff; } }
+
+/* Animações de Movimento e Explosão */
+.anim-descendo { transition: transform 0.3s ease-in; }
+.anim-trocando { transition: transform 0.3s ease-in-out; z-index: 10; }
+.anim-explodindo {
+    animation: explodirJoia 0.3s forwards;
+}
+
+@keyframes explodirJoia {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); filter: brightness(2); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+/* Onda de Choque (Flash Branco na Tela Inteira) */
+#flash-choque {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #fff; z-index: 999; opacity: 0.8; pointer-events: none;
+    animation: sumirChoque 0.8s forwards ease-out;
+}
+
+@keyframes sumirChoque { 0% { opacity: 0.9; } 100% { opacity: 0; display: none; } }
+
+/* ==========================================
+   MENSAGENS ÉPICAS DE COMBO (MATCH-3)
+========================================== */
+.texto-combo {
+    position: absolute; 
+    top: 45%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    font-family: 'Playfair Display', serif; 
+    font-size: clamp(2.5rem, 10vw, 4.5rem); 
+    font-weight: 900;
+    color: #FFF;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.1;
+    
+    /* Efeito 3D e Neon */
+    -webkit-text-stroke: 2px #d35400;
+    text-shadow: 
+        0px 5px 0px #c0392b,
+        0px 10px 15px rgba(0,0,0,0.8), 
+        0 0 30px #f1c40f, 
+        0 0 50px #ff9f43;
+        
+    z-index: 9999; 
+    pointer-events: none;
+    
+    /* Ao invés de opacity, ele fica invisível por padrão */
+    display: none; 
+}
+
+/* A CLASSE GATILHO QUE O JS VAI CHAMAR */
+.texto-combo.mostrar-animacao {
+    display: block; /* Aparece! */
+    animation: flutuarTextoEpico 1.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes flutuarTextoEpico {
+    0% { opacity: 0; transform: translate(-50%, -20%) scale(0.1) rotate(-10deg); }
+    30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(5deg); filter: brightness(1.5); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    80% { opacity: 1; transform: translate(-50%, -60%) scale(1.05); }
+    100% { opacity: 0; transform: translate(-50%, -100%) scale(1.5); filter: blur(5px); }
+}
+
+
+
+/* ==========================================
+   NOSSO SOLO FÉRTIL (ESTUFA QUÂNTICA)
+========================================== */
+#container-jardim {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: radial-gradient(circle at center, #0d2b18 0%, #050a05 100%);
+    z-index: 100; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.conteudo-jardim {
+    flex: 1; 
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    justify-content: flex-start; /* CORREÇÃO: Impede que o conteúdo vaze para cima */
+    padding: 80px 10px 30px 10px; /* CORREÇÃO: Espaço reservado para não bater na Top Bar */
+    overflow-y: auto;
+}
+
+/* O Pedestal Místico do Prisma */
+.area-estufa {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 30px; margin-top: 20px;
+}
+
+.prisma-pedestal {
+    position: relative;
+    width: 250px; height: 300px;
+    display: flex; align-items: center; justify-content: center;
+    /* O Pedestal físico desenhado em CSS puro */
+    background: radial-gradient(ellipse at bottom, rgba(46, 204, 113, 0.15) 0%, transparent 60%);
+    border-bottom: 2px solid rgba(46, 204, 113, 0.4);
+    border-radius: 50%;
+    animation: flutuarPedestal 4s infinite ease-in-out alternate;
+}
+
+/* 1. Garante que o Prisma preencha o pedestal e seja tocável */
+#prisma-3d {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 5;
+    pointer-events: auto; /* Permite que vocês girem o prisma com o dedo! */
+}
+
+/* 2. O Badge Premium de Ciclos (Substitui o texto solto) */
+.badge-ciclos {
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(145deg, rgba(212, 175, 55, 0.15), rgba(0, 0, 0, 0.8));
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    padding: 6px 18px;
+    border-radius: 20px;
+    color: #D4AF37;
+    font-size: 0.85rem;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.1);
+    backdrop-filter: blur(5px);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap; 
+    flex-shrink: 0;
+}
+
+.icone-ciclo {
+    font-size: 1.1rem;
+    animation: pulsarBrilho 2s infinite alternate;
+    flex-shrink: 0; /* Impede o ícone de ser esmagado */
+}
+
+.brilho-base {
+    position: absolute; bottom: -10px; width: 150px; height: 20px;
+    background: #2ecc71; filter: blur(20px); opacity: 0.5;
+    animation: pulsarBrilho 2s infinite alternate;
+}
+
+@keyframes flutuarPedestal { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+@keyframes pulsarBrilho { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 0.7; transform: scale(1.2); } }
+
+/* Textos de Status */
+.status-estufa { text-align: center; margin-top: 20px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+.texto-evolucao { font-size: 1.2rem; font-family: 'Playfair Display', serif; color: #fff; text-shadow: 0 0 10px #2ecc71; }
+.texto-ultima-acao { font-size: 0.8rem; color: #aaa; margin-top: 5px; font-style: italic; }
+
+/* Barra de Progresso Suprema */
+.painel-progresso-jardim { width: 100%; max-width: 400px; margin-bottom: 30px; }
+.trilha-crescimento { width: 100%; height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; box-shadow: inset 0 0 10px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+.seiva-vital { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71, #a8ff78); border-radius: 6px; box-shadow: 0 0 15px #2ecc71; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* Painel de Ações (Botões) */
+.painel-acoes-jardim { display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 400px; }
+.btn-nutrir {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 10px; border-radius: 15px; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.05); backdrop-filter: blur(5px);
+    transition: all 0.2s; border-top: 1px solid rgba(255,255,255,0.2);
+}
+.btn-nutrir:active { transform: scale(0.9); }
+
+.icone-btn { font-size: 1.8rem; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+.nome-btn { font-size: 0.75rem; color: #fff; font-weight: bold; text-transform: uppercase; }
+.custo-btn { font-size: 0.7rem; color: #FFD700; margin-top: 3px; font-family: monospace; }
+
+/* Cores Específicas dos Botões */
+.btn-agua { box-shadow: inset 0 0 15px rgba(52, 152, 219, 0.2); }
+.btn-agua:active { background: rgba(52, 152, 219, 0.3); }
+.btn-luz { box-shadow: inset 0 0 15px rgba(241, 196, 15, 0.2); }
+.btn-luz:active { background: rgba(241, 196, 15, 0.3); }
+.btn-magia { box-shadow: inset 0 0 15px rgba(155, 89, 182, 0.2); }
+.btn-magia:active { background: rgba(155, 89, 182, 0.3); }
+
+/* Animação Mística quando chega a 100% */
+.arvore-florescendo { animation: pulsarFlorescimento 1s infinite alternate; }
+@keyframes pulsarFlorescimento { 0% { filter: brightness(1) drop-shadow(0 0 20px #2ecc71); } 100% { filter: brightness(1.5) drop-shadow(0 0 50px #f1c40f); } }
+
+
+
+
+
+/* ==========================================
+   CORREÇÃO GLOBAL: NOTIFICAÇÕES (TOASTS) DEIXAR SEMPRE POR ÚLTIMO PARA GARANTIR QUE FIQUE POR CIMA DE TUDO!
+========================================== */
+/* ==========================================
+   CORREÇÃO GLOBAL: NOTIFICAÇÕES (TOASTS)
+========================================== */
+#toast, .toast, .toast-notificacao, [id*="toast"] {
+    max-width: 90vw !important; /* Respeita as margens da tela do celular */
+    width: max-content !important; 
+    box-sizing: border-box !important;
+    white-space: normal !important; /* Permite a quebra de linha do texto */
+    word-wrap: break-word !important;
+    text-align: center !important;
+    padding: 15px 20px !important;
+    line-height: 1.5 !important;
+    border-radius: 12px !important;
 }

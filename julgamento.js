@@ -1,453 +1,460 @@
-// ==========================================
-// JULGAMENTO DA SAFRA - MOTOR BLINDADO E COM VIBRAÇÃO
-// ==========================================
+// ============================================================================
+// JULGAMENTO DA SAFRA: THE MAGNETIC MATCH-3 (PADRÃO OURO)
+// ============================================================================
 
 (function() {
-    // ========== VARIÁVEIS PRIVADAS ==========
-    const tiposPecas = ['🌽', '⚖️', '🌱', '📜', '🔨', '🌻'];
-    let grade = [];
-    const linhas = 6;
-    const colunas = 6;
+    // 1. ÁUDIOS CINEMATOGRÁFICOS E LOCAIS
+    const AudioMatch = {
+        troca: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
+        match3: new Audio('assets/sons/acerto.mp3'), // Som de acerto local
+        match5: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'),
+        explosaoNuke: new Audio('https://assets.mixkit.co/active_storage/sfx/2771/2771-preview.mp3'),
+        subirNivel: new Audio('assets/sons/nivel.mp3'),
+        erroGameOver: new Audio('assets/sons/erro.mp3') // Som de erro local
+    };
+    Object.values(AudioMatch).forEach(a => a.volume = 0.5);
+
+    // 2. CONFIGURAÇÕES DO TABULEIRO (GEOMETRIA RIGOROSA)
+    const LINHAS = 7;
+    const COLUNAS = 6;
+    const JOIAS = [
+        { emoji: '🌽', cor: '#f1c40f' }, 
+        { emoji: '⚖️', cor: '#9b59b6' }, 
+        { emoji: '☕', cor: '#7f8c8d' }, 
+        { emoji: '🔨', cor: '#e74c3c' }, 
+        { emoji: '💧', cor: '#3498db' }, 
+        { emoji: '🌱', cor: '#2ecc71' }  
+    ];
+    const SEMENTE_DOURADA = '🌟';
+
+    // 3. ESTADO DO JOGO
+    let grade = []; 
     let pontuacao = 0;
     let nivel = 1;
-    let meta = 100;
-    let selecionada = null;
-    let jogoAtivo = true;
-    let processando = false; 
+    let metaNivel = 1000;
+    let movimentosRestantes = 15;
+    
+    let joiaSelecionada = null; 
+    let processandoCascata = false; 
 
-    // ========== EFEITOS SONOROS ==========
-    const somAcerto = new Audio('assets/sons/acerto.mp3');
-    const somNivel  = new Audio('assets/sons/nivel.mp3');
+    // Variáveis para detectar Arraste (Swipe)
+    let startX = 0, startY = 0;
 
-    somAcerto.volume = 0.6;
-    somNivel.volume  = 0.7;
-
-    function tocarSom(som) {
-        if (som) {
-            som.currentTime = 0;
-            som.play().catch(e => console.log('Áudio bloqueado:', e));
-        }
-    }
-
-    // ========== FUNÇÕES AUXILIARES ==========
-    function mostrarToast(mensagem) {
-        if (typeof window.mostrarToast === 'function') {
-            window.mostrarToast(mensagem);
-        } else {
-            alert(mensagem);
-        }
-    }
-
-    function gerarGradeAleatoria() {
-        const novaGrade = [];
-        for (let i = 0; i < linhas; i++) {
-            novaGrade[i] = [];
-            for (let j = 0; j < colunas; j++) {
-                novaGrade[i][j] = tiposPecas[Math.floor(Math.random() * tiposPecas.length)];
-            }
-        }
-        return novaGrade;
-    }
-
-    function renderizarGrade() {
-        const gradeDiv = document.getElementById('julgamento-grade');
-        if (!gradeDiv) return;
+    // 4. INICIALIZAÇÃO
+    window.iniciarJulgamento = function() {
+        console.log("Iniciando Match-3 Magnético Sênior...");
+        nivel = 1;
+        metaNivel = 1000;
+        iniciarNovoNivel();
         
-        gradeDiv.innerHTML = '';
-        for (let i = 0; i < linhas; i++) {
-            for (let j = 0; j < colunas; j++) {
-                const peca = document.createElement('div');
-                peca.className = 'peca-julgamento';
-                peca.dataset.linha = i;
-                peca.dataset.coluna = j;
-                peca.innerText = grade[i][j] || '';
-                
-                if (grade[i][j] === null) {
-                    peca.style.transform = 'scale(0)';
-                    peca.style.opacity = '0';
-                    peca.style.transition = 'all 0.2s';
-                }
-                
-                peca.onclick = () => selecionarPeca(i, j);
-                gradeDiv.appendChild(peca);
+        const btnNovo = document.getElementById('julgamento-btn-novo');
+        if(btnNovo) btnNovo.onclick = () => { iniciarNovoNivel(true); }; // Força reinício manual
+    };
+
+    function iniciarNovoNivel(resetarTudo = false) {
+        if(resetarTudo) { pontuacao = 0; nivel = 1; metaNivel = 1000; }
+        
+        // A Dificuldade e Balanceamento: Ganha mais movimentos por nível, mas a meta é agressiva!
+        movimentosRestantes = 15 + Math.floor(nivel * 2); 
+        processandoCascata = false;
+        
+        gerarGradeInicial();
+        atualizarPlacarUI();
+    }
+
+    // 5. GERAÇÃO BLINDADA DO TABULEIRO
+    function gerarGradeInicial() {
+        const tabuleiro = document.getElementById('julgamento-grade');
+        tabuleiro.innerHTML = '';
+        grade = [];
+
+        for (let l = 0; l < LINHAS; l++) {
+            grade[l] = [];
+            for (let c = 0; c < COLUNAS; c++) {
+                let joia;
+                let isMatch;
+                // Garante que NENHUMA linha de 3 venha pronta do berço!
+                do {
+                    isMatch = false;
+                    joia = JOIAS[Math.floor(Math.random() * JOIAS.length)];
+                    if (c >= 2 && grade[l][c-1].emoji === joia.emoji && grade[l][c-2].emoji === joia.emoji) isMatch = true;
+                    if (l >= 2 && grade[l-1][c].emoji === joia.emoji && grade[l-2][c].emoji === joia.emoji) isMatch = true;
+                } while (isMatch);
+
+                grade[l][c] = { ...joia };
             }
+        }
+        atualizarVisualDaGrade();
+    }
+
+    function criarElementoVisual(l, c, joia) {
+        const tabuleiro = document.getElementById('julgamento-grade');
+        const div = document.createElement('div');
+        div.className = 'joia-cristal';
+        div.id = `joia-${l}-${c}`;
+        div.innerText = joia.emoji;
+        div.style.filter = `drop-shadow(0 0 8px ${joia.cor})`;
+
+        if (joia.emoji === SEMENTE_DOURADA) div.classList.add('semente-dourada');
+
+        // === EVENTOS DE DRAG E DROP (ARRASTE) E TOQUE UNIFICADOS ===
+        
+        // Mobile (Touch)
+        div.addEventListener('touchstart', e => {
+            if(processandoCascata) return;
+            startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+            lidarSelecaoInicial(l, c, div);
+        }, {passive: true});
+
+        div.addEventListener('touchend', e => {
+            lidarSoltura(l, c, e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        });
+
+        // PC (Mouse)
+        div.addEventListener('mousedown', e => {
+            if(processandoCascata) return;
+            startX = e.clientX; startY = e.clientY;
+            lidarSelecaoInicial(l, c, div);
+        });
+
+        div.addEventListener('mouseup', e => {
+            lidarSoltura(l, c, e.clientX, e.clientY);
+        });
+
+        tabuleiro.appendChild(div);
+        return div;
+    }
+
+    // 6. A LÓGICA DE MOVIMENTO UNIFICADO
+    function lidarSelecaoInicial(l, c, el) {
+        if (!joiaSelecionada) {
+            joiaSelecionada = { l, c, el };
+            el.classList.add('joia-selecionada');
+            if(window.Haptics) window.Haptics.toqueLeve();
         }
     }
 
-    function atualizarInterface() {
-        const nivelEl = document.getElementById('julgamento-nivel');
-        const pontosEl = document.getElementById('julgamento-pontos');
-        const metaEl = document.getElementById('julgamento-meta');
-        if (nivelEl) nivelEl.innerText = nivel;
-        if (pontosEl) pontosEl.innerText = pontuacao;
-        if (metaEl) metaEl.innerText = meta;
-    }
+    function lidarSoltura(origemL, origemC, endX, endY) {
+        if (processandoCascata || !joiaSelecionada) return;
 
-    function salvarJogo() {
-        const dados = { grade, pontuacao, nivel, meta };
-        localStorage.setItem('julgamento_safra', JSON.stringify(dados));
-    }
+        let dx = endX - startX;
+        let dy = endY - startY;
 
-    // ========== VERIFICAÇÃO DE JOGADAS POSSÍVEIS ==========
-    function temJogadaPossivel() {
-        for (let i = 0; i < linhas; i++) {
-            for (let j = 0; j < colunas; j++) {
-                if (j + 1 < colunas) {
-                    const temp = grade[i][j];
-                    grade[i][j] = grade[i][j+1];
-                    grade[i][j+1] = temp;
-                    if (verificarCombinacoes()) {
-                        grade[i][j+1] = grade[i][j];
-                        grade[i][j] = temp;
-                        return true;
-                    }
-                    grade[i][j+1] = grade[i][j];
-                    grade[i][j] = temp;
-                }
-                if (i + 1 < linhas) {
-                    const temp = grade[i][j];
-                    grade[i][j] = grade[i+1][j];
-                    grade[i+1][j] = temp;
-                    if (verificarCombinacoes()) {
-                        grade[i+1][j] = grade[i][j];
-                        grade[i][j] = temp;
-                        return true;
-                    }
-                    grade[i+1][j] = grade[i][j];
-                    grade[i][j] = temp;
-                }
-            }
-        }
-        return false;
-    }
-
-    // ========== MECÂNICAS DO JOGO ==========
-    function saoAdjacentes(a, b) {
-        return (Math.abs(a.linha - b.linha) + Math.abs(a.coluna - b.coluna)) === 1;
-    }
-
-    function trocarPecas(a, b) {
-        const temp = grade[a.linha][a.coluna];
-        grade[a.linha][a.coluna] = grade[b.linha][b.coluna];
-        grade[b.linha][b.coluna] = temp;
-        renderizarGrade();
-    }
-
-    function verificarCombinacoes() {
-        for (let i = 0; i < linhas; i++) {
-            for (let j = 0; j < colunas - 2; j++) {
-                if (grade[i][j] && grade[i][j] === grade[i][j+1] && grade[i][j] === grade[i][j+2]) return true;
-            }
-        }
-        for (let j = 0; j < colunas; j++) {
-            for (let i = 0; i < linhas - 2; i++) {
-                if (grade[i][j] && grade[i][j] === grade[i+1][j] && grade[i][j] === grade[i+2][j]) return true;
-            }
-        }
-        return false;
-    }
-
-    function aplicarGravidadeModelo() {
-        for (let j = 0; j < colunas; j++) {
-            const coluna = [];
-            for (let i = 0; i < linhas; i++) {
-                if (grade[i][j] !== null) coluna.push(grade[i][j]);
-            }
-            for (let i = linhas - 1; i >= 0; i--) {
-                if (coluna.length > 0) {
-                    grade[i][j] = coluna.pop();
-                } else {
-                    grade[i][j] = null;
-                }
-            }
-        }
-    }
-
-    function preencherNovasPecasModelo() {
-        for (let i = 0; i < linhas; i++) {
-            for (let j = 0; j < colunas; j++) {
-                if (grade[i][j] === null) {
-                    grade[i][j] = tiposPecas[Math.floor(Math.random() * tiposPecas.length)];
-                }
-            }
-        }
-    }
-
-    function resolverCombinacoesSemAnimacao() {
-        let combinou = true;
-        while (combinou) {
-            combinou = false;
-            const removerSet = new Set();
-
-            for (let i = 0; i < linhas; i++) {
-                for (let j = 0; j < colunas - 2; j++) {
-                    if (grade[i][j] && grade[i][j] === grade[i][j+1] && grade[i][j] === grade[i][j+2]) {
-                        let k = j;
-                        while (k < colunas && grade[i][k] === grade[i][j]) {
-                            removerSet.add(`${i},${k}`);
-                            k++;
-                        }
-                        combinou = true;
-                    }
-                }
-            }
-            for (let j = 0; j < colunas; j++) {
-                for (let i = 0; i < linhas - 2; i++) {
-                    if (grade[i][j] && grade[i][j] === grade[i+1][j] && grade[i][j] === grade[i+2][j]) {
-                        let k = i;
-                        while (k < linhas && grade[k][j] === grade[i][j]) {
-                            removerSet.add(`${k},${j}`);
-                            k++;
-                        }
-                        combinou = true;
-                    }
-                }
-            }
-
-            if (!combinou) break;
-
-            const paraRemover = Array.from(removerSet).map(coord => {
-                const [l, c] = coord.split(',').map(Number);
-                return { linha: l, coluna: c };
-            });
-
-            paraRemover.forEach(pos => {
-                grade[pos.linha][pos.coluna] = null;
-            });
-
-            pontuacao += paraRemover.length * 10;
-            aplicarGravidadeModelo();
-            preencherNovasPecasModelo();
-
-            while (pontuacao >= meta) {
-                nivel++;
-                meta = Math.floor(meta * 1.5);
-                pontuacao = 0;
-            }
-        }
-        atualizarInterface();
-        salvarJogo();
-    }
-
-    function processarCombinacoes() {
-        // Agora verificamos, mas o jogo sempre libera a trava antes de recursões
-        if (processando) return; 
-        processando = true;
-
-        let combinou = false;
-        const removerSet = new Set();
-
-        // Linhas
-        for (let i = 0; i < linhas; i++) {
-            for (let j = 0; j < colunas - 2; j++) {
-                if (grade[i][j] && grade[i][j] === grade[i][j+1] && grade[i][j] === grade[i][j+2]) {
-                    let k = j;
-                    while (k < colunas && grade[i][k] === grade[i][j]) {
-                        removerSet.add(`${i},${k}`);
-                        k++;
-                    }
-                    combinou = true;
-                }
-            }
-        }
-        // Colunas
-        for (let j = 0; j < colunas; j++) {
-            for (let i = 0; i < linhas - 2; i++) {
-                if (grade[i][j] && grade[i][j] === grade[i+1][j] && grade[i][j] === grade[i+2][j]) {
-                    let k = i;
-                    while (k < linhas && grade[k][j] === grade[i][j]) {
-                        removerSet.add(`${k},${j}`);
-                        k++;
-                    }
-                    combinou = true;
-                }
-            }
-        }
-
-        if (!combinou) {
-            processando = false;
+        // Se ele ativou a Semente Dourada apenas clicando nela!
+        if (grade[origemL][origemC].emoji === SEMENTE_DOURADA && Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+            joiaSelecionada.el.classList.remove('joia-selecionada');
+            joiaSelecionada = null;
+            detonarOndaDeChoque(origemL, origemC);
             return;
         }
 
-        tocarSom(somAcerto); 
-
-        const paraRemover = Array.from(removerSet).map(coord => {
-            const [l, c] = coord.split(',').map(Number);
-            return { linha: l, coluna: c };
-        });
-
-        paraRemover.forEach(pos => {
-            const pecaEl = document.querySelector(`.peca-julgamento[data-linha="${pos.linha}"][data-coluna="${pos.coluna}"]`);
-            if (pecaEl) pecaEl.classList.add('removendo');
-        });
-
-        setTimeout(() => {
-            paraRemover.forEach(pos => {
-                grade[pos.linha][pos.coluna] = null;
-            });
-
-            pontuacao += paraRemover.length * 10;
-
-            aplicarGravidadeModelo();
-            preencherNovasPecasModelo();
-
-            if (pontuacao >= meta) {
-                nivel++;
-                meta = Math.floor(meta * 1.5);
-                pontuacao = 0;
-                tocarSom(somNivel);
-                mostrarToast(`🥳 Nível ${nivel}!`);
-            }
-
-            atualizarInterface();
-            salvarJogo();
-            renderizarGrade();
-
-            document.querySelectorAll('.peca-julgamento').forEach(el => {
-                el.classList.add('nova');
-                setTimeout(() => el.classList.remove('nova'), 400); 
-            });
-
-            if (verificarCombinacoes()) {
-                // A SOLUÇÃO DO CONGELAMENTO: Libera a trava explicitamente antes da próxima chamada em cascata!
-                processando = false; 
-                setTimeout(processarCombinacoes, 400); // Dá um fôlego para as peças caírem na tela
-            } else {
-                processando = false;
-                if (!temJogadaPossivel()) {
-                    grade = gerarGradeAleatoria();
-                    mostrarToast("🌀 Grade reembaralhada!");
-                    renderizarGrade();
-                    salvarJogo();
-                }
-            }
-        }, 300); 
-    }
-
-    function selecionarPeca(linha, coluna) {
-        if (!jogoAtivo || processando || grade[linha][coluna] === null) return; 
-
-        if (selecionada === null) {
-            selecionada = { linha, coluna };
-            document.querySelector(`.peca-julgamento[data-linha="${linha}"][data-coluna="${coluna}"]`).classList.add('selecionada');
-        } else {
-            const primeira = selecionada;
-            const segunda = { linha, coluna };
+        if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
+            // FOI UM ARRASTE (SWIPE)
+            joiaSelecionada.el.classList.remove('joia-selecionada');
+            let targetL = origemL; 
+            let targetC = origemC;
             
-            // Remove a seleção visual
-            document.querySelectorAll('.peca-julgamento').forEach(p => p.classList.remove('selecionada'));
-            selecionada = null;
-
-            if (saoAdjacentes(primeira, segunda)) {
-                trocarPecas(primeira, segunda);
-                
-                if (verificarCombinacoes()) {
-                    processarCombinacoes();
-                } else {
-                    processando = true;
-                    
-                    // Vibração visual (CSS) nas DUAS peças da troca inválida
-                    const p1 = document.querySelector(`.peca-julgamento[data-linha="${primeira.linha}"][data-coluna="${primeira.coluna}"]`);
-                    const p2 = document.querySelector(`.peca-julgamento[data-linha="${segunda.linha}"][data-coluna="${segunda.coluna}"]`);
-                    if (p1) p1.classList.add('erro-plantio');
-                    if (p2) p2.classList.add('erro-plantio');
-                    
-                    // Vibração física (Celular)
-                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                    
-                    mostrarToast("❌ Sem combinação!");
-
-                    setTimeout(() => {
-                        trocarPecas(primeira, segunda); 
-                        processando = false;
-                    }, 400);
-                }
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0) targetC++; else targetC--; // Direita ou Esquerda
             } else {
-                processando = true;
-                
-                // Clicou longe, vibra a segunda peça
-                const p2 = document.querySelector(`.peca-julgamento[data-linha="${linha}"][data-coluna="${coluna}"]`);
-                if (p2) p2.classList.add('erro-plantio');
-                
-                // Vibração física rápida
-                if (navigator.vibrate) navigator.vibrate(100);
-                
-                mostrarToast("❌ Escolha uma peça adjacente!");
-                
-                setTimeout(() => {
-                    if (p2) p2.classList.remove('erro-plantio');
-                    processando = false;
-                }, 400);
+                if (dy > 0) targetL++; else targetL--; // Baixo ou Cima
             }
-        }
-    }
 
-    function reiniciarJogo() {
-        if (confirm('Reiniciar o jogo? Todo progresso será perdido.')) {
-            localStorage.removeItem('julgamento_safra');
-            grade = gerarGradeAleatoria();
-            pontuacao = 0;
-            nivel = 1;
-            meta = 100;
-            resolverCombinacoesSemAnimacao();
-            renderizarGrade();
-        }
-    }
-
-    function novoCaso() {
-        if (confirm('Iniciar novo caso? A pontuação atual será perdida.')) {
-            grade = gerarGradeAleatoria();
-            pontuacao = 0;
-            resolverCombinacoesSemAnimacao();
-            renderizarGrade();
-            atualizarInterface();
-            salvarJogo();
-        }
-    }
-
-    function inicializarJulgamento() {
-        const salvo = localStorage.getItem('julgamento_safra');
-        if (salvo) {
-            try {
-                const dados = JSON.parse(salvo);
-                grade = dados.grade;
-                pontuacao = dados.pontuacao;
-                nivel = dados.nivel;
-                meta = dados.meta;
-                if (!grade || grade.length !== linhas) grade = gerarGradeAleatoria();
-            } catch (e) {
-                grade = gerarGradeAleatoria();
+            if (targetL >= 0 && targetL < LINHAS && targetC >= 0 && targetC < COLUNAS) {
+                tentarTroca(origemL, origemC, targetL, targetC);
             }
+            joiaSelecionada = null;
         } else {
-            grade = gerarGradeAleatoria();
+            // FOI UM CLIQUE SIMPLES (TAP)
+            if (joiaSelecionada.l !== origemL || joiaSelecionada.c !== origemC) {
+                // Clicou na segunda peça adjacente
+                joiaSelecionada.el.classList.remove('joia-selecionada');
+                const adjacente = (Math.abs(joiaSelecionada.l - origemL) === 1 && joiaSelecionada.c === origemC) || 
+                                  (Math.abs(joiaSelecionada.c - origemC) === 1 && joiaSelecionada.l === origemL);
+                if (adjacente) {
+                    tentarTroca(joiaSelecionada.l, joiaSelecionada.c, origemL, origemC);
+                }
+                joiaSelecionada = null;
+            }
+            // Se ele apenas soltou no mesmo lugar, a peça continua selecionada esperando o próximo clique.
         }
-        
-        resolverCombinacoesSemAnimacao();
-        renderizarGrade();
-        atualizarInterface();
     }
 
-    // ========== EXPOR FUNÇÕES GLOBAIS ==========
+    async function tentarTroca(l1, c1, l2, c2) {
+        processandoCascata = true;
+        AudioMatch.troca.currentTime = 0; AudioMatch.troca.play();
+
+        // Troca Física
+        let temp = grade[l1][c1];
+        grade[l1][c1] = grade[l2][c2];
+        grade[l2][c2] = temp;
+        atualizarVisualDaGrade();
+
+        await new Promise(r => setTimeout(r, 300)); // Espera animação
+
+        const matches = encontrarMatches();
+        
+        if (matches.length > 0) {
+            // MATCH BEM SUCEDIDO! Gasta 1 movimento.
+            movimentosRestantes--;
+            atualizarPlacarUI();
+            
+            await processarMatches(matches); // Espera toda a cascata terminar!
+            verificarFimDeTurno(); // Checa se ganhou ou perdeu
+        } else {
+            // MOVIMENTO INVÁLIDO! Destroca.
+            if(window.Haptics) navigator.vibrate([20, 20]);
+            let tempReversa = grade[l1][c1];
+            grade[l1][c1] = grade[l2][c2];
+            grade[l2][c2] = tempReversa;
+            atualizarVisualDaGrade();
+            processandoCascata = false; // Destrava
+        }
+    }
+
+    // 7. O ALGORITMO DE MATCH-3 (BLINDADO CONTRA OUT-OF-BOUNDS)
+    function encontrarMatches() {
+        let matches = new Set(); 
+
+        // Busca Horizontal
+        for (let l = 0; l < LINHAS; l++) {
+            for (let c = 0; c < COLUNAS - 2; c++) {
+                if (!grade[l][c]) continue;
+                let emoji = grade[l][c].emoji;
+                if (!emoji || emoji === SEMENTE_DOURADA) continue;
+
+                // A proteção mágica: && grade[l][c+1] impede o código de ler no vazio
+                if (grade[l][c+1] && grade[l][c+2] && grade[l][c+1].emoji === emoji && grade[l][c+2].emoji === emoji) {
+                    matches.add(`${l},${c}`); matches.add(`${l},${c+1}`); matches.add(`${l},${c+2}`);
+                    if (c+3 < COLUNAS && grade[l][c+3] && grade[l][c+3].emoji === emoji) matches.add(`${l},${c+3}`);
+                    if (c+4 < COLUNAS && grade[l][c+4] && grade[l][c+4].emoji === emoji) matches.add(`${l},${c+4}`);
+                }
+            }
+        }
+
+        // Busca Vertical
+        for (let c = 0; c < COLUNAS; c++) {
+            for (let l = 0; l < LINHAS - 2; l++) {
+                if (!grade[l][c]) continue;
+                let emoji = grade[l][c].emoji;
+                if (!emoji || emoji === SEMENTE_DOURADA) continue;
+
+                if (grade[l+1] && grade[l+1][c] && grade[l+2] && grade[l+2][c] && grade[l+1][c].emoji === emoji && grade[l+2][c].emoji === emoji) {
+                    matches.add(`${l},${c}`); matches.add(`${l+1},${c}`); matches.add(`${l+2},${c}`);
+                    if (l+3 < LINHAS && grade[l+3] && grade[l+3][c] && grade[l+3][c].emoji === emoji) matches.add(`${l+3},${c}`);
+                    if (l+4 < LINHAS && grade[l+4] && grade[l+4][c] && grade[l+4][c].emoji === emoji) matches.add(`${l+4},${c}`);
+                }
+            }
+        }
+
+        return Array.from(matches).map(pos => {
+            const [l, c] = pos.split(',').map(Number);
+            return { l, c };
+        });
+    }
+
+    async function processarMatches(matches) {
+        if (matches.length === 0) return;
+
+        const recompensa = matches.length * 15;
+        pontuacao += recompensa;
+        AudioMatch.match3.currentTime = 0; AudioMatch.match3.play();
+        if(window.Haptics) navigator.vibrate([30, 50]);
+
+        integrarComArvoreDaVida(recompensa);
+
+        // Semente Dourada (Match de 5 ou +)
+        if (matches.length >= 5) {
+            AudioMatch.match5.play();
+            mostrarTextoFlutuante("SEMENTE DOURADA!");
+            const meio = matches[Math.floor(matches.length / 2)];
+            grade[meio.l][meio.c] = { emoji: SEMENTE_DOURADA, cor: '#f1c40f' };
+            matches = matches.filter(m => !(m.l === meio.l && m.c === meio.c));
+        } else if (matches.length === 4) {
+            mostrarTextoFlutuante("COLHEITA FORTE!");
+        }
+
+        // Explode
+        matches.forEach(m => {
+            const el = document.getElementById(`joia-${m.l}-${m.c}`);
+            if (el) el.classList.add('anim-explodindo');
+            grade[m.l][m.c] = null; 
+        });
+
+        atualizarPlacarUI();
+        await new Promise(r => setTimeout(r, 300));
+
+        // Gravidade e Repreenchimento
+        aplicarGravidade();
+        preencherGrade();
+        atualizarVisualDaGrade();
+        await new Promise(r => setTimeout(r, 300));
+
+        // O Efeito Cascata Recursivo Magnífico
+        const novosMatches = encontrarMatches();
+        if (novosMatches.length > 0) {
+            mostrarTextoFlutuante("CASCATA!");
+            await processarMatches(novosMatches); 
+        }
+    }
+
+    function aplicarGravidade() {
+        for (let c = 0; c < COLUNAS; c++) {
+            let chao = LINHAS - 1;
+            for (let l = LINHAS - 1; l >= 0; l--) {
+                if (grade[l][c] !== null) {
+                    if (chao !== l) {
+                        grade[chao][c] = grade[l][c];
+                        grade[l][c] = null;
+                    }
+                    chao--;
+                }
+            }
+        }
+    }
+
+    function preencherGrade() {
+        for (let l = 0; l < LINHAS; l++) {
+            for (let c = 0; c < COLUNAS; c++) {
+                if (grade[l][c] === null) {
+                    grade[l][c] = { ...JOIAS[Math.floor(Math.random() * JOIAS.length)] };
+                }
+            }
+        }
+    }
+
+    function atualizarVisualDaGrade() {
+        const tabuleiro = document.getElementById('julgamento-grade');
+        tabuleiro.innerHTML = '';
+        for (let l = 0; l < LINHAS; l++) {
+            for (let c = 0; c < COLUNAS; c++) {
+                if (grade[l][c]) criarElementoVisual(l, c, grade[l][c]);
+            }
+        }
+    }
+
+    // 8. BOMBA NUCLEAR (SEMENTE DOURADA) E GERENCIAMENTO DE TURNOS
+    async function detonarOndaDeChoque(lSemente, cSemente) {
+        processandoCascata = true;
+        movimentosRestantes--; // Gasta 1 movimento para detonar
+        atualizarPlacarUI();
+
+        AudioMatch.explosaoNuke.play();
+        if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 200, 100, 300]); 
+
+        mostrarTextoFlutuante("ONDA DE CHOQUE!");
+        const flash = document.getElementById('flash-choque');
+        flash.classList.remove('escondido');
+        flash.style.animation = 'none';
+        void flash.offsetWidth; 
+        flash.style.animation = 'sumirChoque 1s forwards ease-out';
+
+        pontuacao += 1500; 
+        integrarComArvoreDaVida(1500);
+        atualizarPlacarUI();
+
+        for (let l = 0; l < LINHAS; l++) {
+            for (let c = 0; c < COLUNAS; c++) {
+                const el = document.getElementById(`joia-${l}-${c}`);
+                if (el) el.classList.add('anim-explodindo');
+                grade[l][c] = null;
+            }
+        }
+
+        await new Promise(r => setTimeout(r, 400));
+        preencherGrade();
+        atualizarVisualDaGrade();
+        
+        const novosMatches = encontrarMatches();
+        if (novosMatches.length > 0) await processarMatches(novosMatches);
+        
+        verificarFimDeTurno();
+    }
+
+    function verificarFimDeTurno() {
+        if (pontuacao >= metaNivel) {
+            subirDeNivel();
+        } else if (movimentosRestantes <= 0) {
+            gameOver();
+        } else {
+            processandoCascata = false; // O jogador pode continuar!
+        }
+    }
+
+    function subirDeNivel() {
+        processandoCascata = true; // Trava a tela enquanto celebra
+        nivel++;
+        pontuacao = 0;
+        metaNivel = Math.floor(metaNivel * 1.5); 
+        movimentosRestantes = 15 + Math.floor(nivel * 2); 
+        
+        AudioMatch.subirNivel.play();
+        mostrarTextoFlutuante(`NÍVEL ${nivel}!`);
+        if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#9b59b6'], spread: 90});
+        
+        let statsTribunal = JSON.parse(localStorage.getItem('estatisticasCasalTribunal')) || { ganhos: 0, perdidos: 0 };
+        statsTribunal.ganhos++;
+        localStorage.setItem('estatisticasCasalTribunal', JSON.stringify(statsTribunal));
+        
+        setTimeout(() => {
+            gerarGradeInicial();
+            atualizarPlacarUI();
+            processandoCascata = false;
+        }, 2000);
+    }
+
+    function gameOver() {
+        processandoCascata = true;
+        AudioMatch.erroGameOver.play();
+        mostrarTextoFlutuante("SEM MOVIMENTOS!");
+        if(window.Haptics) navigator.vibrate([200, 100, 200]);
+        
+        setTimeout(() => {
+            if(typeof mostrarToast === 'function') mostrarToast("A safra foi perdida. Tentando novamente!", "⏳");
+            iniciarNovoNivel(); // Reinicia o nível atual
+        }, 2500);
+    }
+
+    // 9. FUNÇÕES DE UI
+    function atualizarPlacarUI() {
+        document.getElementById('julgamento-pontuacao').innerText = pontuacao;
+        document.getElementById('julgamento-nivel').innerText = nivel;
+        document.getElementById('julgamento-prox-nivel').innerText = nivel;
+        document.getElementById('julgamento-meta').innerText = metaNivel;
+        document.getElementById('julgamento-movimentos').innerText = movimentosRestantes;
+        
+        let progresso = (pontuacao / metaNivel) * 100;
+        if(progresso > 100) progresso = 100;
+        document.getElementById('julgamento-barra-progresso').style.width = `${progresso}%`;
+    }
+
+    function integrarComArvoreDaVida(pontosGanhos) {
+        if (window.statusPlanta && typeof window.statusPlanta.nivel !== 'undefined') {
+            window.statusPlanta.nivel += (pontosGanhos / 1000); 
+            if (window.statusPlanta.nivel > 100) window.statusPlanta.nivel = 100;
+            if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
+        }
+    }
+
+    function mostrarTextoFlutuante(texto) {
+        const div = document.getElementById('texto-combo-flutuante');
+        if (!div) return;
+        
+        div.innerHTML = texto;
+        
+        // Remove as classes antigas para "zerar" o elemento
+        div.classList.remove('escondido'); // Caso ainda tenha o escondido do HTML
+        div.classList.remove('mostrar-animacao');
+        
+        // Força o navegador a recalcular a tela (Reflow mágico)
+        void div.offsetWidth; 
+        
+        // Adiciona a classe do gatilho! O CSS assume daqui pra frente.
+        div.classList.add('mostrar-animacao');
+    }
+
     window.toggleInstrucoesJulgamento = function() {
-        const el = document.getElementById('instrucoes-julgamento');
-        if (el) el.classList.toggle('escondido');
+        document.getElementById('instrucoes-julgamento').classList.toggle('escondido');
     };
 
-    window.iniciarJulgamento = function() {
-        inicializarJulgamento();
-
-        const btnNovo = document.getElementById('julgamento-btn-novo');
-        if (btnNovo) {
-            const novoBtn = btnNovo.cloneNode(true);
-            btnNovo.parentNode.replaceChild(novoBtn, btnNovo);
-            novoBtn.addEventListener('click', novoCaso);
-        }
-
-        const btnReiniciar = document.getElementById('julgamento-btn-reiniciar');
-        if (btnReiniciar) {
-            const novoReiniciar = btnReiniciar.cloneNode(true);
-            btnReiniciar.parentNode.replaceChild(novoReiniciar, btnReiniciar);
-            novoReiniciar.addEventListener('click', reiniciarJogo);
-        }
-    };
 })();

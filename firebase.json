@@ -1,42 +1,25 @@
 {
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "disallowLegacyRuntimeConfig": true,
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ]
-    }
-  ],
-  "hosting": {
-    "public": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  },
-  "emulators": {
-    "auth": {
-      "port": 9099
-    },
-    "functions": {
-      "port": 5001
-    },
-    "database": {
-      "port": 9000
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "ui": {
-      "enabled": true
-    },
-    "singleProjectMode": true
+  "rules": {
+    // 1. PASTAS DO SISTEMA (SÓ LEITURA PARA VOCÊS, ESCRITA SÓ PELO CÓDIGO INTERNO)
+    "clima": { ".read": "auth != null", ".write": false },
+    "precosMercado": { ".read": "auth != null", ".write": false },
+    "metasDiarias": { ".read": "auth != null", ".write": false },
+    "conquistas": { ".read": "auth != null", ".write": false },
+
+    // 2. PASTAS DOS JOGOS E INTERAÇÕES (ONDE O APP PRECISA SALVAR DADOS)
+    "jogos": { ".read": "auth != null", ".write": "auth != null" },
+    "jardim_global": { ".read": "auth != null", ".write": "auth != null" },
+    "pulsos": { ".read": "auth != null", ".write": "auth != null" },
+    "pulsosContador": { ".read": "auth != null", ".write": "auth != null" },
+    "moods": { ".read": "auth != null", ".write": "auth != null" },
+    "postits": { ".read": "auth != null", ".write": "auth != null" },
+    "ecos_recentes": { ".read": "auth != null", ".write": "auth != null" },
+    "horizontes": { ".read": "auth != null", ".write": "auth != null" },
+    
+    // 3. PASTAS QUE VOCÊ JÁ TINHA
+    "vendas": { ".read": "auth != null", ".write": "auth != null" },
+    "jogadores": { ".read": "auth != null", ".write": "auth != null" },
+    "logins": { ".read": "auth != null", ".write": "auth != null" },
+    "fcmTokens": { ".read": "auth != null", ".write": "auth != null" }
   }
 }

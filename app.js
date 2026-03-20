@@ -635,6 +635,9 @@ if (temaIcon && temaSelector) {
         if(typeof inicializarEco3D === 'function') inicializarEco3D();
         if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
         if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        
+        // O GATILHO QUE FALTAVA PARA A ÁRVORE DA VIDA ACORDAR!
+        if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D();
     });
 
 }); // Fecha o DOMContentLoaded

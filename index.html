@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <!-- Import map primeiro -->
     <script type="importmap">
@@ -296,323 +296,429 @@
 
 <!-- TRIBUNAL DO AFETO -->
 <div id="container-tribunal" class="escondido">
-    <div class="cartao-vidro" style="padding: 15px;">
-        <!-- Cabeçalho com botão voltar e instruções -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-    <div style="display: flex; gap: 8px;">
-        <button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
-        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
+    <div class="top-bar" style="background: rgba(0,0,0,0.7); border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
+            <button class="btn-info" onclick="abrirDossieTribunal()" style="font-size: 1.2rem;">📊</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso">⚖️ Nível <span id="tribunal-nivel">1</span></span>
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">⭐ <span id="tribunal-estrelas">3</span></span>
+        </div>
     </div>
-</div>
-<h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Tribunal do Afeto</h2>
 
-        <!-- Instruções do Tribunal -->
+    <div class="conteudo-tribunal">
         <div id="instrucoes-tribunal" class="escondido cartao-instrucoes">
-            <h4>Como Julgar</h4>
+            <h4>📜 Manual do Juizado Afetivo</h4>
             <ul>
-                <li>Você recebe 8 cartas com valores numéricos.</li>
-                <li>O caso exige uma soma <b>exata</b> (meta).</li>
-                <li>Clique nas cartas para somar até atingir a meta.</li>
-                <li><span style="color: #2ecc71; font-weight: bold;">Se acertar</span> → ganha estrelas e avança.</li>
-                <li><span style="color: #e74c3c; font-weight: bold;">Se ultrapassar</span> → perde uma estrela e o caso.</li>
-                <li>A cada 3 casos vencidos, o nível sobe.</li>
+                <li>Leia o "Caso Narrativo" e entenda a infração cometida.</li>
+                <li>Sua missão é selecionar as provas na mesa até que a <b>Soma</b> seja <b>EXATAMENTE IGUAL</b> à Meta.</li>
+                <li><span style="color: #f1c40f;">Dica de Ouro:</span> Os nomes das provas (Print Oculto, Áudio de 5 min) são divertidos, mas foque nos <b>números</b>!</li>
+                <li><span style="color: #e74c3c;">🚨 Testemunhas Surpresa:</span> Elas podem invadir o tribunal e proibir números ímpares, limitar cartas, etc.</li>
+                <li>Travou? Use a <b>Dica de Amor</b> (custa moedas da Fazenda) para revelar uma carta correta.</li>
+                <li>Bata o martelo! Acertar rende moedas, errar custa uma estrela.</li>
             </ul>
         </div>
 
-        <!-- Painel de status -->
-<div class="painel-recursos">
-    <span>📊 Nível <span id="tribunal-nivel">1</span></span>
-    <span>⭐ Estrelas <span id="tribunal-estrelas">2</span></span>
-    <span>📚 Resolvidos <span id="tribunal-casos">0</span></span>
-    <span>💔 Perdidos <span id="tribunal-perdidos">0</span></span>
-</div>
-
-        <!-- Caso atual -->
-<div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
-    <h3 id="tribunal-titulo-caso" style="color: #FFD700; margin-bottom: 5px;">⚖️ Caso #<span id="tribunal-numero-caso">1</span></h3>
-    <p id="tribunal-descricao-caso" style="font-style: italic; margin-bottom: 10px;"></p>
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px;">
-        <span>🎯 Meta: <span id="tribunal-meta">0</span> pts</span>
-        <span>📊 Máx: <span id="tribunal-max">0</span> pts</span>
-        <span>🏆 Sua: <span id="tribunal-pontos">0</span> pts</span>
-    </div>
-</div>
-
-        <!-- Mão de cartas -->
-        <div style="margin: 15px 0 5px; text-align: center;">
-            <span style="color: #FFD700; font-weight: bold;">🃏 Suas cartas:</span>
-        </div>
-        <div id="tribunal-mao" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; min-height: 140px;">
-            <!-- Cartas serão inseridas aqui -->
+        <div id="dossie-tribunal" class="escondido cartao-instrucoes" style="border-left: 5px solid #3498db;">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h4 style="color: #3498db; font-size: 1.4rem; margin-bottom: 5px;">🏛️ Dossiê Confidencial</h4>
+                <p id="tribunal-patente" style="font-family: 'Playfair Display', serif; color: #FFD700; font-size: 1.1rem; letter-spacing: 1px;">Estagiários do Amor</p>
+            </div>
+            
+            <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 15px;">
+                <div>
+                    <div style="font-size: 2rem; color: #2ecc71;" id="stats-ganhos">0</div>
+                    <div style="font-size: 0.8rem; color: #ccc; text-transform: uppercase;">Casos Vencidos</div>
+                </div>
+                <div>
+                    <div style="font-size: 2rem; color: #e74c3c;" id="stats-perdidos">0</div>
+                    <div style="font-size: 0.8rem; color: #ccc; text-transform: uppercase;">Processos Perdidos</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; font-size: 0.9rem; color: #aaa;">
+                Taxa de Sucesso: <strong id="stats-taxa" style="color: #fff;">0%</strong>
+            </div>
+            
+            <button class="btn-acao" onclick="fecharDossieTribunal()" style="width: 100%; margin-top: 15px; padding: 10px; font-size: 1rem;">Fechar Dossiê</button>
         </div>
 
-        <!-- Botões de ação -->
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-    <button id="tribunal-btn-julgar" class="btn-acao" style="flex:1;">⚖️ Julgar</button>
-    <button id="tribunal-btn-dica" class="btn-acao" style="flex:1;">💡 Dica</button>
-    <button id="tribunal-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
-</div>
+        <div class="cartao-caso-rpg">
+            <h3 id="tribunal-titulo-caso">⚖️ Carregando os autos do processo...</h3>
+            <p id="tribunal-descricao-caso" style="font-style: italic; margin-bottom: 10px; color: #ccc;">
+                Aguardando o escrivão...
+            </p>
+            <div class="meta-painel">
+                <div class="meta-item">🎯 Meta: <span id="tribunal-meta">0</span></div>
+                <div class="meta-item" style="color: #FFD700;">🏆 Sua Soma: <span id="tribunal-pontos">0</span></div>
+            </div>
+        </div>
+
+        <div id="area-testemunha" class="testemunha-card escondido">
+            <span id="icone-testemunha" class="testemunha-icone">👀</span>
+            <div class="testemunha-texto">
+                <strong id="nome-testemunha">Testemunha Surpresa</strong>
+                <p id="tribunal-regra-testemunha">"Nova regra aplicada à rodada!"</p>
+            </div>
+        </div>
+
+        <div id="tribunal-mao" class="mesa-cartas-rpg"></div>
+
+        <div class="area-martelo">
+            <div id="martelo-3d" class="martelo-icone">🔨</div>
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button id="tribunal-btn-julgar" class="btn-acao btn-julgar-rpg">Bater o Martelo</button>
+                <button id="tribunal-btn-reiniciar" class="btn-refresh" style="width: 60px; padding: 0; font-size: 1.5rem;">↻</button>
+            </div>
+        </div>
     </div>
 </div>
 
                 <div id="container-termo" class="escondido">
-                    <div class="cartao-vidro">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-    <div style="display: flex; gap: 8px;">
-        <button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
-        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-    </div>
-</div>
-                        <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin-bottom: 15px; text-align: center;">Termo do Santuário</h3>
-                        
-                        <div id="instrucoes-termo" class="escondido cartao-instrucoes">
-                            <h4>Como Jogar</h4>
-                            <ul>
-                                <li>Adivinhe a palavra secreta em 6 tentativas.</li>
-                                <li><span style="background:var(--cor-agronomia); padding:2px 5px; border-radius:3px; color:white; font-size:10px;">VERDE</span> Letra e posição certas.</li>
-                                <li><span style="background:#c9b458; padding:2px 5px; border-radius:3px; color:white; font-size:10px;">AMARELO</span> Letra certa, posição errada.</li>
-                                <li>Vença para liberar as relíquias de hoje!</li>
-                            </ul>
-                        </div>
-
-                        <div id="tabuleiro-termo"></div>
-                        <div id="teclado-termo"></div>
-                        <button id="btn-verificar" class="btn-acao">Verificar</button>
-                    </div>
-                </div>
-
-                <div id="termo-reset-container" class="escondido" style="text-align: center; margin-top: 20px;">
-                    <button onclick="resetarTermo()" class="btn-refresh">
-                        <span style="font-size: 1.5rem;">↻</span>
-                        <p style="font-size: 10px; text-transform: uppercase; margin-top: 5px;">Tentar Novamente</p>
-                    </button>
-                </div>
-
-                <div id="container-sincronia" class="escondido" style="padding-top: 10px; text-align: center;">
-                    <div class="cartao-vidro">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-    <div style="display: flex; gap: 8px;">
-        <button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
-        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-    </div>
-</div>
-                        <div class="header-jogos" style="margin-bottom: 20px;">
-                            <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; font-size: 1.5rem; margin: 0;">Match de Sincronia</h3>
-                            <p class="subtitulo-lei" style="letter-spacing: 2px; margin-top: 5px; font-size: 0.7rem;">UMA PERGUNTA, DOIS MUNDOS</p>
-                        </div>
-
-                        <div id="instrucoes-sincronia" class="escondido cartao-instrucoes">
-                            <h4>Como Jogar</h4>
-                            <ul>
-                                <li>Este é um teste de telepatia amorosa.</li>
-                                <li>Leia a reflexão gerada na tela.</li>
-                                <li>Ambos devem enviar a resposta ao mesmo tempo no WhatsApp.</li>
-                                <li>Veja se os corações estão em sintonia!</li>
-                            </ul>
-                        </div>
-
-                        <div class="cartao-vidro" style="min-height: 180px; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.2);">
-                            <div id="area-pergunta">
-                                <p id="texto-pergunta" class="texto-itálico" style="font-size: 1.2rem; padding: 0 10px; line-height: 1.6;">Carregando...</p>
-                            </div>
-                        </div>
-                        <button class="btn-acao" onclick="gerarNovaPergunta()">Nova Reflexão</button>
-                    </div>
-                </div>
-
-                <!-- MINI FAZENDA -->
-<div id="container-minifazenda" class="escondido">
-    <div id="aviso-orientacao" class="aviso-orientacao escondido">
-        <p>🔄 Por favor, vire o celular para jogar no modo paisagem.</p>
-    </div>
-    <div id="conteudo-minifazenda" class="conteudo-minifazenda">
-        <!-- BARRA SUPERIOR -->
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-                <button class="btn-info" onclick="toggleInstrucoesMiniFazenda()">❓</button>
-                <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-            </div>
-            <div class="top-bar-right">
-                <span class="recurso">💰 <span id="mf-dinheiro">50</span></span>
-                <span class="recurso">📊 Nível <span id="mf-nivel">1</span></span>
-                <span class="recurso">⭐ EXP <span id="mf-exp">0</span>/<span id="mf-exp-prox">50</span></span>
-            </div>
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
         </div>
-
-        <!-- ÁREA PRINCIPAL -->
-        <div class="main-area">
-            <!-- Grade de plantio -->
-            <div class="grade-area">
-                <div class="cerca">
-                    <div id="mf-grade" class="mf-grade"></div>
-                </div>
-            </div>
-
-            <!-- Painel lateral -->
-            <div class="painel-area">
-                <div class="painel-conteudo">
-                    <!-- Instruções -->
-                    <div id="instrucoes-minifazenda" class="escondido cartao-instrucoes">
-                        <h4>🌱 Como Cuidar da Fazenda</h4>
-                        <ul>
-                            <li><strong>Plantio:</strong> Compre sementes com o dinheiro (💰). Plante nos quadrados vazios (➕).</li>
-                            <li>Cada planta tem um tempo de crescimento. Quando pronta (brilhando verde), clique para colher.</li>
-                            <li>Ao colher, você ganha dinheiro e experiência (⭐). Suba de nível para expandir a fazenda.</li>
-                        </ul>
-                        <h4 style="margin-top: 15px;">🐾 Animais</h4>
-                        <ul>
-                            <li><strong>Comprar:</strong> Na aba "Animais", compre animais com dinheiro.</li>
-                            <li><strong>Felicidade:</strong> Cada animal tem um círculo colorido que indica seu estado:
-                                <span style="display: inline-block; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; margin: 0 4px;"></span> Alta (≥70%),
-                                <span style="display: inline-block; width: 12px; height: 12px; background: #f39c12; border-radius: 50%; margin: 0 4px;"></span> Média (30-69%),
-                                <span style="display: inline-block; width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; margin: 0 4px;"></span> Baixa (<30%).
-                            </li>
-                            <li><strong>Alimentar:</strong> Clique no ícone de maçã (🍎) no card do animal para alimentá‑lo (custa 5💰). A felicidade aumenta.</li>
-                            <li>Animais felizes podem produzir recursos no futuro (em breve).</li>
-                        </ul>
-                    </div>
-
-                    <!-- Abas -->
-                    <div class="painel-abas">
-                        <button class="aba-ativa" data-aba="cultivo">🌱 Cultivo</button>
-                        <button data-aba="animais">🐾 Animais</button>
-                        <button data-aba="conquistas">🏆 Conquistas</button>
-                    </div>
-
-                    <!-- Conteúdo Cultivo -->
-                    <div id="aba-cultivo" class="aba-conteudo">
-                        <div class="deposito-area collapsible-section">
-                            <div class="section-header">
-                                <span class="deposito-titulo">🌱 Suas sementes:</span>
-                                <button class="collapse-btn" id="collapseSementesBtn">▼</button>
-                            </div>
-                            <div id="mf-deposito" class="deposito-lista"></div>
-                        </div>
-
-                        <div class="selecao-area">
-                            <span class="selecao-titulo">🌱 Escolha a semente:</span>
-                            <div class="botoes-sementes">
-                                <button class="btn-tipo-semente" data-tipo="0" title="Milho (10💰)">🌽 10💰</button>
-                                <button class="btn-tipo-semente" data-tipo="1" title="Cenoura (12💰)">🥕 12💰</button>
-                                <button class="btn-tipo-semente" data-tipo="2" title="Tomate (15💰)">🍅 15💰</button>
-                                <button class="btn-tipo-semente" data-tipo="3" title="Abóbora (20💰)">🎃 20💰</button>
-                                <button class="btn-tipo-semente" data-tipo="4" title="Morango (18💰)">🍓 18💰</button>
-                                <button class="btn-tipo-semente" data-tipo="5" title="Alface (8💰)">🥬 8💰</button>
-                                <button class="btn-tipo-semente" data-tipo="6" title="Girassol (25💰)">🌻 25💰</button>
-                                <button class="btn-tipo-semente" data-tipo="7" title="Batata (14💰)">🥔 14💰</button>
-                            </div>
-                        </div>
-
-                        <div class="botoes-acao">
-                            <button id="mf-btn-comprar-semente" class="btn-acao">Comprar Semente <span id="mf-preco-semente">(10💰)</span></button>
-                            <button id="mf-btn-reiniciar" class="btn-refresh">Reiniciar</button>
-                        </div>
-                    </div>
-
-                    <!-- Conteúdo Animais -->
-                    <div id="aba-animais" class="aba-conteudo escondido">
-                        <div class="animais-area">
-                            <div id="mf-animais" class="animais-lista"></div>
-                        </div>
-                        <div class="compra-animais-area" style="margin-top: 15px;">
-                            <span class="compra-animais-titulo" style="display: block; color: #FFD700; font-weight: bold; margin-bottom: 10px; text-align: center;">🐾 Comprar animal:</span>
-                            <div class="botoes-animais">
-                                <button class="btn-tipo-animal" data-animal="0" title="Galinha (30💰)">🐔 30💰</button>
-                                <button class="btn-tipo-animal" data-animal="1" title="Vaca (50💰)">🐄 50💰</button>
-                                <button class="btn-tipo-animal" data-animal="2" title="Porco (40💰)">🐖 40💰</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Conteúdo Conquistas -->
-                    <div id="aba-conquistas" class="aba-conteudo escondido">
-                        <div class="conquistas-area">
-                            <div id="mf-metas" class="metas-container" style="margin-bottom: 15px;"></div>
-                            <div id="mf-conquistas-lista" class="conquistas-lista"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); color: #D4AF37;">🔑 Guardião do Cofre</span>
         </div>
-    </div> <!-- fim conteudo-minifazenda -->
-</div> <!-- fim container-minifazenda -->
-
-                <div id="container-jardim" class="escondido" style="padding-top: 10px; text-align: center;">
-                    <div class="cartao-vidro">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-    <div style="display: flex; gap: 8px;">
-        <button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
-        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
     </div>
-</div>
-                        <h3 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A;">Nosso Solo Fértil</h3>
 
-                        <div id="instrucoes-jardim" class="escondido cartao-instrucoes" style="border: 1px solid #D4AF37; box-shadow: 0 0 20px rgba(212,175,55,0.15); background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);">
-                            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 10px; text-align: center;">A Árvore da Vida</h4>
-                            <p style="font-size: 0.8rem; font-style: italic; color: #ccc; text-align: center; margin-bottom: 15px;">Um organismo matemático gerado pelo afeto.</p>
-                            <ul style="font-size: 0.85rem; line-height: 1.6; color: #eee; text-align: left; padding-left: 15px;">
-                                <li style="margin-bottom: 8px;"><b>A Conexão:</b> Toque diretamente na árvore para nutri-la. A água flui entre Goiânia e Colombo em tempo real.</li>
-                                <li style="margin-bottom: 8px;"><b>A Regra do Tempo:</b> A árvore só absorve água <b>1 vez por dia</b> (compartilhado entre vocês dois). A paciência fortalece as raízes.</li>
-                                <li style="margin-bottom: 8px;"><b>A Evolução:</b> Vocês começam com uma <i>Semente de Esmeralda</i>. A cada nível alcançado, a matemática gera novos troncos de ouro maciço. Como na natureza, <b>nenhuma árvore crescerá com o mesmo formato da anterior</b>.</li>
-                                <li style="margin-bottom: 8px;"><b>O Ápice:</b> Ao atingir o nível máximo, a árvore atinge a glória, emanando folhas de Sakura rosadas. Um ciclo é concluído e guardado na memória.</li>
-                                <li style="color: #ff6b6b; font-weight: bold;">⚠️ Atenção: Se a árvore ficar mais de 1 dia sem o toque de vocês, a sequência de dias é rompida.</li>
-                            </ul>
-                        </div>
-
-                        <div id="prisma-3d" style="width: 100%; height: 300px; margin-top: 10px; cursor: pointer; position: relative;" onclick="regarPlanta()"></div>
-                        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0px; margin-bottom: 20px;">Toque na árvore mágica para regá-la 💧</p>
-
-                        <div class="barra-vida" style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 12px; margin: 10px 20px; overflow: hidden;">
-                            <div id="progresso-crescimento" class="progresso" style="background: var(--cor-primaria); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
-                        </div>
-                        <p id="status-texto" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
-                        <p id="aviso-regada" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 15px;"></p>
-                        <p id="contador-ciclos">🌱 Ciclos completados: 0</p>
-                    </div>
-                </div>
-                <div id="container-julgamento" class="escondido">
-    <div class="cartao-vidro">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-    <div style="display: flex; gap: 8px;">
-        <button class="btn-info" onclick="toggleInstrucoesJulgamento()">❓</button>
-        <button class="btn-mute-jogo" onclick="toggleMuteJogos()">🔊</button>
-    </div>
-</div>
-<h2 style="font-family: 'Courier New', monospace; color: #FFD700; text-shadow: 3px 3px 0 #5D3A1A; margin:0; text-align: center; width: 100%;">Julgamento da Safra</h2>
-
-        <!-- Instruções -->
-        <div id="instrucoes-julgamento" class="escondido cartao-instrucoes">
-            <h4>Como Jogar</h4>
-            <ul>
-                <li>Combine 3 ou mais peças iguais para coletar provas.</li>
-                <li>Cada combinação vale pontos e ajuda a resolver o caso.</li>
-                <li>Complete a barra de objetivo para avançar de nível.</li>
-                <li>Novos ícones aparecem conforme você progride.</li>
+    <div class="conteudo-termo">
+        <div id="instrucoes-termo" class="escondido cartao-instrucoes" style="border-left: 5px solid #D4AF37;">
+            <h4 style="color: #D4AF37;">🔮 O Oráculo de Cristal</h4>
+            <p>Adivinhe a palavra secreta de 5 letras para destrancar o Cofre de Relíquias.</p>
+            <ul style="font-size: 0.85rem; margin-top: 10px;">
+                <li><span style="color: #2ecc71; font-weight: bold;">VERDE:</span> Letra certa no lugar certo.</li>
+                <li><span style="color: #f39c12; font-weight: bold;">OURO:</span> Letra certa no lugar errado.</li>
+                <li><span style="color: #555; font-weight: bold;">ESCURO:</span> A letra não existe na palavra.</li>
             </ul>
         </div>
 
-        <!-- Painel de status -->
-        <div class="painel-recursos" style="background: #2c3e50; border-color: #d4af37;">
-            <span>📊 Nível <span id="julgamento-nivel">1</span></span>
-            <span>⭐ Pontos <span id="julgamento-pontos">0</span></span>
-            <span>🎯 Meta <span id="julgamento-meta">100</span></span>
+        <div class="oraculo-pedestal">
+            <div id="oraculo-3d" style="width: 100%; height: 100%; z-index: 5;"></div>
+            <div class="brilho-oraculo"></div>
         </div>
 
-        <!-- Grade do jogo -->
-        <div class="cerca" style="background: #1a2a3a; border-color: #d4af37;">
-            <div id="julgamento-grade" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; padding: 10px;"></div>
+        <div id="grade-termo" class="grade-oraculo">
+            </div>
+
+        <div id="teclado-termo" class="teclado-oraculo">
+            </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 15px; width: 100%; max-width: 400px;">
+            <button id="btn-verificar" class="btn-acao btn-verificar-oraculo" onclick="verificarPalavra()">Revelar Destino ✨</button>
         </div>
 
-        <!-- Botões -->
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button id="julgamento-btn-novo" class="btn-acao" style="flex:1;">Novo Caso</button>
-            <button id="julgamento-btn-reiniciar" class="btn-refresh" style="flex:1;">Reiniciar</button>
+        <div id="termo-reset-container" class="escondido" style="margin-top: 15px; width: 100%; max-width: 400px;">
+            <button class="btn-acao" onclick="resetarTermo()" style="background: linear-gradient(145deg, #e74c3c, #c0392b); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4); width: 100%;">↻ Tentar Novamente</button>
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; gap: 10px; width: 100%; max-width: 400px; justify-content: center;">
+            <button class="btn-acao" onclick="usarDicaAmor()" style="flex: 1; background: linear-gradient(145deg, #9b59b6, #8e44ad); color: white; border: 1px solid #d35400; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4); padding: 10px;">💡 Dica do Coração (10💰)</button>
+            <div style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); padding: 0 20px; border-radius: 12px; border: 1px solid #D4AF37; color: #D4AF37; font-weight: bold; font-size: 1.2rem; backdrop-filter: blur(5px);">
+                <span id="termo-moedas">0</span>💰
+            </div>
+        </div>
+    </div>
+</div>
+
+                <div id="container-sincronia" class="escondido">
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); border-bottom: 1px solid rgba(155, 89, 182, 0.4);">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
+            <button class="btn-info" onclick="abrirLinhaDoTempoSincronia()" style="font-size: 1.2rem;">📜</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);">💫 Conexões: <span id="sincronia-contador">0</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-sincronia">
+        <div id="instrucoes-sincronia" class="escondido cartao-instrucoes" style="border-left: 5px solid #9b59b6;">
+            <h4 style="color: #9b59b6;">🧠 Telepatia em Tempo Real</h4>
+            <ul>
+                <li>Entrem no jogo ao mesmo tempo. A Orbe avisará quando as mentes estiverem conectadas.</li>
+                <li>Leiam a reflexão do dia e digitem a resposta secreta.</li>
+                <li>Quando os dois travarem a resposta, a verdade será revelada!</li>
+                <li>Respostas iguais (ou com a mesma essência) geram uma Super Conexão e muitos pontos!</li>
+            </ul>
+        </div>
+
+        <div class="area-orbe">
+            <div id="status-conexao" class="status-texto">Aguardando a conexão de Goiânia...</div>
+            
+            <div class="orbe-container">
+                <div id="orbe-energia" class="orbe orbe-desconectada"></div>
+                <div class="anel-orbita anel-1"></div>
+                <div class="anel-orbita anel-2"></div>
+            </div>
+            
+            <div id="tema-sincronia" class="tema-pergunta">
+            Sintonizando frequências quânticas... 📡
+        </div>
+        </div>
+
+        <div class="area-telepatia">
+            <div class="inputs-telepatia">
+                <div class="campo-jogador">
+                    <label>Sua Mente:</label>
+                    <input type="text" id="input-minha-palavra" placeholder="Digite sua palavra..." autocomplete="off">
+                    <button id="btn-travar-mente" class="btn-acao btn-travar" onclick="travarPalavra()">Trancar Resposta 🔒</button>
+                </div>
+                
+                <div class="campo-parceiro">
+                    <label>A Mente Dela:</label>
+                    <div id="status-parceira-digitando" class="status-parceira">Aguardando conexão...</div>
+                    <div id="palavra-parceira-oculta" class="palavra-oculta escondido">Resposta Trancada! 🔒</div>
+                    <div id="palavra-parceira-revelada" class="palavra-revelada escondido">???</div>
+                </div>
+
+                <div id="area-nova-rodada" class="escondido" style="margin-top: 15px;">
+                    <button class="btn-acao" onclick="iniciarNovaInvestigacao()" style="width: 100%; background: linear-gradient(145deg, #2ecc71, #27ae60); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);">Próxima Investigação 🔍</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="linha-tempo-sincronia" class="escondido cartao-instrucoes" style="border-left: 5px solid #3498db; width: 90%; max-width: 400px; margin-top: 20px;">
+            <h4 style="text-align: center; color: #3498db;">📜 Nossas Conexões Eternas</h4>
+            <div id="lista-historico-sincronia" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.9rem;">
+                <p style="text-align: center; color: #aaa; font-style: italic;">Nenhuma conexão registrada ainda.</p>
+            </div>
+            <button class="btn-acao" onclick="fecharLinhaDoTempo()" style="width: 100%; margin-top: 15px;">Fechar Arquivos</button>
+        </div>
+    </div>
+</div>
+
+                <!-- MINI FAZENDA -->
+<div id="container-minifazenda" class="escondido">
+    <div id="clima-overlay" class="camada-clima"></div>
+    <div id="vagalumes-overlay" class="escondido"></div>
+
+    <div id="alerta-rotacao" class="alerta-rotacao">
+        <div class="icone-celular-girando">📱</div>
+        <h3 style="color: #2ecc71; margin-bottom: 10px;">Modo Paisagem Exigido</h3>
+        <p>A Mini Fazenda Pro é um simulador avançado.</p>
+        <p><b>Por favor, deite o seu celular para iniciar o expediente.</b></p>
+    </div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(46, 204, 113, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesFazenda()">❓</button>
+            <button class="btn-info" onclick="abrirPainelBurocracia()" style="font-size: 1.2rem;">⚖️</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);">💰 <span id="fazenda-capital">0</span></span>
+            <span class="recurso">🌤️ <span id="fazenda-clima-texto">Sol</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-fazenda">
+        <div id="instrucoes-fazenda" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71;">
+            <h4 style="color: #2ecc71;">🚜 Simulador Agrícola</h4>
+            <ul style="font-size: 0.85rem;">
+                <li><b>Clima Vivo:</b> A chuva 🌧️ irriga as plantas grátis, mas dobra o risco de Fungos 🍄. Dias ensolarados secam o solo 2x mais rápido!</li>
+                <li><b>Bolsa de Valores:</b> Venda seus grãos no Mercado quando o preço estiver em alta!</li>
+                <li><b>Manejo de Solo:</b> Monitore o pH e NPK. Solo ácido (pH < 5.5) atrasa a colheita. Compre Calcário e Adubo.</li>
+                <li><b>Burocracia Ambiental ⚖️:</b> Vença casos no <b>Tribunal do Afeto</b> para conseguir Licenças de Expansão e Alvarás para Defensivos Pesados (Venenos)!</li>
+            </ul>
+        </div>
+
+        <div id="painel-burocracia" class="escondido cartao-instrucoes" style="border-left: 5px solid #D4AF37; background: rgba(20, 20, 20, 0.95);">
+            <h4 style="color: #D4AF37; text-align: center;">⚖️ Depto. Jurídico Ambiental</h4>
+            <div class="status-burocracia" style="font-size: 0.9rem; margin-top: 15px;">
+                <p style="margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <b>Licença de Expansão (Terreno 3):</b><br>
+                    <span id="status-licenca-expansao" style="color: #e74c3c;">Bloqueado (Requer 5 Vitórias no Tribunal)</span>
+                </p>
+                <p style="margin-bottom: 15px;">
+                    <b>Alvará de Defensivos (Herbicida/Fungicida):</b><br>
+                    <span id="status-alvara-defensivos" style="color: #e74c3c;">Bloqueado (Requer 10 Vitórias no Tribunal)</span>
+                </p>
+                
+                <div style="padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 8px; text-align: center; border: 1px solid rgba(212,175,55,0.3);">
+                    <span style="font-size: 1.5rem;">🏛️</span><br>
+                    <b>Histórico Oficial do Tribunal:</b><br>
+                    <span id="fazenda-vitorias-tribunal" style="color: #2ecc71; font-weight: bold; font-size: 1.4rem;">0</span> Casos Vencidos
+                </div>
+            </div>
+            <button class="btn-acao" onclick="fecharPainelBurocracia()" style="margin-top: 15px; width: 100%;">Arquivar Processos</button>
+        </div>
+
+        <div class="area-pastagem">
+            <div id="animal-vaca" class="animatronic-fazenda escondido" onclick="interagirAnimatronic('vaca')">
+                <span class="emoji-3d">🐄</span>
+                <div id="status-vaca" class="status-animal">Fome: 0%</div>
+            </div>
+            <div id="maquina-trator" class="animatronic-fazenda escondido" onclick="interagirAnimatronic('trator')">
+                <span class="emoji-3d">🚜</span>
+                <div class="status-animal" style="color: #f1c40f;">Operacional</div>
+            </div>
+        </div>
+
+        <div id="grade-fazenda" class="grade-plantacao">
+            </div>
+
+        <div class="painel-economia-agricola">
+            <div class="modulo-economia silo">
+                <h5>🏭 Meu Silo</h5>
+                <div class="item-estoque">🌾 Soja: <span id="estoque-soja">0</span> sc</div>
+                <div class="item-estoque">🌽 Milho: <span id="estoque-milho">0</span> sc</div>
+                <div class="item-estoque">☕ Café: <span id="estoque-cafe">0</span> sc</div>
+                <div class="item-estoque" style="color: #fffdf2; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px;">🥛 Leite: <span id="estoque-leite">0</span> L</div>
+            </div>
+            
+            <div class="modulo-economia mercado">
+                <h5>📈 Bolsa (R$)</h5>
+                <div class="item-mercado" onclick="venderProduto('soja')">🌾 Soja: <span id="preco-soja" class="preco-neutro">120</span> <button class="btn-vender">Vender</button></div>
+                <div class="item-mercado" onclick="venderProduto('milho')">🌽 Milho: <span id="preco-milho" class="preco-neutro">50</span> <button class="btn-vender">Vender</button></div>
+                <div class="item-mercado" onclick="venderProduto('cafe')">☕ Café: <span id="preco-cafe" class="preco-neutro">800</span> <button class="btn-vender">Vender</button></div>
+                <div class="item-mercado" onclick="venderProduto('leite')">🥛 Leite: <span id="preco-leite" class="preco-neutro">15</span> <button class="btn-vender">Vender</button></div>
+            </div>
+        </div>
+
+        <div id="loja-agricola" class="loja-agricola-container">
+            <div class="abas-loja" style="flex-wrap: wrap;">
+                <button class="aba-btn ativa" onclick="mudarAbaLoja('sementes')">Sementes</button>
+                <button class="aba-btn" onclick="mudarAbaLoja('insumos')">Manejo</button>
+                <button class="aba-btn" onclick="mudarAbaLoja('pecuaria')">Pecuária</button>
+                <button class="aba-btn" onclick="mudarAbaLoja('maquinas')">Máquinas</button>
+            </div>
+            <div id="conteudo-loja" class="conteudo-loja-scroll">
+                </div>
+        </div>
+    </div>
+</div>
+
+                <div id="container-jardim" class="escondido">
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(46, 204, 113, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">💰 Capital: <span id="jardim-moedas">0</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-jardim">
+        <div id="instrucoes-jardim" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71;">
+            <h4 style="color: #2ecc71; text-align: center;">🌳 A Árvore da Vida</h4>
+            <ul style="font-size: 0.85rem;">
+                <li>Este é o coração do Santuário. Todo o esforço de vocês nos outros jogos converge para cá.</li>
+                <li>Usem o <b>Capital 💰</b> para nutrir a planta. Cada elemento dá um tipo de energia:</li>
+                <li>💧 <b>Orvalho (10💰):</b> Crescimento estável.</li>
+                <li>☀️ <b>Luz Solar (25💰):</b> Crescimento forte.</li>
+                <li>✨ <b>Pó de Estrela (50💰):</b> Magia pura, crescimento massivo!</li>
+                <li>O Prisma 3D protege a essência do amor de vocês. Girem-no para apreciar a energia fluindo!</li>
+            </ul>
+        </div>
+
+        <div class="area-estufa">
+            <div id="prisma-container" class="prisma-pedestal">
+                <div id="prisma-3d" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;"></div>
+                <div id="brilho-pedestal" class="brilho-base"></div>
+            </div>
+            
+            <div class="status-estufa" style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin-top: 20px;">
+                <div id="status-texto" class="texto-evolucao" style="text-align: center;">Sintonizando energia vital...</div>
+                <div id="aviso-regada" class="texto-ultima-acao" style="text-align: center;">Aguardando a primeira nutrição do dia.</div>
+                
+                <div class="badge-ciclos" style="margin-top: 5px;">
+                    <span class="icone-ciclo">♾️</span> 
+                    <span>Ciclos Completos: <span id="contador-ciclos-numero">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="painel-progresso-jardim">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
+                <span>Semente</span>
+                <span>Florescimento</span>
+            </div>
+            <div class="trilha-crescimento">
+                <div id="progresso-crescimento" class="seiva-vital"></div>
+            </div>
+            <div style="text-align: center; margin-top: 5px; font-weight: bold; color: #2ecc71;" id="porcentagem-jardim">0%</div>
+        </div>
+
+        <div class="painel-acoes-jardim">
+            <button class="btn-nutrir btn-agua" onclick="nutrirPlanta('agua')">
+                <span class="icone-btn">💧</span>
+                <span class="nome-btn">Orvalho</span>
+                <span class="custo-btn">10💰</span>
+            </button>
+            <button class="btn-nutrir btn-luz" onclick="nutrirPlanta('luz')">
+                <span class="icone-btn">☀️</span>
+                <span class="nome-btn">Luz Solar</span>
+                <span class="custo-btn">25💰</span>
+            </button>
+            <button class="btn-nutrir btn-magia" onclick="nutrirPlanta('magia')">
+                <span class="icone-btn">✨</span>
+                <span class="nome-btn">Pó de Estrela</span>
+                <span class="custo-btn">50💰</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+                <div id="container-julgamento" class="escondido">
+    <div id="flash-choque" class="escondido"></div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesJulgamento()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso">⚖️ Nível <span id="julgamento-nivel">1</span></span>
+            <span class="recurso" style="box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); color: #2ecc71;">🌳 <span id="julgamento-arvore-sync">Conectado</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-julgamento">
+        
+        <div id="instrucoes-julgamento" class="escondido cartao-instrucoes" style="border-left: 5px solid #9b59b6;">
+            <h4 style="color: #9b59b6;">💎 Julgamento Magnético</h4>
+            <ul style="font-size: 0.85rem;">
+                <li>Alinhe 3 ou mais joias (Agronômicas ou Jurídicas) para coletar evidências.</li>
+                <li><span style="color: #f1c40f;">Combos de 5 Joias:</span> Criam a <b>Semente Dourada</b>.</li>
+                <li>Toque na Semente Dourada para detonar uma <b>Onda de Choque</b> que limpa a tela inteira!</li>
+                <li><b>Integração Global:</b> A energia das joias alimenta diretamente o crescimento da <b>Árvore da Vida</b> no seu Jardim!</li>
+            </ul>
+        </div>
+
+        <div class="painel-score-choque">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px;">
+                <div style="text-align: left;">
+                    <div class="score-titulo">Poder Coletado</div>
+                    <div class="score-valor" id="julgamento-pontuacao">0</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="score-titulo" style="color: #e74c3c;">Movimentos</div>
+                    <div class="score-valor" id="julgamento-movimentos" style="color: #e74c3c; font-size: 2.2rem; animation: pulsarJoia 2s infinite alternate;">15</div>
+                </div>
+            </div>
+            <div class="score-meta">Meta: <span id="julgamento-meta">1000</span> (Nível <span id="julgamento-prox-nivel">1</span>)</div>
+            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.6); border-radius: 4px; margin-top: 8px; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);">
+                <div id="julgamento-barra-progresso" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9b59b6, #3498db, #2ecc71); border-radius: 4px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            </div>
+        </div>
+
+        <div id="julgamento-grade" class="tabuleiro-match3">
+            </div>
+        
+        <div id="texto-combo-flutuante" class="texto-combo escondido"></div>
+
+        <div style="margin-top: 20px; display: flex; gap: 15px;">
+            <button id="julgamento-btn-novo" class="btn-refresh" style="font-size: 1.5rem; border-radius: 50%; width: 60px; height: 60px; padding: 0;">↻</button>
         </div>
     </div>
 </div>
@@ -899,6 +1005,7 @@
     <script src="tribunal.js"></script>
     <script src="julgamento.js"></script>
     <script src="minifazenda_novo.js"></script>
+    <script src="sincronia.js"></script>
     <script src="script.js"></script> 
     <script src="app.js"></script>
 

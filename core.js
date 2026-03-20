@@ -134,23 +134,13 @@ window.SantuarioApp.conectar = function() {
         if (postits.length > 0) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
     });
 
-    // --- RADAR DE ECOS (Escuta se a outra pessoa mandou áudio) ---
-    const refEcoParceiro = ref(db, 'ecos_recentes/' + window.NOME_PARCEIRO.toLowerCase());
-    onValue(refEcoParceiro, (snapshot) => {
-        const dados = snapshot.val();
-        const btnOuvir = document.getElementById('btn-ouvir-eco');
-        const statusEco = document.getElementById('status-eco');
-        
-        if (dados && dados.audio) {
-            // Constrói o áudio que veio da nuvem
-            window.ecoRecebidoAudio = new Audio(dados.audio);
-            if (btnOuvir) {
-                btnOuvir.style.display = 'inline-block'; // Revela o botão de Play
-                btnOuvir.style.animation = 'pulse-gold 2s infinite';
-            }
-            if (statusEco) statusEco.innerText = "Um novo eco chegou no espaço.";
+    // 6. Listener do Cofre (Ecos Recentes)
+        // Invoca o motor de áudio multiplataforma (Samsung/iPhone) construído no script.js
+        if (typeof window.escutarEcosDoParceiro === 'function') {
+            window.escutarEcosDoParceiro();
+        } else {
+            console.warn("Atenção: O motor de Ecos ainda não foi carregado.");
         }
-    });
 };
 
 
@@ -228,89 +218,127 @@ window.atualizarContadorInterface = function(quantidade) {
     elemento.innerText = texto;
 };
 
-window.regarPlanta = function() {
-    if (!window.SantuarioApp.inicializado || !window.MEU_NOME) {
-        if(typeof window.mostrarToast === 'function') window.mostrarToast("Aguardando identificação...");
-        return;
-    }
 
-    const { db, ref, get, set } = window.SantuarioApp.modulos;
-    const refJardim = ref(db, 'jardim_global');
 
-    get(refJardim).then((snapshot) => {
-        let dados = snapshot.val() || { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
-        const agora = new Date();
-        const hoje = agora.toLocaleDateString('pt-BR');
+// ==========================================
+// MOTOR BOTÂNICO SÊNIOR (O CORAÇÃO DO SANTUÁRIO)
+// ==========================================
 
-        if (dados.diaUltimaRegada === hoje) {
-            if(typeof window.mostrarToast === 'function') window.mostrarToast("A terra já está úmida hoje. Voltem amanhã! 🌱");
-            return;
-        }
-
-        const somRega = new Audio('assets/sons/mf/regar.mp3');
-        somRega.volume = 0.4;
-        somRega.play().catch(e => console.log('Áudio bloqueado:', e));
-
-        const prisma = document.getElementById('prisma-3d');
-        if (prisma) {
-            for (let i = 0; i < 5; i++) {
-                const gota = document.createElement('div');
-                gota.className = 'gota';
-                gota.style.left = (Math.random() * 40 + 30) + '%'; 
-                gota.style.top = '5%';
-                prisma.appendChild(gota);
-                setTimeout(() => gota.remove(), 600);
-            }
-        }
-
-        const ontem = new Date();
-        ontem.setDate(agora.getDate() - 1);
-        if (dados.diaUltimaRegada === ontem.toLocaleDateString('pt-BR')) {
-            dados.sequencia += 1;
-        } else {
-            dados.sequencia = 1;
-        }
-
-        dados.nivel += 4;
-        if (dados.nivel >= 100) {
-            dados.ciclos += 1;
-            dados.nivel = 0;
-            if(typeof window.mostrarToast === 'function') window.mostrarToast(`🌸 CICLO COMPLETO! O amor de vocês atingiu um novo nível!`);
-        } else {
-            if(typeof window.mostrarToast === 'function') window.mostrarToast(`💦 Planta regada por ${window.MEU_NOME}!`);
-        }
-
-        dados.diaUltimaRegada = hoje;
-        dados.ultimaRegada = agora.getTime();
-
-        set(refJardim, dados);
-        window.statusPlanta = dados;
-        if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
-        if(typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
-    });
-};
-
+// 1. A MÁGICA VISUAL (Lê os dados da nuvem e desenha a interface)
 window.renderizarPlanta = function() {
     if (!window.statusPlanta) return;
+    
     const barra = document.getElementById("progresso-crescimento");
     const texto = document.getElementById("status-texto");
     const aviso = document.getElementById("aviso-regada");
-    const contadorCiclos = document.getElementById('contador-ciclos');
+    const contadorNumero = document.getElementById('contador-ciclos-numero');
+    const porcentagem = document.getElementById('porcentagem-jardim');
+    const brilhoBase = document.getElementById('brilho-pedestal');
     
-    if (contadorCiclos) contadorCiclos.innerText = `🌱 Ciclos completados: ${window.statusPlanta.ciclos || 0}`;
-    if (!barra || !texto) return; 
+    const capitalUI = document.getElementById('jardim-moedas');
+    if (capitalUI) capitalUI.innerText = window.pontosDoCasal || 0;
+
+    // ATUALIZA APENAS O NÚMERO DO BADGE
+    if (contadorNumero) contadorNumero.innerText = window.statusPlanta.ciclos || 0;
     
-    barra.style.width = window.statusPlanta.nivel + "%";
+    if (!barra || !texto) return;
+    
+    // Garante que o nível não estoure visualmente
+    let nivelExibicao = window.statusPlanta.nivel;
+    if (nivelExibicao > 100) nivelExibicao = 100;
+    
+    barra.style.width = nivelExibicao + "%";
+    if (porcentagem) porcentagem.innerText = Math.floor(nivelExibicao) + "%";
 
-    if (window.statusPlanta.nivel <= 0) texto.innerText = "Um novo ciclo se inicia. Cuidem juntos.";
-    else if (window.statusPlanta.nivel < 25) texto.innerText = "As raízes estão se firmando.";
-    else if (window.statusPlanta.nivel < 50) texto.innerText = "Crescimento contínuo e forte.";
-    else if (window.statusPlanta.nivel < 90) texto.innerText = "A folhagem já provê abrigo e paz.";
-    else texto.innerText = "Prestes a florescer um novo marco!";
-
-    if (window.statusPlanta.diaUltimaRegada === new Date().toLocaleDateString('pt-BR')) {
-        if (aviso) aviso.innerText = "Solo nutrido por hoje. Descansem.";
-    } else {
-        if (aviso) aviso.innerText = "A planta aguarda a água de um de vocês.";
+    // As fases narrativas da árvore
+    if (nivelExibicao <= 0) texto.innerText = "A semente repousa na terra. Usem a energia de vocês.";
+    else if (nivelExibicao < 25) texto.innerText = "As primeiras raízes começam a se firmar no solo.";
+    else if (nivelExibicao < 50) texto.innerText = "Um broto forte e verdejante. O amor está crescendo!";
+    else if (nivelExibicao < 80) texto.innerText = "Tronco robusto. A Árvore da Vida já provê abrigo e paz.";
+    else if (nivelExibicao < 100) texto.innerText = "A folhagem cintila. A magia está prestes a transbordar!";
+    else {
+        texto.innerText = "FLORESCIMENTO SUPREMO! ✨";
+        texto.style.color = "#f1c40f";
+        if (brilhoBase) brilhoBase.style.background = "#f1c40f"; // O Prisma fica dourado!
     }
+
+    // Histórico de Ações
+    if (window.statusPlanta.diaUltimaRegada) {
+        aviso.innerText = `Última nutrição: ${window.statusPlanta.diaUltimaRegada}`;
+    } else {
+        aviso.innerText = "Aguardando o primeiro toque de vida.";
+    }
+};
+
+// 2. AÇÃO DE NUTRIR (A integração de esforços)
+window.nutrirPlanta = function(tipoAcao) {
+    // A. Verifica se tem saldo no Banco Central do Casal
+    const saldoAtual = window.pontosDoCasal || 0;
+    let custo = 0;
+    let ganhoXP = 0;
+    let nomeAcao = "";
+    let somAcao = null;
+
+    if (tipoAcao === 'agua') { custo = 10; ganhoXP = 2; nomeAcao = "Orvalho"; somAcao = new Audio('assets/sons/mf/regar.mp3'); }
+    if (tipoAcao === 'luz') { custo = 25; ganhoXP = 6; nomeAcao = "Luz Solar"; somAcao = new Audio('assets/sons/acerto.mp3'); }
+    if (tipoAcao === 'magia') { custo = 50; ganhoXP = 15; nomeAcao = "Pó de Estrela"; somAcao = new Audio('assets/sons/nivel.mp3'); }
+
+    if (saldoAtual < custo) {
+        if (typeof mostrarToast === 'function') mostrarToast(`Vocês precisam de ${custo}💰! Vençam jogos juntos.`, "⚠️");
+        if (window.Haptics) window.Haptics.erro();
+        return; // Bloqueia a ação
+    }
+
+    // B. Gasta o dinheiro (O suor das outras fazendas)
+    if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-custo, `Comprou ${nomeAcao} para a Árvore`);
+    
+    // Atualiza visualmente na mesma hora
+    const capitalUI = document.getElementById('jardim-moedas');
+    if (capitalUI) capitalUI.innerText = window.pontosDoCasal;
+
+    // C. Aplica o crescimento
+    window.statusPlanta.nivel += ganhoXP;
+    
+    const quemAgiu = window.MEU_NOME || "Um coração anônimo";
+    window.statusPlanta.diaUltimaRegada = `${quemAgiu} enviou ${nomeAcao} hoje.`;
+
+    // Efeitos sensoriais
+    if (somAcao) { somAcao.volume = 0.5; somAcao.play(); }
+    if (window.Haptics) window.Haptics.sucesso();
+    if (typeof mostrarToast === 'function') mostrarToast(`${nomeAcao} enviada para a Árvore! +${ganhoXP}%`, "🌿");
+
+    // D. O GRANDE MOMENTO: Chegou a 100%?
+    if (window.statusPlanta.nivel >= 100) {
+        window.statusPlanta.ciclos += 1; // Guarda na memória que completaram um ciclo
+        window.statusPlanta.nivel = 0; // Renasce (Prestige)
+        
+        if (typeof mostrarToast === 'function') mostrarToast("A Árvore da Vida completou um ciclo! Renascendo mais forte...", "🌟");
+        if (window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]);
+        if (typeof confetti === 'function') confetti({colors: ['#2ecc71', '#f1c40f', '#fff'], particleCount: 200, spread: 160});
+        
+        // Pode dar um prêmio em dinheiro ao resetar o ciclo
+        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(200, `Recompensa de Florescimento!`);
+    }
+
+    // E. Salva as mudanças direto na Nuvem!
+    salvarProgressoPlantaFirebase();
+    
+    // Atualiza a tela
+    renderizarPlanta();
+};
+
+function salvarProgressoPlantaFirebase() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    const refPlanta = ref(db, 'jardim_global/status');
+    set(refPlanta, window.statusPlanta).catch(erro => {
+        console.error("Erro ao enraizar dados na nuvem:", erro);
+    });
+}
+
+// Botão de instrução (Coloque em qualquer lugar do seu script)
+window.toggleInstrucoesJardim = function() {
+    const el = document.getElementById('instrucoes-jardim');
+    if (el) el.classList.toggle('escondido');
 };

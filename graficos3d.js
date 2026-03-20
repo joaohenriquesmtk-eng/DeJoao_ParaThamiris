@@ -192,145 +192,6 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         animar();
     };
 
-    // --- 2. A ÁRVORE DA VIDA (FRACTAL PROCEDURAL) ---
-    window.inicializarPrisma3D = () => {
-        const container = document.getElementById('prisma-3d');
-        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.domElement.style.display = 'block';
-        container.appendChild(renderer.domElement);
-
-        camera.position.set(0, 2, 7);
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        const luzD = new THREE.DirectionalLight(0xffd700, 1.5);
-        luzD.position.set(5, 10, 5);
-        scene.add(luzD);
-        const luzAura = new THREE.PointLight(0xff6b6b, 2, 8);
-        luzAura.position.set(0, 2, 0);
-        scene.add(luzAura);
-
-        const arvoreGroup = new THREE.Group();
-        arvoreGroup.position.y = -1.5; 
-        scene.add(arvoreGroup);
-
-        let pulsoRegador = 1;
-        container.addEventListener('click', () => {
-            pulsoRegador = 1.15; 
-            if (navigator.vibrate) navigator.vibrate([40, 60, 40]); 
-        });
-
-        const matTronco = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.3, metalness: 0.8 }); 
-        const matFolha = new THREE.MeshBasicMaterial({ color: 0xff6b6b, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending }); 
-        const matSemente = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.2, metalness: 0.5, emissive: 0x1abc9c }); 
-
-        let sistemaPetalas;
-        const particulasCount = 80;
-        const petalasGeo = new THREE.BufferGeometry();
-        const petalasPos = new Float32Array(particulasCount * 3);
-
-        const nivel = window.statusPlanta ? window.statusPlanta.nivel : 0;
-        let maxProfundidade = 0;
-        if (nivel > 5) maxProfundidade = 1;  
-        if (nivel > 25) maxProfundidade = 2; 
-        if (nivel > 50) maxProfundidade = 3; 
-        if (nivel > 80) maxProfundidade = 4; 
-        if (nivel >= 100) maxProfundidade = 5; 
-
-        function criarGalho(comprimento, espessuraBase, profundidadeAtual) {
-            const galhoGrupo = new THREE.Group();
-            const galhoGeo = new THREE.CylinderGeometry(espessuraBase * 0.65, espessuraBase, comprimento, 6);
-            galhoGeo.translate(0, comprimento / 2, 0); 
-            galhoGrupo.add(new THREE.Mesh(galhoGeo, matTronco));
-
-            if (profundidadeAtual < maxProfundidade) {
-                for(let i = 0; i < 3; i++) {
-                    const galhoFilho = criarGalho(comprimento * 0.75, espessuraBase * 0.65, profundidadeAtual + 1);
-                    galhoFilho.position.y = comprimento; 
-                    galhoFilho.rotation.y = ((Math.PI * 2) / 3) * i + (Math.random() * 0.4 - 0.2);
-                    galhoFilho.rotation.z = 0.5 + (Math.random() * 0.3);
-                    galhoFilho.rotation.x = (Math.random() * 0.4 - 0.2);
-                    galhoGrupo.add(galhoFilho);
-                }
-            } else {
-                if (maxProfundidade > 1) { 
-                    const folha = new THREE.Mesh(new THREE.SphereGeometry(espessuraBase * 3, 5, 5), matFolha);
-                    folha.position.y = comprimento;
-                    galhoGrupo.add(folha);
-                }
-            }
-            return galhoGrupo;
-        }
-
-        let semente;
-        if (maxProfundidade === 0) {
-            semente = new THREE.Mesh(new THREE.OctahedronGeometry(0.5, 0), matSemente);
-            semente.position.y = 1;
-            arvoreGroup.add(semente);
-        } else {
-            arvoreGroup.add(criarGalho(1.5, 0.25, 1));
-            if (maxProfundidade >= 4) {
-                for(let i=0; i<particulasCount; i++) {
-                    petalasPos[i*3] = (Math.random() - 0.5) * 6; 
-                    petalasPos[i*3+1] = Math.random() * 6;       
-                    petalasPos[i*3+2] = (Math.random() - 0.5) * 6; 
-                }
-                petalasGeo.setAttribute('position', new THREE.BufferAttribute(petalasPos, 3));
-                sistemaPetalas = new THREE.Points(petalasGeo, new THREE.PointsMaterial({ color: 0xffb7c5, size: 0.1, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }));
-                arvoreGroup.add(sistemaPetalas);
-            }
-        }
-
-        let arvoreVisivel = false;
-        const observerArvore = new IntersectionObserver((entries) => { arvoreVisivel = entries[0].isIntersecting; });
-        observerArvore.observe(container);
-
-        let tempo = 0;
-        const animar = () => {
-            requestAnimationFrame(animar);
-            if (!window.RadarDePerformance.podeAnimar('prisma-3d')) return;
-            if (!arvoreVisivel) return; 
-
-            tempo += 0.01;
-            arvoreGroup.rotation.y += 0.003;
-            arvoreGroup.position.y = -1.5 + Math.sin(tempo) * 0.1;
-
-            pulsoRegador += (1 - pulsoRegador) * 0.1; 
-            arvoreGroup.scale.set(pulsoRegador, pulsoRegador, pulsoRegador);
-
-            if (maxProfundidade === 0 && semente) {
-                const pulso = 1 + Math.sin(tempo * 3) * 0.2;
-                semente.scale.set(pulso, pulso, pulso);
-                semente.rotation.x += 0.01; semente.rotation.y += 0.02;
-            }
-
-            if (sistemaPetalas) {
-                const pos = sistemaPetalas.geometry.attributes.position.array;
-                for(let i=1; i<pos.length; i+=3) {
-                    pos[i] -= 0.02; 
-                    pos[i-1] += Math.sin(tempo + i) * 0.01; 
-                    if (pos[i] < -1.5) { pos[i] = 4 + Math.random() * 2; }
-                }
-                sistemaPetalas.geometry.attributes.position.needsUpdate = true;
-            }
-            renderer.render(scene, camera);
-        };
-        
-        window.addEventListener('resize', () => {
-            if(container.clientWidth > 0) {
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-            }
-        });
-        animar();
-    };
 
     // --- 3. A GALÁXIA PARTICULAR ---
     window.inicializarGalaxia3D = () => {
@@ -1325,4 +1186,146 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
                 if(btn) { btn.disabled = false; btn.style.opacity = "1"; }
             };
         };
+    };
+
+// --- 2. A ÁRVORE DA VIDA (FRACTAL PROCEDURAL) ---
+window.inicializarPrisma3D = () => {
+    const container = document.getElementById('prisma-3d');
+    
+    // CORREÇÃO: Verificamos se o motor existe e se já não injetamos um canvas lá dentro
+    if (!container || typeof THREE === 'undefined' || container.children.length > 0) return;
+
+    const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.domElement.style.display = 'block';
+        container.appendChild(renderer.domElement);
+
+        camera.position.set(0, 2, 7);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const luzD = new THREE.DirectionalLight(0xffd700, 1.5);
+        luzD.position.set(5, 10, 5);
+        scene.add(luzD);
+        const luzAura = new THREE.PointLight(0xff6b6b, 2, 8);
+        luzAura.position.set(0, 2, 0);
+        scene.add(luzAura);
+
+        const arvoreGroup = new THREE.Group();
+        arvoreGroup.position.y = -1.5; 
+        scene.add(arvoreGroup);
+
+        let pulsoRegador = 1;
+        container.addEventListener('click', () => {
+            pulsoRegador = 1.15; 
+            if (navigator.vibrate) navigator.vibrate([40, 60, 40]); 
+        });
+
+        const matTronco = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.3, metalness: 0.8 }); 
+        const matFolha = new THREE.MeshBasicMaterial({ color: 0xff6b6b, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending }); 
+        const matSemente = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.2, metalness: 0.5, emissive: 0x1abc9c }); 
+
+        let sistemaPetalas;
+        const particulasCount = 80;
+        const petalasGeo = new THREE.BufferGeometry();
+        const petalasPos = new Float32Array(particulasCount * 3);
+
+        const nivel = window.statusPlanta ? window.statusPlanta.nivel : 0;
+        let maxProfundidade = 0;
+        if (nivel > 5) maxProfundidade = 1;  
+        if (nivel > 25) maxProfundidade = 2; 
+        if (nivel > 50) maxProfundidade = 3; 
+        if (nivel > 80) maxProfundidade = 4; 
+        if (nivel >= 100) maxProfundidade = 5; 
+
+        function criarGalho(comprimento, espessuraBase, profundidadeAtual) {
+            const galhoGrupo = new THREE.Group();
+            const galhoGeo = new THREE.CylinderGeometry(espessuraBase * 0.65, espessuraBase, comprimento, 6);
+            galhoGeo.translate(0, comprimento / 2, 0); 
+            galhoGrupo.add(new THREE.Mesh(galhoGeo, matTronco));
+
+            if (profundidadeAtual < maxProfundidade) {
+                for(let i = 0; i < 3; i++) {
+                    const galhoFilho = criarGalho(comprimento * 0.75, espessuraBase * 0.65, profundidadeAtual + 1);
+                    galhoFilho.position.y = comprimento; 
+                    galhoFilho.rotation.y = ((Math.PI * 2) / 3) * i + (Math.random() * 0.4 - 0.2);
+                    galhoFilho.rotation.z = 0.5 + (Math.random() * 0.3);
+                    galhoFilho.rotation.x = (Math.random() * 0.4 - 0.2);
+                    galhoGrupo.add(galhoFilho);
+                }
+            } else {
+                if (maxProfundidade > 1) { 
+                    const folha = new THREE.Mesh(new THREE.SphereGeometry(espessuraBase * 3, 5, 5), matFolha);
+                    folha.position.y = comprimento;
+                    galhoGrupo.add(folha);
+                }
+            }
+            return galhoGrupo;
+        }
+
+        let semente;
+        if (maxProfundidade === 0) {
+            semente = new THREE.Mesh(new THREE.OctahedronGeometry(0.5, 0), matSemente);
+            semente.position.y = 1;
+            arvoreGroup.add(semente);
+        } else {
+            arvoreGroup.add(criarGalho(1.5, 0.25, 1));
+            if (maxProfundidade >= 4) {
+                for(let i=0; i<particulasCount; i++) {
+                    petalasPos[i*3] = (Math.random() - 0.5) * 6; 
+                    petalasPos[i*3+1] = Math.random() * 6;       
+                    petalasPos[i*3+2] = (Math.random() - 0.5) * 6; 
+                }
+                petalasGeo.setAttribute('position', new THREE.BufferAttribute(petalasPos, 3));
+                sistemaPetalas = new THREE.Points(petalasGeo, new THREE.PointsMaterial({ color: 0xffb7c5, size: 0.1, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }));
+                arvoreGroup.add(sistemaPetalas);
+            }
+        }
+
+        let arvoreVisivel = false;
+        const observerArvore = new IntersectionObserver((entries) => { arvoreVisivel = entries[0].isIntersecting; });
+        observerArvore.observe(container);
+
+        let tempo = 0;
+        const animar = () => {
+            requestAnimationFrame(animar);
+            if (!window.RadarDePerformance.podeAnimar('prisma-3d')) return;
+            if (!arvoreVisivel) return; 
+
+            tempo += 0.01;
+            arvoreGroup.rotation.y += 0.003;
+            arvoreGroup.position.y = -1.5 + Math.sin(tempo) * 0.1;
+
+            pulsoRegador += (1 - pulsoRegador) * 0.1; 
+            arvoreGroup.scale.set(pulsoRegador, pulsoRegador, pulsoRegador);
+
+            if (maxProfundidade === 0 && semente) {
+                const pulso = 1 + Math.sin(tempo * 3) * 0.2;
+                semente.scale.set(pulso, pulso, pulso);
+                semente.rotation.x += 0.01; semente.rotation.y += 0.02;
+            }
+
+            if (sistemaPetalas) {
+                const pos = sistemaPetalas.geometry.attributes.position.array;
+                for(let i=1; i<pos.length; i+=3) {
+                    pos[i] -= 0.02; 
+                    pos[i-1] += Math.sin(tempo + i) * 0.01; 
+                    if (pos[i] < -1.5) { pos[i] = 4 + Math.random() * 2; }
+                }
+                sistemaPetalas.geometry.attributes.position.needsUpdate = true;
+            }
+            renderer.render(scene, camera);
+        };
+        
+        window.addEventListener('resize', () => {
+            if(container.clientWidth > 0) {
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+            }
+        });
+        animar();
     };

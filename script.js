@@ -110,10 +110,18 @@ async function carregarDadosExternos() {
 }
 
 
-// 4. JOGO: TERMO (código original)
+// 4. JOGO: TERMO (Estado Global Corrigido)
 let tentativaAtual = 0;
 let letraAtual = 0;
-let grade = ["", "", "", "", "", ""];
+// A grade DEVE nascer como uma Matriz 2D (Lista de Listas)
+let grade = [
+    ["", "", "", "", ""],
+    ["", "", "", "", ""],
+    ["", "", "", "", ""],
+    ["", "", "", "", ""],
+    ["", "", "", "", ""],
+    ["", "", "", "", ""]
+];
 
 function salvarEstadoTermo() {
     const estado = {
@@ -124,67 +132,69 @@ function salvarEstadoTermo() {
     sessionStorage.setItem('termo_estado', JSON.stringify(estado));
 }
 
+// ==========================================
+// CONSTRUÇÃO DO ORÁCULO DE CRISTAL (TERMO)
+// ==========================================
 function inicializarTermo() {
-    const tabuleiro = document.getElementById("tabuleiro-termo");
-    if (!tabuleiro) return;
-    tabuleiro.innerHTML = "";
+    const gradeElemento = document.getElementById("grade-termo");
+    const tecladoElemento = document.getElementById("teclado-termo");
 
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
+    if (!gradeElemento || !tecladoElemento) return;
 
-    if (ganhouHoje) {
-        const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-        for (let i = 0; i < 6; i++) {
-            let linha = document.createElement("div");
-            linha.className = "linha-termo";
-            for (let j = 0; j < 5; j++) {
-                let quadrado = document.createElement("div");
-                quadrado.className = "letra-quadrado correta";
-                quadrado.innerText = palavraFinal[j];
-                linha.appendChild(quadrado);
-            }
-            tabuleiro.appendChild(linha);
-        }
+    // Limpa o terreno para desenhar a nova versão
+    gradeElemento.innerHTML = "";
+    tecladoElemento.innerHTML = "";
 
-        document.getElementById("teclado-termo").innerHTML = "";
-        document.getElementById("btn-verificar").classList.add("escondido");
-
-        const inst = document.getElementById('instrucoes-termo');
-        inst.innerHTML = `<h4 style="text-align:center; color: var(--cor-agronomia);">Vitória Colhida! 🌱</h4>
-                          <p style="text-align:center;">Volte amanhã para colher uma nova palavra e liberar mais relíquias.</p>`;
-        inst.classList.remove('escondido');
-
-        tentativaAtual = 6;
-        return;
-    }
-
-    tentativaAtual = 0;
-    letraAtual = 0;
-    grade = ["", "", "", "", "", ""];
-    document.getElementById("btn-verificar").classList.remove("escondido");
-    document.getElementById("teclado-termo").innerHTML = "";
-
+    // 1. GERA A GRADE (Com as novas classes Premium do CSS)
     for (let i = 0; i < 6; i++) {
-        let linha = document.createElement("div");
-        linha.className = "linha-termo";
+        const linha = document.createElement("div");
+        linha.className = "linha-termo"; // Nome novo!
+        
         for (let j = 0; j < 5; j++) {
-            let quadrado = document.createElement("div");
-            quadrado.className = "letra-quadrado";
+            const quadrado = document.createElement("div");
+            quadrado.className = "termo-quadrado"; // Nome novo!
             quadrado.id = `q-${i}-${j}`;
             linha.appendChild(quadrado);
         }
-        tabuleiro.appendChild(linha);
+        gradeElemento.appendChild(linha);
     }
-    restaurarEstadoTermo();
 
-    gerarTeclado();
+    // 2. GERA O TECLADO (Com as novas classes Premium do CSS)
+    const linhasTeclado = [
+        ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+        ["Z", "X", "C", "V", "B", "N", "M", "⌫"]
+    ];
 
-    const btnVerificar = document.getElementById('btn-verificar');
-    if (btnVerificar) {
-        const novoBtn = btnVerificar.cloneNode(true);
-        btnVerificar.parentNode.replaceChild(novoBtn, btnVerificar);
-        novoBtn.addEventListener('click', verificarPalavra);
+    linhasTeclado.forEach((linhaLetras) => {
+        const linhaDiv = document.createElement("div");
+        linhaDiv.className = "teclado-linha";
+        
+        linhaLetras.forEach(letra => {
+            const botao = document.createElement("button");
+            botao.id = `tecla-${letra}`;
+            
+            if (letra === "⌫") {
+                botao.className = "tecla tecla-larga";
+                botao.innerText = "⌫";
+                botao.onclick = removerLetra;
+            } else {
+                botao.className = "tecla";
+                botao.innerText = letra;
+                botao.onclick = () => adicionarLetra(letra);
+            }
+            
+            linhaDiv.appendChild(botao);
+        });
+        tecladoElemento.appendChild(linhaDiv);
+    });
+
+    // Puxa as memórias caso a pessoa tenha saído no meio do jogo
+    if (typeof restaurarEstadoTermo === 'function') {
+        restaurarEstadoTermo();
     }
+
+    const moedasUI = document.getElementById('termo-moedas'); if (moedasUI) moedasUI.innerText = window.pontosDoCasal || 0;
 }
 
 function gerarTeclado() {
@@ -215,88 +225,280 @@ function processarEntrada(tecla) {
     else adicionarLetra(tecla);
 }
 
+// Para colocar a letra dentro de um <span> para o 3D funcionar
 function adicionarLetra(letra) {
-    if (letraAtual < 5) {
+    if (letraAtual < 5 && tentativaAtual < 6) {
+        grade[tentativaAtual][letraAtual] = letra;
         const quadrado = document.getElementById(`q-${tentativaAtual}-${letraAtual}`);
         if (quadrado) {
             quadrado.innerText = letra;
-            grade[tentativaAtual] += letra;
-            letraAtual++;
-            salvarEstadoTermo();
+            // Aciona a animação de "Pop" e a borda dourada
+            quadrado.classList.add("preenchido");
+            if(window.Haptics) window.Haptics.toqueLeve();
         }
+        letraAtual++;
     }
 }
 
-function apagarLetra() {
-    if (letraAtual > 0) {
+function removerLetra() {
+    if (letraAtual > 0 && tentativaAtual < 6) {
         letraAtual--;
+        grade[tentativaAtual][letraAtual] = "";
         const quadrado = document.getElementById(`q-${tentativaAtual}-${letraAtual}`);
         if (quadrado) {
             quadrado.innerText = "";
-            grade[tentativaAtual] = grade[tentativaAtual].slice(0, -1);
-            salvarEstadoTermo();
+            // Remove a animação e a borda dourada
+            quadrado.classList.remove("preenchido");
+            if(window.Haptics) window.Haptics.toqueLeve();
         }
     }
 }
 
-function verificarPalavra() {
-    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-    salvarEstadoTermo();
-    const palpite = grade[tentativaAtual];
-    if (palpite.length < 5) return;
-
-    for (let i = 0; i < 5; i++) {
-        const quadrado = document.getElementById(`q-${tentativaAtual}-${i}`);
-        const letra = palpite[i];
-        if (letra === palavraFinal[i]) quadrado.classList.add("correta");
-        else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
-        else quadrado.classList.add("ausente");
-    }
-
-    if (palpite === palavraFinal) finalizarVitoria();
-    else {
-        tentativaAtual++;
-        letraAtual = 0;
-        if (tentativaAtual === 6) {
-            mostrarToast("Não foi dessa vez... Mas você merece outra chance!");
-            document.getElementById('termo-reset-container').classList.remove('escondido');
-        }
-    }
-}
-
-function finalizarVitoria() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    localStorage.setItem('santuario_vitoria_dia', hoje);
-    mostrarToast("Incrível! Você colheu a vitória! 🌱");
-    // Confetes
-confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 }
-});
-    if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
-    inicializarTermo();
-    liberarCofreVisual();
-    atualizarDinamicaHome();
-    document.getElementById('tabuleiro-termo').classList.add('vitoria');
-}
-
-function resetarTermo() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    sessionStorage.removeItem('termo_estado');
-    if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
+// O Grande Veredito com Animação em Cascata
+window.verificarPalavra = function() {
+    if (letraAtual !== 5) {
+        if(typeof mostrarToast === 'function') mostrarToast("A palavra precisa ter 5 letras!", "⚠️");
+        if(window.Haptics) window.Haptics.erro();
         return;
     }
-    tentativaAtual = 0;
-    letraAtual = 0;
-    grade = ["", "", "", "", "", ""];
-    inicializarTermo();
-    const resetContainer = document.getElementById('termo-reset-container');
-    if (resetContainer) {
-        resetContainer.classList.add('escondido');
+
+    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+    const palpite = grade[tentativaAtual].join("");
+    let letrasRestantes = palavraFinal.split(""); 
+    let statusClasses = ["ausente", "ausente", "ausente", "ausente", "ausente"];
+
+    // 1ª Passagem: Verifica as CORRETAS (Verde)
+    for (let i = 0; i < 5; i++) {
+        if (palpite[i] === palavraFinal[i]) {
+            statusClasses[i] = "correta";
+            letrasRestantes[i] = null; 
+        }
+    }
+
+    // 2ª Passagem: Verifica as PRESENTES (Amarelo)
+    for (let i = 0; i < 5; i++) {
+        if (statusClasses[i] !== "correta") {
+            const indexNaPalavra = letrasRestantes.indexOf(palpite[i]);
+            if (indexNaPalavra !== -1) {
+                statusClasses[i] = "presente";
+                letrasRestantes[indexNaPalavra] = null; 
+            }
+        }
+    }
+
+    // A MÁGICA DO FLIP 3D EM CASCATA
+    let acertos = 0;
+    
+    // Desativa o botão temporariamente para evitar spam de cliques
+    const btnVerificar = document.getElementById("btn-verificar");
+    if(btnVerificar) btnVerificar.disabled = true;
+
+    for (let i = 0; i < 5; i++) {
+        // Cria o atraso em cascata (0ms, 300ms, 600ms, 900ms, 1200ms)
+        setTimeout(() => {
+            const quadrado = document.getElementById(`q-${tentativaAtual}-${i}`);
+            if (quadrado) {
+                // Inicia o giro 3D
+                quadrado.classList.add("anim-flip");
+                
+                // No meio do giro (300ms), muda a cor!
+                setTimeout(() => {
+                    quadrado.classList.add(statusClasses[i]);
+                    quadrado.style.color = "#000"; // Força a cor do texto para preto
+                    if(window.Haptics) navigator.vibrate(30); // Vibra a cada letra revelada!
+                }, 300);
+            }
+
+            // Atualiza a cor no Teclado
+            setTimeout(() => {
+                const tecla = document.getElementById(`tecla-${palpite[i]}`);
+                if (tecla) {
+                    if (statusClasses[i] === "correta") {
+                        tecla.className = `tecla correta`;
+                    } else if (statusClasses[i] === "presente" && !tecla.classList.contains("correta")) {
+                        tecla.className = `tecla presente`;
+                    } else if (statusClasses[i] === "ausente" && !tecla.classList.contains("correta") && !tecla.classList.contains("presente")) {
+                        tecla.className = `tecla ausente`;
+                    }
+                }
+            }, 300);
+
+            if (statusClasses[i] === "correta") acertos++;
+
+            // Se for a última letra da linha, checa se ganhou ou perdeu
+            if (i === 4) {
+                setTimeout(() => {
+                    if(btnVerificar) btnVerificar.disabled = false; // Reativa o botão
+                    
+                    if (acertos === 5) {
+                        if(typeof mostrarToast === 'function') mostrarToast("O Oráculo revelou a verdade!", "✨");
+                        if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]);
+                        if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 150, spread: 100});
+                        
+                        if(typeof finalizarVitoria === 'function') finalizarVitoria();
+                        
+                    } else {
+                        tentativaAtual++;
+                        letraAtual = 0;
+                        salvarEstadoTermo();
+                        
+                        if (tentativaAtual >= 6) {
+                            if(typeof mostrarToast === 'function') mostrarToast(`Sua jornada falhou. A palavra era: ${palavraFinal}`, "💔");
+                            if(window.Haptics) window.Haptics.erro();
+                            const reset = document.getElementById('termo-reset-container');
+                            if(reset) reset.classList.remove('escondido');
+                        }
+                    }
+                }, 400); // Espera o último flip terminar
+            }
+        }, i * 300); // Multiplicador de tempo para a cascata
+    }
+};
+
+function verificarFimDeJogo(palpite, palavraFinal) {
+    if (palpite === palavraFinal) {
+        // VITÓRIA! O ECOSISTEMA SE CONECTA
+        mostrarToast("O Oráculo revelou a verdade! +50💰", "✨");
+        
+        // Dá dinheiro para a Fazenda!
+        if (typeof atualizarPontosCasal === 'function') {
+            atualizarPontosCasal(50, "Vitória no Oráculo");
+        }
+        
+        finalizarVitoria();
+    } else {
+        tentativaAtual++;
+        letraAtual = 0;
+        salvarEstadoTermo();
+        if (tentativaAtual === 6) {
+            mostrarToast("A névoa cobriu o oráculo... Tente novamente.");
+            document.getElementById('termo-reset-container').classList.remove('escondido');
+            if(window.Haptics) window.Haptics.erro();
+        }
     }
 }
 
+// ==========================================
+// A CHAVE DO COFRE E A MISERICÓRDIA DO ORÁCULO
+// ==========================================
+
+// Conecta a vitória do Oráculo com a porta do Cofre.
+function finalizarVitoria() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    
+    // 1. Salva na memória profunda do celular que vocês ganharam hoje!
+    localStorage.setItem('santuario_vitoria_dia', hoje);
+    
+    // 2. A MÁGICA: Destranca o cofre visualmente e atualiza a tela Home
+    if (typeof liberarCofreVisual === 'function') liberarCofreVisual();
+    if (typeof atualizarDinamicaHome === 'function') atualizarDinamicaHome();
+    
+    // 3. Atualiza a Ofensiva Diária (O "foguinho" dos rituais)
+    if (typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
+    
+    // 4. Limpa o teclado e esconde o botão para a tela ficar com cara de "Jogo Concluído"
+    document.getElementById("teclado-termo").innerHTML = "";
+    document.getElementById("btn-verificar").classList.add("escondido");
+    
+    // 5. Atualiza o painel de instruções com a glória da vitória
+    const inst = document.getElementById('instrucoes-termo');
+    if (inst) {
+        inst.innerHTML = `<h4 style="text-align:center; color: #2ecc71;">Vitória Alcançada! ✨</h4>
+                          <p style="text-align:center;">O Oráculo revelou a verdade. O Cofre do Santuário foi destrancado para vocês hoje!</p>`;
+        inst.classList.remove('escondido');
+    }
+}
+
+// ==========================================
+// FUNÇÃO DE RECOMEÇO (CORRIGIDA - MATRIZ 2D)
+// ==========================================
+function resetarTermo() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    
+    // Se a pessoa já ganhou hoje, avisamos amigavelmente
+    if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
+        if(typeof mostrarToast === 'function') mostrarToast("Você já venceu hoje! Volte amanhã para um novo enigma.", "✨");
+        return;
+    }
+
+    // 1. Limpa a memória das tentativas fracassadas
+    sessionStorage.removeItem('termo_estado');
+    
+    // 2. Zera as variáveis globais (O SEGREDO DA MATRIZ 2D ESTÁ AQUI)
+    tentativaAtual = 0;
+    letraAtual = 0;
+    grade = [
+        ["", "", "", "", ""],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""]
+    ];
+    
+    // 3. Reativa os botões
+    const resetContainer = document.getElementById('termo-reset-container');
+    if (resetContainer) resetContainer.classList.add('escondido');
+    
+    const btnVerificar = document.getElementById("btn-verificar");
+    if(btnVerificar) {
+        btnVerificar.disabled = false;
+        btnVerificar.classList.remove("escondido");
+    }
+
+    // 4. Reconstrói o tabuleiro visual
+    inicializarTermo();
+    
+    // 5. Dá o feedback sensorial
+    if(typeof mostrarToast === 'function') mostrarToast("O Oráculo lhe concedeu uma nova chance!", "🔮");
+    if (window.Haptics) window.Haptics.toqueLeve();
+}
+
+// ==========================================
+// A DICA DE AMOR SUPREMA (COM ATUALIZAÇÃO DE SALDO)
+// ==========================================
+window.usarDicaAmor = function() {
+    const moedasAtuais = window.pontosDoCasal || 0;
+
+    if (moedasAtuais < 10) {
+        if(typeof mostrarToast === 'function') mostrarToast("Vocês precisam de 10💰 cultivadas na Fazenda ou Tribunal para a dica!", "🔒");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+    
+    if (letraAtual < 5) {
+        // Desconta os pontos globalmente
+        if (typeof atualizarPontosCasal === 'function') {
+            atualizarPontosCasal(-10, "Dica de Amor Oráculo");
+        }
+
+        // Atualiza o visor de saldo na hora!
+        const visorMoedas = document.getElementById('termo-moedas');
+        if (visorMoedas) visorMoedas.innerText = window.pontosDoCasal;
+
+        const letraCorreta = palavraFinal[letraAtual];
+        adicionarLetra(letraCorreta);
+
+        const elogios = [
+            "Seu sorriso ilumina mais que essas letras.",
+            "Mesmo de longe, sinto sua intuição aguçada.",
+            "Um empurrãozinho para a mulher mais inteligente que conheço.",
+            "Sua dedicação me inspira. Aqui está uma luz!"
+        ];
+        const elogioSorteado = elogios[Math.floor(Math.random() * elogios.length)];
+        
+        if(typeof mostrarToast === 'function') mostrarToast(elogioSorteado, "💖");
+        if(window.Haptics) window.Haptics.sucesso();
+    } else {
+        if(typeof mostrarToast === 'function') mostrarToast("A linha já está cheia, apague uma letra antes de pedir a dica!", "⚠️");
+    }
+};
+
+// ==========================================
+// RESTAURAÇÃO DE MEMÓRIA (Com suporte ao Glassmorphism)
+// ==========================================
 function restaurarEstadoTermo() {
     const estadoSalvo = sessionStorage.getItem('termo_estado');
     if (estadoSalvo) {
@@ -311,18 +513,32 @@ function restaurarEstadoTermo() {
                     const quadrado = document.getElementById(`q-${i}-${j}`);
                     if (quadrado && grade[i] && grade[i][j]) {
                         quadrado.innerText = grade[i][j];
-                        if (i < tentativaAtual) {
+                        quadrado.classList.add("preenchido"); // Mantém o brilho interno
+                        
+                        if (i < tentativaAtual) { 
+                            // Linhas já chutadas (Aplica as cores finais)
                             const letra = grade[i][j];
                             const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+                            
                             if (letra === palavraFinal[j]) quadrado.classList.add("correta");
                             else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
                             else quadrado.classList.add("ausente");
+                            
+                            quadrado.style.color = "#000"; // Força a cor do texto para dar contraste
+                            
+                            // Pinta o teclado também para a Thamiris não se perder!
+                            const tecla = document.getElementById(`tecla-${letra}`);
+                            if (tecla) {
+                                if (letra === palavraFinal[j]) tecla.className = "tecla correta";
+                                else if (palavraFinal.includes(letra) && !tecla.classList.contains("correta")) tecla.className = "tecla presente";
+                                else if (!tecla.classList.contains("correta") && !tecla.classList.contains("presente")) tecla.className = "tecla ausente";
+                            }
                         }
                     }
                 }
             }
         } catch (e) {
-            console.warn('Estado do Termo corrompido. Ignorando...');
+            console.warn('Memória do Oráculo corrompida. Recriando destino...');
             sessionStorage.removeItem('termo_estado');
         }
     }
@@ -346,9 +562,6 @@ function liberarCofreVisual() {
 
 function toggleInstrucoesTermo() {
     document.getElementById('instrucoes-termo').classList.toggle('escondido');
-}
-function toggleInstrucoesSincronia() {
-    document.getElementById('instrucoes-sincronia').classList.toggle('escondido');
 }
 function toggleInstrucoesJardim() {
     document.getElementById('instrucoes-jardim').classList.toggle('escondido');
@@ -786,7 +999,6 @@ function abrirJogo(tipo) {
     if (container) {
         container.classList.remove('escondido');
         if (tipo === 'termo') inicializarTermo();
-        if (tipo === 'sincronia') gerarNovaPergunta();
         if (tipo === 'minifazenda') {
             if (typeof window.iniciarMiniFazenda === 'function') {
                 window.iniciarMiniFazenda();
@@ -798,20 +1010,31 @@ function abrirJogo(tipo) {
             }
         }
         if (tipo === 'julgamento') {
-            if (typeof window.iniciarJulgamento === 'function') {
-                window.iniciarJulgamento();
-            }
-        }
-        // --- NOVA PARTE PARA O SOLO FÉRTIL (PRISMA) ---
-        if (tipo === 'jardim') {
-            // Dá um atraso de 100 milissegundos para a tela aparecer, 
-            // assim o 3D consegue medir o tamanho real da tela (que não será mais zero)
-            setTimeout(() => {
-                if (typeof window.inicializarPrisma3D === 'function') {
-                    window.inicializarPrisma3D();
+                    if (typeof window.iniciarJulgamento === 'function') {
+                        window.iniciarJulgamento();
+                    }
                 }
-            }, 100);
-        }
+                
+                // === ADICIONE ESTE BLOCO NOVO AQUI ===
+                if (tipo === 'sincronia') {
+                    if (typeof window.iniciarSincronia === 'function') {
+                        window.iniciarSincronia();
+                    }
+                }
+
+
+        // --- NOVA PARTE PARA O SOLO FÉRTIL (PRISMA) ---
+                if (tipo === 'jardim') {
+                    if (typeof window.renderizarPlanta === 'function') {
+                        window.renderizarPlanta();
+                    }
+                    
+                    // O CHOQUE QUÂNTICO: Força o motor 3D a recalcular o tamanho da tela
+                    // logo após o display:none ser removido, fazendo o Prisma aparecer!
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('resize'));
+                    }, 50);
+                }
         // ----------------------------------------------
     }
     document.body.classList.add('modo-jogo-ativo');
@@ -831,82 +1054,6 @@ if (window.orientacaoListener) {
     window.removeEventListener('orientationchange', window.orientacaoListener);
     window.removeEventListener('resize', window.orientacaoListener);
 }
-}
-
-const perguntasSincronia = [
-    "Qual é a memória mais vívida que você tem de nós dois no início?",
-    "Se pudéssemos projetar nossa casa ideal hoje, qual detalhe não poderia faltar?",
-    "Qual é a nossa melhor memória juntos?",
-    "O que você mais admira em mim?",
-    "Qual é o nosso maior sonho como casal?",
-    "Como você descreveria nós como um time?",
-    "Se pudéssemos viajar para qualquer lugar do mundo amanhã, para onde iríamos?",
-    "O que eu faço que, sem eu saber, faz você se sentir mais amada?",
-    "Qual característica minha você acha que mais combina com a sua?",
-    "Qual foi o momento em que você sentiu mais orgulho de nós como um time?",
-    "Qual cheiro te lembra de mim?",
-    "Se a nossa história fosse um filme, qual seria o título?",
-    "O que você gostaria de aprender a fazer comigo?",
-    "Qual música te faz pensar em mim instantaneamente?",
-    "Se você pudesse me dar um superpoder, qual seria?",
-    "Qual foi a maior loucura que já fez por amor (e se arrependeu ou não)?",
-    "Se o nosso amor fosse uma comida, qual seria?",
-    "Que lugarzinho secreto na sua cidade você sonha em me mostrar?",
-    "Qual foi o momento em que você pensou 'é com essa pessoa que quero passar o resto da vida'?",
-    "Se você pudesse reviver um dia nosso, qual escolheria?",
-    "Qual foi o momento exato em que você percebeu que éramos um 'caso julgado'?",
-    "Se nosso amor fosse uma semente, qual seria o fruto da nossa colheita?",
-    "Qual é a 'cláusula pétrea' (que nunca muda) do nosso relacionamento?",
-    "Qual viagem para o interior você mais quer fazer comigo?",
-    "Qual é o nosso prato favorito para dividir em um domingo de sol?",
-    "Qual música do Flamengo mais faz você lembrar da nossa energia juntos?",
-    "Quem é mais provável de ganhar uma discussão: a lógica do engenheiro ou os argumentos da advogada?",
-    "Qual 'safra' da nossa história você mais gosta de recordar?",
-    "Se tivéssemos que escrever o nosso próprio código de leis, qual seria a Lei nº 1?",
-    "Qual é o nosso refúgio favorito quando o mundo parece barulhento demais?",
-    "Qual característica minha você acha que 'germinou' em você ao longo do tempo?",
-    "No tribunal do nosso amor, qual é a sentença para quem fica com saudade demais?",
-    "Qual é o cheiro que mais te faz lembrar de mim?",
-    "Qual é o nosso maior 'projeto de vida' para os próximos 5 anos?",
-    "Praia com o sol de Goiânia ou serra com o frio de Colombo?",
-    "Quem de nós é mais provável de se perder no meio de uma lavoura?",
-    "Qual é o segredo para a nossa produtividade de felicidade ser sempre alta?",
-    "Qual é a mania do outro que você secretamente acha fofa?",
-    "Se nosso relacionamento fosse um time, quem seria o capitão e quem seria o camisa 10?",
-    "Qual filme ou série define perfeitamente o nosso enredo?",
-    "Qual 'recurso' você usaria para adiar o fim de um final de semana juntos?",
-    "Qual semente de sonho nós plantamos recentemente e você quer ver crescer?",
-    "Qual é a palavra que melhor resume o que sentimos quando estamos em silêncio?",
-    "Quem é mais provável de esquecer onde estacionou o carro no shopping?",
-    "Qual é a nossa 'jurisprudência': um erro que nos ensinou a sermos melhores hoje?",
-    "Se pudéssemos criar um feriado nacional para o nosso dia, como ele seria?",
-    "Qual é a característica que faz de nós o solo perfeito para o par ideal?",
-    "O que você acha que eu ainda não descobri sobre você?",
-    "Qual a sua tradição favorita que já criamos juntos?",
-    "Se a gente pudesse ter um animal de estimação agora, qual seria e por quê?",
-    "Que medo você já superou por minha causa?",
-    "Qual foi a primeira impressão (a petição inicial) que você teve de mim?",
-    "Se você pudesse me dar um apelido novo hoje, qual seria?",
-    "O que você diria para o seu 'eu' do passado no dia em que nos conhecemos?",
-    "O que você mais admira na forma como eu trato as pessoas?",
-    "Se a gente fosse escrever um livro juntos, sobre o que seria?",
-    "Qual defeito meu você acha que, na verdade, é uma qualidade?",
-    "Que sonho seu eu ainda não conheço?",
-    "Se pudéssemos fazer uma doação para uma causa juntos, qual escolheríamos?",
-    "Qual é a primeira coisa que faremos quando a distância entre Colombo e Goiânia for zero?",
-    "Se você tivesse que descrever nosso amor em três palavras, quais seriam?"
-];
-
-function gerarNovaPergunta() {
-    const indiceAleatorio = Math.floor(Math.random() * perguntasSincronia.length);
-    const textoElemento = document.getElementById('texto-pergunta');
-    if (textoElemento) {
-        textoElemento.style.opacity = 0;
-        setTimeout(() => {
-            textoElemento.innerText = perguntasSincronia[indiceAleatorio];
-            textoElemento.style.opacity = 1;
-        }, 300);
-    }
 }
 
 // 9. LEIS
@@ -1567,68 +1714,66 @@ window.fecharCapsula = () => {
 };
 
 // ==========================================
-// MOTOR DOS "NOSSOS ECOS" (GRAVAÇÃO DE ÁUDIO)
+// RELÍQUIA 1: NOSSOS ECOS (Motor Cross-Platform iOS/Android)
 // ==========================================
 let gravadorDeVoz;
-let fragmentosDeAudio = [];
-window.ecoRecebidoAudio = null; // Guardará o áudio que vem do Firebase
+let pedacosDeAudio = [];
 
-window.iniciarGravacao = async function() {
-    try {
-        // Pede permissão e liga o microfone do celular
-        const fluxo = await navigator.mediaDevices.getUserMedia({ audio: true });
-        gravadorDeVoz = new MediaRecorder(fluxo);
-        fragmentosDeAudio = [];
-
-        // Vai guardando os pedacinhos da voz enquanto fala
-        gravadorDeVoz.ondataavailable = (e) => {
-            if (e.data.size > 0) fragmentosDeAudio.push(e.data);
-        };
-
-        // Quando soltar o botão, ele empacota tudo e envia
-        gravadorDeVoz.onstop = () => {
-            const blobAudio = new Blob(fragmentosDeAudio, { type: 'audio/webm' });
+window.toggleGravacaoEco = async function() {
+    if (!gravadorDeVoz || gravadorDeVoz.state === "inactive") {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             
-            // O Firebase RTDB não aceita arquivos "crus", então transformamos o áudio em texto (Base64)
-            const leitor = new FileReader();
-            leitor.readAsDataURL(blobAudio);
-            leitor.onloadend = () => {
-                const audioBase64 = leitor.result;
-                salvarEcoNoFirebase(audioBase64);
+            // DETECÇÃO DE SISTEMA: Deixa o iPhone gravar em mp4 e o Android em webm
+            let options = {};
+            if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                options = { mimeType: 'audio/mp4' }; // Salvação para o iPhone 14 Pro Max
+            } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                options = { mimeType: 'audio/webm' }; // Salvação para o Samsung A55
+            }
+
+            gravadorDeVoz = new MediaRecorder(stream, options);
+            pedacosDeAudio = [];
+
+            gravadorDeVoz.ondataavailable = e => {
+                if (e.data.size > 0) pedacosDeAudio.push(e.data);
             };
-        };
 
-        gravadorDeVoz.start();
-        document.getElementById('status-eco').innerText = "Gravando batimentos sonoros... 🎙️";
-        document.getElementById('btn-gravar-eco').style.boxShadow = "0 0 20px #ff6b6b";
-        document.getElementById('btn-gravar-eco').style.borderColor = "#ff6b6b";
-        
-        // Vibra levinho pra avisar que começou
-        if(window.Haptics) window.Haptics.toqueLeve();
-        
-    } catch (err) {
-        console.error("Erro ao acessar microfone:", err);
-        document.getElementById('status-eco').innerText = "Permissão de microfone negada!";
-    }
-};
+            gravadorDeVoz.onstop = () => {
+                // Cria o arquivo de áudio respeitando o formato nativo do celular
+                const blob = new Blob(pedacosDeAudio, { type: gravadorDeVoz.mimeType });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => salvarEcoNoFirebase(reader.result);
+                
+                // Desliga fisicamente o microfone (Some o ícone de gravação do topo do celular)
+                stream.getTracks().forEach(track => track.stop());
+            };
 
-window.pararGravacao = function() {
-    if (gravadorDeVoz && gravadorDeVoz.state === "recording") {
+            gravadorDeVoz.start();
+            document.getElementById('status-eco').innerText = "Gravando mensagem... 🎙️";
+            document.getElementById('btn-gravar-eco').style.boxShadow = "0 0 15px #e74c3c";
+            document.getElementById('btn-gravar-eco').style.borderColor = "#e74c3c";
+            if(window.Haptics) window.Haptics.toqueForte();
+
+        } catch (err) {
+            console.error("Erro no microfone:", err);
+            if(typeof mostrarToast === 'function') mostrarToast("Permita o uso do microfone nas configurações do navegador!", "🎙️");
+        }
+    } else if (gravadorDeVoz.state === "recording") {
         gravadorDeVoz.stop();
-        // Desliga a "luz vermelha" do microfone do celular
-        gravadorDeVoz.stream.getTracks().forEach(track => track.stop());
-        
         document.getElementById('status-eco').innerText = "Processando frequências...";
         document.getElementById('btn-gravar-eco').style.boxShadow = "";
         document.getElementById('btn-gravar-eco').style.borderColor = "var(--cor-primaria)";
+        if(window.Haptics) window.Haptics.sucesso();
     }
 };
 
 function salvarEcoNoFirebase(base64) {
-    if (!window.SantuarioApp.modulos) return;
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, set } = window.SantuarioApp.modulos;
     
-    // Salva na pasta do remetente
+    // ALINHAMENTO COM AS REGRAS: Aponta exatamente para "ecos_recentes"
     const refEco = ref(db, 'ecos_recentes/' + window.MEU_NOME.toLowerCase());
     
     set(refEco, {
@@ -1637,19 +1782,38 @@ function salvarEcoNoFirebase(base64) {
     }).then(() => {
         document.getElementById('status-eco').innerText = "Voz enviada pelas estrelas! ✨";
         if(window.Haptics) window.Haptics.sucesso();
+        setTimeout(() => {
+            const el = document.getElementById('status-eco');
+            if(el) el.innerText = "O cofre aguarda sua voz.";
+        }, 3000);
     });
 }
+
+// Escuta em tempo real se a parceira mandou um áudio
+window.escutarEcosDoParceiro = function() {
+    if (!window.SantuarioApp || !window.NOME_PARCEIRO) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    const refEcoParceiro = ref(db, 'ecos_recentes/' + window.NOME_PARCEIRO.toLowerCase());
+    onValue(refEcoParceiro, (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.audio) {
+            window.ecoRecebidoAudio = new Audio(dados.audio);
+            const statusEco = document.getElementById('status-eco');
+            if (statusEco) statusEco.innerText = `Um novo eco de ${window.NOME_PARCEIRO} está aguardando! 🎵`;
+        }
+    });
+};
 
 window.tocarEco = function() {
     if (window.ecoRecebidoAudio) {
         window.ecoRecebidoAudio.play();
         document.getElementById('status-eco').innerText = `Ouvindo a voz de ${window.NOME_PARCEIRO}... 🎵`;
         
-        // Quando a voz terminar de tocar...
         window.ecoRecebidoAudio.onended = () => {
-            document.getElementById('status-eco').innerText = "Eco finalizado. O silêncio voltou.";
+            document.getElementById('status-eco').innerText = "O cofre aguarda sua voz.";
         };
     } else {
-        document.getElementById('status-eco').innerText = "Nenhuma voz ecoando no momento.";
+        if(typeof mostrarToast === 'function') mostrarToast("Nenhum eco novo no horizonte.", "🌌");
     }
 };

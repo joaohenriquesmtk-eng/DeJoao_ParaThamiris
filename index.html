@@ -150,6 +150,33 @@
     </div>
 </div>
 
+<div class="cartao-vidro" id="cartao-espelho-alma" style="margin-top: 20px; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div id="espelho-overlay" class="espelho-overlay"></div> <h3 class="titulo-cartao" style="text-align: center; color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(0,0,0,0.8);">🪞 O Espelho da Alma</h3>
+                <p id="pergunta-espelho" style="font-size: 1.05rem; font-style: italic; text-align: center; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.9); line-height: 1.5;"></p>
+
+                <div id="estado-espelho-responder" class="escondido">
+                    <textarea id="input-espelho" placeholder="Escreva a sua verdade aqui... (A sua resposta será selada)" style="width: 100%; height: 90px; background: rgba(0,0,0,0.6); border: 1px solid var(--cor-primaria); border-radius: 8px; color: white; padding: 12px; resize: none; margin-bottom: 12px; box-sizing: border-box; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);"></textarea>
+                    <button class="btn-acao" onclick="enviarRespostaEspelho()" style="width: 100%; background: var(--cor-primaria); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--cor-primaria);">Selar Resposta no Vidro</button>
+                </div>
+
+                <div id="estado-espelho-aguardando" class="escondido" style="text-align: center; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px dashed var(--cor-primaria); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
+                    <p style="color: #ddd; font-size: 0.95rem; line-height: 1.5;" id="texto-aguardando-espelho"></p>
+                </div>
+
+                <div id="estado-espelho-revelado" class="escondido" style="margin-top: 15px;">
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--cor-primaria); padding: 15px; border-radius: 0 8px 8px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                            <span style="font-size: 0.75rem; color: var(--cor-primaria); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">A Sua Alma</span>
+                            <p id="resposta-minha" style="color: #fff; font-size: 0.95rem; margin-top: 8px; white-space: pre-wrap; font-style: italic;"></p>
+                        </div>
+                        <div style="background: rgba(255, 51, 102, 0.05); border-left: 4px solid #ff3366; padding: 15px; border-radius: 0 8px 8px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                            <span id="nome-parceiro-espelho" style="font-size: 0.75rem; color: #ff9ff3; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">A Alma Dela</span>
+                            <p id="resposta-dela" style="color: #fff; font-size: 0.95rem; margin-top: 8px; white-space: pre-wrap; font-style: italic;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
                 <div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
                     <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
                     <p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
@@ -177,26 +204,37 @@
                         <p id="texto-surpresa" style="font-style: italic; margin-top: 15px; font-size: 1rem; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
                     </div>
 
+
+                    <div class="cartao-vidro" id="cartao-temas" style="margin-top: 20px; border-color: rgba(255,255,255,0.1);">
+                <div class="cabecalho-colapsavel" onclick="toggleTemas()" style="display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative;">
+                    <h3 class="titulo-cartao" style="margin-bottom: 0; color: var(--cor-primaria); text-align: center; transition: color 0.4s ease;">Aura do Santuário</h3>
+                    <span id="icone-toggle-temas" style="transition: transform 0.3s; color: var(--cor-primaria); font-size: 1.2rem; position: absolute; right: 0;">▼</span>
+                </div>
+                
+                <div id="conteudo-temas" class="escondido" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px;">
+                    <button class="btn-tema ativo" data-tema="dourado">Ouro</button>
+                    <button class="btn-tema" data-tema="azul">Azul</button>
+                    <button class="btn-tema" data-tema="rosa">Rosa</button>
+                    
+                    <button class="btn-tema" data-tema="verde">Verde</button>
+                    <button class="btn-tema" data-tema="roxo">Roxo</button>
+                    <button class="btn-tema" data-tema="rubi">Rubi</button>
+                    
+                    <button class="btn-tema" data-tema="safira">Safira</button>
+                    <button class="btn-tema" data-tema="ambar">Âmbar</button>
+                    <button class="btn-tema" data-tema="turquesa">Turquesa</button>
+                    
+                    <button class="btn-tema" data-tema="coral">Coral</button>
+                    <button class="btn-tema" data-tema="lotus">Lótus</button>
+                    <button class="btn-tema" data-tema="onix">Ônix</button>
+
+                    <button class="btn-tema escondido" id="btn-tema-diamante" data-tema="diamante" style="width: 100%;">💎 Diamante</button>
+                </div>
+            </div>
+
+
                     <div style="text-align: center; margin-top: 10px;">
     <button id="btn-verificar-atualizacao" style="background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 8px 16px; border-radius: 20px; font-size: 12px;">🔄 Verificar atualização</button>
-</div>
-
-<!-- Ícone flutuante para abrir o seletor de temas -->
-<div id="tema-icon" class="tema-icon">🎨</div>
-
-<!-- Seletor de temas (inicialmente escondido) -->
-<div id="tema-selector" class="tema-selector escondido">
-    <div class="cartao-vidro" style="padding: 15px;">
-        <h4 style="color: var(--cor-primaria); margin-bottom: 10px; text-align: center;">Escolha seu tema</h4>
-        <div class="botoes-temas">
-            <button class="btn-tema" data-tema="dourado">✨ Dourado</button>
-            <button class="btn-tema" data-tema="azul">🌙 Azul Noturno</button>
-            <button class="btn-tema" data-tema="rosa">🌸 Rosa Suave</button>
-            <button class="btn-tema" data-tema="verde">🌿 Verde Esmeralda</button>
-            <button class="btn-tema" data-tema="roxo">🔮 Roxo Real</button>
-            <button class="btn-tema escondido" id="btn-tema-diamante" data-tema="diamante">💎 Diamante (🔥 7 dias)</button>
-        </div>
-    </div>
 </div>
 
             </section> 
@@ -231,6 +269,30 @@
             </button>
         </div>
 
+    </div>
+
+    <div id="jornada" class="tela escondido" style="padding: 0; margin: 0; overflow: hidden; position: relative; height: 100vh; background: #000;">
+        
+        <div id="jornada-3d-fundo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;"></div>
+        
+        <div class="hud-jornada-container">
+            <div class="hud-topo">
+                <h1 class="hud-titulo">NOSSA JORNADA</h1>
+                <div class="hud-progresso-box">
+                    <span class="hud-label">DISTÂNCIA PERCORRIDA</span>
+                    <div class="hud-numeros" id="km-contador">0 <span class="hud-max">/ 1300 KM</span></div>
+                </div>
+            </div>
+
+            <div class="hud-base">
+                <div class="hud-alerta-interacao">
+                    <span class="piscar">●</span> Toque e arraste para explorar o cosmos
+                </div>
+                <button class="btn-acao hud-btn-ignicao" onclick="comprarCombustivel()">
+                    <span class="hud-btn-texto">IGNIÇÃO DOS MOTORES (100 💰)</span>
+                </button>
+            </div>
+        </div>
     </div>
 
             <section id="jogos" class="tela escondido">
@@ -731,6 +793,11 @@
             <p class="titulo-reliquia">Nossa Trilha</p>
             <small class="status-reliquia">Trancado</small>
         </div>
+        <div class="cartao-vidro item-cofre" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'planetario'); setTimeout(() => { if(typeof inicializarPlanetario3D === 'function') inicializarPlanetario3D(); }, 200);">
+            <span class="icone-reliquia">🌠</span>
+            <p class="titulo-reliquia">Planetário</p>
+                        <small class="status-reliquia">Trancado</small>
+        </div>
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'ceu')">
             <span class="icone-reliquia">🌌</span>
             <p class="titulo-reliquia">Mesmo Céu</p>
@@ -761,6 +828,11 @@
             <p class="titulo-reliquia">Horizontes</p>
             <small class="status-reliquia">Trancado</small>
         </div>
+
+        <div class="cartao-vidro item-cofre" onclick="abrirPainelCapsula()">
+            <span class="icone-reliquia">⏳</span>
+            <p class="titulo-reliquia">Cápsula do Tempo</p>
+        </div>
     </div>
 
     <div id="modal-reliquia" class="modal escondido">
@@ -780,6 +852,30 @@
                 <button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">▶️</button>
             </div>
             <p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+        </div>
+
+        <div id="cartao-planetario" style="text-align: center; width: 100%;">
+            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Planetário de Sonhos</h3>
+            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Transforme seu Capital (💰) em constelações. Eternize nossas metas no céu.</p>
+            
+            <div id="planetario-3d-container" style="width: 100%; height: 230px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, #050510 0%, #000 100%); position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">
+                <div id="esqueleto-planetario" class="esqueleto-cintilante"></div>
+                <div style="position: absolute; bottom: 10px; width: 100%; display: flex; justify-content: center; z-index: 10;">
+                    <button class="btn-acao" onclick="abrirCriacaoEstrela()" style="padding: 8px 20px; font-size: 0.9rem; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--cor-primaria); backdrop-filter: blur(5px);">✨ Batizar Estrela (100💰)</button>
+                </div>
+            </div>
+
+            <div id="form-criar-estrela" class="escondido" style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--cor-primaria);">
+                <input type="text" id="input-nome-estrela" placeholder="Nome do Sonho (Ex: Morar Juntos)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.8); color: white; margin-bottom: 10px; outline: none; text-align: center;">
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-acao" onclick="cancelarCriacaoEstrela()" style="flex: 1; background: transparent; border: 1px solid #e74c3c; color: #e74c3c;">Cancelar</button>
+                    <button class="btn-acao" onclick="comprarEstrela()" style="flex: 2; background: var(--cor-primaria); color: #000000; font-weight: bold;">Comprar (100💰)</button>
+                </div>
+            </div>
+
+            <div id="lista-estrelas-planetario" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px;">
+                <p style="color: #888; font-size: 0.85rem; font-style: italic;">O cosmos está vazio. Crie a nossa primeira estrela.</p>
+            </div>
         </div>
 
         <div id="cartao-bussola" style="text-align: center; width: 100%;">
@@ -821,6 +917,7 @@
         <nav class="menu-inferior">
             <a href="#" class="item-menu ativo" data-alvo="home">🏛️<span>Home</span></a>
             <a href="#" class="item-menu" data-alvo="leis">⚖️<span>Leis</span></a>
+            <a href="#" class="item-menu" data-alvo="jornada"><span class="icone-menu">🗺️</span><span class="texto-menu">Jornada</span></a>
             <a href="#" class="item-menu" data-alvo="jogos">🎮<span>Jogos</span></a>
             <a href="#" class="item-menu" data-alvo="cofre">🎁<span>Cofre</span></a>
         </nav>
@@ -991,6 +1088,13 @@
         <span id="island-text" class="island-text">Mensagem</span>
     </div>
 
+    <div id="radar-telepresenca" class="radar-inativo">
+        <div id="radar-ondas"></div>
+        <button id="btn-coracao-radar" onpointerdown="iniciarPulsoRadar(event)" onpointerup="pararPulsoRadar(event)" onpointercancel="pararPulsoRadar(event)" onpointerleave="pararPulsoRadar(event)">
+            ❤️
+        </button>
+    </div>
+
     <div class="fio-de-ouro"></div>
 
     <script src="core.js"></script>
@@ -1001,6 +1105,68 @@
     <script src="sincronia.js"></script>
     <script src="script.js"></script> 
     <script src="app.js"></script>
+    
+    <div id="container-capsula" class="escondido">
+    <div class="top-bar top-bar-capsula" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar btn-voltar-capsula" onclick="fecharPainelCapsula()">← Voltar</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso recurso-capsula">⏳ Relíquia Temporal</span>
+        </div>
+    </div>
 
+    <div class="conteudo-capsula" style="padding: 20px; display: flex; flex-direction: column; align-items: center; max-width: 500px; margin: 0 auto;">
+        
+        <div class="visor-tempo" id="visor-tempo">
+            <div class="icone-cadeado" id="icone-cadeado-capsula">🔓</div>
+            <div id="relogio-capsula" class="relogio-neon">00:00:00:00</div>
+            <div id="status-capsula" style="color: #aaa; font-size: 0.85rem; margin-top: 10px; text-align: center;">Nenhuma cápsula ativa no momento.</div>
+        </div>
+
+        <div id="form-criar-capsula" class="cartao-vidro" style="width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; padding: 20px; box-sizing: border-box; border-color: rgba(255, 51, 102, 0.3);">
+            <h4 style="color: #ff3366; text-align: center; text-shadow: 0 0 10px rgba(255,51,102,0.4);">Trancar uma Memória</h4>
+            
+            <textarea id="texto-capsula" placeholder="A carta para o futuro..." rows="3" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 10px; color: white; padding: 10px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
+            
+            <div class="anexos-capsula">
+                <label class="btn-anexo" id="btn-foto-capsula">
+                    📸 Anexar Visão
+                    <input type="file" accept="image/*" class="escondido" onchange="processarFotoCapsula(event)">
+                </label>
+                <button class="btn-anexo" id="btn-audio-capsula" onclick="toggleGravarAudioCapsula()">
+                    🎙️ Gravar Voz
+                </button>
+            </div>
+            <div id="status-anexos-capsula" style="font-size: 0.75rem; color: #ff9ff3; text-align: center; font-style: italic; min-height: 15px;"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: 5px;">
+                <label style="color: #ff3366; font-size: 0.85rem; font-weight: bold;">Momento da Abertura Exata:</label>
+                <input type="datetime-local" id="data-abertura-capsula" class="input-data-neon">
+            </div>
+
+            <button class="btn-acao" onclick="selarCapsula()" style="width: 100%; font-weight: bold; background: linear-gradient(145deg, #ff3366, #c0392b); border:none; box-shadow: 0 4px 15px rgba(255,51,102,0.4); margin-top: 10px;">🔒 Selar no Cofre</button>
+        </div>
+
+        <div id="painel-leitura-capsula" class="cartao-vidro escondido" style="width: 100%; margin-top: 20px; text-align: center; padding: 20px; box-sizing: border-box; border-color: rgba(255, 51, 102, 0.4);">
+            <h4 style="color: #ff3366; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,51,102,0.5);">Mensagem do Passado ✨</h4>
+            
+            <div id="conteudo-revelado-capsula" style="display: flex; flex-direction: column; gap: 15px;">
+                <img id="img-revelada-capsula" class="escondido" style="width: 100%; border-radius: 10px; border: 2px solid #ff3366; box-shadow: 0 0 15px rgba(255,51,102,0.3);">
+                
+                <div id="container-audio-revelado" class="escondido" style="background: rgba(255,51,102,0.1); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,51,102,0.3);">
+                    <span style="display:block; margin-bottom:10px; color:#ff9ff3; font-weight:bold;">🎙️ Um Eco do Passado</span>
+                    <button class="btn-acao" id="btn-tocar-audio-revelado" onclick="tocarAudioCapsulaLida()" style="background: #ff3366; border: none; padding: 8px 20px;">▶ Tocar Áudio</button>
+                </div>
+
+                <p id="mensagem-revelada" style="color: white; font-style: italic; line-height: 1.6; white-space: pre-wrap; text-align: left; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 10px; border-left: 3px solid #ff3366;"></p>
+            </div>
+
+            <button class="btn-acao" onclick="destruirCapsulaLida()" style="margin-top: 25px; width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid #aaa; color: #fff;">Guardar na Memória e Esvaziar</button>
+        </div>
+
+    </div>
+</div>
+    
 </body>
 </html>

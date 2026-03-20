@@ -6,6 +6,7 @@ let audioJogos = null;
 let telaAtual = 'home';
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
+
 // 1. MOTOR DO TEMPO
 function atualizarMotorDoTempo() {
     const agora = new Date().getTime();
@@ -934,30 +935,115 @@ window.abrirReliquia = function(event, tipo) {
     if (tipo === 'musica') {
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 5px; font-family: 'Playfair Display', serif;">Nossa Trilha</h3>
-            <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Sincronia de Almas</p>
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px;">A mesma música, no mesmo segundo, não importa a distância.</p>
+            
+            <div class="toca-discos-container">
+                <div class="base-toca-discos">
+                    <div class="disco-vinil" id="disco-vinil">
+                        <div class="selo-disco">Santuário</div>
+                    </div>
+                    <div class="braco-agulha" id="braco-agulha"></div>
+                </div>
+            </div>
+
+            <audio id="audio-sincronizado" src="assets/nossa-musica.mp3" preload="auto"></audio>
+
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
+                <button class="btn-acao" id="btn-toca-discos-play" onclick="iniciarMusicaSincronizada()" style="background: var(--cor-primaria); color: #000; font-weight: bold; width: 140px;">
+                    ▶ Ouvir Juntos
+                </button>
+                <button class="btn-acao escondido" id="btn-toca-discos-pause" onclick="pausarMusicaSincronizada()" style="background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); width: 140px;">
+                    ⏸ Pausar
+                </button>
+            </div>
+            <p id="status-toca-discos" style="color: #888; font-size: 0.75rem; margin-top: 15px; font-style: italic;">Aguardando conexão com as agulhas do destino...</p>
+
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(212,175,55,0.2); text-align: center;">
+                <p style="font-size: 0.85rem; color: #ddd; margin-bottom: 15px; font-style: italic;">A nossa coleção completa de memórias:</p>
+                
+                <a href="https://open.spotify.com/embed/playlist/00h463A5jtiPGnlLzCu2Em?utm_source=generator" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #1DB954; color: white; text-decoration: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4); transition: transform 0.2s; border: 1px solid #1ed760;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.84.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.84.241 1.2zM20.16 9.6C15.84 7.08 9.12 6.96 5.28 8.16c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.32-1.32 11.64-1.2 16.62 1.8.54.36.72 1.02.36 1.56-.42.54-1.08.72-1.44.18z"/></svg>
+                    Ouvir "Minha Thamiris"
+                </a>
+            </div>
+        `;
+        
+        setTimeout(() => { if (typeof window.escutarTocaDiscos === 'function') window.escutarTocaDiscos(); }, 200);
     } else if (tipo === 'ceu') {
         const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
+        
+        const climaJoao = window.dadosClima?.joao?.weather[0]?.main || 'Clear';
+        const tempJoao = window.dadosClima?.joao?.main?.temp ? Math.round(window.dadosClima.joao.main.temp) : '--';
+        const noiteJoao = window.dadosClima?.joao ? (Date.now()/1000 < window.dadosClima.joao.sys.sunrise || Date.now()/1000 > window.dadosClima.joao.sys.sunset) : false;
+
+        const climaThamiris = window.dadosClima?.thamiris?.weather[0]?.main || 'Clear';
+        const tempThamiris = window.dadosClima?.thamiris?.main?.temp ? Math.round(window.dadosClima.thamiris.main.temp) : '--';
+        const noiteThamiris = window.dadosClima?.thamiris ? (Date.now()/1000 < window.dadosClima.thamiris.sys.sunrise || Date.now()/1000 > window.dadosClima.thamiris.sys.sunset) : false;
+
+        const obterClasseJanela = (condicao, eNoite) => {
+            if (condicao === 'Rain' || condicao === 'Drizzle') return 'efeito-chuva';
+            if (condicao === 'Thunderstorm') return 'efeito-tempestade';
+            if (condicao === 'Clouds') return eNoite ? 'efeito-nublado-noite' : 'efeito-nublado-dia';
+            return eNoite ? 'efeito-limpo-noite' : 'efeito-limpo-dia';
+        };
+
+        // A MÁGICA DA JAULA: Uma div principal com "position: relative" prende o 3D lá dentro!
         corpo.innerHTML = `
-            <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Mesmo Céu</h3>
-            <div class="modal-ceu" id="modal-ceu-container" style="padding: 10px;">
-                <div id="galaxia-3d" style="width: 100%; height: 220px; border-radius: 12px; overflow: hidden; background: #020111;"></div>
-                <p style="margin-top: 15px; font-style: italic; color: #e0e0e0; font-size: 0.95rem;">"${textoCeu}"</p>
-            </div>`;
-        setTimeout(() => { if (typeof window.inicializarGalaxia3D === 'function') window.inicializarGalaxia3D(); }, 100);
+            <div style="position: relative; width: 100%; height: 100%; min-height: 350px; border-radius: 12px; overflow: hidden;">
+                
+                <div id="galaxia-3d-fundo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.7; cursor: grab;"></div>
+                
+                <div style="position: relative; z-index: 2; padding: 10px; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+                    <h3 style="color: var(--cor-primaria); margin-bottom: 5px; font-family: 'Playfair Display', serif; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">Mesmo Céu</h3>
+                    <p style="font-size: 0.8rem; color: #ddd; margin-bottom: 15px; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Deslize o fundo para mover as estrelas.</p>
+
+                    <div class="moldura-janela-mista" style="background: transparent; border: 2px solid rgba(212,175,55,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.9); height: 180px; flex-shrink: 0;">
+                        <div class="painel-janela ${obterClasseJanela(climaJoao, noiteJoao)}" style="opacity: 0.85;">
+                            <div class="vidro-overlay">
+                                <span class="cidade-tag">📍 Colombo</span>
+                                <span class="temp-tag">${tempJoao}°</span>
+                            </div>
+                        </div>
+
+                        <div class="divisoria-janela" style="background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(60,60,60,0.9), rgba(0,0,0,0.9)); border-color: rgba(212,175,55,0.5);"></div>
+
+                        <div class="painel-janela ${obterClasseJanela(climaThamiris, noiteThamiris)}" style="opacity: 0.85;">
+                            <div class="vidro-overlay">
+                                <span class="cidade-tag">📍 Goiânia</span>
+                                <span class="temp-tag">${tempThamiris}°</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 15px; font-style: italic; color: #fff; font-size: 0.9rem; text-align: center; border-top: 1px solid rgba(212,175,55,0.3); padding-top: 15px; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">
+                        "${textoCeu}"
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        setTimeout(() => { if (typeof window.inicializarGalaxia3D === 'function') window.inicializarGalaxia3D(); }, 150);
     } else if (tipo === 'cartas') {
         const textoSemente = BIBLIOTECA_RELIQUIAS.sementes[diaDoAno % BIBLIOTECA_RELIQUIAS.sementes.length];
         corpo.innerHTML = `
             <h3 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Semente Exclusiva</h3>
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 25px; position: relative;">
-                <span style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); font-size: 24px;">✉️</span>
-                <p style="font-style:italic; font-size: 1.1rem; line-height: 1.6; margin-top: 10px;">"${textoSemente}"</p>
+            
+            <div class="envelope-misterioso" id="envelope-semente">
+                <div class="selo-cera" id="selo-cera" onpointerdown="quebrarSeloDeCera(event)">
+                    <span class="texto-selo">T</span>
+                </div>
+                <p class="dica-selo" id="dica-selo">Pressione o selo para abrir</p>
+                
+                <div class="carta-revelada">
+                    <span style="font-size: 28px; margin-bottom: 12px; display: block; filter: drop-shadow(0 0 5px var(--cor-primaria));">📜</span>
+                    <p style="font-style:italic; font-size: 1.05rem; line-height: 1.6; color: #f5f6fa; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">"${textoSemente}"</p>
+                </div>
             </div>`;
     } else if (tipo === 'encontro') {
         const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
         corpo.innerHTML = `<div class="bilhete-dourado"><div class="bilhete-dourado-inner"><div class="bilhete-header">Voucher Vitalício</div><div class="bilhete-corpo">Vale para:<div class="bilhete-destaque">${v.t}</div>${v.d}</div></div></div>`;
     } 
-    // SE FOR UM ITEM DA GAVETA (Ecos, Bussola, Carrossel)
+// SE FOR UM ITEM DA GAVETA (Ecos, Bussola, Carrossel)
     else if (['ecos', 'bussola', 'carrossel'].includes(tipo)) {
         const template = document.getElementById(`cartao-${tipo}`);
         if(template) corpo.appendChild(template);
@@ -966,14 +1052,13 @@ window.abrirReliquia = function(event, tipo) {
     }
 
     modal.classList.remove('escondido');
-};
+}; // Fim da função window.abrirReliquia
 
 window.fecharModal = function(apenasLimpar = false) {
     const modal = document.getElementById('modal-reliquia');
     const corpo = document.getElementById('corpo-modal');
     const gaveta = document.getElementById('reliquias-templates');
     
-    // Resgata os cartões complexos antes de limpar o HTML
     if (gaveta && corpo) {
         ['ecos', 'bussola', 'carrossel'].forEach(id => {
             const el = document.getElementById(`cartao-${id}`);
@@ -1417,30 +1502,28 @@ window.enviarNotificacaoLocal = function(titulo, corpo) {
 };
 
 // ==========================================
-// SISTEMA DE TEMAS
+// SISTEMA DE TEMAS (DINÂMICO E ESCALÁVEL)
 // ==========================================
 function aplicarTema(tema) {
-    // Remove classes de tema anteriores
-    document.body.classList.remove('tema-azul', 'tema-rosa', 'tema-verde', 'tema-roxo');
-    if (tema === 'azul') {
-        document.body.classList.add('tema-azul');
-    } else if (tema === 'rosa') {
-        document.body.classList.add('tema-rosa');
-    } else if (tema === 'verde') {
-        document.body.classList.add('tema-verde');
-    } else if (tema === 'roxo') {
-        document.body.classList.add('tema-roxo');
+    // 1. O Motor Inteligente que limpa qualquer tema anterior automaticamente
+    document.body.className = document.body.className.replace(/\btema-\S+/g, '');
+    
+    // 2. Aplica o novo (Se não for o Dourado padrão)
+    if (tema !== 'dourado') {
+        document.body.classList.add(`tema-${tema}`);
     }
-    // Salva no localStorage
+    
+    // 3. Salva na memória
     localStorage.setItem('santuario_tema', tema);
-    // Atualiza botão ativo
+    
+    // 4. Atualiza os botões visuais na gaveta
     document.querySelectorAll('.btn-tema').forEach(btn => {
         btn.classList.remove('ativo');
         if (btn.dataset.tema === tema) btn.classList.add('ativo');
     });
 }
 
-// Carregar tema salvo
+// Carregar tema salvo ao abrir o app
 const temaSalvo = localStorage.getItem('santuario_tema') || 'dourado';
 aplicarTema(temaSalvo);
 
@@ -1448,6 +1531,7 @@ aplicarTema(temaSalvo);
 document.querySelectorAll('.btn-tema').forEach(btn => {
     btn.addEventListener('click', () => {
         aplicarTema(btn.dataset.tema);
+        if(window.Haptics) window.Haptics.toqueLeve();
     });
 });
 
@@ -1833,4 +1917,904 @@ window.tocarEco = function() {
     } else {
         if(typeof mostrarToast === 'function') mostrarToast("Nenhum eco novo no horizonte.", "🌌");
     }
+};
+
+
+// ==========================================
+// RELÍQUIA 3: CÁPSULA DO TEMPO (MULTIMÍDIA & FILA QUÂNTICA)
+// ==========================================
+let loopRelogioCapsula = null;
+let capsulaAtivaDados = null; 
+let capsulaAtivaId = null; 
+let totalCapsulasNaFila = 0;
+
+// Memórias de Anexos (Nomes 100% padronizados e interligados)
+let fotoCapsulaBase64 = null;
+let audioCapsulaBase64 = null;
+let mediaRecorderCapsula = null;
+let audioChunksCapsula = [];
+let audioReveladoCapsula = null; 
+
+window.abrirPainelCapsula = function() {
+    const container = document.getElementById('container-capsula');
+    if (container) container.classList.remove('escondido');
+    document.body.classList.add('modo-jogo-ativo'); 
+    
+    // Zera tudo com segurança ao abrir
+    fotoCapsulaBase64 = null;
+    audioCapsulaBase64 = null;
+    const statusAnexos = document.getElementById('status-anexos-capsula');
+    if (statusAnexos) statusAnexos.innerText = "";
+    
+    const dataAbertura = document.getElementById('data-abertura-capsula');
+    if (dataAbertura) dataAbertura.value = "";
+    
+    const textoCapsula = document.getElementById('texto-capsula');
+    if (textoCapsula) textoCapsula.value = "";
+    
+    escutarCapsulaDoTempo();
+};
+
+window.fecharPainelCapsula = function() {
+    const container = document.getElementById('container-capsula');
+    if (container) container.classList.add('escondido');
+    document.body.classList.remove('modo-jogo-ativo');
+    if (loopRelogioCapsula) clearInterval(loopRelogioCapsula);
+    if (audioReveladoCapsula) { audioReveladoCapsula.pause(); audioReveladoCapsula = null; }
+};
+
+// --- PROCESSAMENTO DE MÍDIAS ---
+window.processarFotoCapsula = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        img.src = e.target.result;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // Compressão inteligente
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            fotoCapsulaBase64 = canvas.toDataURL('image/jpeg', 0.6); // Salva na variável blindada
+            
+            const statusAnexos = document.getElementById('status-anexos-capsula');
+            if(statusAnexos) statusAnexos.innerText += " [📸 Foto Anexada]";
+            if(window.Haptics) window.Haptics.toqueLeve();
+        };
+    };
+    reader.readAsDataURL(file);
+};
+
+window.toggleGravarAudioCapsula = async function() {
+    const btn = document.getElementById('btn-audio-capsula');
+    const statusDiv = document.getElementById('status-anexos-capsula');
+    if (!btn) return;
+
+    if (!mediaRecorderCapsula || mediaRecorderCapsula.state === 'inactive') {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            let options = {};
+            if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                options = { mimeType: 'audio/mp4' };
+            } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                options = { mimeType: 'audio/webm' };
+            }
+            
+            mediaRecorderCapsula = new MediaRecorder(stream, options);
+            audioChunksCapsula = [];
+
+            mediaRecorderCapsula.ondataavailable = e => {
+                if (e.data.size > 0) audioChunksCapsula.push(e.data);
+            };
+
+            mediaRecorderCapsula.onstop = () => {
+                const blob = new Blob(audioChunksCapsula, { type: mediaRecorderCapsula.mimeType });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    audioCapsulaBase64 = reader.result; // Salva na variável blindada
+                    if (statusDiv) statusDiv.innerText += " [🎙️ Áudio Gravado]";
+                    btn.innerText = "🎙️ Regravar Voz";
+                    btn.style.backgroundColor = "";
+                    btn.style.borderColor = "";
+                    if (window.Haptics) window.Haptics.sucesso();
+                };
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorderCapsula.start();
+            btn.style.backgroundColor = "rgba(255, 51, 102, 0.3)";
+            btn.style.borderColor = "#ff3366";
+            btn.innerText = "⏹️ Gravando... (Parar)";
+            if (window.Haptics) window.Haptics.toqueForte();
+        } catch (err) {
+            console.error("Erro ao acessar microfone:", err);
+            if (typeof mostrarToast === 'function') mostrarToast("Permita o uso do microfone!", "🎙️");
+        }
+    } else if (mediaRecorderCapsula.state === 'recording') {
+        mediaRecorderCapsula.stop();
+    }
+};
+
+window.tocarAudioCapsulaLida = function() {
+    if (audioReveladoCapsula) {
+        audioReveladoCapsula.play();
+        const btn = document.getElementById('btn-tocar-audio-revelado');
+        if(btn) btn.innerText = "⏳ Tocando...";
+        audioReveladoCapsula.onended = () => { if(btn) btn.innerText = "▶ Ouvir Novamente"; };
+    }
+};
+
+// --- A FILA DO FIREBASE E O RELÓGIO ---
+function escutarCapsulaDoTempo() {
+    if (!window.SantuarioApp || !window.MEU_NOME) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    const refMinhasCapsulas = ref(db, 'capsulas_tempo/' + window.MEU_NOME.toLowerCase());
+    
+    onValue(refMinhasCapsulas, (snapshot) => {
+        const dados = snapshot.val();
+        if (!dados) {
+            capsulaAtivaDados = null; capsulaAtivaId = null; totalCapsulasNaFila = 0;
+        } else {
+            const listaCapsulas = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
+            totalCapsulasNaFila = listaCapsulas.length;
+            listaCapsulas.sort((a, b) => a.dataAbertura - b.dataAbertura); 
+            capsulaAtivaDados = listaCapsulas[0];
+            capsulaAtivaId = listaCapsulas[0].id;
+        }
+        atualizarInterfaceCapsula();
+    });
+}
+
+function atualizarInterfaceCapsula() {
+    const formCriar = document.getElementById('form-criar-capsula');
+    const painelLeitura = document.getElementById('painel-leitura-capsula');
+    const iconeCadeado = document.getElementById('icone-cadeado-capsula');
+    const status = document.getElementById('status-capsula');
+    const relogio = document.getElementById('relogio-capsula');
+
+    if (loopRelogioCapsula) clearInterval(loopRelogioCapsula);
+    if (audioReveladoCapsula) { audioReveladoCapsula.pause(); audioReveladoCapsula = null; }
+
+    if (!capsulaAtivaDados) {
+        if(formCriar) formCriar.classList.remove('escondido');
+        if(painelLeitura) painelLeitura.classList.add('escondido');
+        if(iconeCadeado) { iconeCadeado.innerText = "🔓"; iconeCadeado.classList.remove('trancado'); }
+        if(relogio) { relogio.innerText = "--:--:--:--"; relogio.classList.remove('zerado'); }
+        if(status) status.innerText = `Nenhuma cápsula no horizonte. Escreva para ${window.NOME_PARCEIRO}.`;
+    } else {
+        if(formCriar) formCriar.classList.add('escondido'); 
+        iniciarMotorDoTempoCapsula();
+    }
+}
+
+function iniciarMotorDoTempoCapsula() {
+    const relogio = document.getElementById('relogio-capsula');
+    const iconeCadeado = document.getElementById('icone-cadeado-capsula');
+    const painelLeitura = document.getElementById('painel-leitura-capsula');
+    const status = document.getElementById('status-capsula');
+    const msgRevelada = document.getElementById('mensagem-revelada');
+    const imgRevelada = document.getElementById('img-revelada-capsula');
+    const boxAudio = document.getElementById('container-audio-revelado');
+
+    const atualizar = () => {
+        const agora = new Date().getTime();
+        const diferenca = capsulaAtivaDados.dataAbertura - agora;
+
+        if (diferenca <= 0) {
+            clearInterval(loopRelogioCapsula);
+            if(relogio) { relogio.innerText = "00:00:00:00"; relogio.classList.add('zerado'); }
+            if(iconeCadeado) { iconeCadeado.innerText = "✨"; iconeCadeado.classList.remove('trancado'); }
+            
+            let textoFila = totalCapsulasNaFila > 1 ? ` (+${totalCapsulasNaFila - 1} na fila!)` : "";
+            if(status) status.innerText = "A barreira do tempo foi rompida." + textoFila;
+            
+            let txt = window.SantuarioCrypto ? window.SantuarioCrypto.decodificar(capsulaAtivaDados.mensagem) : capsulaAtivaDados.mensagem;
+            if(msgRevelada) msgRevelada.innerText = txt || "Apenas memórias anexadas...";
+            
+            // Revelação Limpa da Foto
+            if (capsulaAtivaDados.foto && imgRevelada) {
+                imgRevelada.src = capsulaAtivaDados.foto;
+                imgRevelada.classList.remove('escondido');
+            } else if(imgRevelada) { imgRevelada.classList.add('escondido'); imgRevelada.src = ""; }
+
+            // Revelação Limpa do Áudio
+            if (capsulaAtivaDados.audio && boxAudio) {
+                audioReveladoCapsula = new Audio(capsulaAtivaDados.audio);
+                boxAudio.classList.remove('escondido');
+            } else if(boxAudio) { boxAudio.classList.add('escondido'); }
+
+            if(painelLeitura) painelLeitura.classList.remove('escondido');
+            if(window.Haptics && diferenca > -2000) navigator.vibrate([100, 50, 100]); // Vibra só na virada
+        } else {
+            const d = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diferenca % (1000 * 60)) / 1000);
+            
+            const formatar = (n) => n < 10 ? "0" + n : n;
+            if(relogio) relogio.innerText = `${formatar(d)}:${formatar(h)}:${formatar(m)}:${formatar(s)}`;
+            if(iconeCadeado) { iconeCadeado.innerText = "🔒"; iconeCadeado.classList.add('trancado'); }
+            
+            let textoFila = totalCapsulasNaFila > 1 ? ` (${totalCapsulasNaFila} cápsulas na fila)` : "";
+            if(status) status.innerText = `O espaço-tempo protege esta mensagem de ${window.NOME_PARCEIRO}.${textoFila}`;
+            
+            if(painelLeitura) painelLeitura.classList.add('escondido');
+            if(imgRevelada) imgRevelada.classList.add('escondido');
+            if(boxAudio) boxAudio.classList.add('escondido');
+        }
+    };
+
+    atualizar(); 
+    loopRelogioCapsula = setInterval(atualizar, 1000); 
+}
+
+window.selarCapsula = function() {
+    const texto = document.getElementById('texto-capsula').value;
+    const dataInput = document.getElementById('data-abertura-capsula').value; 
+
+    // Bloqueia se tentar enviar vazio
+    if (!texto.trim() && !fotoCapsulaBase64 && !audioCapsulaBase64) {
+        if(typeof mostrarToast === 'function') mostrarToast("Adicione pelo menos um texto, foto ou áudio!", "⚠️");
+        return;
+    }
+    if (!dataInput) {
+        if(typeof mostrarToast === 'function') mostrarToast("Você precisa definir a data exata da abertura!", "⏳");
+        return;
+    }
+
+    const dataAbertura = new Date(dataInput).getTime();
+    const agora = new Date().getTime();
+
+    if (dataAbertura <= agora) {
+        if(typeof mostrarToast === 'function') mostrarToast("A data precisa estar no futuro!", "⏳");
+        return;
+    }
+
+    const textoCriptografado = window.SantuarioCrypto ? window.SantuarioCrypto.codificar(texto) : texto;
+    const { db, ref, push } = window.SantuarioApp.modulos;
+    
+    const refDestino = ref(db, 'capsulas_tempo/' + window.NOME_PARCEIRO.toLowerCase());
+
+    const capsuleData = {
+        mensagem: textoCriptografado,
+        dataCriacao: agora,
+        dataAbertura: dataAbertura,
+        autor: window.MEU_NOME
+    };
+    
+    // Anexa as mídias capturadas
+    if (fotoCapsulaBase64) capsuleData.foto = fotoCapsulaBase64;
+    if (audioCapsulaBase64) capsuleData.audio = audioCapsulaBase64;
+
+    push(refDestino, capsuleData).then(() => {
+        if(typeof mostrarToast === 'function') mostrarToast("Cápsula multimídia selada e enviada!", "🔒");
+        if(window.Haptics) navigator.vibrate([50, 100, 50]);
+        
+        // Zera os inputs do HTML e Limpa as variáveis
+        document.getElementById('texto-capsula').value = "";
+        document.getElementById('data-abertura-capsula').value = "";
+        fotoCapsulaBase64 = null;
+        audioCapsulaBase64 = null;
+        
+        const statusAnexos = document.getElementById('status-anexos-capsula');
+        if(statusAnexos) statusAnexos.innerText = "";
+        
+        const btnAudio = document.getElementById('btn-audio-capsula');
+        if(btnAudio) {
+            btnAudio.innerText = "🎙️ Gravar Voz";
+            btnAudio.style.backgroundColor = "";
+            btnAudio.style.borderColor = "";
+        }
+        
+        if (mediaRecorderCapsula && mediaRecorderCapsula.state === 'recording') {
+            mediaRecorderCapsula.stop();
+        }
+    });
+};
+
+window.destruirCapsulaLida = function() {
+    if (!capsulaAtivaId) return;
+
+    const { db, ref, remove } = window.SantuarioApp.modulos;
+    const refMinhaCapsula = ref(db, 'capsulas_tempo/' + window.MEU_NOME.toLowerCase() + '/' + capsulaAtivaId);
+    
+    remove(refMinhaCapsula).then(() => {
+        if(typeof mostrarToast === 'function') mostrarToast("Memória absorvida. Verificando o relógio seguinte...", "✨");
+        if(window.Haptics) window.Haptics.toqueLeve();
+    });
+};
+
+
+
+// ==========================================
+// EXPANSÃO 1: RADAR DE TELEPRESENÇA VIVO
+// ==========================================
+let loopVibracaoRadar = null;
+
+// Quando você aperta o dedo na tela
+window.iniciarPulsoRadar = function(e) {
+    if (e) e.preventDefault(); 
+    if (!window.SantuarioApp || !window.MEU_NOME) return;
+    
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const meuRadarRef = ref(db, 'telepresenca/' + window.MEU_NOME.toLowerCase());
+    
+    // Manda o sinal luminoso "ONLINE/PULSANDO"
+    set(meuRadarRef, { pulsando: true, timestamp: Date.now() });
+    
+    // Dá um soquinho no seu celular para confirmar que o botão foi apertado
+    if (window.Haptics) navigator.vibrate(30); 
+};
+
+// Quando você tira o dedo da tela
+window.pararPulsoRadar = function(e) {
+    if (e) e.preventDefault();
+    if (!window.SantuarioApp || !window.MEU_NOME) return;
+    
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const meuRadarRef = ref(db, 'telepresenca/' + window.MEU_NOME.toLowerCase());
+    
+    // Desliga o sinal luminoso
+    set(meuRadarRef, { pulsando: false, timestamp: Date.now() });
+};
+
+// O Ouvido Constante (Escuta a Thamiris 24 horas por dia)
+window.escutarRadarParceiro = function() {
+    if (!window.SantuarioApp || !window.NOME_PARCEIRO) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    const radarParceiroRef = ref(db, 'telepresenca/' + window.NOME_PARCEIRO.toLowerCase());
+    
+    onValue(radarParceiroRef, (snapshot) => {
+        const dados = snapshot.val();
+        const containerRadar = document.getElementById('radar-telepresenca');
+        
+        if (dados && dados.pulsando) {
+            // ELA APERTOU O DEDO LÁ EM GOIÁS!
+            if (containerRadar) containerRadar.classList.add('radar-recebendo');
+            
+            // Inicia o motor de vibração rítmica (Batimento Cardíaco - 100 BPM)
+            if (!loopVibracaoRadar) {
+                // Dá o primeiro pulso imediatamente
+                if (window.Haptics) navigator.vibrate([60, 80, 60]);
+                
+                // Repete o pulso enquanto ela segurar
+                loopVibracaoRadar = setInterval(() => {
+                    if (window.Haptics) navigator.vibrate([60, 80, 60]); 
+                }, 800); 
+            }
+        } else {
+            // ELA SOLTOU O DEDO
+            if (containerRadar) containerRadar.classList.remove('radar-recebendo');
+            if (loopVibracaoRadar) {
+                clearInterval(loopVibracaoRadar);
+                loopVibracaoRadar = null;
+            }
+        }
+    });
+};
+
+
+
+// ==========================================
+// TOGGLE DA AURA DO SANTUÁRIO (TEMAS COLAPSÁVEIS)
+// ==========================================
+window.toggleTemas = function() {
+    const conteudo = document.getElementById('conteudo-temas');
+    const icone = document.getElementById('icone-toggle-temas');
+    
+    if (conteudo && icone) {
+        if (conteudo.classList.contains('escondido')) {
+            // Abrir a gaveta
+            conteudo.classList.remove('escondido');
+            icone.style.transform = 'rotate(180deg)';
+            if(window.Haptics) window.Haptics.toqueLeve();
+        } else {
+            // Fechar a gaveta
+            conteudo.classList.add('escondido');
+            icone.style.transform = 'rotate(0deg)';
+            if(window.Haptics) window.Haptics.toqueLeve();
+        }
+    }
+};
+
+// ==========================================
+// CHAVE MESTRA DO COFRE (CORREÇÃO DA JANELA VAZIA)
+// ==========================================
+// Essa trava impede que a função se duplique se você recarregar a página
+if (!window.abrirReliquiaBlindada) {
+    const abrirReliquiaOriginal = window.abrirReliquia;
+    
+    window.abrirReliquia = function(event, tipo) {
+        // Se for o nosso Planetário, assumimos o controle total da janela!
+        if (tipo === 'planetario') {
+            if (event) event.preventDefault();
+            const modal = document.getElementById('modal-reliquia');
+            const corpo = document.getElementById('corpo-modal');
+            const template = document.getElementById('cartao-planetario');
+            
+            if (template && corpo && modal) {
+                // Copia o Planetário para dentro da janela de vidro
+                corpo.innerHTML = template.innerHTML;
+                modal.classList.remove('escondido');
+                
+                // Conecta o banco de dados na mesma hora para não piscar tela vazia
+                if (typeof window.escutarPlanetario === 'function') {
+                    window.escutarPlanetario();
+                }
+            }
+        } 
+        // Se for qualquer outra relíquia antiga, usa a sua função original intacta:
+        else if (abrirReliquiaOriginal) {
+            abrirReliquiaOriginal(event, tipo);
+        }
+    };
+    window.abrirReliquiaBlindada = true;
+}
+
+// ==========================================
+// EXPANSÃO 2: PLANETÁRIO DE SONHOS (ECONOMIA VIVA)
+// ==========================================
+window.abrirCriacaoEstrela = function() {
+    // Procura o formulário EXATAMENTE dentro da janela que está aberta no momento
+    const form = document.querySelector('#corpo-modal #form-criar-estrela');
+    if (form) form.classList.remove('escondido');
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+window.cancelarCriacaoEstrela = function() {
+    const form = document.querySelector('#corpo-modal #form-criar-estrela');
+    if (form) form.classList.add('escondido');
+    const input = document.querySelector('#corpo-modal #input-nome-estrela');
+    if (input) input.value = "";
+};
+
+window.escutarPlanetario = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    const refPlanetario = ref(db, 'planetario_sonhos');
+    
+    onValue(refPlanetario, (snapshot) => {
+        const dados = snapshot.val();
+        
+        // A MÁGICA DO ALVO: Atualiza a lista do Modal se ele estiver aberto. Se não, atualiza o esqueleto invisível.
+        let lista = document.querySelector('#corpo-modal #lista-estrelas-planetario');
+        if (!lista) lista = document.querySelector('#reliquias-templates #lista-estrelas-planetario');
+        if (!lista) return;
+
+        if (!dados) {
+            lista.innerHTML = '<p style="color: #888; font-size: 0.85rem; font-style: italic; text-align:center;">O cosmos está vazio. Crie a primeira estrela.</p>';
+            window.quantidadeSupernovas = 0;
+            return;
+        }
+
+        lista.innerHTML = "";
+        let countSupernovas = 0;
+
+        // Ordena para que as estrelas recém-criadas fiquem no topo
+        const arrayEstrelas = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
+        arrayEstrelas.sort((a, b) => a.realizado - b.realizado || b.dataCriacao - a.dataCriacao);
+
+        arrayEstrelas.forEach(estrela => {
+            const dataCriacao = new Date(estrela.dataCriacao).toLocaleDateString('pt-BR');
+            const isSupernova = estrela.realizado;
+            if(isSupernova) countSupernovas++;
+
+            lista.innerHTML += `
+                <div class="estrela-item ${isSupernova ? 'supernova' : ''}">
+                    <div>
+                        <div class="estrela-nome">${estrela.nome} ${isSupernova ? '✨' : ''}</div>
+                        <div class="estrela-data">${isSupernova ? 'Realizado! O sonho colapsou em Luz.' : 'Adicionada em: ' + dataCriacao}</div>
+                    </div>
+                    <button class="btn-supernova" onclick="explodirSupernova('${estrela.id}')" ${isSupernova ? 'disabled' : ''}>
+                        ${isSupernova ? '🌟' : '🎇'}
+                    </button>
+                </div>
+            `;
+        });
+        
+        window.quantidadeSupernovas = countSupernovas;
+    });
+};
+
+window.comprarEstrela = function() {
+    // Pega o que você digitou DENTRO do modal
+    const inputDOM = document.querySelector('#corpo-modal #input-nome-estrela');
+    if (!inputDOM) return;
+    const nome = inputDOM.value.trim();
+
+    if (!nome) {
+        if(typeof mostrarToast === 'function') mostrarToast("Batize o seu sonho antes de comprar!", "⚠️");
+        return;
+    }
+
+    const moedasDOM = document.getElementById('fazenda-capital') || document.getElementById('jardim-moedas');
+    if (moedasDOM) {
+        let saldoAtual = parseInt(moedasDOM.innerText) || 0;
+        if (saldoAtual < 100) {
+            if(typeof mostrarToast === 'function') mostrarToast("Capital insuficiente. Joguem para lucrar mais!", "📉");
+            if(window.Haptics) window.Haptics.erro();
+            return;
+        }
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-100, "Constelação Criada!");
+    }
+
+    const { db, ref, push } = window.SantuarioApp.modulos;
+    const refPlanetario = ref(db, 'planetario_sonhos');
+
+    push(refPlanetario, {
+        nome: nome,
+        dataCriacao: Date.now(),
+        realizado: false,
+        autor: window.MEU_NOME
+    }).then(() => {
+        if(typeof mostrarToast === 'function') mostrarToast("Uma nova estrela nasceu no Santuário!", "🌌");
+        if(window.Haptics) navigator.vibrate([50, 100, 50]);
+        window.cancelarCriacaoEstrela();
+    });
+};
+
+window.explodirSupernova = function(id) {
+    if(!confirm("Atenção: Este sonho já foi realizado na vida real por vocês dois?")) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const refEstrela = ref(db, `planetario_sonhos/${id}`);
+    
+    update(refEstrela, {
+        realizado: true,
+        dataRealizacao: Date.now()
+    }).then(() => {
+        if(typeof mostrarToast === 'function') mostrarToast("SUPERNOVA! Um sonho se tornou realidade!", "🌟");
+        if(window.Haptics) navigator.vibrate([100, 50, 200, 50, 300]);
+        if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37', '#ffffff'], particleCount: 200, spread: 180});
+    });
+};
+
+
+
+// ==========================================
+// RITUAL DO PERGAMINHO DE CERA (SEMENTES)
+// ==========================================
+window.quebrarSeloDeCera = function(e) {
+    if(e) e.preventDefault();
+    
+    const envelope = document.getElementById('envelope-semente');
+    if(!envelope || envelope.classList.contains('quebrado')) return;
+    
+    // 1. Aciona a animação CSS de abrir o envelope
+    envelope.classList.add('quebrado');
+    
+    // 2. Feedback Sensorial Bruto (Simula algo se partindo na mão dela)
+    if(window.Haptics) {
+        // Um solavanco forte, seguido de tremores menores simulando a cera caindo
+        navigator.vibrate([100, 30, 50, 20, 30]); 
+    }
+    
+    // 3. Explosão Visual da Cera (Usando a biblioteca de confetes, mas só com tons de vermelho escuro)
+    if(typeof confetti === 'function') {
+        const rect = document.getElementById('selo-cera').getBoundingClientRect();
+        // Converte a posição do selo para a tela do canvas de confetes
+        const yPos = (rect.top + (rect.height / 2)) / window.innerHeight;
+        const xPos = (rect.left + (rect.width / 2)) / window.innerWidth;
+        
+        confetti({
+            particleCount: 60,
+            spread: 70,
+            origin: { y: yPos, x: xPos },
+            colors: ['#ff4d4d', '#b30000', '#800000', '#4d0000'], // Paleta de Cera Derretida
+            startVelocity: 25,
+            gravity: 1.2,
+            ticks: 80, // Partículas somem rápido (como pedaços pesados caindo)
+            shapes: ['square', 'circle'] 
+        });
+    }
+};
+
+
+
+// ==========================================
+// RITUAL DO TOCA-DISCOS SINCRONIZADO
+// ==========================================
+window.iniciarMusicaSincronizada = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const refMusica = ref(db, 'estado_musica'); // Nó global que une os dois celulares
+    
+    // Dispara a ordem de Play para o Firebase com o Timestamp exato
+    set(refMusica, {
+        tocando: true,
+        inicioTempo: Date.now(),
+        autor: window.MEU_NOME
+    });
+    
+    if(window.Haptics) window.Haptics.toqueForte();
+};
+
+window.pausarMusicaSincronizada = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const refMusica = ref(db, 'estado_musica');
+    
+    set(refMusica, {
+        tocando: false,
+        autor: window.MEU_NOME
+    });
+    
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+window.escutarTocaDiscos = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    const refMusica = ref(db, 'estado_musica');
+    
+    onValue(refMusica, (snapshot) => {
+        const dados = snapshot.val();
+        
+        // Busca os elementos dentro do Modal
+        const audio = document.querySelector('#corpo-modal #audio-sincronizado');
+        const disco = document.querySelector('#corpo-modal #disco-vinil');
+        const agulha = document.querySelector('#corpo-modal #braco-agulha');
+        const btnPlay = document.querySelector('#corpo-modal #btn-toca-discos-play');
+        const btnPause = document.querySelector('#corpo-modal #btn-toca-discos-pause');
+        const status = document.querySelector('#corpo-modal #status-toca-discos');
+        
+        if (!audio || !disco || !agulha) return; // Se a relíquia não estiver aberta, ignora
+
+        if (dados && dados.tocando) {
+            // LÓGICA DE PLAY:
+            const tempoDecorrido = (Date.now() - dados.inicioTempo) / 1000;
+            
+            // Verifica se a música já acabou
+            if (tempoDecorrido < audio.duration || isNaN(audio.duration)) {
+                // Sincroniza o tempo (Se ele não estiver muito diferente, para não ficar gaguejando)
+                if (Math.abs(audio.currentTime - tempoDecorrido) > 2) {
+                    audio.currentTime = tempoDecorrido;
+                }
+                
+                audio.play().then(() => {
+                    // Magia visual!
+                    agulha.classList.add('tocando');
+                    disco.classList.add('tocando');
+                    if(btnPlay) btnPlay.classList.add('escondido');
+                    if(btnPause) btnPause.classList.remove('escondido');
+                    if(status) status.innerText = `🔊 Sincronizado por ${dados.autor}`;
+                }).catch((e) => {
+                    if(status) status.innerText = "🔇 O navegador bloqueou o áudio automático. Toque na tela!";
+                });
+            } else {
+                // A música já acabou faz tempo, desliga tudo
+                window.pausarMusicaSincronizada();
+            }
+        } else {
+            // LÓGICA DE PAUSE:
+            audio.pause();
+            agulha.classList.remove('tocando');
+            disco.classList.remove('tocando');
+            if(btnPlay) btnPlay.classList.remove('escondido');
+            if(btnPause) btnPause.classList.add('escondido');
+            
+            let textoStatus = dados ? `⏸ Pausado por ${dados.autor}` : "Pronto para tocar.";
+            if(status) status.innerText = textoStatus;
+        }
+    });
+};
+
+
+
+// ==========================================
+// EXPANSÃO 3: O ESPELHO DA ALMA (DIÁRIO SINCRONIZADO)
+// ==========================================
+const PERGUNTAS_ESPELHO = [
+    "Qual foi o exato momento, o milissegundo, em que você percebeu que me amava?",
+    "Se fôssemos fugir de tudo amanhã sem destino, para onde você gostaria de ir comigo?",
+    "Qual é o pequeno detalhe em mim que você mais admira, mas raramente comenta?",
+    "Se você pudesse reviver um único dia da nossa história, qual seria e por quê?",
+    "O que você mais admira na forma como lidamos com os quilômetros de distância?",
+    "Qual música toca a sua alma e te faz lembrar de mim instantaneamente?",
+    "Qual é o seu maior sonho para a nossa primeira semana morando sob o mesmo teto?",
+    "O que eu faço ou digo que te traz mais paz quando o seu mundo está caótico?",
+    "Como você descreveria o meu abraço e o meu cheiro para alguém cego?",
+    "Qual foi a maior e mais profunda lição que o nosso amor te ensinou até hoje?"
+    // Você pode adicionar infinitas perguntas aqui depois!
+];
+
+window.escutarEspelhoDaAlma = function() {
+    if (!window.SantuarioApp || !window.MEU_NOME || !window.NOME_PARCEIRO) return;
+    
+    // Pega a data de hoje no fuso horário do celular
+    const hoje = new Date();
+    const stringData = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+    
+    // Sorteio matemático da pergunta baseado no dia do ano
+    const inicioAno = new Date(hoje.getFullYear(), 0, 0);
+    const diff = hoje - inicioAno;
+    const umDia = 1000 * 60 * 60 * 24;
+    const diaDoAno = Math.floor(diff / umDia);
+    const indicePergunta = diaDoAno % PERGUNTAS_ESPELHO.length;
+    
+    document.getElementById('pergunta-espelho').innerText = `"${PERGUNTAS_ESPELHO[indicePergunta]}"`;
+    const tagNomeParceiro = document.getElementById('nome-parceiro-espelho');
+    if (tagNomeParceiro) tagNomeParceiro.innerText = `A alma de ${window.NOME_PARCEIRO}`;
+    
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    // Ouve especificamente o diretório da data de hoje!
+    const refEspelho = ref(db, `espelho_alma/${stringData}`);
+    
+    onValue(refEspelho, (snapshot) => {
+        const dados = snapshot.val() || {};
+        
+        const minhaResposta = dados[window.MEU_NOME.toLowerCase()];
+        const respostaDela = dados[window.NOME_PARCEIRO.toLowerCase()];
+        
+        const boxResponder = document.getElementById('estado-espelho-responder');
+        const boxAguardando = document.getElementById('estado-espelho-aguardando');
+        const boxRevelado = document.getElementById('estado-espelho-revelado');
+        const cartaoEspelho = document.getElementById('cartao-espelho-alma');
+        
+        if (minhaResposta && respostaDela) {
+            // ESTADO 3: OS DOIS RESPONDERAM! A MAGIA ACONTECE.
+            if(boxResponder) boxResponder.classList.add('escondido');
+            if(boxAguardando) boxAguardando.classList.add('escondido');
+            if(boxRevelado) boxRevelado.classList.remove('escondido');
+            
+            document.getElementById('resposta-minha').innerText = minhaResposta;
+            document.getElementById('resposta-dela').innerText = respostaDela;
+            
+            // Efeito visual + Físico se for a primeira vez que quebra o vidro hoje
+            if (cartaoEspelho && !cartaoEspelho.classList.contains('efeito-estilhaco')) {
+                cartaoEspelho.classList.add('efeito-estilhaco');
+                if (window.Haptics) navigator.vibrate([100, 50, 200, 50, 300]);
+                if (typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff', '#3498db'], particleCount: 150, spread: 120, zIndex: 1000});
+            }
+        } else if (minhaResposta && !respostaDela) {
+            // ESTADO 2.A: SÓ EU RESPONDI E ESTOU AGUARDANDO
+            if(boxResponder) boxResponder.classList.add('escondido');
+            if(boxAguardando) boxAguardando.classList.remove('escondido');
+            if(boxRevelado) boxRevelado.classList.add('escondido');
+            document.getElementById('texto-aguardando-espelho').innerText = `A sua verdade foi gravada. Aguardando ${window.NOME_PARCEIRO} responder em Goiânia para que o espelho se estilhace... 🔒`;
+        } else if (!minhaResposta && respostaDela) {
+            // ESTADO 2.B: SÓ ELA RESPONDEU (A PRESSÃO PSICOLÓGICA!)
+            if(boxResponder) boxResponder.classList.remove('escondido');
+            if(boxAguardando) boxAguardando.classList.remove('escondido');
+            if(boxRevelado) boxRevelado.classList.add('escondido');
+            document.getElementById('texto-aguardando-espelho').innerHTML = `<span style="color: #ff9ff3; font-weight:bold; font-size:1.1rem;">✨ ${window.NOME_PARCEIRO} já respondeu!</span><br>O espelho agora aguarda a sua resposta para ser revelado.`;
+        } else {
+            // ESTADO 1: O DIA COMEÇOU, NINGUÉM RESPONDEU
+            if(boxResponder) boxResponder.classList.remove('escondido');
+            if(boxAguardando) boxAguardando.classList.add('escondido');
+            if(boxRevelado) boxRevelado.classList.add('escondido');
+            if(cartaoEspelho) cartaoEspelho.classList.remove('efeito-estilhaco'); // Reseta o vidro
+        }
+    });
+};
+
+window.enviarRespostaEspelho = function() {
+    const input = document.getElementById('input-espelho');
+    if (!input) return;
+    const resposta = input.value.trim();
+    
+    if (!resposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Você precisa escrever a sua verdade primeiro!", "⚠️");
+        return;
+    }
+    
+    const hoje = new Date();
+    const stringData = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+    
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const refEspelho = ref(db, `espelho_alma/${stringData}`);
+    
+    const payload = {};
+    payload[window.MEU_NOME.toLowerCase()] = resposta;
+    
+    // Usamos UPDATE em vez de SET para não apagar a resposta dela se ela já respondeu!
+    update(refEspelho, payload).then(() => {
+        if(typeof mostrarToast === 'function') mostrarToast("A sua alma foi selada no espelho.", "🪞");
+        if(window.Haptics) window.Haptics.sucesso();
+    });
+};
+
+
+
+// ==========================================
+// EXPANSÃO 4: A ROTA DO DESTINO (Motor Raymarching SDF)
+// ==========================================
+window.escutarRotaDestino = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    const refRota = ref(db, 'rota_destino/estado');
+    
+    const btnJornada = document.querySelector('.item-menu[data-alvo="jornada"]');
+    if (btnJornada && !window.jornadaMenuConfigurado) {
+        btnJornada.addEventListener('click', () => {
+            if (typeof window.injetarMotor3D === 'function') window.injetarMotor3D();
+            const tentarLigar = setInterval(() => {
+                if (typeof window.inicializarJornada3D === 'function') {
+                    window.inicializarJornada3D();
+                    clearInterval(tentarLigar);
+                }
+            }, 200);
+        });
+        window.jornadaMenuConfigurado = true;
+    }
+    
+    // Variável para a suavização matemática
+    window.ProgressoAlvoJornada = window.ProgressoAlvoJornada || 0;
+    
+    onValue(refRota, (snapshot) => {
+        const dados = snapshot.val() || { km: 0 };
+        let kmTotal = dados.km > 1300 ? 1300 : dados.km;
+        
+        const contador = document.getElementById('km-contador');
+        if (contador) contador.innerHTML = `${kmTotal} <span class="hud-max">/ 1300 KM</span>`;
+        
+        // Define o alvo (de 0.0 a 1.0) para a Placa de Vídeo buscar suavemente
+        window.ProgressoAlvoJornada = kmTotal / 1300;
+    });
+};
+
+window.comprarCombustivel = function() {
+    const moedasDOM = document.getElementById('fazenda-capital') || document.getElementById('jardim-moedas');
+    if (moedasDOM) {
+        let saldoAtual = parseInt(moedasDOM.innerText) || 0;
+        if (saldoAtual < 100) {
+            if(typeof mostrarToast === 'function') mostrarToast("Vocês precisam de 100💰 para abastecer!", "⛽");
+            if(window.Haptics) window.Haptics.erro();
+            return;
+        }
+    }
+
+    const { db, ref, get, update } = window.SantuarioApp.modulos;
+    const refRota = ref(db, 'rota_destino/estado');
+    
+    get(refRota).then((snapshot) => {
+        let dados = snapshot.val() || { km: 0 };
+        if (dados.km >= 1300) {
+            if(typeof mostrarToast === 'function') mostrarToast("A viagem intergaláctica está completa. Vocês se encontraram!", "❤️");
+            return;
+        }
+
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-100, "Combustível Comprado!");
+
+        // NOVA PROGRESSÃO: 5 km por vez! (Tornando o jogo muito mais duradouro e valioso)
+        let novoKm = dados.km + 5;
+        if (novoKm > 1300) novoKm = 1300;
+        
+        let payload = { km: novoKm };
+        
+        if (novoKm >= 325 && !dados.c325) {
+            payload.c325 = true;
+            setTimeout(() => { if(typeof mostrarToast === 'function') mostrarToast("Parada 1 (325km)! O primeiro marco foi superado.", "🎉"); }, 1000);
+        }
+        if (novoKm >= 650 && !dados.c650) {
+            payload.c650 = true;
+            setTimeout(() => { if(typeof mostrarToast === 'function') mostrarToast("650km! Vocês chegaram na exata metade do caminho!", "🔥"); }, 1000);
+        }
+        if (novoKm >= 975 && !dados.c975) {
+            payload.c975 = true;
+            setTimeout(() => { if(typeof mostrarToast === 'function') mostrarToast("975km! A gravidade de vocês já está se puxando...", "🚀"); }, 1000);
+        }
+        if (novoKm === 1300 && !dados.c1300) {
+            payload.c1300 = true;
+            setTimeout(() => { 
+                if(typeof mostrarToast === 'function') mostrarToast("O ENCONTRO MÁXIMO! A distância foi zerada.", "❤️"); 
+                if (typeof confetti === 'function') confetti({colors: ['#ff3366', '#D4AF37'], particleCount: 400, spread: 360});
+                if(window.Haptics) navigator.vibrate([100, 50, 200, 50, 300, 100, 500, 100, 800]);
+            }, 1000);
+        }
+
+        update(refRota, payload).then(() => {
+            if(typeof mostrarToast === 'function') mostrarToast("Motores ativados! +5 KM percorridos na maratona.", "🚗");
+            if(window.Haptics) navigator.vibrate([30, 50, 30]);
+        });
+    });
 };

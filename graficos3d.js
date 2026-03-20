@@ -18,7 +18,7 @@ window.RadarDePerformance = {
 
         // Componentes que exigem GPU pesada
         // Componentes que exigem GPU pesada
-        const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d', 'coracao-3d', 'prisma-3d'];
+        const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d', 'coracao-3d', 'prisma-3d', 'planetario-3d-container'];
         pesados.forEach(id => {
             const el = document.getElementById(id);
             if (el) observer.observe(el);
@@ -1329,3 +1329,313 @@ window.inicializarPrisma3D = () => {
         });
         animar();
     };
+
+
+// --- 3. PLANETÁRIO DE SONHOS (GALÁXIA PROCEDURAL) ---
+window.inicializarPlanetario3D = () => {
+    // Busca a tela da galáxia EXATAMENTE no modal que saltou na sua tela
+    const container = document.querySelector('#corpo-modal #planetario-3d-container');
+    
+    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    
+    const esqueleto = container.querySelector('#esqueleto-planetario');
+    if (esqueleto) esqueleto.remove();
+
+    camera.position.z = 12;
+    camera.position.y = 4;
+    camera.lookAt(0, 0, 0);
+
+    // Criação Quântica de Estrelas
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 2000;
+    const starPos = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+
+    for(let i=0; i < starCount; i++) {
+        const r = 12 * Math.sqrt(Math.random());
+        const theta = r * 0.5 + (Math.random() * 2 * Math.PI);
+        starPos[i*3] = r * Math.cos(theta) + (Math.random()-0.5)*2;
+        starPos[i*3+1] = (Math.random()-0.5) * 2;
+        starPos[i*3+2] = r * Math.sin(theta) + (Math.random()-0.5)*2;
+
+        const color = new THREE.Color();
+        color.setHSL(0.6 + (Math.random()*0.1), 0.8, 0.5 + Math.random()*0.5); 
+        starColors[i*3] = color.r; starColors[i*3+1] = color.g; starColors[i*3+2] = color.b;
+    }
+
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+    const starMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+    const galaxy = new THREE.Points(starGeo, starMat);
+    scene.add(galaxy);
+
+    let tempo = 0;
+    const animar = () => {
+        requestAnimationFrame(animar);
+        tempo += 0.003;
+        galaxy.rotation.y = tempo;
+        
+        // Efeito visual caso exista uma Supernova 
+        if (window.quantidadeSupernovas > 0) {
+            const pulso = 1 + Math.sin(tempo * 10) * 0.05;
+            galaxy.scale.set(pulso, pulso, pulso);
+            starMat.size = 0.15 + Math.sin(tempo * 20) * 0.05;
+        }
+
+        renderer.render(scene, camera);
+    };
+    animar();
+};
+
+
+
+// --- 4. GALÁXIA INTERATIVA HUD (MESMO CÉU) ---
+window.inicializarGalaxia3D = () => {
+    // Busca o fundo da janela modal
+    const modais = document.querySelectorAll('#galaxia-3d-fundo');
+    const container = modais[modais.length - 1]; 
+    
+    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    camera.position.z = 15;
+
+    // Criação do Campo Estelar
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 2000;
+    const starPos = new Float32Array(starCount * 3);
+
+    for(let i=0; i < starCount; i++) {
+        starPos[i*3] = (Math.random() - 0.5) * 50;
+        starPos[i*3+1] = (Math.random() - 0.5) * 50;
+        starPos[i*3+2] = (Math.random() - 0.5) * 50;
+    }
+
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.9 });
+    const galaxy = new THREE.Points(starGeo, starMat);
+    scene.add(galaxy);
+
+    // Interatividade Real (O Fator UAU)
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    const onMove = (event) => {
+        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        // Normaliza a posição do dedo para girar a galáxia
+        mouseX = (clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(clientY / window.innerHeight) * 2 + 1;
+    };
+
+    container.addEventListener('mousemove', onMove);
+    container.addEventListener('touchmove', onMove, {passive: true});
+
+    let tempo = 0;
+    const animar = () => {
+        requestAnimationFrame(animar);
+        tempo += 0.001;
+        
+        // Movimento inercial suave
+        targetX = mouseX * 1.5;
+        targetY = mouseY * 1.5;
+        
+        // Gira sozinha bem devagar, mas obedece ao dedo do usuário se ele tocar
+        galaxy.rotation.y += 0.001 + (targetX - galaxy.rotation.y) * 0.05;
+        galaxy.rotation.x += 0.001 + (targetY - galaxy.rotation.x) * 0.05;
+        
+        renderer.render(scene, camera);
+    };
+    animar();
+};
+
+
+
+// --- 5. O VÓRTICE ORGÂNICO INTERATIVO (RAYMARCHING & SDF) ---
+window.inicializarJornada3D = () => {
+    const container = document.getElementById('jornada-3d-fundo');
+    if (!container || typeof THREE === 'undefined') return;
+    if (container.children.length > 0) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    renderer.setPixelRatio(window.devicePixelRatio); 
+    container.appendChild(renderer.domElement);
+
+    const progressoData = { atual: 0.0 };
+    
+    // Variáveis de controle de rotação
+    let alvoRotacaoX = 0;
+    let alvoRotacaoY = 0;
+    let mouseSuave = new THREE.Vector2(0, 0);
+
+    const uniforms = {
+        uTime: { value: 0 },
+        uResolution: { value: new THREE.Vector2() },
+        uProgress: { value: 0.0 },
+        uMouse: { value: new THREE.Vector2(0, 0) } // <-- Conecta o seu dedo à GPU
+    };
+
+    const shaderMaterial = new THREE.ShaderMaterial({
+        uniforms: uniforms,
+        vertexShader: `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0); 
+            }
+        `,
+        fragmentShader: `
+            uniform float uTime;
+            uniform vec2 uResolution;
+            uniform float uProgress;
+            uniform vec2 uMouse;
+            varying vec2 vUv;
+
+            float smin(float a, float b, float k) {
+                float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+                return mix(b, a, h) - k * h * (1.0 - h);
+            }
+
+            mat2 rot(float a) {
+                float s = sin(a), c = cos(a);
+                return mat2(c, -s, s, c);
+            }
+
+            vec2 map(vec3 p) {
+                vec3 q = p;
+                q.xy *= rot(p.z * 0.1 + uTime * 0.2);
+                float dTunnel = length(q.xy) - (2.5 + sin(p.z * 2.0 + uTime)*0.3); 
+                
+                float distanciaInicial = 1.2;
+                float posicaoX = distanciaInicial * (1.0 - uProgress); 
+                
+                vec3 posJoao = vec3(-posicaoX, sin(uTime*2.0)*0.1, 5.0);
+                vec3 posThamiris = vec3(posicaoX, cos(uTime*2.0)*0.1, 5.0);
+                
+                float dJoao = length(p - posJoao) - 0.35;
+                float dThamiris = length(p - posThamiris) - 0.35;
+
+                float dAlmas = smin(dJoao, dThamiris, 0.8);
+                float dSol = length(p - vec3(0.0, 0.0, 5.5)) - (0.2 + (uProgress * 0.8));
+                float dNucleo = smin(dAlmas, dSol, 0.5);
+
+                if (dNucleo < -dTunnel) return vec2(dNucleo, 2.0); 
+                return vec2(-dTunnel, 1.0); 
+            }
+
+            void main() {
+                vec2 uv = (vUv - 0.5) * 2.0;
+                uv.x *= uResolution.x / uResolution.y;
+
+                vec3 ro = vec3(0.0, 0.0, uTime * 2.0); 
+                vec3 rd = normalize(vec3(uv, 1.2)); 
+
+                // APLICAÇÃO DO GIRO (AQUI É ONDE O 3D ACONTECE)
+                rd.yz *= rot(uMouse.y); // Inclinação Cima/Baixo
+                rd.xz *= rot(uMouse.x); // Giro Esquerda/Direita
+
+                float t = 0.0, glowAlmas = 0.0, glowTunnel = 0.0;
+                vec3 p;
+                
+                for(int i = 0; i < 64; i++) { 
+                    p = ro + rd * t;
+                    vec3 pLocal = p;
+                    pLocal.z -= ro.z; 
+                    vec2 d = map(pLocal);
+                    if(d.x < 0.01 || t > 20.0) break;
+                    t += d.x * 0.7; 
+                    if (d.y == 2.0) glowAlmas += 0.05 / (0.05 + d.x*d.x);
+                    else glowTunnel += 0.01 / (0.01 + d.x*d.x);
+                }
+
+                vec3 col = vec3(0.0); 
+                vec3 corTunnel = mix(vec3(0.02, 0.05, 0.1), vec3(0.1, 0.0, 0.1), sin(p.z*0.5)*0.5+0.5);
+                col += corTunnel * glowTunnel * 1.5;
+
+                float lado = clamp(p.x * 2.0, -1.0, 1.0);
+                vec3 corBaseAlmas = mix(vec3(0.2, 0.6, 1.0), vec3(1.0, 0.2, 0.4), lado * 0.5 + 0.5);
+                vec3 corFinalAlma = mix(corBaseAlmas, vec3(1.0, 0.8, 0.2), uProgress);
+
+                col += corFinalAlma * glowAlmas * 0.6;
+                col = col * (2.51 * col + 0.03) / (col * (2.43 * col + 0.59) + 0.14);
+
+                gl_FragColor = vec4(col, 1.0);
+            }
+        `
+    });
+
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), shaderMaterial);
+    scene.add(plane);
+
+    // --- SISTEMA DE TOQUE/ARRASTE ---
+    let touchX = 0, touchY = 0, isDragging = false;
+
+    container.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        touchX = e.clientX;
+        touchY = e.clientY;
+    });
+
+    window.addEventListener('pointerup', () => { isDragging = false; });
+
+    container.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - touchX;
+        const deltaY = e.clientY - touchY;
+        alvoRotacaoX += deltaX * 0.005;
+        alvoRotacaoY += deltaY * 0.005;
+        touchX = e.clientX;
+        touchY = e.clientY;
+    });
+
+    const atualizarTamanho = () => {
+        if (container.clientWidth > 0 && container.clientHeight > 0) {
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            uniforms.uResolution.value.set(container.clientWidth, container.clientHeight);
+        }
+    };
+    new ResizeObserver(atualizarTamanho).observe(container);
+    atualizarTamanho();
+
+    let tempoAnterior = performance.now();
+    const animar = () => {
+        requestAnimationFrame(animar);
+        const agora = performance.now();
+        const delta = (agora - tempoAnterior) * 0.001;
+        tempoAnterior = agora;
+        uniforms.uTime.value += delta;
+
+        // Suaviza o movimento do "pescoço" (Interpolação)
+        mouseSuave.x += (alvoRotacaoX - mouseSuave.x) * 0.1;
+        mouseSuave.y += (alvoRotacaoY - mouseSuave.y) * 0.1;
+        uniforms.uMouse.value.set(mouseSuave.x, mouseSuave.y);
+
+        const alvo = window.ProgressoAlvoJornada || 0;
+        progressoData.atual += (alvo - progressoData.atual) * 0.02;
+        uniforms.uProgress.value = progressoData.atual;
+
+        renderer.render(scene, camera);
+    };
+    animar();
+};

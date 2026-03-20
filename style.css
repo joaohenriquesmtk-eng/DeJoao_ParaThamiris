@@ -33,6 +33,48 @@
     --cor-fundo: #1a0f1a;
 }
 
+/* Tema Rubi Intenso */
+.tema-rubi {
+    --cor-primaria: #e74c3c;
+    --cor-fundo: #1a0a0a;
+}
+
+/* Tema Safira Profundo */
+.tema-safira {
+    --cor-primaria: #0984e3;
+    --cor-fundo: #0a101a;
+}
+
+/* Tema Âmbar Aconchegante */
+.tema-ambar {
+    --cor-primaria: #f39c12;
+    --cor-fundo: #1a140a;
+}
+
+/* Tema Turquesa (Oceano Profundo) */
+.tema-turquesa {
+    --cor-primaria: #00cec9;
+    --cor-fundo: #001010;
+}
+
+/* Tema Coral (Pôr do Sol) */
+.tema-coral {
+    --cor-primaria: #ff7f50;
+    --cor-fundo: #1a0b08;
+}
+
+/* Tema Lótus (Energia Mística) */
+.tema-lotus {
+    --cor-primaria: #fd79a8;
+    --cor-fundo: #140510;
+}
+
+/* Tema Ônix (Minimalismo Prateado) */
+.tema-onix {
+    --cor-primaria: #bdc3c7;
+    --cor-fundo: #050505;
+}
+
 /* Estado Ativo (Selecionado) para botões de cidade */
 .btn-cidade-ativo {
     background: var(--cor-primaria) !important;
@@ -2795,30 +2837,33 @@ body.modo-alerta {
     100% { box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.4); }
 }
 
-.botoes-temas {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
+/* ==========================================
+   AURA DO SANTUÁRIO (BOTÕES DE TEMA)
+========================================== */
 .btn-tema {
-    background: var(--cor-vidro);
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid var(--cor-primaria);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 30px;
+    color: var(--cor-primaria);
+    padding: 10px 5px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    flex: 1 1 calc(30% - 10px); /* Cria uma grade de 3 colunas perfeitas */
+    text-align: center;
 }
-.btn-tema:hover {
-    background: var(--cor-primaria);
-    color: black;
-}
+
 .btn-tema.ativo {
-    background: var(--cor-primaria);
-    color: black;
-    font-weight: bold;
+    background: var(--cor-primaria) !important;
+    color: #000 !important;
+    box-shadow: 0 0 12px var(--cor-primaria);
+    transform: scale(1.05);
+}
+
+.cabecalho-colapsavel:active {
+    opacity: 0.7; /* Efeito de clique no vidro */
 }
 
 @keyframes onda {
@@ -6066,9 +6111,6 @@ body.aura-ansiosa {
 /* ==========================================
    CORREÇÃO GLOBAL: NOTIFICAÇÕES (TOASTS) DEIXAR SEMPRE POR ÚLTIMO PARA GARANTIR QUE FIQUE POR CIMA DE TUDO!
 ========================================== */
-/* ==========================================
-   CORREÇÃO GLOBAL: NOTIFICAÇÕES (TOASTS)
-========================================== */
 #toast, .toast, .toast-notificacao, [id*="toast"] {
     max-width: 90vw !important; /* Respeita as margens da tela do celular */
     width: max-content !important; 
@@ -6080,3 +6122,740 @@ body.aura-ansiosa {
     line-height: 1.5 !important;
     border-radius: 12px !important;
 }
+
+
+/* ==========================================
+   CÁPSULA DO TEMPO (NEON CARMESIM EXCLUSIVO)
+========================================== */
+/* Substituição da cor da Top Bar apenas nesta tela */
+.top-bar-capsula { border-bottom: 1px solid rgba(255, 51, 102, 0.4) !important; }
+.btn-voltar-capsula { color: #ff3366 !important; }
+.recurso-capsula { color: #ff3366 !important; box-shadow: 0 0 10px rgba(255, 51, 102, 0.2) !important; }
+
+/* O Visor de Tempo (Mantido da última atualização) */
+.visor-tempo {
+    width: 100%; background: linear-gradient(145deg, rgba(20, 5, 10, 0.95), rgba(0, 0, 0, 0.9));
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 51, 102, 0.3);
+    border-radius: 15px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 25px rgba(255, 51, 102, 0.15);
+    position: relative; overflow: hidden;
+}
+
+.icone-cadeado { font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3)); transition: all 0.5s; }
+.icone-cadeado.trancado { color: #ff3366; filter: drop-shadow(0 0 20px rgba(255, 51, 102, 0.8)); animation: pulsarCadeadoNeon 2s infinite alternate; }
+
+.relogio-neon {
+    font-family: monospace; font-size: 2.5rem; font-weight: 900; color: #ff3366;
+    text-shadow: 0 0 15px rgba(255, 51, 102, 0.9), 0 0 30px rgba(255, 51, 102, 0.5); letter-spacing: 2px;
+}
+.relogio-neon.zerado {
+    color: #ff9ff3; text-shadow: 0 0 15px rgba(255, 159, 243, 0.9), 0 0 40px rgba(255, 159, 243, 0.7);
+    animation: piscarZerado 1s infinite alternate;
+}
+
+/* O novo Seletor de Data/Hora Exato */
+.input-data-neon {
+    width: 100%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255, 51, 102, 0.5);
+    border-radius: 10px; color: #ff9ff3; padding: 12px; font-family: inherit; font-size: 1rem;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8); outline: none; box-sizing: border-box; text-align: center;
+}
+.input-data-neon::-webkit-calendar-picker-indicator { filter: invert(1) sepia(1) saturate(5) hue-rotate(300deg); cursor: pointer; }
+
+/* Botões de Anexo */
+.anexos-capsula { display: flex; gap: 10px; width: 100%; margin-top: 5px; }
+.btn-anexo {
+    flex: 1; background: rgba(255, 51, 102, 0.1); border: 1px dashed rgba(255, 51, 102, 0.4);
+    color: #ff9ff3; border-radius: 8px; padding: 10px; font-size: 0.85rem; font-weight: bold;
+    text-align: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px);
+}
+.btn-anexo:active { transform: scale(0.95); background: rgba(255, 51, 102, 0.3); }
+
+@keyframes pulsarCadeadoNeon { 0% { transform: scale(0.9); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
+@keyframes piscarZerado { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+#container-capsula {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-color: var(--cor-fundo);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+
+
+/* ==========================================
+   RADAR DE TELEPRESENÇA (BATIMENTO CARDÍACO)
+========================================== */
+#radar-telepresenca {
+    position: fixed;
+    bottom: 80px; /* Desceu para ficar mais perto da barra, mantendo um respiro elegante */
+    right: 20px;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#btn-coracao-radar {
+    background: radial-gradient(circle, rgba(20, 5, 10, 0.95), rgba(0, 0, 0, 0.9));
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 51, 102, 0.5);
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    font-size: 1.8rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6), inset 0 0 15px rgba(255, 51, 102, 0.2);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    z-index: 2;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none; /* Impede o celular de tentar selecionar como texto */
+    touch-action: none; /* Essencial: Impede o celular de dar zoom ao segurar */
+}
+
+/* Quando você aperta fisicamente */
+#btn-coracao-radar:active {
+    transform: scale(0.85);
+    box-shadow: 0 0 25px rgba(255, 51, 102, 0.8);
+    border-color: #ff3366;
+}
+
+/* As ondas de choque de quando o outro aperta */
+#radar-ondas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 51, 102, 0.6), transparent);
+    z-index: 1;
+    transform: scale(1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radar-recebendo #radar-ondas {
+    animation: emitirOndasRadar 0.8s infinite ease-out;
+}
+.radar-recebendo #btn-coracao-radar {
+    animation: pulsarCoracaoRecebendo 0.8s infinite alternate ease-in-out;
+    border-color: #ff9ff3;
+}
+
+@keyframes emitirOndasRadar {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.8); opacity: 0; }
+}
+@keyframes pulsarCoracaoRecebendo {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,51,102,0.4); }
+    100% { transform: scale(1.15); box-shadow: 0 0 30px rgba(255,51,102,0.9); }
+}
+
+
+
+/* Amarra o Fundo do Botão de Surpresa à cor da Aura atual */
+#btn-surpresa {
+    background: var(--cor-primaria) !important; /* Fundo preenchido com a cor do tema */
+    color: #000000 !important; /* Texto preto */
+    border: none !important;
+    box-shadow: 0 0 15px var(--cor-primaria) !important; /* Brilho com a cor do tema */
+    transition: all 0.4s ease;
+    font-weight: bold;
+}
+
+#btn-surpresa:not(.btn-desativado):active {
+    transform: scale(0.95);
+    filter: brightness(1.2);
+}
+
+
+
+/* ==========================================
+   PLANETÁRIO DE SONHOS (UI DAS ESTRELAS)
+========================================== */
+.estrela-item {
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.6));
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 12px; padding: 12px;
+    display: flex; justify-content: space-between; align-items: center; text-align: left;
+    transition: all 0.5s ease;
+}
+.estrela-item.supernova {
+    border-color: #2ecc71;
+    background: linear-gradient(145deg, rgba(46,204,113,0.1), rgba(0,0,0,0.8));
+    box-shadow: 0 0 15px rgba(46,204,113,0.2);
+}
+.estrela-nome { color: #fff; font-weight: bold; font-size: 0.95rem; margin-bottom: 3px; }
+.estrela-data { color: #aaa; font-size: 0.75rem; }
+.btn-supernova {
+    background: rgba(212,175,55,0.2); border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria); border-radius: 50%; width: 45px; height: 45px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer;
+    box-shadow: 0 0 10px rgba(212,175,55,0.2);
+}
+.btn-supernova:active { transform: scale(0.9); }
+.estrela-item.supernova .btn-supernova {
+    background: rgba(46,204,113,0.2); border-color: #2ecc71; color: #2ecc71; 
+    box-shadow: 0 0 15px rgba(46,204,113,0.5); pointer-events: none; animation: pulsarFlorescimento 2s infinite alternate;
+}
+
+
+/* ==========================================
+   RELÍQUIA 4: O PERGAMINHO DE CERA (SEMENTES)
+========================================== */
+.envelope-misterioso {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    background: linear-gradient(135deg, rgba(20,20,20,0.9), rgba(5,5,5,0.95));
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.5);
+    transition: all 0.5s ease;
+}
+
+/* O Selo de Cera 3D */
+.selo-cera {
+    width: 75px;
+    height: 75px;
+    background: radial-gradient(circle at 30% 30%, #ff4d4d, #b30000, #4d0000);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(179, 0, 0, 0.6), inset 0 -3px 10px rgba(0,0,0,0.6), inset 0 3px 10px rgba(255,255,255,0.3);
+    border: 2px solid #800000;
+    z-index: 10;
+    animation: pulsarCera 2s infinite alternate;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    touch-action: none;
+}
+
+/* Letra cravada na cera */
+.texto-selo {
+    color: rgba(255, 204, 204, 0.9);
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 2rem;
+    text-shadow: -1px -1px 2px rgba(0,0,0,0.8), 1px 1px 2px rgba(255,255,255,0.2);
+}
+
+@keyframes pulsarCera {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(179,0,0,0.4); }
+    100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(179,0,0,0.8); }
+}
+
+.selo-cera:active {
+    transform: scale(0.9) !important;
+    filter: brightness(0.8);
+}
+
+/* A Mágica da Quebra */
+.envelope-misterioso.quebrado .selo-cera {
+    transform: scale(2);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.envelope-misterioso.quebrado .dica-selo {
+    opacity: 0;
+}
+
+.dica-selo {
+    margin-top: 15px;
+    color: rgba(212,175,55,0.8);
+    font-size: 0.85rem;
+    font-style: italic;
+    animation: piscarLento 2s infinite;
+    transition: opacity 0.3s ease;
+}
+
+/* O Pergaminho que surge das sombras */
+.carta-revelada {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s; /* Atraso de 0.2s para a cera quebrar primeiro */
+    text-align: center;
+    border: 1px solid var(--cor-primaria);
+}
+
+.envelope-misterioso.quebrado .carta-revelada {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+
+
+/* ==========================================
+   RELÍQUIA 5: A JANELA DE REALIDADE MISTA (CÉU)
+========================================== */
+.moldura-janela-mista {
+    display: flex;
+    width: 100%;
+    height: 220px;
+    background: #000;
+    border: 5px solid #1a1a1a;
+    border-radius: 8px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 10px 20px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+/* O Vidro Individual de cada cidade */
+.painel-janela {
+    flex: 1;
+    position: relative;
+    background-size: cover;
+    overflow: hidden;
+    transition: background 1s ease;
+}
+
+/* O esqueleto da janela no meio */
+.divisoria-janela {
+    width: 6px;
+    background: linear-gradient(to right, #111, #333, #111);
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+}
+
+/* O Reflexo de vidro embaçado por cima */
+.vidro-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.4) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+    z-index: 5;
+}
+
+.cidade-tag {
+    font-size: 0.7rem;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+    font-weight: bold;
+    background: rgba(0,0,0,0.6);
+    padding: 4px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.temp-tag {
+    font-size: 1.6rem;
+    color: #fff;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+    font-weight: 900;
+    align-self: flex-end;
+}
+
+/* ==========================================
+   MOTOR DE CLIMA PROCEDURAL CSS
+========================================== */
+.efeito-limpo-dia { background: linear-gradient(to bottom, #4facfe, #00f2fe); }
+.efeito-limpo-noite { background: linear-gradient(to bottom, #090a0f, #04102e); }
+
+.efeito-nublado-dia { background: linear-gradient(to bottom, #8e9eab, #eef2f3); }
+.efeito-nublado-noite { background: linear-gradient(to bottom, #2c3e50, #000000); }
+
+/* Animação de Gotas Escorrendo */
+.efeito-chuva {
+    background: linear-gradient(to bottom, #3a404d, #182848);
+}
+.efeito-chuva::after {
+    content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
+    background-image: linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-size: 3px 30px;
+    animation: cairChuva 0.4s linear infinite;
+    opacity: 0.5;
+}
+
+/* Animação de Relâmpagos e Gotas Rápidas */
+.efeito-tempestade {
+    background: linear-gradient(to bottom, #141e30, #243b55);
+    animation: relampago 5s infinite;
+}
+.efeito-tempestade::after {
+    content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
+    background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 2px 20px;
+    animation: cairChuva 0.2s linear infinite;
+    opacity: 0.6;
+}
+
+@keyframes cairChuva {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50%); }
+}
+@keyframes relampago {
+    0%, 95%, 98%, 100% { filter: brightness(1); }
+    96%, 99% { filter: brightness(2.5) drop-shadow(0 0 20px #fff); background: #8e9eab; }
+}
+
+
+
+/* ==========================================
+   RELÍQUIA 6: O TOCA-DISCOS SINCRONIZADO
+========================================== */
+.toca-discos-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.base-toca-discos {
+    width: 220px;
+    height: 220px;
+    background: linear-gradient(145deg, #1f1a18, #0a0808);
+    border-radius: 15px;
+    border: 2px solid rgba(212,175,55,0.4);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.05);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* O Disco de Vinil com textura de ranhuras */
+.disco-vinil {
+    width: 190px;
+    height: 190px;
+    background: #111;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0,0,0,0.9), inset 0 0 5px rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: repeating-radial-gradient(
+        #111 0px, 
+        #1a1a1a 2px, 
+        #111 4px
+    );
+    transition: transform 0.2s ease;
+}
+
+.disco-vinil.tocando {
+    animation: girarDisco 3s linear infinite;
+}
+
+/* O adesivo central do disco */
+.selo-disco {
+    width: 60px;
+    height: 60px;
+    background: var(--cor-primaria);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #000;
+    text-align: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+    border: 2px solid #000;
+    font-family: 'Playfair Display', serif;
+}
+
+.selo-disco::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: inset 0 0 3px rgba(255,255,255,0.5);
+}
+
+/* O braço de metal da agulha */
+.braco-agulha {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 8px;
+    height: 110px;
+    background: linear-gradient(to right, #888, #fff, #555);
+    border-radius: 5px;
+    transform-origin: top center;
+    transform: rotate(-35deg);
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 10px 10px rgba(0,0,0,0.6);
+    z-index: 10;
+}
+
+/* A cabeça da agulha */
+.braco-agulha::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: -6px;
+    width: 20px;
+    height: 30px;
+    background: linear-gradient(145deg, #333, #111);
+    border-radius: 3px;
+    box-shadow: 0 5px 5px rgba(0,0,0,0.5);
+}
+
+/* Posição quando a música está rolando */
+.braco-agulha.tocando {
+    transform: rotate(20deg); 
+}
+
+@keyframes girarDisco {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+/* ==========================================
+   EXPANSÃO 3: O ESPELHO DA ALMA
+========================================== */
+.espelho-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    /* Um gradiente diagonal que simula o reflexo chanfrado de um espelho */
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(255,255,255,0.08) 60%, rgba(0,0,0,0.8) 100%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* O impacto cinematográfico quando as duas respostas se encontram */
+.efeito-estilhaco {
+    animation: vidroQuebrando 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes vidroQuebrando {
+    0% { filter: blur(8px) brightness(2.5); transform: scale(1.05); }
+    30% { filter: blur(4px) brightness(1.5); transform: scale(0.98); }
+    60% { filter: blur(0px) brightness(1); transform: scale(1.02); }
+    100% { filter: blur(0px) brightness(1); transform: scale(1); }
+}
+
+
+
+/* ==========================================
+   EXPANSÃO 4: A ROTA DO DESTINO (MAPA)
+========================================== */
+.mapa-jornada-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.cidade-ponto {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--cor-primaria);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    white-space: nowrap;
+}
+
+.linha-estrada {
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    width: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+}
+
+/* O caminho que se ilumina enquanto eles andam */
+.luz-estrada-thamiris {
+    position: absolute; top: 0; left: 0; width: 100%; height: 0%;
+    background: #ff9ff3; box-shadow: 0 0 10px #ff9ff3; transition: height 1s ease-in-out;
+}
+.luz-estrada-joao {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+    background: #3498db; box-shadow: 0 0 10px #3498db; transition: height 1s ease-in-out;
+}
+
+/* Os Avatares */
+.avatar-jornada {
+    position: absolute;
+    left: -18px;
+    width: 40px; height: 40px;
+    background: #111; border: 2px solid var(--cor-primaria); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    box-shadow: 0 0 15px var(--cor-primaria); z-index: 5;
+    transition: top 1s ease-in-out, bottom 1s ease-in-out;
+}
+
+/* Os Pontos de Parada (Checkpoints) */
+.checkpoint-mapa {
+    position: absolute;
+    left: -8px;
+    width: 20px; height: 20px;
+    background: #222; border: 2px solid #555; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+    transition: all 0.5s ease;
+}
+.checkpoint-mapa.desbloqueado {
+    background: var(--cor-primaria); border-color: #fff; box-shadow: 0 0 15px var(--cor-primaria);
+}
+.checkpoint-mapa .icone-cp { font-size: 0.7rem; }
+.checkpoint-mapa.desbloqueado .icone-cp { content: "✨"; filter: brightness(2); }
+
+/* ==========================================
+   ATUALIZAÇÃO UX/UI: JORNADA HOLOGRÁFICA
+========================================== */
+.cartao-jornada-holografico {
+    background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(5,5,5,0.6)) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(212,175,55,0.2) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.02) !important;
+}
+
+
+
+/* ==========================================
+   HUD DA JORNADA (SCIFI INTERFACE)
+========================================== */
+.hud-jornada-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 50px 20px 100px 20px; /* Espaço para o menu inferior */
+    box-sizing: border-box;
+    pointer-events: none; /* Deixa o dedo passar para o 3D */
+}
+
+.hud-topo {
+    text-align: center;
+    animation: descerHUD 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-titulo {
+    color: #fff;
+    font-family: monospace;
+    font-size: 1.2rem;
+    letter-spacing: 8px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px var(--cor-primaria);
+}
+
+.hud-progresso-box {
+    background: linear-gradient(180deg, rgba(0,0,0,0.8), rgba(0,0,0,0.2));
+    border: 1px solid rgba(212,175,55,0.3);
+    border-top: 3px solid var(--cor-primaria);
+    padding: 15px;
+    border-radius: 5px;
+    display: inline-block;
+    backdrop-filter: blur(5px);
+}
+
+.hud-label {
+    font-size: 0.65rem;
+    color: var(--cor-primaria);
+    letter-spacing: 3px;
+}
+
+.hud-numeros {
+    font-size: 2.5rem;
+    color: #fff;
+    font-family: monospace;
+    font-weight: 900;
+    margin-top: 5px;
+    text-shadow: 0 0 20px rgba(255,255,255,0.8);
+}
+
+.hud-max {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.5);
+}
+
+.hud-base {
+    text-align: center;
+    pointer-events: auto; /* Reativa o clique só aqui em baixo */
+    animation: subirHUD 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-alerta-interacao {
+    color: #aaa;
+    font-size: 0.75rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.hud-alerta-interacao .piscar {
+    color: var(--cor-primaria);
+    animation: piscarLento 1s infinite alternate;
+}
+
+.hud-btn-ignicao {
+    width: 100%;
+    height: 65px;
+    background: rgba(212,175,55,0.1) !important;
+    border: 1px solid var(--cor-primaria) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 0 !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.hud-btn-ignicao::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,0.5), transparent);
+    animation: scanline 3s infinite linear;
+}
+
+.hud-btn-texto {
+    color: var(--cor-primaria);
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.hud-btn-ignicao:active {
+    background: var(--cor-primaria) !important;
+}
+
+@keyframes descerHUD { 0% { opacity: 0; transform: translateY(-50px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes subirHUD { 0% { opacity: 0; transform: translateY(50px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes scanline { 0% { left: -100%; } 100% { left: 200%; } }

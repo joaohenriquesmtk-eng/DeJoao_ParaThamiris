@@ -141,6 +141,27 @@ window.SantuarioApp.conectar = function() {
         } else {
             console.warn("Atenção: O motor de Ecos ainda não foi carregado.");
         }
+
+        // 6. Listener do Cofre (Ecos Recentes)
+        if (typeof window.escutarEcosDoParceiro === 'function') {
+            window.escutarEcosDoParceiro();
+        } else {
+            console.warn("Atenção: O motor de Ecos ainda não foi carregado.");
+        }
+
+        // 7. Ignição do Radar de Telepresença (NOVO!)
+        if (typeof window.escutarRadarParceiro === 'function') {
+            window.escutarRadarParceiro();
+        }
+
+        // 8. Ignição do Planetário de Sonhos
+        if (typeof window.escutarPlanetario === 'function') window.escutarPlanetario();
+
+        // 9. Ignição do Espelho da Alma
+        if (typeof window.escutarEspelhoDaAlma === 'function') window.escutarEspelhoDaAlma();
+
+        // 10. Ignição da Rota do Destino
+        if (typeof window.escutarRotaDestino === 'function') window.escutarRotaDestino();
 };
 
 

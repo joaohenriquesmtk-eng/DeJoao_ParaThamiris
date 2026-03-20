@@ -42,22 +42,29 @@ let fazenda = {
 
 let loopSimulador = null;
 
-// 3. INICIALIZAÇÃO
+// ==========================================
+// PERSISTÊNCIA DA FAZENDA
+// ==========================================
+function salvarFazenda() {
+    localStorage.setItem('estado_minifazenda', JSON.stringify(fazenda));
+}
+
+function carregarFazenda() {
+    const salvo = localStorage.getItem('estado_minifazenda');
+    if (salvo) {
+        try {
+            fazenda = JSON.parse(salvo);
+        } catch (e) {
+            console.error("Erro ao ler save da fazenda", e);
+        }
+    }
+}
+
+// 3. INICIALIZAÇÃO APRIMORADA
 window.iniciarMiniFazenda = function() {
-    console.log("Iniciando Simulador Agrícola Pro (Offline Mode)...");
-    document.getElementById('fazenda-capital').innerText = window.pontosDoCasal || 100;
-    
-    atualizarVisuaisAnimatronics();
-    renderizarTerrenos();
-    renderizarLoja('sementes');
-    renderizarSiloEMercado();
-    
-    if (loopSimulador) clearInterval(loopSimulador);
-    loopSimulador = setInterval(motorAgronomico, 1000); 
-};// 3. INICIALIZAÇÃO APRIMORADA
-window.iniciarMiniFazenda = function() {
-    console.log("Iniciando Simulador Agrícola Pro (Offline Mode)...");
-    document.getElementById('fazenda-capital').innerText = window.pontosDoCasal || 100;
+    console.log("Iniciando Simulador Agrícola Pro...");
+    carregarFazenda(); // Puxa a memória salva!
+    document.getElementById('fazenda-capital').innerText = window.pontosDoCasal;
     
     // Sincroniza o Direito com a Agronomia logo na entrada
     sincronizarTribunal();
@@ -189,6 +196,7 @@ function motorAgronomico() {
     });
 
     renderizarTerrenos();
+    salvarFazenda(); // Salva o crescimento das plantas a cada segundo!
 }
 
 // 5. RENDERIZAÇÃO E INTERAÇÃO

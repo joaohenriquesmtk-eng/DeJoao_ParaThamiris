@@ -218,7 +218,32 @@ window.atualizarContadorInterface = function(quantidade) {
     elemento.innerText = texto;
 };
 
+// ==========================================
+// BANCO CENTRAL DO SANTUÁRIO (SISTEMA FINANCEIRO)
+// ==========================================
+// Conserta o "Dinheiro Fantasma": Dá 100 moedas REAIS na primeira vez que o app for aberto
+let pontosSalvos = localStorage.getItem('santuario_pontos');
+if (pontosSalvos === null) {
+    window.pontosDoCasal = 100;
+    localStorage.setItem('santuario_pontos', 100);
+} else {
+    window.pontosDoCasal = parseInt(pontosSalvos) || 0;
+}
 
+window.atualizarPontosCasal = function(valor, motivo) {
+    window.pontosDoCasal += valor;
+    if (window.pontosDoCasal < 0) window.pontosDoCasal = 0;
+    localStorage.setItem('santuario_pontos', window.pontosDoCasal);
+
+    // Atualiza TODOS os visores de dinheiro do app instantaneamente
+    const visores = ['fazenda-capital', 'jardim-moedas', 'termo-moedas'];
+    visores.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = window.pontosDoCasal;
+    });
+
+    console.log(`Economia atualizada: ${motivo} | Saldo: ${window.pontosDoCasal}`);
+};
 
 // ==========================================
 // MOTOR BOTÂNICO SÊNIOR (O CORAÇÃO DO SANTUÁRIO)

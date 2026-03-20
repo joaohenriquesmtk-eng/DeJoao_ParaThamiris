@@ -5119,14 +5119,16 @@ body.aura-ansiosa {
 .conteudo-termo {
     flex: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: flex-start;
-    padding: 80px 10px 30px 10px; overflow-y: auto; width: 100%;
+    padding: 60px 10px 20px 10px; /* Reduzido de 80px para 60px */
+    overflow-y: auto; width: 100%;
 }
 
 /* O Pedestal do Motor 3D */
 .oraculo-pedestal {
-    position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto;
+    position: relative; width: 60px; height: 60px; margin: 5px auto 15px auto; /* Reduzido de 80px para 60px e margem encolhida */
     animation: flutuarOraculo 4s infinite alternate ease-in-out;
 }
+
 .brilho-oraculo {
     position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
     width: 60px; height: 15px; background: #D4AF37; filter: blur(15px); opacity: 0.6;
@@ -5137,8 +5139,9 @@ body.aura-ansiosa {
 
 /* A Grade de Vidro Esculpido */
 .grade-oraculo {
-    display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px;
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; /* Reduzido de 25px para 15px */
 }
+
 .linha-termo {
     display: flex; gap: 8px; justify-content: center;
 }

@@ -247,9 +247,6 @@
     <source src="assets/ambient.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Botão de mute -->
-<button id="btn-mute-jogos" class="btn-mute escondido" title="Ativar/desativar música">🔊</button>
-
 <div id="menu-jogos" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 5px 10px; margin-bottom: 20px;">
     
     <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('termo')">
@@ -289,10 +286,6 @@
     </div>
 
 </div>
-
-<!-- Botão de mute na tela Jogos (fora dos jogos) -->
-                <button id="btn-mute-jogos-tela" class="btn-mute-jogo" onclick="toggleMuteJogos()" title="Ativar/desativar música">🔊</button>
-
 
 <!-- TRIBUNAL DO AFETO -->
 <div id="container-tribunal" class="escondido">

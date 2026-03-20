@@ -3,7 +3,6 @@
 // ==========================================
 window.statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
-let audioJogosMuted = localStorage.getItem('audio_jogos_muted') === 'true';
 let telaAtual = 'home';
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
@@ -987,74 +986,108 @@ window.fecharModal = function(apenasLimpar = false) {
 };
 
 // ==========================================
-// 8. HUB DE JOGOS & SINCRONIA
+// GERENCIADOR DE TELAS (MEMÓRIA INTELIGENTE E BLINDADA)
 // ==========================================
-function abrirJogo(tipo) {
-    document.querySelector('nav.menu-inferior').classList.add('escondido');
-    document.getElementById('menu-jogos').classList.add('escondido');
-    document.getElementById('header-jogos-main').classList.add('escondido');
-    document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
-
-    const container = document.getElementById(`container-${tipo}`);
-    if (container) {
-        container.classList.remove('escondido');
-        if (tipo === 'termo') inicializarTermo();
-        if (tipo === 'minifazenda') {
-            if (typeof window.iniciarMiniFazenda === 'function') {
-                window.iniciarMiniFazenda();
-            }
-        }
-        if (tipo === 'tribunal') {
-            if (typeof window.iniciarTribunal === 'function') {
-                window.iniciarTribunal();
-            }
-        }
-        if (tipo === 'julgamento') {
-                    if (typeof window.iniciarJulgamento === 'function') {
-                        window.iniciarJulgamento();
-                    }
-                }
-                
-                // === ADICIONE ESTE BLOCO NOVO AQUI ===
-                if (tipo === 'sincronia') {
-                    if (typeof window.iniciarSincronia === 'function') {
-                        window.iniciarSincronia();
-                    }
-                }
-
-
-        // --- NOVA PARTE PARA O SOLO FÉRTIL (PRISMA) ---
-                if (tipo === 'jardim') {
-                    if (typeof window.renderizarPlanta === 'function') {
-                        window.renderizarPlanta();
-                    }
-                    
-                    // O CHOQUE QUÂNTICO: Força o motor 3D a recalcular o tamanho da tela
-                    // logo após o display:none ser removido, fazendo o Prisma aparecer!
-                    setTimeout(() => {
-                        window.dispatchEvent(new Event('resize'));
-                    }, 50);
-                }
-        // ----------------------------------------------
-    }
+window.abrirJogo = function(tipo) {
+    // 1. Esconde a interface principal de jogos, a navegação inferior e o áudio
+    const menuLista = document.getElementById('menu-jogos-lista');
+    const menuGrid = document.querySelector('.jogos-grid');
+    const menuJogos = document.getElementById('menu-jogos');
+    const headerJogos = document.getElementById('header-jogos-main');
+    const navInferior = document.querySelector('.menu-inferior');
+    
+    if (menuLista) menuLista.classList.add('escondido');
+    if (menuGrid) menuGrid.classList.add('escondido');
+    if (menuJogos) menuJogos.classList.add('escondido');
+    if (headerJogos) headerJogos.classList.add('escondido');
+    if (navInferior) navInferior.classList.add('escondido');
+    
     document.body.classList.add('modo-jogo-ativo');
-    document.body.classList.add('jogo-aberto');
-}
 
-function voltarMenuJogos() {
-    document.querySelectorAll('[id^="container-"]').forEach(t => t.classList.add('escondido'));
-    document.getElementById('menu-jogos').classList.remove('escondido');
-    document.querySelector('nav.menu-inferior').classList.remove('escondido');
-    document.getElementById('header-jogos-main').classList.remove('escondido');
-    atualizarDinamicaHome();
+    // 2. Esconde TODOS os containers de jogos por segurança
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim'];
+    jogosContainers.forEach(jogoId => {
+        const el = document.getElementById(`container-${jogoId}`);
+        if (el) el.classList.add('escondido');
+    });
+
+    // 3. Mostra o container do jogo selecionado e DÁ O GATILHO DE INÍCIO
+    const containerAtivo = document.getElementById(`container-${tipo}`);
+    if (containerAtivo) {
+        containerAtivo.classList.remove('escondido');
+        
+        // --- INICIALIZAÇÃO INTELIGENTE ---
+        if (tipo === 'termo') {
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            const moedasUI = document.getElementById('termo-moedas');
+            if (moedasUI) moedasUI.innerText = window.pontosDoCasal || 0;
+
+            // A MÁGICA: SEMPRE cria a grade se ela não existir, INDEPENDENTE de ter ganho ou não!
+            const gradeTermo = document.getElementById("grade-termo");
+            if (gradeTermo && gradeTermo.children.length === 0) {
+                if (typeof inicializarTermo === 'function') inicializarTermo();
+                else if (typeof window.inicializarTermo === 'function') window.inicializarTermo();
+            }
+
+            // DEPOIS da grade existir, verifica se já venceu hoje para ativar o visual de vitória
+            if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
+                if (typeof window.reconstruirVitoriaTermo === 'function') window.reconstruirVitoriaTermo();
+            }
+        }
+        else if (tipo === 'tribunal') {
+            const tribMao = document.getElementById("tribunal-mao");
+            if (tribMao && tribMao.children.length === 0) {
+                if (typeof iniciarTribunal === 'function') iniciarTribunal();
+            }
+        }
+        else if (tipo === 'sincronia') {
+            const sincTema = document.getElementById("tema-sincronia");
+            if (sincTema && sincTema.innerText.includes("Sintonizando")) {
+                if (typeof iniciarSincronia === 'function') iniciarSincronia();
+            }
+        }
+        else if (tipo === 'julgamento') {
+            const julga = document.getElementById("julgamento-grade");
+            if (julga && julga.children.length === 0) {
+                if (typeof iniciarJulgamento === 'function') iniciarJulgamento();
+            }
+        }
+        else if (tipo === 'minifazenda') {
+            if(typeof iniciarMiniFazenda === 'function') iniciarMiniFazenda();
+        }
+        else if (tipo === 'jardim') {
+            if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
+            const capitalUI = document.getElementById('jardim-moedas');
+            if (capitalUI) capitalUI.innerText = window.pontosDoCasal || 0;
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+        }
+    }
+};
+
+window.voltarMenuJogos = function() {
+    // 1. Esconde todos os jogos abertos
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim'];
+    jogosContainers.forEach(jogoId => {
+        const el = document.getElementById(`container-${jogoId}`);
+        if (el) el.classList.add('escondido');
+    });
+
+    // 2. Restaura o menu principal, a navegação e os botões
+    const menuLista = document.getElementById('menu-jogos-lista');
+    const menuGrid = document.querySelector('.jogos-grid');
+    const menuJogos = document.getElementById('menu-jogos');
+    const headerJogos = document.getElementById('header-jogos-main');
+    const navInferior = document.querySelector('.menu-inferior');
+
+    if (menuLista) menuLista.classList.remove('escondido');
+    if (menuGrid) menuGrid.classList.remove('escondido');
+    if (menuJogos) menuJogos.classList.remove('escondido');
+    if (headerJogos) headerJogos.classList.remove('escondido');
+    if (navInferior) navInferior.classList.remove('escondido');
+
+    // Retira o ajuste de tela cheia do corpo do app
     document.body.classList.remove('modo-jogo-ativo');
-    document.body.classList.remove('jogo-aberto');
-    // Remover listeners de orientação
-if (window.orientacaoListener) {
-    window.removeEventListener('orientationchange', window.orientacaoListener);
-    window.removeEventListener('resize', window.orientacaoListener);
-}
-}
+};
 
 // 9. LEIS
 const URL_LEIS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?gid=1219842239&single=true&output=csv";
@@ -1142,28 +1175,12 @@ function atualizarDinamicaHome() {
     }
 }
 
-// ========== FUNÇÕES DE ÁUDIO ==========
-function toggleMuteJogos() {
-    if (!audioJogos) return;
-    audioJogos.muted = !audioJogos.muted;
-    audioJogosMuted = audioJogos.muted;
-    localStorage.setItem('audio_jogos_muted', audioJogos.muted);
-    atualizarBotoesMute();
-}
-
-function atualizarBotoesMute() {
-    const botoes = document.querySelectorAll('#btn-mute-jogos, .btn-mute-jogo');
-    botoes.forEach(btn => {
-        btn.innerText = audioJogosMuted ? '🔇' : '🔊';
-    });
-}
 
 function playAudioJogos() {
     if (!audioJogos) {
         audioJogos = document.getElementById('audio-jogos');
         if (!audioJogos) return;
         audioJogos.volume = 0.2;
-        audioJogos.muted = audioJogosMuted;
     }
     if (audioJogos.paused) {
         audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));

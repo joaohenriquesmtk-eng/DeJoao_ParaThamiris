@@ -242,9 +242,6 @@ window.addEventListener('DOMContentLoaded', () => {
     atualizarClima();
     atualizarSaudacao();
     setInterval(atualizarSaudacao, 60000);
-
-    document.getElementById('btn-mute-jogos')?.addEventListener('click', toggleMuteJogos);
-    atualizarBotoesMute();
     // Verifica o estado do botão de mensagem surpresa agora
     verificarEstadoBotaoSurpresa();
 

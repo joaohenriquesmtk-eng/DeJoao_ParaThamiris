@@ -110,6 +110,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const animar = () => {
             requestAnimationFrame(animar);
+            
             if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
             if (!globoVisivel) return;
             sistemaGlobal.rotation.y += 0.005;
@@ -262,7 +263,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         animar();
     };
 
-    // ==========================================
+// ==========================================
     // UI/UX NÍVEL DEUS: ORBE DA SINCRONIA (APOGEU)
     // ==========================================
     window.inicializarOrbeClima = () => {
@@ -375,11 +376,10 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             }
         };
 
-        // CORREÇÃO DA CONDIÇÃO DE CORRIDA: Se o clima já foi baixado da internet, atualiza o Orbe na mesma hora!
+        // 🚨 CORREÇÃO CIRÚRGICA: Lendo o novo formato da Open-Meteo
         if (window.dadosClima && window.dadosClima[window.climaExibido]) {
             const dados = window.dadosClima[window.climaExibido];
-            const eNoite = Math.floor(Date.now()/1000) < dados.sys.sunrise || Math.floor(Date.now()/1000) > dados.sys.sunset;
-            window.mudarClimaOrbe(dados.weather[0].main, eNoite);
+            window.mudarClimaOrbe(dados.condicao, dados.eNoite);
         }
 
         window.addEventListener('resize', () => {
@@ -390,15 +390,14 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             }
         });
 
-        let orbeVisivel = false;
-        const observer = new IntersectionObserver((entries) => { orbeVisivel = entries[0].isIntersecting; });
-        observer.observe(container);
-
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
-            if (!window.RadarDePerformance.podeAnimar('orbe-clima-3d')) return;
-            if (!orbeVisivel) return; 
+            
+            // Trava Nativa e Inquebrável de Hibernação
+            const elEco = document.getElementById('orbe-clima-3d');
+            if (!elEco || elEco.clientWidth === 0) return;
+            
             tempo += 0.01;
             
             if (orbGroup.scale.x < 1) { orbGroup.scale.x += 0.01; orbGroup.scale.y += 0.01; orbGroup.scale.z += 0.01; }
@@ -813,6 +812,8 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            const elBussola = document.getElementById('bussola-3d');
+        if (!elBussola || elBussola.clientWidth === 0) return;
             if (!window.RadarDePerformance.podeAnimar('bussola-3d')) return;
             // AUTO-AJUSTE: Se a aba abrir e a div ganhar tamanho real, a câmera se ajusta!
             if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
@@ -1381,6 +1382,8 @@ window.inicializarPlanetario3D = () => {
     let tempo = 0;
     const animar = () => {
         requestAnimationFrame(animar);
+        const elPlanetario = document.getElementById('planetario-3d-container');
+        if (!elPlanetario || elPlanetario.clientWidth === 0) return;
         tempo += 0.003;
         galaxy.rotation.y = tempo;
         
@@ -1452,6 +1455,8 @@ window.inicializarGalaxia3D = () => {
     let tempo = 0;
     const animar = () => {
         requestAnimationFrame(animar);
+        const elGalaxia = document.getElementById('galaxia-3d-fundo');
+        if (!elGalaxia || elGalaxia.clientWidth === 0) return;
         tempo += 0.001;
         
         // Movimento inercial suave
@@ -1618,15 +1623,23 @@ window.inicializarJornada3D = () => {
     new ResizeObserver(atualizarTamanho).observe(container);
     atualizarTamanho();
 
+const telaJornada = document.getElementById('jornada');
     let tempoAnterior = performance.now();
+
     const animar = () => {
         requestAnimationFrame(animar);
+        
+        // MOTOR DE HIBERNAÇÃO DA JORNADA
+        if (telaJornada && telaJornada.classList.contains('escondido')) {
+            tempoAnterior = performance.now(); 
+            return; 
+        }
+
         const agora = performance.now();
         const delta = (agora - tempoAnterior) * 0.001;
         tempoAnterior = agora;
         uniforms.uTime.value += delta;
 
-        // Suaviza o movimento do "pescoço" (Interpolação)
         mouseSuave.x += (alvoRotacaoX - mouseSuave.x) * 0.1;
         mouseSuave.y += (alvoRotacaoY - mouseSuave.y) * 0.1;
         uniforms.uMouse.value.set(mouseSuave.x, mouseSuave.y);

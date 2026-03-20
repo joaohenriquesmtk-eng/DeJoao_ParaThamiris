@@ -738,6 +738,11 @@ body.modo-jogo-ativo .tela {
     position: relative;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     text-align: center;
+    
+    /* 🚨 CORREÇÃO: Prende a caixa na tela e cria a rolagem interna */
+    max-height: 85vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .fechar-modal {
@@ -6487,28 +6492,37 @@ body.aura-ansiosa {
 .efeito-nublado-noite { background: linear-gradient(to bottom, #2c3e50, #000000); }
 
 /* Animação de Gotas Escorrendo */
+/* Animação de Gotas Verticais (Chuva Limpa) */
 .efeito-chuva {
     background: linear-gradient(to bottom, #3a404d, #182848);
 }
 .efeito-chuva::after {
     content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
-    background-image: linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
-    background-size: 3px 30px;
-    animation: cairChuva 0.4s linear infinite;
-    opacity: 0.5;
+    /* A Mágica: Elipses de 1px de largura criam agulhas de água perfeitas e isoladas */
+    background-image: 
+        radial-gradient(ellipse 1px 15px at 20% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(ellipse 1px 20px at 70% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(ellipse 1px 10px at 40% 80%, rgba(255,255,255,0.3) 0%, transparent 100%);
+    background-size: 30px 60px;
+    animation: cairChuva 0.5s linear infinite;
+    opacity: 0.8;
 }
 
-/* Animação de Relâmpagos e Gotas Rápidas */
+/* Animação de Tempestade (Fios de chuva mais densos e rápidos) */
 .efeito-tempestade {
     background: linear-gradient(to bottom, #141e30, #243b55);
     animation: relampago 5s infinite;
 }
 .efeito-tempestade::after {
     content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
-    background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
-    background-size: 2px 20px;
-    animation: cairChuva 0.2s linear infinite;
-    opacity: 0.6;
+    background-image: 
+        radial-gradient(ellipse 1px 20px at 10% 10%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(ellipse 1.5px 25px at 60% 40%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(ellipse 1px 15px at 30% 80%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(ellipse 2px 30px at 80% 90%, rgba(255,255,255,0.4) 0%, transparent 100%);
+    background-size: 40px 70px;
+    animation: cairChuva 0.25s linear infinite;
+    opacity: 0.9;
 }
 
 @keyframes cairChuva {
@@ -6859,3 +6873,22 @@ body.aura-ansiosa {
 @keyframes descerHUD { 0% { opacity: 0; transform: translateY(-50px); } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes subirHUD { 0% { opacity: 0; transform: translateY(50px); } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes scanline { 0% { left: -100%; } 100% { left: 200%; } }
+
+
+
+
+
+
+/* ==========================================
+   OTIMIZAÇÃO DE RENDERIZAÇÃO (CORRIGIDA)
+========================================== */
+.modal-reliquia, 
+.cartao-vidro {
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0); 
+}
+
+
+

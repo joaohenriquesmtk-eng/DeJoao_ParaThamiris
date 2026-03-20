@@ -3,6 +3,31 @@
 // ==========================================
 window.statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
+// ==========================================
+// GERENTE MÁXIMO DE ÁUDIO (SISTEMA ANTI-DUPLICAÇÃO)
+// ==========================================
+window.musicaNossaTocando = false; // Trava de segurança
+
+window.tocarAmbiente = () => {
+    if (window.musicaNossaTocando) return; // Se a "Nossa Música" tá rolando, a ambiente fica calada.
+    
+    if (!audioJogos) {
+        // Só cria a música se ela NÃO existir na RAM
+        audioJogos = new Audio('ambient.mp3'); 
+        audioJogos.loop = true;
+        audioJogos.volume = 0.5;
+    }
+    
+    if (audioJogos.paused) {
+        audioJogos.play().catch(e => console.log("Navegador bloqueou áudio:", e));
+    }
+};
+
+window.pausarAmbiente = () => {
+    if (typeof audioJogos !== 'undefined' && audioJogos && !audioJogos.paused) {
+        audioJogos.pause();
+    }
+};
 let telaAtual = 'home';
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
@@ -567,103 +592,92 @@ function toggleInstrucoesJardim() {
     document.getElementById('instrucoes-jardim').classList.toggle('escondido');
 }
 
-// 5. CLIMA
-const API_KEY = "da54b3d1f91b3ca0850de8cb7890e572";
+// 5. CLIMA (NOVA API OPEN-METEO - OPEN SOURCE)
+window.dadosClima = { joao: null, thamiris: null };
+window.climaExibido = 'thamiris'; 
 
-function obterEmojiClima(condicao, sunrise, sunset) {
-    const agora = Math.floor(Date.now() / 1000);
-    const eNoite = agora < sunrise || agora > sunset;
-    let emoji = '';
-    let classe = '';
+// O Open-Meteo devolve códigos numéricos de clima (Padrão OMM). Vamos traduzi-los!
+function mapearCodigoWMO(codigo) {
+    if (codigo <= 1) return 'Clear';
+    if (codigo === 2 || codigo === 3) return 'Clouds';
+    if (codigo === 45 || codigo === 48) return 'Mist';
+    if ((codigo >= 51 && codigo <= 67) || (codigo >= 80 && codigo <= 82)) return 'Rain';
+    if ((codigo >= 71 && codigo <= 77) || codigo === 85 || codigo === 86) return 'Snow';
+    if (codigo >= 95) return 'Thunderstorm';
+    return 'Clear';
+}
 
+function obterEmojiClima(condicao, eNoite) {
+    let emoji = '', classe = '';
     switch(condicao) {
-        case 'Clear':
-            emoji = eNoite ? '🌙' : '☀️';
-            classe = eNoite ? 'emoji-lua' : 'emoji-sol';
-            break;
-        case 'Clouds':
-            emoji = '☁️';
-            classe = 'emoji-nuvem';
-            break;
-        case 'Rain':
-            emoji = '🌧️';
-            classe = 'emoji-chuva';
-            break;
-        case 'Thunderstorm':
-            emoji = '⛈️';
-            classe = 'emoji-tempestade';
-            break;
-        default:
-            emoji = '🌡️';
-            classe = '';
+        case 'Clear': emoji = eNoite ? '🌙' : '☀️'; classe = eNoite ? 'emoji-lua' : 'emoji-sol'; break;
+        case 'Clouds': emoji = '☁️'; classe = 'emoji-nuvem'; break;
+        case 'Rain': emoji = '🌧️'; classe = 'emoji-chuva'; break;
+        case 'Thunderstorm': emoji = '⛈️'; classe = 'emoji-tempestade'; break;
+        default: emoji = '🌡️'; classe = '';
     }
-
     return `<span class="${classe}">${emoji}</span>`;
 }
 
-// VARIÁVEIS GLOBAIS DO CLIMA UNIFICADO
-window.dadosClima = { joao: null, thamiris: null };
-window.climaExibido = 'thamiris'; // O app abre focando nela por padrão ❤️
-
 async function atualizarClima() {
     try {
-        // Busca os dois climas
-        const resJ = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Colombo,BR&units=metric&appid=${API_KEY}`);
-        const resT = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Goiania,BR&units=metric&appid=${API_KEY}`);
+        // Coordenadas exatas injetadas direto na URL (sem chaves privadas)
+        const urlJoao = "https://api.open-meteo.com/v1/forecast?latitude=-25.2917&longitude=-49.2242&current=temperature_2m,is_day,weather_code&timezone=America/Sao_Paulo";
+        const urlThamiris = "https://api.open-meteo.com/v1/forecast?latitude=-16.6869&longitude=-49.2648&current=temperature_2m,is_day,weather_code&timezone=America/Sao_Paulo";
 
-        if (resJ.ok) window.dadosClima.joao = await resJ.json();
-        if (resT.ok) window.dadosClima.thamiris = await resT.json();
+        // Chama as duas cidades ao mesmo tempo em paralelo para não travar o app
+        const [resJ, resT] = await Promise.all([fetch(urlJoao), fetch(urlThamiris)]);
 
-        // Atualiza as temperaturas nos botões
-        if (window.dadosClima.joao) {
-            document.getElementById("mini-temp-joao").innerText = `${Math.round(window.dadosClima.joao.main.temp)}°C`;
+        if (resJ.ok) {
+            const dataJ = await resJ.json();
+            window.dadosClima.joao = {
+                temp: Math.round(dataJ.current.temperature_2m),
+                condicao: mapearCodigoWMO(dataJ.current.weather_code),
+                eNoite: dataJ.current.is_day === 0 // 0 é noite, 1 é dia
+            };
+            document.getElementById("mini-temp-joao").innerText = `${window.dadosClima.joao.temp}°C`;
         }
-        if (window.dadosClima.thamiris) {
-            document.getElementById("mini-temp-thamiris").innerText = `${Math.round(window.dadosClima.thamiris.main.temp)}°C`;
+        
+        if (resT.ok) {
+            const dataT = await resT.json();
+            window.dadosClima.thamiris = {
+                temp: Math.round(dataT.current.temperature_2m),
+                condicao: mapearCodigoWMO(dataT.current.weather_code),
+                eNoite: dataT.current.is_day === 0
+            };
+            document.getElementById("mini-temp-thamiris").innerText = `${window.dadosClima.thamiris.temp}°C`;
         }
 
-        // Dispara a visualização
         alternarVisaoClima(window.climaExibido);
-
     } catch (e) {
-        console.error("Erro na API de Clima", e);
+        console.error("Erro na API Open-Meteo", e);
         document.getElementById("texto-mensagem-clima").innerText = "❌ Clima indisponível no momento";
     }
 }
 
-// Função chamada quando você clica nos botões (Colombo / Goiânia)
 window.alternarVisaoClima = function(pessoa) {
     window.climaExibido = pessoa;
     const dados = window.dadosClima[pessoa];
     
-    // 1. ATUALIZAÇÃO VISUAL DOS BOTÕES (REMOVE O AZUL, ATIVA O OURO)
-    // Remove a classe 'ativo' de ambos primeiro
     document.getElementById('btn-view-thamiris').classList.remove('ativo');
     document.getElementById('btn-view-joao').classList.remove('ativo');
     
-    // Adiciona a classe 'ativo' apenas no que foi clicado
     const btnAtivo = document.getElementById(`btn-view-${pessoa}`);
     if (btnAtivo) btnAtivo.classList.add('ativo');
 
     if (!dados) return;
 
-    // 2. LÓGICA DE EXIBIÇÃO (MANTÉM O QUE JÁ FUNCIONAVA)
-    const agora = Math.floor(Date.now() / 1000);
-    const eNoite = agora < dados.sys.sunrise || agora > dados.sys.sunset;
-    const condicao = dados.weather[0].main;
-    const temp = Math.round(dados.main.temp);
-
     const elMensagem = document.getElementById("texto-mensagem-clima");
     if (elMensagem) {
         if (pessoa === 'thamiris') {
-            elMensagem.innerText = gerarMensagemClima(condicao, temp);
+            elMensagem.innerText = gerarMensagemClima(dados.condicao, dados.temp);
         } else {
-            elMensagem.innerText = `Faz ${temp}°C em Colombo. O clima aqui espera por você.`;
+            elMensagem.innerText = `Faz ${dados.temp}°C em Colombo. O clima aqui espera por você.`;
         }
     }
 
     if (typeof window.mudarClimaOrbe === 'function') {
-        window.mudarClimaOrbe(condicao, eNoite);
+        window.mudarClimaOrbe(dados.condicao, dados.eNoite);
     }
 };
 
@@ -972,13 +986,14 @@ window.abrirReliquia = function(event, tipo) {
     } else if (tipo === 'ceu') {
         const textoCeu = BIBLIOTECA_RELIQUIAS.ceu[diaDoAno % BIBLIOTECA_RELIQUIAS.ceu.length];
         
-        const climaJoao = window.dadosClima?.joao?.weather[0]?.main || 'Clear';
-        const tempJoao = window.dadosClima?.joao?.main?.temp ? Math.round(window.dadosClima.joao.main.temp) : '--';
-        const noiteJoao = window.dadosClima?.joao ? (Date.now()/1000 < window.dadosClima.joao.sys.sunrise || Date.now()/1000 > window.dadosClima.joao.sys.sunset) : false;
+        // 🚨 NOVO PADRÃO: Leitura absurdamente simplificada do Open-Meteo
+        const climaJoao = window.dadosClima?.joao?.condicao || 'Clear';
+        const tempJoao = window.dadosClima?.joao?.temp ?? '--';
+        const noiteJoao = window.dadosClima?.joao?.eNoite ?? false;
 
-        const climaThamiris = window.dadosClima?.thamiris?.weather[0]?.main || 'Clear';
-        const tempThamiris = window.dadosClima?.thamiris?.main?.temp ? Math.round(window.dadosClima.thamiris.main.temp) : '--';
-        const noiteThamiris = window.dadosClima?.thamiris ? (Date.now()/1000 < window.dadosClima.thamiris.sys.sunrise || Date.now()/1000 > window.dadosClima.thamiris.sys.sunset) : false;
+        const climaThamiris = window.dadosClima?.thamiris?.condicao || 'Clear';
+        const tempThamiris = window.dadosClima?.thamiris?.temp ?? '--';
+        const noiteThamiris = window.dadosClima?.thamiris?.eNoite ?? false;
 
         const obterClasseJanela = (condicao, eNoite) => {
             if (condicao === 'Rain' || condicao === 'Drizzle') return 'efeito-chuva';
@@ -993,11 +1008,12 @@ window.abrirReliquia = function(event, tipo) {
                 
                 <div id="galaxia-3d-fundo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.7; cursor: grab;"></div>
                 
-                <div style="position: relative; z-index: 2; padding: 10px; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+                <div style="position: relative; z-index: 2; padding: 10px; display: flex; flex-direction: column; height: 100%; justify-content: center; pointer-events: none;">
+                    
                     <h3 style="color: var(--cor-primaria); margin-bottom: 5px; font-family: 'Playfair Display', serif; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">Mesmo Céu</h3>
                     <p style="font-size: 0.8rem; color: #ddd; margin-bottom: 15px; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Deslize o fundo para mover as estrelas.</p>
 
-                    <div class="moldura-janela-mista" style="background: transparent; border: 2px solid rgba(212,175,55,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.9); height: 180px; flex-shrink: 0;">
+                    <div class="moldura-janela-mista" style="background: transparent; border: 2px solid rgba(212,175,55,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.9); height: 180px; flex-shrink: 0; pointer-events: auto;">
                         <div class="painel-janela ${obterClasseJanela(climaJoao, noiteJoao)}" style="opacity: 0.85;">
                             <div class="vidro-overlay">
                                 <span class="cidade-tag">📍 Colombo</span>
@@ -1058,6 +1074,13 @@ window.fecharModal = function(apenasLimpar = false) {
     const modal = document.getElementById('modal-reliquia');
     const corpo = document.getElementById('corpo-modal');
     const gaveta = document.getElementById('reliquias-templates');
+    
+    // 🚨 CORREÇÃO MUSICAL: Para a música sincronizada e retoma o som do jogo
+    const audioSinc = document.getElementById('audio-sincronizado');
+    if (audioSinc && !audioSinc.paused) {
+        audioSinc.pause();
+        if (typeof playAudioJogos === 'function') playAudioJogos(); 
+    }
     
     if (gaveta && corpo) {
         ['ecos', 'bussola', 'carrossel'].forEach(id => {
@@ -1176,15 +1199,23 @@ window.voltarMenuJogos = function() {
 
 // 9. LEIS
 const URL_LEIS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?gid=1219842239&single=true&output=csv";
+window.cacheHTMLdasLeis = null; // A memória RAM do app
 
 async function carregarLeis() {
     try {
-        const res = await fetch(URL_LEIS);
-        const txt = await res.text();
-        const linhas = txt.split(/\r?\n/).filter(l => l.trim()).slice(1);
         const container = document.querySelector(".lista-leis");
         if (!container) return;
 
+        // Se já baixamos as leis hoje e a memória existe, injeta instantaneamente e aborta o download!
+        if (window.cacheHTMLdasLeis) {
+            if (container.innerHTML === "") container.innerHTML = window.cacheHTMLdasLeis;
+            return; 
+        }
+
+        const res = await fetch(URL_LEIS);
+        const txt = await res.text();
+        const linhas = txt.split(/\r?\n/).filter(l => l.trim()).slice(1);
+        
         container.innerHTML = "";
 
         linhas.forEach((linha, index) => {
@@ -1205,28 +1236,25 @@ async function carregarLeis() {
                 const item = document.createElement("div");
                 item.className = "item-lei";
                 item.innerHTML = `<span class="num-artigo">${art}</span><p>${cont}</p>${par ? `<small>§ Único: ${par}</small>` : ""}`;
-                
                 item.style.animationDelay = (index * 0.1) + 's';
-                
                 container.appendChild(item);
             }
         });
 
         const dataInicioObj = new Date(dataInicio);
         const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-        const dia = dataInicioObj.getDate();
-        const mes = meses[dataInicioObj.getMonth()];
-        const ano = dataInicioObj.getFullYear();
-
         const assinatura = document.createElement('div');
         assinatura.className = 'assinatura-leis';
         assinatura.style.marginBottom = "80px"; 
         assinatura.style.paddingBottom = "env(safe-area-inset-bottom)";
         assinatura.innerHTML = `
-            <p>Promulgado em nome do amor, por João, em ${dia} de ${mes} de ${ano}.</p>
+            <p>Promulgado em nome do amor, por João, em ${dataInicioObj.getDate()} de ${meses[dataInicioObj.getMonth()]} de ${dataInicioObj.getFullYear()}.</p>
             <p class="local-data">Santuário, em toda eternidade.</p>
         `;
         container.appendChild(assinatura);
+
+        // O SEGREDO: Salva o HTML montado na memória RAM para as próximas vezes
+        window.cacheHTMLdasLeis = container.innerHTML;
 
     } catch (e) { 
         console.error('Erro ao carregar leis:', e);
@@ -1265,7 +1293,7 @@ function playAudioJogos() {
     if (!audioJogos) {
         audioJogos = document.getElementById('audio-jogos');
         if (!audioJogos) return;
-        audioJogos.volume = 0.2;
+        audioJogos.volume = 0.001;
     }
     if (audioJogos.paused) {
         audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));
@@ -2559,7 +2587,6 @@ window.escutarTocaDiscos = function() {
     onValue(refMusica, (snapshot) => {
         const dados = snapshot.val();
         
-        // Busca os elementos dentro do Modal
         const audio = document.querySelector('#corpo-modal #audio-sincronizado');
         const disco = document.querySelector('#corpo-modal #disco-vinil');
         const agulha = document.querySelector('#corpo-modal #braco-agulha');
@@ -2567,35 +2594,31 @@ window.escutarTocaDiscos = function() {
         const btnPause = document.querySelector('#corpo-modal #btn-toca-discos-pause');
         const status = document.querySelector('#corpo-modal #status-toca-discos');
         
-        if (!audio || !disco || !agulha) return; // Se a relíquia não estiver aberta, ignora
+        if (!audio || !disco || !agulha) return; 
 
         if (dados && dados.tocando) {
-            // LÓGICA DE PLAY:
             const tempoDecorrido = (Date.now() - dados.inicioTempo) / 1000;
             
-            // Verifica se a música já acabou
             if (tempoDecorrido < audio.duration || isNaN(audio.duration)) {
-                // Sincroniza o tempo (Se ele não estiver muito diferente, para não ficar gaguejando)
                 if (Math.abs(audio.currentTime - tempoDecorrido) > 2) {
                     audio.currentTime = tempoDecorrido;
                 }
                 
                 audio.play().then(() => {
-                    // Magia visual!
                     agulha.classList.add('tocando');
                     disco.classList.add('tocando');
                     if(btnPlay) btnPlay.classList.add('escondido');
                     if(btnPause) btnPause.classList.remove('escondido');
                     if(status) status.innerText = `🔊 Sincronizado por ${dados.autor}`;
-                }).catch((e) => {
-                    if(status) status.innerText = "🔇 O navegador bloqueou o áudio automático. Toque na tela!";
-                });
+                    
+                    // 🚨 MUTA A MÚSICA DE FUNDO IMEDIATAMENTE
+                    if(typeof pauseAudioJogos === 'function') pauseAudioJogos();
+                    
+                }).catch((e) => { /*... erro ...*/ });
             } else {
-                // A música já acabou faz tempo, desliga tudo
                 window.pausarMusicaSincronizada();
             }
         } else {
-            // LÓGICA DE PAUSE:
             audio.pause();
             agulha.classList.remove('tocando');
             disco.classList.remove('tocando');
@@ -2604,6 +2627,9 @@ window.escutarTocaDiscos = function() {
             
             let textoStatus = dados ? `⏸ Pausado por ${dados.autor}` : "Pronto para tocar.";
             if(status) status.innerText = textoStatus;
+            
+            // 🚨 RETOMA A MÚSICA DE FUNDO
+            if(typeof playAudioJogos === 'function') playAudioJogos();
         }
     });
 };

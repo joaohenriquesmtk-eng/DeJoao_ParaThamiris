@@ -17,11 +17,17 @@ jobs:
       - name: Instalar Dependencias do Projeto
         run: npm install
         
-      - name: Fabricar iOS do Zero no Mac
+      - name: Recriar a Plataforma iOS do Zero
         run: |
           rm -rf ios
           npx cap add ios
           npx cap sync ios
+          
+      - name: Forcar a Criacao do Workspace (CocoaPods)
+        run: |
+          cd ios/App
+          pod repo update
+          pod install
           
       - name: Fabricar o App no Mac Virtual
         run: |

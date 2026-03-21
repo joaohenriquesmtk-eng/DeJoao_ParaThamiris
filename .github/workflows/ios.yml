@@ -14,20 +14,23 @@ jobs:
         with:
           node-version: '22'
           
-      - name: Instalar Dependencias do Projeto
-        run: npm install
-        
+      - name: Forcar Instalacao do Motor iOS
+        run: |
+          npm install
+          npm install @capacitor/ios @capacitor/core @capacitor/cli --save
+          
       - name: Recriar a Plataforma iOS do Zero
         run: |
           rm -rf ios
           npx cap add ios
-          npx cap sync ios
           
-      - name: Forcar a Criacao do Workspace (CocoaPods)
+      - name: Sincronizar e Criar Arquivos Nativos
+        run: npx cap sync ios
+          
+      - name: Construir as Fundacoes da Apple (CocoaPods)
         run: |
           cd ios/App
-          pod repo update
-          pod install
+          pod install --repo-update
           
       - name: Fabricar o App no Mac Virtual
         run: |

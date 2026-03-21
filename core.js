@@ -349,7 +349,7 @@ window.nutrirPlanta = function(tipoAcao) {
     window.statusPlanta.diaUltimaRegada = `${quemAgiu} enviou ${nomeAcao} hoje.`;
 
     // Efeitos sensoriais
-    if (somAcao) { somAcao.volume = 0.5; somAcao.play(); }
+    if (somAcao) { somAcao.volume = 0.2; somAcao.play(); }
     if (window.Haptics) window.Haptics.sucesso();
     if (typeof mostrarToast === 'function') mostrarToast(`${nomeAcao} enviada para a Árvore! +${ganhoXP}%`, "🌿");
 

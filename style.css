@@ -4402,10 +4402,10 @@ body {
 }
 
 /* ==========================================
-   A JOIA DA COROA: GOLDEN GLASS & LIQUID GOLD
+   A JOIA DA COROA: OBSIDIAN & LIQUID GOLD
 ========================================== */
 
-/* A Base de Vidro Dourado Permanente e Levitação Magnética */
+/* A Base de Vidro Escuro e Levitação Magnética */
 .cartao-saudacao {
     position: relative;
     display: flex !important;
@@ -4417,43 +4417,17 @@ body {
     padding: 15px 35px;
     border-radius: 28px;
     
-    /* 🚨 A MÁGICA AQUI: O Fundo de Cristal Dourado Permanente */
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(212, 175, 55, 0.1)) !important;
-    
+    /* O Fundo Obsidian Glass */
+    background: rgba(18, 18, 22, 0.75) !important;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    
-    /* Borda de ouro puro mais forte para destacar o cristal */
-    border: 1px solid rgba(212, 175, 55, 0.6) !important;
+    border: 1px solid rgba(212, 175, 55, 0.25) !important;
     
     overflow: hidden;
     z-index: 1;
     
     /* Levitação suave e respiração da sombra */
     animation: levitacaoSoberana 6s ease-in-out infinite;
-}
-
-/* 🚨 EMOJI ✨ NO CANTO SUPERIOR DIREITO - ROTAÇÃO E NEON */
-.estrela-canto {
-    position: absolute !important;
-    top: 10px !important;
-    right: 12px !important;
-    z-index: 10 !important;
-    
-    /* Força o emoji a ser um bloco para poder girar */
-    display: inline-block !important;
-    
-    /* Estilo Neon aplicado diretamente ao brilho do Emoji */
-    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.8)) 
-            drop-shadow(0 0 10px rgba(212, 175, 55, 0.4)) !important;
-    
-    font-size: 22px;
-
-    /* 🚨 MOTORES LIGADOS: Rotação 360° e Pulso */
-    animation: rotateSeal 8s infinite linear, pulseSeal 4s infinite alternate ease-in-out !important;
-    
-    pointer-events: none;
-    will-change: transform, filter;
 }
 
 /* O Brilho Estelar nas Bordas (Luz Rotativa de Fundo) */
@@ -4465,7 +4439,7 @@ body {
         from 0deg,
         transparent 0%,
         rgba(212, 175, 55, 0.05) 25%,
-        rgba(212, 175, 55, 0.85) 50%, 
+        rgba(212, 175, 55, 0.85) 50%, /* O Flash de Ouro nas bordas */
         rgba(212, 175, 55, 0.05) 75%,
         transparent 100%
     );
@@ -4484,11 +4458,12 @@ body {
         to right,
         rgba(255, 255, 255, 0) 0%,
         rgba(255, 255, 255, 0.1) 40%,
-        rgba(255, 255, 255, 0.6) 50%, 
+        rgba(255, 255, 255, 0.6) 50%, /* Centro afiado da luz */
         rgba(255, 255, 255, 0.1) 60%,
         rgba(255, 255, 255, 0) 100%
     );
     transform: skewX(-30deg);
+    /* Acelera no começo, freia no final e dorme */
     animation: varreduraLuz 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     z-index: 1;
     pointer-events: none;
@@ -4502,10 +4477,11 @@ body {
     font-weight: 600;
     margin: 0;
     position: relative;
-    z-index: 3; 
+    z-index: 3; /* Fica acima da luz para não ser ofuscado */
     letter-spacing: 0.5px;
     line-height: 1.2;
 
+    /* A Pintura de Ouro Metálico e Animado */
     background: linear-gradient(
         to right,
         #BF953F 0%,
@@ -4523,6 +4499,19 @@ body {
     filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.4));
 }
 
+/* ANIMATED REAL SEAL: Rotação e Pulso Magnético */
+.estrela-canto {
+    position: absolute;
+    top: 14px;
+    right: 15px;
+    font-size: 22px;
+    z-index: 4;
+    filter: drop-shadow(0 2px 5px rgba(212, 175, 55, 0.6));
+    /* Dois motores rodando na mesma estrela */
+    animation: rotateSeal 8s infinite linear, pulseSeal 4s infinite alternate ease-in-out;
+    display: inline-block;
+}
+
 /* --- MOTORES V8 DE ANIMAÇÃO --- */
 
 @keyframes levitacaoSoberana {
@@ -4531,7 +4520,7 @@ body {
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.05); 
     }
     50% { 
-        transform: translateY(-6px); 
+        transform: translateY(-6px); /* Sobe 6 pixels suavemente */
         box-shadow: 0 25px 45px rgba(0, 0, 0, 0.7), inset 0 0 35px rgba(212, 175, 55, 0.15); 
     }
 }
@@ -4544,22 +4533,58 @@ body {
 @keyframes varreduraLuz {
     0% { left: -150%; opacity: 0; }
     10% { opacity: 1; }
-    25%, 100% { left: 200%; opacity: 0; }
+    25%, 100% { left: 200%; opacity: 0; } /* Passa rápido e espera o resto do tempo */
 }
 
 @keyframes ouroFluido {
     to { background-position: 200% center; }
 }
 
-/* 🚨 ANIMAÇÃO DE ROTAÇÃO 360° DO EMOJI */
 @keyframes rotateSeal {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 
 @keyframes pulseSeal {
-    0% { transform: scale(1); opacity: 0.8; }
-    100% { transform: scale(1.15); opacity: 1; }
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+}
+
+/* ==========================================
+   TRANSIÇÕES NÍVEL APPLE (VIEW TRANSITIONS API)
+========================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.4s;
+    /* Curva de aceleração estilo iOS (rápido no começo, suave no final) */
+    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* A tela que está saindo afunda e some */
+::view-transition-old(root) {
+    animation-name: fade-out-apple, scale-down-apple;
+}
+
+/* A tela que está entrando vem de cima e aparece */
+::view-transition-new(root) {
+    animation-name: fade-in-apple, scale-up-apple;
+}
+
+@keyframes fade-in-apple { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+@keyframes fade-out-apple { 
+    from { opacity: 1; } 
+    to { opacity: 0; } 
+}
+@keyframes scale-up-apple { 
+    from { transform: scale(0.96); } 
+    to { transform: scale(1); } 
+}
+@keyframes scale-down-apple { 
+    from { transform: scale(1); } 
+    to { transform: scale(1.04); } 
 }
 
 /* ==========================================

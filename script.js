@@ -15,7 +15,7 @@ window.tocarAmbiente = () => {
         // Só cria a música se ela NÃO existir na RAM
         audioJogos = new Audio('ambient.mp3'); 
         audioJogos.loop = true;
-        audioJogos.volume = 0.1;
+        audioJogos.volume = 0.0;
     }
     
     if (audioJogos.paused) {
@@ -1293,7 +1293,7 @@ function playAudioJogos() {
     if (!audioJogos) {
         audioJogos = document.getElementById('audio-jogos');
         if (!audioJogos) return;
-        audioJogos.volume = 0.1;
+        audioJogos.volume = 0.0;
     }
     if (audioJogos.paused) {
         audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));

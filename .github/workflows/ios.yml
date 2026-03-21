@@ -18,8 +18,10 @@ jobs:
         run: |
           npm install
           npm install @capacitor/ios @capacitor/core @capacitor/cli
-          # Força a criação do arquivo de configuração nativo na nuvem
-          npx cap init Santuario com.joaoethamiris.santuario --web-dir www --force
+          # Passo 1: Limpamos qualquer resquicio de configuracao antiga para evitar conflitos
+          rm -f capacitor.config.json capacitor.config.ts
+          # Passo 2: Inicializamos o projeto de forma limpa, sem a tag que causou o erro
+          npx cap init Santuario com.joaoethamiris.santuario --web-dir www
           
       - name: Fabricar a Plataforma iOS do Zero Absoluto
         run: |

@@ -4402,94 +4402,120 @@ body {
 }
 
 /* ==========================================
-   A JOIA DA COROA: OBSIDIAN & LIQUID GOLD
+   CARTÃO DE SAUDAÇÃO PRESTIGE - OURO LÍQUIDO
 ========================================== */
-
-/* A Base de Vidro Dourado Permanente (OTIMIZADA PARA GPU) */
 .cartao-saudacao {
     position: relative;
+    /* Fundo Dourado Sólido Premium */
+    background: #D4AF37 !important; 
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 28px;
+    
+    /* Centralização Absoluta do Texto */
     display: flex !important;
     align-items: center;
     justify-content: center;
     text-align: center;
-    min-height: 80px;
+    
+    /* Altura Reduzida e Elegante */
+    min-height: 80px; 
     margin: 15px;
-    padding: 15px 35px;
-    border-radius: 28px;
-    
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(212, 175, 55, 0.1)) !important;
-    
-    /* 🚨 OTIMIZAÇÃO: Blur reduzido para 10px (Corta o peso pela metade sem perder o luxo) */
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-    border: 1px solid rgba(212, 175, 55, 0.6) !important;
+    padding: 15px 35px; /* Espaço lateral para não bater no emoji */
     
     overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 
+                inset 0 0 25px rgba(0, 0, 0, 0.15) !important;
     z-index: 1;
-    
-    /* 🚨 TRAVA 3D: Força a placa de vídeo a assumir o controle do cartão */
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    perspective: 1000px;
-    
-    animation: levitacaoSoberana 6s ease-in-out infinite;
 }
 
-/* EMOJI NEON (OTIMIZADO) */
-.estrela-canto {
-    position: absolute !important;
-    top: 10px !important;
-    right: 12px !important;
-    z-index: 10 !important;
-    display: inline-block !important;
-    
-    /* 🚨 OTIMIZAÇÃO: Usando text-shadow nativo em vez de filter (MUITO mais leve) */
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.8), 0 0 20px rgba(212, 175, 55, 0.4) !important;
-    font-size: 22px;
-
-    /* Apenas animações leves que a GPU entende */
-    animation: rotateSeal 8s infinite linear, pulseSeal 4s infinite alternate ease-in-out !important;
+/* EFEITO SEDA: Ondulação Orgânica e Suave */
+.cartao-saudacao::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    /* Gradiente que simula o brilho do cetim movendo-se */
+    background: radial-gradient(circle at center, 
+        rgba(255, 255, 255, 0.22) 0%, 
+        rgba(255, 255, 255, 0) 60%
+    );
+    background-size: 50% 50%;
+    /* Movimento de seda fluida */
+    animation: sedaMovimento 18s infinite linear;
     pointer-events: none;
-    
-    /* Delega para a placa de vídeo */
-    will-change: transform, opacity;
-    transform: translateZ(0);
+    z-index: 1;
 }
 
-/* --- MOTORES V8 DE ANIMAÇÃO (ALTA PERFORMANCE) --- */
-
-/* 🚨 OTIMIZAÇÃO: Animando APENAS o Y (Transform), sem animar sombras pesadas */
-@keyframes levitacaoSoberana {
-    0%, 100% { transform: translateY(0) translateZ(0); }
-    50% { transform: translateY(-5px) translateZ(0); }
+/* REFLEXO DE LUXO: Um feixe de luz que atravessa o vidro */
+.cartao-saudacao::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent
+    );
+    transform: skewX(-30deg);
+    animation: reflexoPrestige 8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
 }
 
-@keyframes giroEstelar {
-    from { transform: rotate(0deg) translateZ(0); }
-    to { transform: rotate(360deg) translateZ(0); }
+/* TIPOGRAFIA ELEGANTE */
+#saudacao-personalizada {
+    font-family: 'Playfair Display', serif !important; 
+    font-style: italic;
+    font-size: 1.35rem; /* Ajustado para a nova altura */
+    font-weight: 600;
+    /* Texto em tom Ébano para contraste luxuoso sobre o ouro */
+    color: #121212 !important; 
+    margin: 0;
+    position: relative;
+    z-index: 3;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
-/* 🚨 OTIMIZAÇÃO: Usando transform translateX em vez de 'left' para evitar o Repaint da tela inteira */
-@keyframes varreduraLuz {
-    0% { transform: skewX(-30deg) translateX(-150%); opacity: 0; }
-    10% { opacity: 1; }
-    25%, 100% { transform: skewX(-30deg) translateX(300%); opacity: 0; }
+/* SELO REAL ANIMADO: Girando no Canto Superior Direito */
+.estrela-canto {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 22px;
+    z-index: 5;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    /* Rotação perpétua e elegante */
+    animation: rotacionarSelo 6s infinite linear;
+    display: inline-block;
 }
 
-@keyframes ouroFluido {
-    to { background-position: 200% center; }
+/* --- MOTORES DE ANIMAÇÃO --- */
+
+/* Movimento da Seda */
+@keyframes sedaMovimento {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-15%, -15%); }
+    100% { transform: translate(0, 0); }
 }
 
-@keyframes rotateSeal {
-    from { transform: rotate(0deg) translateZ(0); }
-    to { transform: rotate(360deg) translateZ(0); }
+/* Brilho que percorre o vidro */
+@keyframes reflexoPrestige {
+    0% { left: -150%; }
+    25% { left: 150%; }
+    100% { left: 150%; }
 }
 
-/* 🚨 OTIMIZAÇÃO: Anima o scale e a opacidade em vez de brilhos complexos */
-@keyframes pulseSeal {
-    0% { transform: scale(1) translateZ(0); opacity: 0.8; }
-    100% { transform: scale(1.15) translateZ(0); opacity: 1; }
+/* Rotação do Emoji */
+@keyframes rotacionarSelo {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* ==========================================

@@ -734,7 +734,7 @@ function atualizarSaudacao() {
     } else if (hora >= 18 && hora < 24) {
         saudacao = 'Boa noite, meu céu! 🌙';
     } else {
-        saudacao = 'Já é madrugada... sonhando com você! 🌜';
+        saudacao = 'Sonhando com você! 🌜';
     }
 
     const elSaudacao = document.getElementById('saudacao-personalizada');

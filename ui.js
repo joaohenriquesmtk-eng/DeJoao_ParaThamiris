@@ -62,7 +62,7 @@ window.MotorDeAudio = {
         // Tenta pegar a música de fundo existente ou cria uma invisível
         this.musica = document.getElementById('audio-ambiente') || new Audio('assets/ambient.mp3');
         this.musica.loop = true;
-        this.musica.volume = 0.5;
+        this.musica.volume = 0.3;
 
         // Cria o Contexto de Áudio (A Mesa de Som do Navegador)
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -86,7 +86,7 @@ window.MotorDeAudio = {
         if (!this.iniciado) return;
         // Desce a frequência para 600Hz em 0.3 segundos (Cria a sensação de som atrás da porta)
         this.filtro.frequency.setTargetAtTime(600, this.ctx.currentTime, 0.3);
-        this.musica.volume = 0.2;
+        this.musica.volume = 0.01;
     },
 
     // Efeito de "Retorno": Abre o som novamente
@@ -94,7 +94,7 @@ window.MotorDeAudio = {
         if (!this.iniciado) return;
         // Sobe a frequência de volta para o limite da audição humana
         this.filtro.frequency.setTargetAtTime(20000, this.ctx.currentTime, 0.3);
-        this.musica.volume = 0.5;
+        this.musica.volume = 0.3;
     }
 };
 

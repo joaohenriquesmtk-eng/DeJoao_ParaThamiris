@@ -18,10 +18,18 @@ jobs:
         run: |
           npm install
           npm install @capacitor/ios @capacitor/core @capacitor/cli
-          # Passo 1: Limpamos qualquer resquicio de configuracao antiga para evitar conflitos
           rm -f capacitor.config.json capacitor.config.ts
-          # Passo 2: Inicializamos o projeto de forma limpa, sem a tag que causou o erro
           npx cap init Santuario com.joaoethamiris.santuario --web-dir www
+          
+      - name: O Golpe de Mestre (Blindagem da Pasta www)
+        run: |
+          # O Capacitor exige que a pasta 'www' exista E tenha um 'index.html' dentro.
+          # Se o Git espalhou os arquivos, nós forçamos tudo para o lugar certo na nuvem!
+          mkdir -p www
+          cp index.html www/ 2>/dev/null || true
+          cp *.js www/ 2>/dev/null || true
+          cp *.css www/ 2>/dev/null || true
+          cp -r assets www/ 2>/dev/null || true
           
       - name: Fabricar a Plataforma iOS do Zero Absoluto
         run: |

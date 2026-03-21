@@ -14,18 +14,18 @@ jobs:
         with:
           node-version: '22'
           
-      - name: Forcar Instalacao do Motor iOS
+      - name: Garantir a Identidade do Projeto
         run: |
           npm install
-          npm install @capacitor/ios @capacitor/core @capacitor/cli --save
+          npm install @capacitor/ios @capacitor/core @capacitor/cli
+          # Força a criação do arquivo de configuração nativo na nuvem
+          npx cap init Santuario com.joaoethamiris.santuario --web-dir www --force
           
-      - name: Recriar a Plataforma iOS do Zero
+      - name: Fabricar a Plataforma iOS do Zero Absoluto
         run: |
           rm -rf ios
           npx cap add ios
-          
-      - name: Sincronizar e Criar Arquivos Nativos
-        run: npx cap sync ios
+          npx cap sync ios
           
       - name: Construir as Fundacoes da Apple (CocoaPods)
         run: |

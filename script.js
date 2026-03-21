@@ -1968,6 +1968,10 @@ window.abrirPainelCapsula = function() {
     if (container) container.classList.remove('escondido');
     document.body.classList.add('modo-jogo-ativo'); 
     
+    // Oculta o menu inferior da tela
+    const navInferior = document.querySelector('.menu-inferior');
+    if (navInferior) navInferior.classList.add('escondido');
+    
     // Zera tudo com segurança ao abrir
     fotoCapsulaBase64 = null;
     audioCapsulaBase64 = null;
@@ -1987,6 +1991,11 @@ window.fecharPainelCapsula = function() {
     const container = document.getElementById('container-capsula');
     if (container) container.classList.add('escondido');
     document.body.classList.remove('modo-jogo-ativo');
+    
+    // Restaura o menu inferior ao sair
+    const navInferior = document.querySelector('.menu-inferior');
+    if (navInferior) navInferior.classList.remove('escondido');
+    
     if (loopRelogioCapsula) clearInterval(loopRelogioCapsula);
     if (audioReveladoCapsula) { audioReveladoCapsula.pause(); audioReveladoCapsula = null; }
 };

@@ -29,6 +29,7 @@ jobs:
       - name: Fabricar o APK (Android)
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
           
       - name: Entregar o Presente (Upload Artifact)

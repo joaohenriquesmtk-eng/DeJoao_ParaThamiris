@@ -20,6 +20,11 @@ jobs:
       - name: Sincronizar Capacitor
         run: npx cap sync ios
         
+      - name: Instalar Pods e Gerar Workspace (A Magica do Mac)
+        run: |
+          cd ios/App
+          pod install
+        
       - name: Fabricar o App no Mac Virtual
         run: |
           cd ios/App

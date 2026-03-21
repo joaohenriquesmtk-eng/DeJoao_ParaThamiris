@@ -14,21 +14,32 @@ jobs:
         with:
           node-version: '22'
           
-      - name: Instalacao de Dependencias
+      - name: Instalacao Limpa de Ferramentas
         run: |
           npm install
           npm install @capacitor/ios @capacitor/core @capacitor/cli
           
-      - name: Vigia de Arquivos (Debug)
+      - name: Protocolo de Blindagem WWW (Garantia de Sucesso)
         run: |
-          echo "--- Verificando Raiz ---"
-          ls -F
-          echo "--- Verificando pasta WWW ---"
+          # 1. Criamos a pasta que o Capacitor exige
           mkdir -p www
-          ls -F www/
           
-      - name: Reconstruir Configuracao
+          # 2. Buscamos o index.html em qualquer lugar e movemos para a www
+          # Isso garante que o Capacitor sempre terá o que precisa
+          find . -name "index.html" -exec cp {} www/ \;
+          
+          # 3. Copiamos todos os recursos vitais para dentro da www
+          cp *.js www/ 2>/dev/null || true
+          cp *.css www/ 2>/dev/null || true
+          cp -r assets www/ 2>/dev/null || true
+          
+          # 4. Verificação Visual (Para vermos no log se deu certo)
+          echo "Conteudo da pasta WWW para o Capacitor:"
+          ls -F www/
+
+      - name: Reset de Configuracao Nativa
         run: |
+          # Criamos um arquivo de configuração do zero, sem erros
           rm -f capacitor.config.json
           echo '{
             "appId": "com.joaoethamiris.santuario",
@@ -37,36 +48,42 @@ jobs:
             "bundledWebRuntime": false
           }' > capacitor.config.json
 
-      - name: Gerar Plataforma iOS Nativa
+      - name: Invocação do Projeto iOS
         run: |
+          # Removemos qualquer tentativa anterior e criamos do zero absoluto
           rm -rf ios
-          npx cap add ios
+          npx cap add ios --verbose
           npx cap sync ios
           
-      - name: Validar Nascimento do Podfile
+      - name: Checkpoint do Podfile
         run: |
           if [ -f "ios/App/Podfile" ]; then
-            echo "✅ Podfile encontrado com sucesso!"
+            echo "✅ SUCESSO: O Podfile foi gerado!"
           else
-            echo "❌ ERRO: O Capacitor falhou em criar o projeto iOS."
+            echo "❌ ERRO CRITICO: O Capacitor ainda nao criou o projeto."
+            echo "Listando pasta ios/App para debug:"
+            ls -R ios/App || echo "Pasta ios/App nem existe."
             exit 1
           fi
 
-      - name: Instalar CocoaPods
+      - name: Instalacao de Dependencias Apple (CocoaPods)
         run: |
           cd ios/App
           pod install --repo-update
           
-      - name: Compilar IPA para Thamiris
+      - name: Compilar o Coracao do App (IPA)
         run: |
           cd ios/App
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Release clean archive -archivePath build/App.xcarchive CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" PROVISIONING_PROFILE=""
-          cd build/App.xcarchive/Products/Applications
+          
+      - name: Empacotamento para Sideloading
+        run: |
+          cd ios/App/build/App.xcarchive/Products/Applications
           mkdir Payload
           cp -r App.app Payload/
           zip -r app.ipa Payload
           
-      - name: Entregar Arquivo IPA
+      - name: Entregar o Presente da Thamiris
         uses: actions/upload-artifact@v4
         with:
           name: app-santuario-ios

@@ -1,7 +1,32 @@
 {
   "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/haptics": "^8.0.1",
+    "@capacitor/ios": "^8.2.0",
     "firebase-admin": "^13.7.0",
     "firebase-functions": "^7.1.1",
     "moment-timezone": "^0.6.0"
-  }
+  },
+  "name": "dejoao_parathamiris",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaohenriquesmtk-eng/DeJoao_ParaThamiris.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/joaohenriquesmtk-eng/DeJoao_ParaThamiris/issues"
+  },
+  "homepage": "https://github.com/joaohenriquesmtk-eng/DeJoao_ParaThamiris#readme"
 }

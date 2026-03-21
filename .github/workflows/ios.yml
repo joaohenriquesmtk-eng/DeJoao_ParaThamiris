@@ -1,0 +1,39 @@
+name: Build iOS
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Instalar Dependencias do Projeto
+        run: npm install
+        
+      - name: Sincronizar Capacitor
+        run: npx cap sync ios
+        
+      - name: Fabricar o App no Mac Virtual
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release clean archive -archivePath build/App.xcarchive CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" PROVISIONING_PROFILE=""
+          
+      - name: Criar o IPA Especial (Sideloading)
+        run: |
+          cd ios/App/build/App.xcarchive/Products/Applications
+          mkdir Payload
+          cp -r App.app Payload/
+          zip -r app.ipa Payload
+          
+      - name: Entregar o Presente (Upload Artifact)
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-santuario-ios
+          path: ios/App/build/App.xcarchive/Products/Applications/app.ipa

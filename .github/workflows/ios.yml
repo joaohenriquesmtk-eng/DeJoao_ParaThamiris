@@ -3,13 +3,6 @@ on:
   push:
     branches: [ main ]
 
-# ------------------------------------------------------------------
-# O SEGREDO: Desligamos qualquer pergunta ou interrupção do Capacitor
-# ------------------------------------------------------------------
-env:
-  CI: true
-  CAPACITOR_DISABLE_TELEMETRY: true
-
 jobs:
   build:
     runs-on: macos-latest
@@ -21,16 +14,22 @@ jobs:
         with:
           node-version: '22'
           
-      - name: Preparar o Terreno (Garantia Absoluta)
+      - name: Instalacao de Dependencias
         run: |
-          # Garantimos que a pasta www exista perfeitamente na nuvem
-          mkdir -p www
-          cp index.html www/ 2>/dev/null || true
-          cp -r assets www/ 2>/dev/null || true
-          cp *.js www/ 2>/dev/null || true
-          cp *.css www/ 2>/dev/null || true
+          npm install
+          npm install @capacitor/ios @capacitor/core @capacitor/cli
           
-          # Criamos a certidão de nascimento do aplicativo à força
+      - name: Vigia de Arquivos (Debug)
+        run: |
+          echo "--- Verificando Raiz ---"
+          ls -F
+          echo "--- Verificando pasta WWW ---"
+          mkdir -p www
+          ls -F www/
+          
+      - name: Reconstruir Configuracao
+        run: |
+          rm -f capacitor.config.json
           echo '{
             "appId": "com.joaoethamiris.santuario",
             "appName": "Santuario",
@@ -38,41 +37,36 @@ jobs:
             "bundledWebRuntime": false
           }' > capacitor.config.json
 
-      - name: Instalar o Capacitor
+      - name: Gerar Plataforma iOS Nativa
         run: |
-          npm install
-          npm install @capacitor/core @capacitor/cli @capacitor/ios
-          
-      - name: Fabricar a Plataforma iOS 
-        run: |
-          # Agora o Capacitor vai trabalhar calado, do início ao fim!
           rm -rf ios
           npx cap add ios
           npx cap sync ios
-
-      - name: Verificacao de Seguranca (A Prova do Crime)
+          
+      - name: Validar Nascimento do Podfile
         run: |
-          # Isso vai imprimir na tela do GitHub se o Podfile finalmente nasceu
-          ls -la ios/App/Podfile || echo "Alerta: Podfile ainda sumido!"
+          if [ -f "ios/App/Podfile" ]; then
+            echo "✅ Podfile encontrado com sucesso!"
+          else
+            echo "❌ ERRO: O Capacitor falhou em criar o projeto iOS."
+            exit 1
+          fi
 
-      - name: Instalar as Fundacoes da Apple (CocoaPods)
+      - name: Instalar CocoaPods
         run: |
           cd ios/App
           pod install --repo-update
           
-      - name: Fabricar o App no Mac Virtual
+      - name: Compilar IPA para Thamiris
         run: |
           cd ios/App
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Release clean archive -archivePath build/App.xcarchive CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" PROVISIONING_PROFILE=""
-          
-      - name: Criar o IPA Especial (Sideloading)
-        run: |
-          cd ios/App/build/App.xcarchive/Products/Applications
+          cd build/App.xcarchive/Products/Applications
           mkdir Payload
           cp -r App.app Payload/
           zip -r app.ipa Payload
           
-      - name: Entregar o Presente Final
+      - name: Entregar Arquivo IPA
         uses: actions/upload-artifact@v4
         with:
           name: app-santuario-ios

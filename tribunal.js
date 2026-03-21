@@ -12,29 +12,22 @@ const AudioTribunal = {
     dica: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3')
 };
 
-// Ajuste de volume para não ensurdecer o usuário
+// Ajuste de volume
 Object.values(AudioTribunal).forEach(som => som.volume = 0.6);
 
-// 2. O ESTADO DO JOGO
 let tribunal = {
     nivel: 1,
-    estrelas: 3,
+    estrelas: 3, // Vidas
     metaAtual: 0,
     somaAtual: 0,
     cartasSelecionadas: [],
     testemunhaAtiva: null,
     cartasGarantidasParaDica: [],
-    casoAtual: null // <-- Nova memória: O jogo agora sabe exatamente qual caso está rodando
+    casoAtual: null
 };
 
-// ==========================================
-// SISTEMA DE CARREIRA E ESTATÍSTICAS
-// (Salva no armazenamento local do celular para não perder os dados)
-// ==========================================
-let estatisticasTribunal = JSON.parse(localStorage.getItem('estatisticasCasalTribunal')) || {
-    ganhos: 0,
-    perdidos: 0
-};
+// ESTATÍSTICAS
+let estatisticasTribunal = JSON.parse(localStorage.getItem('estatisticasCasalTribunal')) || { ganhos: 0, perdidos: 0 };
 
 function calcularPatente() {
     const total = estatisticasTribunal.ganhos;
@@ -49,63 +42,42 @@ function salvarEstatisticas() {
     localStorage.setItem('estatisticasCasalTribunal', JSON.stringify(estatisticasTribunal));
 }
 
-// ==========================================
-// CORREÇÃO DOS MENUS: INSTRUÇÕES E DOSSIÊ (TOGGLE)
-// ==========================================
-
-// 1. Devolvendo a vida ao botão de Instruções (❓)
+// MENUS
 window.toggleInstrucoesTribunal = function() {
     const instrucoes = document.getElementById('instrucoes-tribunal');
     const dossie = document.getElementById('dossie-tribunal');
-    
-    // Se as instruções estão escondidas, nós as mostramos
     if (instrucoes.classList.contains('escondido')) {
         instrucoes.classList.remove('escondido');
-        dossie.classList.add('escondido'); // Fecha o dossiê automaticamente para não encavalar
-        if(window.Haptics) window.Haptics.toqueLeve();
+        dossie.classList.add('escondido');
     } else {
-        // Se já estão abertas, nós fechamos
         instrucoes.classList.add('escondido');
-        if(window.Haptics) window.Haptics.toqueLeve();
     }
 };
 
-// 2. Transformando o botão do Dossiê (📊) em Abre/Fecha
 window.abrirDossieTribunal = function() {
     const dossie = document.getElementById('dossie-tribunal');
     const instrucoes = document.getElementById('instrucoes-tribunal');
-
-    // A MÁGICA: Se o dossiê já NÃO estiver escondido (ou seja, está aberto), 
-    // nós o fechamos e paramos a função aqui com o 'return'.
     if (!dossie.classList.contains('escondido')) {
         window.fecharDossieTribunal();
         return;
     }
-
-    // Se passou do 'if' acima, significa que está fechado. Vamos atualizar os dados e abrir!
     const ganhos = estatisticasTribunal.ganhos;
     const perdidos = estatisticasTribunal.perdidos;
     const total = ganhos + perdidos;
     const taxa = total === 0 ? 0 : Math.round((ganhos / total) * 100);
-
     document.getElementById('stats-ganhos').innerText = ganhos;
     document.getElementById('stats-perdidos').innerText = perdidos;
     document.getElementById('stats-taxa').innerText = `${taxa}%`;
     document.getElementById('tribunal-patente').innerText = calcularPatente();
-
     dossie.classList.remove('escondido');
-    instrucoes.classList.add('escondido'); // Fecha as instruções automaticamente
-    
-    if(window.Haptics) window.Haptics.toqueLeve();
+    instrucoes.classList.add('escondido');
 };
 
-// A função de fechar acionada pelo botão "Fechar Dossiê" lá embaixo
 window.fecharDossieTribunal = function() {
     document.getElementById('dossie-tribunal').classList.add('escondido');
-    if(window.Haptics) window.Haptics.toqueLeve();
 };
 
-// 3. BANCO DE CASOS (Com o Sistema de Tags Lógicas)
+// BANCO DE DADOS (CASOS E PROVAS)
 const bancoDeCasos = [
     { titulo: "O Roubo do Cobertor", desc: "Durante a madrugada chuvosa, o réu puxou 80% do cobertor. Prove sua inocência!", base: 12, tags: ["sono", "casa"] },
     { titulo: "A Marmita Desaparecida", desc: "A última coxinha foi devorada sem aviso prévio. O júri exige provas exatas!", base: 18, tags: ["comida", "casa"] },
@@ -134,7 +106,6 @@ const bancoDeCasos = [
     { titulo: "A Cantoria no Banho", desc: "Vizinhos entraram com ação após tentar os agudos da Marília Mendonça às 6h.", base: 17, tags: ["casa"] }
 ];
 
-// O Novo Banco de Provas (Com Emojis e Lógica)
 const bancoDeProvas = [
     { nome: "Print Oculto", icone: "📱", tags: ["celular", "ciume", "fofoca"] },
     { nome: "Áudio de 5 min", icone: "🎙️", tags: ["celular", "fofoca"] },
@@ -159,7 +130,6 @@ const bancoDeProvas = [
     { nome: "Controle Remoto", icone: "📺", tags: ["tv", "sono"] }
 ];
 
-// 4. TESTEMUNHAS EXPANDIDAS
 const bancoTestemunhas = [
     { nome: "A Conexão Instável", icone: "📶", regra: "pares", msg: "O Wi-Fi oscilou! Só são válidas cartas PARES." },
     { nome: "A Saudade Imensa", icone: "🥺", regra: "impares", msg: "O coração apertou! Só são válidas cartas ÍMPARES." },
@@ -167,7 +137,7 @@ const bancoTestemunhas = [
     { nome: "A Bateria nos 1%", icone: "🪫", regra: "menor15", msg: "O celular vai desligar! Só use cartas MENORES que 15." }
 ];
 
-// 5. INICIALIZAÇÃO
+// INICIALIZAÇÃO
 window.iniciarTribunal = function() {
     tribunal.nivel = 1;
     tribunal.estrelas = 3;
@@ -179,24 +149,18 @@ function iniciarNovoCaso() {
     tribunal.cartasSelecionadas = [];
     tribunal.testemunhaAtiva = null;
     tribunal.cartasGarantidasParaDica = [];
-    
-    document.getElementById('tribunal-mao').innerHTML = '';
-    document.getElementById('area-testemunha').classList.add('escondido');
-    
+    const maoEl = document.getElementById('tribunal-mao');
+    if(maoEl) maoEl.innerHTML = '';
+    const areaTest = document.getElementById('area-testemunha');
+    if(areaTest) areaTest.classList.add('escondido');
     const casoSorteado = bancoDeCasos[Math.floor(Math.random() * bancoDeCasos.length)];
-    
-    // A LINHA NOVA: O jogo salva o caso sorteado na memória
     tribunal.casoAtual = casoSorteado; 
-    
     tribunal.metaAtual = casoSorteado.base + Math.floor(Math.random() * (tribunal.nivel * 3)); 
-    
     document.getElementById('tribunal-titulo-caso').innerText = casoSorteado.titulo;
     document.getElementById('tribunal-descricao-caso').innerText = casoSorteado.desc;
     document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
     document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
-    
     if (Math.random() < 0.35) invocarTestemunha(); 
-    
     gerarCartasMesa();
     atualizarPlacar();
 }
@@ -204,191 +168,74 @@ function iniciarNovoCaso() {
 function invocarTestemunha() {
     const test = bancoTestemunhas[Math.floor(Math.random() * bancoTestemunhas.length)];
     tribunal.testemunhaAtiva = test.regra; 
-    
-    // ==========================================
-    // A INTELIGÊNCIA MATEMÁTICA (MOMENTO PROFESSOR)
-    // Para garantir que o jogo não seja impossível, ajustamos a MetaAtual baseada na regra!
-    // ==========================================
-    if (test.regra === 'pares' && tribunal.metaAtual % 2 !== 0) {
-        tribunal.metaAtual++; // Força a meta a ser Par
-    } else if (test.regra === 'impares' && tribunal.metaAtual % 2 !== 0) {
-        tribunal.metaAtual++; // A soma de dois ímpares SEMPRE dá par, então a meta precisa ser par!
-    } else if (test.regra === 'menor15' && tribunal.metaAtual > 28) {
-        tribunal.metaAtual = 28; // Se as cartas não podem passar de 14, a meta máxima viável em 2 cartas é 28 (14+14).
-    }
-    
+    if (test.regra === 'pares' && tribunal.metaAtual % 2 !== 0) tribunal.metaAtual++;
+    else if (test.regra === 'impares' && tribunal.metaAtual % 2 !== 0) tribunal.metaAtual++;
+    else if (test.regra === 'menor15' && tribunal.metaAtual > 28) tribunal.metaAtual = 28;
     document.getElementById('icone-testemunha').innerText = test.icone;
     document.getElementById('nome-testemunha').innerText = test.nome;
     document.getElementById('tribunal-regra-testemunha').innerText = test.msg;
     document.getElementById('area-testemunha').classList.remove('escondido');
-    
     AudioTribunal.erro.currentTime = 0;
     AudioTribunal.erro.play();
-    if(window.Haptics) navigator.vibrate([80, 50, 80]); // Vibração de alerta duplo
-}
-
-function iniciarNovoCaso() {
-    tribunal.somaAtual = 0;
-    tribunal.cartasSelecionadas = [];
-    tribunal.testemunhaAtiva = null;
-    tribunal.cartasGarantidasParaDica = [];
-    
-    document.getElementById('tribunal-mao').innerHTML = '';
-    document.getElementById('area-testemunha').classList.add('escondido');
-    
-    const casoSorteado = bancoDeCasos[Math.floor(Math.random() * bancoDeCasos.length)];
-    
-    // A LINHA NOVA: O jogo salva o caso sorteado na memória
-    tribunal.casoAtual = casoSorteado; 
-    
-    tribunal.metaAtual = casoSorteado.base + Math.floor(Math.random() * (tribunal.nivel * 3)); 
-    
-    document.getElementById('tribunal-titulo-caso').innerText = casoSorteado.titulo;
-    document.getElementById('tribunal-descricao-caso').innerText = casoSorteado.desc;
-    document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
-    document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
-    
-    if (Math.random() < 0.35) invocarTestemunha(); 
-    
-    gerarCartasMesa();
-    atualizarPlacar();
+    if(window.Haptics) navigator.vibrate([80, 50, 80]);
 }
 
 function gerarCartasMesa() {
     const maoEl = document.getElementById('tribunal-mao');
     const quantidadeCartas = 8;
-    
     let val1 = Math.floor(tribunal.metaAtual / 2);
     let val2 = tribunal.metaAtual - val1;
-    
-    if (tribunal.testemunhaAtiva === 'impares') {
-        if (val1 % 2 === 0) { val1--; val2++; } 
-    } else if (tribunal.testemunhaAtiva === 'pares') {
-        if (val1 % 2 !== 0) { val1--; val2++; } 
-    }
-
+    if (tribunal.testemunhaAtiva === 'impares') { if (val1 % 2 === 0) { val1--; val2++; } }
+    else if (tribunal.testemunhaAtiva === 'pares') { if (val1 % 2 !== 0) { val1--; val2++; } }
     let valores = [{ v: val1, garantida: true }, { v: val2, garantida: true }];
-    
     while(valores.length < quantidadeCartas) {
         let numAleatorio = Math.floor(Math.random() * (tribunal.metaAtual - 2)) + 1;
         valores.push({ v: numAleatorio, garantida: false });
     }
-    
     valores.sort(() => Math.random() - 0.5); 
-    
-    // ==========================================
-    // A INTELIGÊNCIA DE ENCAIXE DE PROVAS (MATCH LÓGICO)
-    // ==========================================
-    
-    // 1. Pega todas as provas que combinam com o assunto do Caso Atual
-    let provasRelacionadas = bancoDeProvas.filter(prova => 
-        prova.tags.some(tag => tribunal.casoAtual.tags.includes(tag))
-    );
-    
-    // 2. Pega as provas restantes (que não tem a ver) só para completar a mesa se faltar carta
-    let provasRestantes = bancoDeProvas.filter(prova => 
-        !prova.tags.some(tag => tribunal.casoAtual.tags.includes(tag))
-    );
-    
-    // Embaralha as duas listas
+    let provasRelacionadas = bancoDeProvas.filter(prova => prova.tags.some(tag => tribunal.casoAtual.tags.includes(tag)));
+    let provasRestantes = bancoDeProvas.filter(prova => !prova.tags.some(tag => tribunal.casoAtual.tags.includes(tag)));
     provasRelacionadas.sort(() => Math.random() - 0.5);
     provasRestantes.sort(() => Math.random() - 0.5);
-    
-    // Junta tudo. As que fazem sentido ficam no começo da fila!
     let filaDeProvas = [...provasRelacionadas, ...provasRestantes];
-    
     valores.forEach((item, index) => {
         const carta = document.createElement('div');
         carta.className = 'carta-tribunal';
-        
-        // Pega a prova da fila (garante que não estoure o tamanho do array)
         const provaSelecionada = filaDeProvas[index % filaDeProvas.length];
-        
-        // A mágica acontece aqui: O ícone e o nome vêm casados e contextualizados!
         carta.innerHTML = `
             <div class="carta-icone" style="font-size: 2.2rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));">${provaSelecionada.icone}</div>
             <div class="carta-valor">${item.v}</div>
             <div class="carta-nome-prova">${provaSelecionada.nome}</div>
         `;
-        
         carta.onclick = () => selecionarCarta(carta, item.v);
         maoEl.appendChild(carta);
-
-        if(item.garantida) {
-            tribunal.cartasGarantidasParaDica.push({ elemento: carta, valor: item.v });
-        }
+        if(item.garantida) tribunal.cartasGarantidasParaDica.push({ elemento: carta, valor: item.v });
     });
 }
 
-// 6. A DICA DE AMOR SUPREMA
 window.usarDicaTribunal = function() {
-    // Faremos de conta que temos o banco global. Se não tiver, mockamos para testar.
-    const moedasCasal = window.pontosDoCasal || 100; 
-    
-    if (moedasCasal < 15) {
-        mostrarToast("Precisa de 15💰 na Fazenda para subornar o escrivão!", "🔒");
-        AudioTribunal.erro.play();
-        return;
-    }
-
-    // Acha a primeira carta garantida que ainda não foi selecionada
+    const moedasCasal = window.pontosDoCasal || 0; 
+    if (moedasCasal < 15) { mostrarToast("Precisa de 15💰 na Fazenda!", "🔒"); AudioTribunal.erro.play(); return; }
     const cartaParaRevelar = tribunal.cartasGarantidasParaDica.find(c => !c.elemento.classList.contains('selecionada'));
-
     if (cartaParaRevelar) {
-        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-15, "Dica de Amor Tribunal");
-        
-        // Efeito visual na carta
+        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-15, "Dica Tribunal");
         cartaParaRevelar.elemento.classList.add('carta-revelada-dica');
-        
-        // Seleciona ela automaticamente
         selecionarCarta(cartaParaRevelar.elemento, cartaParaRevelar.valor);
-        
         AudioTribunal.dica.play();
-        mostrarToast("Uma prova irrefutável foi destacada para você!", "💖");
-    } else {
-        mostrarToast("Você já encontrou todas as provas essenciais. Bata o martelo!", "⚖️");
     }
 };
 
 function selecionarCarta(elementoCarta, valor) {
-    // ==========================================
-    // O JUIZ DE FERRO: Validação das Armadilhas
-    // Se a pessoa clicar numa carta que quebra a regra, o jogo barra!
-    // ==========================================
     if (!elementoCarta.classList.contains('selecionada')) {
         let bloqueado = false;
         let motivo = "";
-
-        if (tribunal.testemunhaAtiva === 'pares' && valor % 2 !== 0) {
-            bloqueado = true; motivo = "OBJEÇÃO! Apenas cartas PARES são permitidas!";
-        } else if (tribunal.testemunhaAtiva === 'impares' && valor % 2 === 0) {
-            bloqueado = true; motivo = "OBJEÇÃO! Apenas cartas ÍMPARES são permitidas!";
-        } else if (tribunal.testemunhaAtiva === 'menor15' && valor >= 15) {
-            bloqueado = true; motivo = "OBJEÇÃO! Cartas de valor 15 ou mais foram embargadas!";
-        } else if (tribunal.testemunhaAtiva === 'max3' && tribunal.cartasSelecionadas.length >= 3) {
-            bloqueado = true; motivo = "OBJEÇÃO! Limite de 3 cartas atingido na mesa!";
-        }
-
-        if (bloqueado) {
-            mostrarToast(motivo, "🚨");
-            AudioTribunal.erro.currentTime = 0;
-            AudioTribunal.erro.play();
-            
-            // O celular vibra forte dando uma "bronca" tátil
-            if(window.Haptics) navigator.vibrate([100, 50, 100]); 
-            
-            // Dispara a animação de tremida vermelha na carta específica!
-            elementoCarta.classList.add('tremida-erro');
-            setTimeout(() => elementoCarta.classList.remove('tremida-erro'), 400);
-            
-            return; // ABORTA A SELEÇÃO. A carta não é adicionada à soma!
-        }
+        if (tribunal.testemunhaAtiva === 'pares' && valor % 2 !== 0) { bloqueado = true; motivo = "Apenas PARES!"; }
+        else if (tribunal.testemunhaAtiva === 'impares' && valor % 2 === 0) { bloqueado = true; motivo = "Apenas ÍMPARES!"; }
+        else if (tribunal.testemunhaAtiva === 'menor15' && valor >= 15) { bloqueado = true; motivo = "Cartas MENORES que 15!"; }
+        else if (tribunal.testemunhaAtiva === 'max3' && tribunal.cartasSelecionadas.length >= 3) { bloqueado = true; motivo = "Máximo 3 cartas!"; }
+        if (bloqueado) { mostrarToast(motivo, "🚨"); AudioTribunal.erro.play(); return; }
     }
-
-    // Se passou pela validação acima (ou se está desselecionando), segue o fluxo normal:
-    AudioTribunal.carta.currentTime = 0;
-    AudioTribunal.carta.play();
-
+    AudioTribunal.carta.currentTime = 0; AudioTribunal.carta.play();
     if (elementoCarta.classList.contains('selecionada')) {
         elementoCarta.classList.remove('selecionada');
         tribunal.somaAtual -= valor;
@@ -398,85 +245,72 @@ function selecionarCarta(elementoCarta, valor) {
         tribunal.somaAtual += valor;
         tribunal.cartasSelecionadas.push(elementoCarta);
     }
-    
-    if(window.Haptics) window.Haptics.toqueLeve();
     atualizarPlacar();
 }
 
 function atualizarPlacar() {
-    document.getElementById('tribunal-meta').innerText = tribunal.metaAtual;
+    const metaEl = document.getElementById('tribunal-meta');
     const somaEl = document.getElementById('tribunal-pontos');
-    somaEl.innerText = tribunal.somaAtual;
-    
-    if (tribunal.somaAtual > tribunal.metaAtual) somaEl.style.color = '#e74c3c';
-    else somaEl.style.color = '#FFD700';
+    if(metaEl) metaEl.innerText = tribunal.metaAtual;
+    if(somaEl) {
+        somaEl.innerText = tribunal.somaAtual;
+        somaEl.style.color = (tribunal.somaAtual > tribunal.metaAtual) ? '#e74c3c' : '#FFD700';
+    }
 }
 
-// 7. O MARTELO E O EFEITO 3D DE VIDRO
-document.getElementById('tribunal-btn-julgar').addEventListener('click', function() {
+// ANIMAÇÃO DO MARTELO (Mover para o centro e aparecer apenas no clique)
+window.baterMarteloVisual = function() {
     const martelo = document.getElementById('martelo-3d');
     
-    martelo.classList.add('batida-martelo');
-    AudioTribunal.impacto.currentTime = 0;
-    AudioTribunal.impacto.play();
+    // 1. Torna o martelo visível apenas agora
+    martelo.classList.remove('escondido');
     
+    // 2. Cria o efeito de tela quebrada
+    const crack = document.createElement('div');
+    crack.className = 'efeito-tela-quebrada';
+    document.body.appendChild(crack);
+
+    // 3. Aplica a animação de impacto
+    martelo.classList.add('martelo-centro-impacto');
+    
+    if(AudioTribunal.impacto) AudioTribunal.impacto.play();
+    if(window.navigator.vibrate) navigator.vibrate([100, 50, 200]);
+
+    // 4. Limpa tudo e julga após a animação
     setTimeout(() => {
-        martelo.classList.remove('batida-martelo');
+        martelo.classList.remove('martelo-centro-impacto');
+        martelo.classList.add('escondido'); // Esconde o martelo de novo
+        crack.remove();
         julgarCaso(); 
-    }, 400); 
-});
+    }, 800);
+};
 
 function julgarCaso() {
     if (tribunal.somaAtual === tribunal.metaAtual) {
-        // VITÓRIA SUPREMA
-        AudioTribunal.vidro.play();
-        AudioTribunal.vitoria.play();
-        
-        const flash = document.createElement('div');
-        flash.className = 'flash-vidro';
-        document.body.appendChild(flash);
-        setTimeout(() => flash.remove(), 600);
-
-        if(window.Haptics) navigator.vibrate([100, 50, 100]); 
-        mostrarToast("Veredito Aceito! +25💰", "👨‍⚖️");
-        
-        // REGISTRA A VITÓRIA NO DOSSIÊ!
-        estatisticasTribunal.ganhos++;
-        salvarEstatisticas();
-        
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(25, "Caso ganho no Tribunal");
-        if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], spread: 80});
-        
+        mostrarToast("Veredito Aceito! +25💰", "⚖️");
+        estatisticasTribunal.ganhos++; salvarEstatisticas();
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(25, "Caso Ganho");
         tribunal.nivel++;
-        setTimeout(iniciarNovoCaso, 2000);
-
+        document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
+        setTimeout(iniciarNovoCaso, 1500);
     } else {
-        // ERROU A SOMA (Perde uma estrela)
-        AudioTribunal.erro.play();
-        if(window.Haptics) navigator.vibrate(200); 
-        
         tribunal.estrelas--;
         document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
-        
         if (tribunal.estrelas <= 0) {
-            // REGISTRA A DERROTA TOTAL (Fim de Jogo) NO DOSSIÊ!
-            estatisticasTribunal.perdidos++;
-            salvarEstatisticas();
-            
-            mostrarToast("Você perdeu o processo! O Tribunal foi encerrado.", "📜");
+            mostrarToast("Justiça falhou! Tribunal encerrado.", "💔");
+            estatisticasTribunal.perdidos++; salvarEstatisticas();
             setTimeout(voltarMenuJogos, 2000);
         } else {
-            // Errou, mas ainda tem estrelas
-            mostrarToast(`Objeção rejeitada! Meta: ${tribunal.metaAtual} | Sua soma: ${tribunal.somaAtual}`, "❌");
-            tribunal.cartasSelecionadas.forEach(c => c.classList.remove('selecionada'));
-            tribunal.cartasSelecionadas = [];
+            mostrarToast(`Objeção! Vidas: ${tribunal.estrelas}`, "❌");
             tribunal.somaAtual = 0;
+            document.querySelectorAll('.carta-tribunal.selecionada').forEach(c => c.classList.remove('selecionada'));
+            tribunal.cartasSelecionadas = [];
             atualizarPlacar();
         }
     }
 }
 
 document.getElementById('tribunal-btn-reiniciar').addEventListener('click', function() {
-    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-5, "Reiniciou o Tribunal");
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-5, "Reset Tribunal");
     iniciarNovoCaso();
 });

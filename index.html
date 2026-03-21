@@ -19,7 +19,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
-    <!-- Import map primeiro -->
     <script type="importmap">
       {
         "imports": {
@@ -99,8 +98,7 @@
     <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
     <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
     <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    <!-- adicione quantas quiser -->
-</div>
+    </div>
 
                 <div class="cartao-vidro" id="frase-do-dia">
                     <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
@@ -198,8 +196,7 @@
                     </div>
                 </div>
 
-                <!-- NOVO: Botão de Mensagem Surpresa -->
-                    <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
+                <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
                         <button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 12px 20px;">✨ Mensagem Surpresa</button>
                         <p id="texto-surpresa" style="font-style: italic; margin-top: 15px; font-size: 1rem; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
                     </div>
@@ -239,34 +236,100 @@
 
             </section> 
 
-            <div id="leis" class="tela escondido" style="padding: 20px; padding-bottom: 120px;">
+            <div id="leis" class="tela escondido" style="padding: 15px; padding-bottom: 120px;">
         
-        <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px;">
-            <div style="font-size: 3rem; margin-bottom: 10px;">📜</div>
-            <h2 style="font-family: 'Playfair Display', serif; color: var(--cor-primaria); margin-bottom: 5px; font-size: 1.8rem;">O Pergaminho</h2>
-            <p style="color: #ccc; font-size: 0.85rem; margin-bottom: 25px; font-style: italic;">As leis inquebráveis do nosso Santuário.</p>
+        <div class="cartao-vidro documento-juridico">
+            <div class="cabecalho-doc">
+                <div class="brasao-santuario">⚖️</div>
+                <h2 class="titulo-magna-carta">Magna Carta</h2>
+                <p class="subtitulo-doc">Vade Mecum Definitivo do Nosso Afeto</p>
+                <div class="linha-divisoria-ouro"></div>
+            </div>
 
-            <div id="lista-leis" style="text-align: left;">
+            <div class="preambulo-container">
+                <p><strong>PREÂMBULO:</strong> Nós, fundadores deste Santuário, reunidos em foro íntimo para instituir um regime vitalício de paz, respeito e paixão inesgotável, promulgamos, sob a jurisdição do nosso amor e mesmo diante da distância geográfica, a seguinte Constituição Definitiva.</p>
+            </div>
+
+            <div id="lista-leis" class="artigos-container">
+                
                 <div class="lei-item">
-                    <strong>I.</strong> Nunca dormir brigados, não importa a tempestade.
+                    <span class="artigo-num">Art. 1º</span>
+                    <span class="caput">Fica terminantemente proibida a decretação do encerramento do dia civil em estado de litígio, independentemente da magnitude do desentendimento.</span>
+                    <div class="paragrafo"><strong>Parágrafo Único.</strong> A chamada de voz ou vídeo para reconciliação possui efeito suspensivo imediato e irrevogável sobre qualquer orgulho ou mágoa.</div>
                 </div>
+
                 <div class="lei-item">
-                    <strong>II.</strong> O respeito mútuo está acima de qualquer emoção temporária.
+                    <span class="artigo-num">Art. 2º</span>
+                    <span class="caput">O respeito mútuo constitui <em>Cláusula Pétrea</em> desta união, não sendo passível de emenda, flexibilização ou supressão temporária sob nenhuma hipótese emocional.</span>
                 </div>
+
                 <div class="lei-item">
-                    <strong>III.</strong> Celebrar as pequenas vitórias um do outro.
+                    <span class="artigo-num">Art. 3º</span>
+                    <span class="caput">A distância quilométrica entre nossas comarcas tem natureza jurídica de <em>Medida Provisória</em>, perdendo totalmente sua eficácia no exato instante do nosso primeiro encontro físico.</span>
                 </div>
+
                 <div class="lei-item">
-                    <strong>IV.</strong> Sinceridade absoluta, mesmo quando for difícil falar.
+                    <span class="artigo-num">Art. 4º</span>
+                    <span class="caput">Institui-se o <em>Princípio da Presença Digital Contínua</em>, garantindo que a quilometragem jamais sirva de jurisprudência para a ausência emocional.</span>
+                    <div class="paragrafo"><strong>§ 1º.</strong> O envio de áudios, fotos cotidianas e reações aleatórias é considerado serviço de utilidade pública para a manutenção da nossa paz de espírito.</div>
                 </div>
+
                 <div class="lei-item">
-                    <strong>V.</strong> O amor é uma escolha diária e inegociável.
+                    <span class="artigo-num">Art. 5º</span>
+                    <span class="caput">As vitórias individuais, do menor acerto na rotina à maior aprovação, classificam-se automaticamente como patrimônio comum do casal.</span>
+                    <div class="paragrafo"><strong>Parágrafo Único.</strong> O trânsito em julgado de uma conquista sua exige celebração imediata da minha parte, ainda que por telas.</div>
+                </div>
+
+                <div class="lei-item">
+                    <span class="artigo-num">Art. 6º</span>
+                    <span class="caput">É assegurado o direito à verdade absoluta e irrestrita (Princípio da Transparência Afetiva).</span>
+                    <div class="paragrafo"><strong>§ 1º.</strong> Fica expressamente vedada a omissão de sentimentos fundamentada no receio de instaurar "conversas difíceis".</div>
+                </div>
+
+                <div class="lei-item">
+                    <span class="artigo-num">Art. 7º</span>
+                    <span class="caput">Os planos formulados para o nosso futuro sob o mesmo teto adquirem, a partir da concepção, status de <em>Direito Adquirido</em>.</span>
+                    <div class="paragrafo"><strong>Parágrafo Único.</strong> É proibida a revogação de nossos sonhos por motivo de pessimismo externo ou demora temporal. A execução do projeto é certa, cabendo ao tempo apenas organizar a pauta.</div>
+                </div>
+
+                <div class="lei-item">
+                    <span class="artigo-num">Art. 8º</span>
+                    <span class="caput">A lealdade e o interesse exclusivo não são obrigações impostas, mas sim uma consequência lógica e natural da soberania deste relacionamento sobre qualquer outro aspecto da vida social.</span>
+                </div>
+
+                <div class="lei-item">
+                    <span class="artigo-num">Art. 9º</span>
+                    <span class="caput">O amor declina da condição de mero sentimento efêmero para instituir-se como escolha diária, deliberada e inegociável, renovada a cada bom dia.</span>
+                </div>
+
+                <div class="lei-item">
+                    <span class="artigo-num">Art. 10º</span>
+                    <span class="caput">Fica estabelecido, sem cabimento de recurso ou apelação, que no milissegundo em que o nosso primeiro abraço presencial acontecer, o tempo sofrerá <em>Embargo de Declaração</em> para que esse instante dure uma eternidade.</span>
+                </div>
+
+            </div>
+
+            <div class="area-assinaturas escondido" id="area-assinaturas-doc">
+                <div class="assinatura-box">
+                    <span class="assinatura-digital">João</span>
+                    <div class="linha-assinatura"></div>
+                    <span class="cargo-assinatura">O Cônjuge</span>
+                </div>
+                <div class="assinatura-box">
+                    <span class="assinatura-digital">Thamiris</span>
+                    <div class="linha-assinatura"></div>
+                    <span class="cargo-assinatura">A Excelentíssima</span>
                 </div>
             </div>
 
-            <button id="btn-renovar-votos" class="btn-acao" style="margin-top: 30px; width: 100%; padding: 15px; font-size: 1.1rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(212, 175, 55, 0.1); border-radius: 15px;" onclick="renovarVotos()">
-                ✍️ Renovar Votos
-            </button>
+            <div class="area-selo-renovacao">
+                <div class="linha-divisoria-ouro"></div>
+                <p id="status-renovacao" class="status-juridico">Requer sanção diária das partes.</p>
+                <button id="btn-renovar-votos" class="selo-cera-btn" onclick="renovarVotos()">
+                    <span class="selo-borda"></span>
+                    <span class="selo-texto">SANCIONAR<br>VOTOS</span>
+                </button>
+            </div>
         </div>
 
     </div>
@@ -301,8 +364,7 @@
                     <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Sincronize mentes e corações</p>
                 </div>
 
-                <!-- Áudio ambiente -->
-                 <audio id="audio-ambiente" loop preload="auto">
+                <audio id="audio-ambiente" loop preload="auto">
     <source src="assets/ambient.mp3" type="audio/mpeg">
 </audio>
 <audio id="audio-jogos" loop preload="auto">
@@ -349,7 +411,6 @@
 
 </div>
 
-<!-- TRIBUNAL DO AFETO -->
 <div id="container-tribunal" class="escondido">
     <div class="top-bar" style="background: rgba(0,0,0,0.7); border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
         <div class="top-bar-left">
@@ -359,7 +420,7 @@
         </div>
         <div class="top-bar-right">
             <span class="recurso">⚖️ Nível <span id="tribunal-nivel">1</span></span>
-            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">⭐ <span id="tribunal-estrelas">3</span></span>
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">❤️ Vidas: <span id="tribunal-estrelas">3</span></span>
         </div>
     </div>
 
@@ -422,9 +483,9 @@
         <div id="tribunal-mao" class="mesa-cartas-rpg"></div>
 
         <div class="area-martelo">
-            <div id="martelo-3d" class="martelo-icone">🔨</div>
+            <div id="martelo-3d" class="martelo-icone escondido">🔨</div>
             <div style="display: flex; gap: 10px; width: 100%;">
-                <button id="tribunal-btn-julgar" class="btn-acao btn-julgar-rpg">Bater o Martelo</button>
+                <button id="tribunal-btn-julgar" class="btn-acao btn-julgar-rpg" onclick="baterMarteloVisual()">Bater o Martelo</button>
                 <button id="tribunal-btn-reiniciar" class="btn-refresh" style="width: 60px; padding: 0; font-size: 1.5rem;">↻</button>
             </div>
         </div>
@@ -549,8 +610,7 @@
     </div>
 </div>
 
-                <!-- MINI FAZENDA -->
-<div id="container-minifazenda" class="escondido">
+                <div id="container-minifazenda" class="escondido">
     <div id="clima-overlay" class="camada-clima"></div>
     <div id="vagalumes-overlay" class="escondido"></div>
 
@@ -829,7 +889,7 @@
             <small class="status-reliquia">Trancado</small>
         </div>
 
-        <div class="cartao-vidro item-cofre" onclick="abrirPainelCapsula()">
+        <div class="cartao-vidro item-cofre capsula-livre" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirPainelFuturo()">
             <span class="icone-reliquia">⏳</span>
             <p class="titulo-reliquia">Cápsula do Tempo</p>
         </div>
@@ -906,7 +966,6 @@
     </div>
 </section>
 
-            <!-- Áudios e modais -->
             <audio id="audio-alerta-cuidado" preload="auto">
                 <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
             </audio>
@@ -923,10 +982,9 @@
         </nav>
     </div>
 
-    <!-- Script module do Firebase (deve vir antes dos outros scripts) -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
-        import { getDatabase, ref, set, get, onValue, runTransaction, push } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
+        import { getDatabase, ref, set, get, onValue, runTransaction, push, update } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
         import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js';
 
@@ -945,77 +1003,35 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // Para o jogo Mini Fazenda
         window.SantuarioDB = db;
         window.SantuarioAuth = auth;
         window.SantuarioDB_Functions = { ref, set, get, onValue };
 
-        // Para o sistema de Pulso
         window.SantuarioApp = window.SantuarioApp || {};
         window.SantuarioApp.inicializado = true;
-        window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction, push, messaging: getMessaging(app), getToken: getToken };
+        window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction, push, update, messaging: getMessaging(app), getToken: getToken };
 
-        // IDs autorizados
         const IDS_AUTORIZADOS = {
             "Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",
             "meXVetR7D7b8d00Yuw8wjtRlpoi1": "thamiris"
         };
 
-        // Função para liberar acesso
-        function liberarAcesso(user) {
-            const perfil = IDS_AUTORIZADOS[user.uid];
-            if (!perfil) {
-                console.error("Usuário não autorizado.");
-                auth.signOut();
-                return;
-            }
-            window.usuarioLogado = perfil;
-            window.souJoao = (perfil === 'joao');
-            window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
-            window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
-            localStorage.setItem('santuario_user_id', perfil);
-            const telaLogin = document.getElementById('tela-login');
-            if (telaLogin) telaLogin.style.display = 'none';
-            window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { perfil } }));
-            console.log(`Login bem-sucedido: ${window.MEU_NOME}`);
-        }
-
-        // Lógica do botão de login
-        const btnLogin = document.getElementById('btn-login-confirmar');
-        if (btnLogin) {
-            btnLogin.onclick = async () => {
-                const email = document.getElementById('login-email').value.trim();
-                const senha = document.getElementById('login-senha').value;
-                const erroDiv = document.getElementById('login-mensagem-erro');
-                try {
-                    await signInWithEmailAndPassword(auth, email, senha);
-                } catch (error) {
-                    console.error("Erro no login:", error);
-                    if (erroDiv) erroDiv.innerText = "E-mail ou senha incorretos.";
-                }
-            };
-        }
-
-        // Monitora o estado de autenticação
         onAuthStateChanged(auth, (user) => {
             const telaLogin = document.getElementById('tela-login');
             if (user) {
-                const perfilIdentificado = window.IDS_SANTUARIO?.[user.uid];
+                const perfilIdentificado = IDS_AUTORIZADOS[user.uid];
                 if (perfilIdentificado) {
                     window.usuarioLogado = perfilIdentificado;
                     window.souJoao = (perfilIdentificado === 'joao');
                     window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
                     window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
-                    if (typeof registrarLogin === 'function') {
-                        registrarLogin(perfilIdentificado);
-                    } else {
-                        console.warn('Função registrarLogin não encontrada');
+                    if (typeof registrarLogin === 'function') registrarLogin(perfilIdentificado);
+                    if (telaLogin) {
+                        telaLogin.style.opacity = '0';
+                        setTimeout(() => { telaLogin.style.display = 'none'; }, 500);
                     }
-                    if (telaLogin) telaLogin.style.opacity = '0';
-                    setTimeout(() => { if (telaLogin) telaLogin.style.display = 'none'; }, 500);
                     window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { user } }));
                 } else {
-                    console.error("Acesso negado: UID não reconhecido.");
                     auth.signOut();
                 }
             } else {
@@ -1105,68 +1121,72 @@
     <script src="sincronia.js"></script>
     <script src="script.js"></script> 
     <script src="app.js"></script>
-    
-    <div id="container-capsula" class="escondido">
+
+
+    <div id="painel-capsula-futuro" class="escondido">
     <div class="top-bar top-bar-capsula" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10;">
         <div class="top-bar-left">
-            <button class="btn-voltar btn-voltar-capsula" onclick="fecharPainelCapsula()">← Voltar</button>
+            <button class="btn-voltar btn-voltar-capsula" onclick="fecharPainelFuturo()">← Voltar</button>
         </div>
         <div class="top-bar-right">
             <span class="recurso recurso-capsula">⏳ Relíquia Temporal</span>
         </div>
     </div>
 
-    <div class="conteudo-capsula" style="padding: 20px; display: flex; flex-direction: column; align-items: center; max-width: 500px; margin: 0 auto;">
+    <div class="conteudo-capsula" style="padding: 20px; display: flex; flex-direction: column; align-items: center; max-width: 500px; margin: 0 auto; padding-bottom: 100px;">
         
-        <div class="visor-tempo" id="visor-tempo">
-            <div class="icone-cadeado" id="icone-cadeado-capsula">🔓</div>
-            <div id="relogio-capsula" class="relogio-neon">00:00:00:00</div>
-            <div id="status-capsula" style="color: #aaa; font-size: 0.85rem; margin-top: 10px; text-align: center;">Nenhuma cápsula ativa no momento.</div>
+        <div class="visor-tempo" id="visor-tempo-futuro">
+            <div class="icone-cadeado" id="icone-cadeado-futuro">🔓</div>
+            <div id="relogio-futuro" class="relogio-neon">00:00:00:00</div>
+            <div id="status-futuro" style="color: #aaa; font-size: 0.85rem; margin-top: 10px; text-align: center;">Nenhuma cápsula ativa no momento.</div>
         </div>
 
-        <div id="form-criar-capsula" class="cartao-vidro" style="width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; padding: 20px; box-sizing: border-box; border-color: rgba(255, 51, 102, 0.3);">
+        <div id="form-criar-futuro" class="cartao-vidro" style="width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; padding: 20px; box-sizing: border-box; border-color: rgba(255, 51, 102, 0.3);">
             <h4 style="color: #ff3366; text-align: center; text-shadow: 0 0 10px rgba(255,51,102,0.4);">Trancar uma Memória</h4>
             
-            <textarea id="texto-capsula" placeholder="A carta para o futuro..." rows="3" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 10px; color: white; padding: 10px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
+            <textarea id="texto-futuro" placeholder="A carta para o futuro..." rows="3" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 10px; color: white; padding: 10px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
             
             <div class="anexos-capsula">
-                <label class="btn-anexo" id="btn-foto-capsula">
+                <label class="btn-anexo" id="btn-foto-futuro">
                     📸 Anexar Visão
-                    <input type="file" accept="image/*" class="escondido" onchange="processarFotoCapsula(event)">
+                    <input type="file" accept="image/*" class="escondido" onchange="processarFotoFuturo(event)">
                 </label>
-                <button class="btn-anexo" id="btn-audio-capsula" onclick="toggleGravarAudioCapsula()">
+                <button class="btn-anexo" id="btn-audio-futuro" onclick="toggleGravarAudioFuturo()">
                     🎙️ Gravar Voz
                 </button>
             </div>
-            <div id="status-anexos-capsula" style="font-size: 0.75rem; color: #ff9ff3; text-align: center; font-style: italic; min-height: 15px;"></div>
+            <div id="status-anexos-futuro" style="font-size: 0.75rem; color: #ff9ff3; text-align: center; font-style: italic; min-height: 15px;"></div>
 
             <div style="display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: 5px;">
                 <label style="color: #ff3366; font-size: 0.85rem; font-weight: bold;">Momento da Abertura Exata:</label>
-                <input type="datetime-local" id="data-abertura-capsula" class="input-data-neon">
+                <input type="datetime-local" id="data-abertura-futuro" class="input-data-neon">
             </div>
 
-            <button class="btn-acao" onclick="selarCapsula()" style="width: 100%; font-weight: bold; background: linear-gradient(145deg, #ff3366, #c0392b); border:none; box-shadow: 0 4px 15px rgba(255,51,102,0.4); margin-top: 10px;">🔒 Selar no Cofre</button>
+            <button class="btn-acao" onclick="selarFuturo()" style="width: 100%; font-weight: bold; background: linear-gradient(145deg, #ff3366, #c0392b); border:none; box-shadow: 0 4px 15px rgba(255,51,102,0.4); margin-top: 10px;">🔒 Selar no Cofre</button>
         </div>
 
-        <div id="painel-leitura-capsula" class="cartao-vidro escondido" style="width: 100%; margin-top: 20px; text-align: center; padding: 20px; box-sizing: border-box; border-color: rgba(255, 51, 102, 0.4);">
+        <div id="painel-leitura-futuro" class="cartao-vidro escondido" style="width: 100%; margin-top: 20px; text-align: center; padding: 20px; box-sizing: border-box; border-color: rgba(255, 51, 102, 0.4);">
             <h4 style="color: #ff3366; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,51,102,0.5);">Mensagem do Passado ✨</h4>
             
-            <div id="conteudo-revelado-capsula" style="display: flex; flex-direction: column; gap: 15px;">
-                <img id="img-revelada-capsula" class="escondido" style="width: 100%; border-radius: 10px; border: 2px solid #ff3366; box-shadow: 0 0 15px rgba(255,51,102,0.3);">
+            <div id="conteudo-revelado-futuro" style="display: flex; flex-direction: column; gap: 15px;">
+                <img id="img-revelada-futuro" class="escondido" style="width: 100%; border-radius: 10px; border: 2px solid #ff3366; box-shadow: 0 0 15px rgba(255,51,102,0.3);">
                 
-                <div id="container-audio-revelado" class="escondido" style="background: rgba(255,51,102,0.1); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,51,102,0.3);">
+                <div id="container-audio-futuro" class="escondido" style="background: rgba(255,51,102,0.1); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,51,102,0.3);">
                     <span style="display:block; margin-bottom:10px; color:#ff9ff3; font-weight:bold;">🎙️ Um Eco do Passado</span>
-                    <button class="btn-acao" id="btn-tocar-audio-revelado" onclick="tocarAudioCapsulaLida()" style="background: #ff3366; border: none; padding: 8px 20px;">▶ Tocar Áudio</button>
+                    <button class="btn-acao" id="btn-tocar-audio-futuro" onclick="tocarAudioFuturoLida()" style="background: #ff3366; border: none; padding: 8px 20px;">▶ Tocar Áudio</button>
                 </div>
 
-                <p id="mensagem-revelada" style="color: white; font-style: italic; line-height: 1.6; white-space: pre-wrap; text-align: left; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 10px; border-left: 3px solid #ff3366;"></p>
+                <p id="mensagem-revelada-futuro" style="color: white; font-style: italic; line-height: 1.6; white-space: pre-wrap; text-align: left; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 10px; border-left: 3px solid #ff3366;"></p>
             </div>
 
-            <button class="btn-acao" onclick="destruirCapsulaLida()" style="margin-top: 25px; width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid #aaa; color: #fff;">Guardar na Memória e Esvaziar</button>
+            <button class="btn-acao" onclick="destruirFuturoLido()" style="margin-top: 25px; width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid #aaa; color: #fff;">Guardar na Memória e Esvaziar</button>
         </div>
 
     </div>
 </div>
-    
+
+
+
+
 </body>
 </html>

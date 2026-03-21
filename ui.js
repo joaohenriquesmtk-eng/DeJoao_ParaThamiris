@@ -200,36 +200,51 @@ window.animarLeisEmCascata = () => {
     if (!leis.length) return;
 
     leis.forEach((lei, index) => {
-        // Zera a animação primeiro (caso o usuário saia e volte para a aba)
         lei.classList.remove('visivel');
         
-        // Aplica o atraso em cascata: a primeira lei atrasa 0ms, a segunda 150ms, a terceira 300ms...
+        // O atraso agora dá um efeito de leitura processual
         setTimeout(() => {
             lei.classList.add('visivel');
-        }, index * 150); 
+            if (window.Haptics && index % 2 === 0) navigator.vibrate(10); // Vibração sutil ao aparecer
+        }, index * 250); 
     });
 };
 
 window.renovarVotos = () => {
-    // 1. Tique-tique forte do celular (Feedback Tátil Sênior)
-    if (window.Haptics) window.Haptics.sucesso();
+    const btnSelo = document.getElementById('btn-renovar-votos');
+    const assinaturas = document.getElementById('area-assinaturas-doc');
+    const status = document.getElementById('status-renovacao');
+    
+    // Evita duplo clique
+    if (btnSelo.classList.contains('carimbado')) return;
 
-    // 2. Aciona a Ilha Dinâmica avisando que os votos foram renovados
-    if (typeof window.mostrarToast === 'function') {
-        window.mostrarToast("Votos renovados com sucesso!", "✍️");
+    // 1. O Peso do Carimbo (Feedback Tátil Profundo)
+    if (window.Haptics) navigator.vibrate([100, 50, 150]);
+
+    // 2. Animação de afundar o selo de cera no papel
+    if (btnSelo) {
+        btnSelo.classList.add('carimbado');
+        btnSelo.querySelector('.selo-texto').innerHTML = "VOTOS<br>SANCIONADOS";
     }
 
-    // 3. Efeito visual extra no botão
-    const btn = document.getElementById('btn-renovar-votos');
-    if (btn) {
-        btn.style.transform = 'scale(0.95)';
-        btn.style.background = 'var(--cor-primaria)';
-        btn.style.color = '#000';
+    // 3. Atualiza o status jurídico
+    if (status) {
+        status.innerText = "Sancionado legalmente no dia de hoje.";
+        status.style.color = "var(--cor-primaria)";
+    }
+
+    // 4. Revela as assinaturas com um delay dramático
+    if (assinaturas) {
         setTimeout(() => {
-            btn.style.transform = 'scale(1)';
-            btn.style.background = 'rgba(212, 175, 55, 0.1)';
-            btn.style.color = 'var(--cor-primaria)';
-        }, 300);
+            assinaturas.classList.remove('escondido');
+            // Timeout duplo para garantir que o display:flex aplique antes da opacidade
+            setTimeout(() => assinaturas.classList.add('reveladas'), 50);
+            
+            // Toca a notificação no topo da tela
+            if (typeof window.mostrarToast === 'function') {
+                window.mostrarToast("Votos lavrados em ata. O amor prevalece.", "⚖️");
+            }
+        }, 600);
     }
 };
 

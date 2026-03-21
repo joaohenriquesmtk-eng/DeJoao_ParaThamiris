@@ -1478,18 +1478,18 @@ window.inicializarGalaxia3D = () => {
 window.inicializarJornada3D = () => {
     const container = document.getElementById('jornada-3d-fundo');
     if (!container || typeof THREE === 'undefined') return;
-    if (container.children.length > 0) return;
+    if (container.children.length > 0) return; // Evita duplicar o canvas
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(window.devicePixelRatio); 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Otimização severa para celulares
     container.appendChild(renderer.domElement);
 
     const progressoData = { atual: 0.0 };
     
-    // Variáveis de controle de rotação
+    // Variáveis de controle de rotação tátil
     let alvoRotacaoX = 0;
     let alvoRotacaoY = 0;
     let mouseSuave = new THREE.Vector2(0, 0);
@@ -1498,7 +1498,7 @@ window.inicializarJornada3D = () => {
         uTime: { value: 0 },
         uResolution: { value: new THREE.Vector2() },
         uProgress: { value: 0.0 },
-        uMouse: { value: new THREE.Vector2(0, 0) } // <-- Conecta o seu dedo à GPU
+        uMouse: { value: new THREE.Vector2(0, 0) } 
     };
 
     const shaderMaterial = new THREE.ShaderMaterial({
@@ -1556,9 +1556,9 @@ window.inicializarJornada3D = () => {
                 vec3 ro = vec3(0.0, 0.0, uTime * 2.0); 
                 vec3 rd = normalize(vec3(uv, 1.2)); 
 
-                // APLICAÇÃO DO GIRO (AQUI É ONDE O 3D ACONTECE)
-                rd.yz *= rot(uMouse.y); // Inclinação Cima/Baixo
-                rd.xz *= rot(uMouse.x); // Giro Esquerda/Direita
+                // APLICAÇÃO DO GIRO
+                rd.yz *= rot(uMouse.y); 
+                rd.xz *= rot(uMouse.x); 
 
                 float t = 0.0, glowAlmas = 0.0, glowTunnel = 0.0;
                 vec3 p;
@@ -1593,7 +1593,7 @@ window.inicializarJornada3D = () => {
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), shaderMaterial);
     scene.add(plane);
 
-    // --- SISTEMA DE TOQUE/ARRASTE ---
+    // --- SISTEMA DE TOQUE/ARRASTE (Aperfeiçoado para Mobile) ---
     let touchX = 0, touchY = 0, isDragging = false;
 
     container.addEventListener('pointerdown', (e) => {
@@ -1602,7 +1602,10 @@ window.inicializarJornada3D = () => {
         touchY = e.clientY;
     });
 
+    // Adicionado cancel e leave para evitar travamentos do dedo na tela
     window.addEventListener('pointerup', () => { isDragging = false; });
+    container.addEventListener('pointerleave', () => { isDragging = false; });
+    container.addEventListener('pointercancel', () => { isDragging = false; });
 
     container.addEventListener('pointermove', (e) => {
         if (!isDragging) return;
@@ -1623,13 +1626,13 @@ window.inicializarJornada3D = () => {
     new ResizeObserver(atualizarTamanho).observe(container);
     atualizarTamanho();
 
-const telaJornada = document.getElementById('jornada');
+    const telaJornada = document.getElementById('jornada');
     let tempoAnterior = performance.now();
 
     const animar = () => {
         requestAnimationFrame(animar);
         
-        // MOTOR DE HIBERNAÇÃO DA JORNADA
+        // MOTOR DE HIBERNAÇÃO (Para não queimar bateria em outras telas)
         if (telaJornada && telaJornada.classList.contains('escondido')) {
             tempoAnterior = performance.now(); 
             return; 
@@ -1652,3 +1655,10 @@ const telaJornada = document.getElementById('jornada');
     };
     animar();
 };
+
+// O GATILHO MÁGICO DO 3D: Isso garante que a Jornada renderize assim que a GPU ligar
+window.addEventListener('motor3DPronto', () => {
+    if (typeof window.inicializarJornada3D === 'function') {
+        window.inicializarJornada3D();
+    }
+});

@@ -3,6 +3,7 @@
 // ==========================================
 window.statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
+
 // ==========================================
 // GERENTE MÁXIMO DE ÁUDIO (SISTEMA ANTI-DUPLICAÇÃO)
 // ==========================================
@@ -759,7 +760,7 @@ const BIBLIOTECA_RELIQUIAS = {
         "Goiânia tem o seu brilho, Colombo tem o meu silêncio, mas o céu de hoje une nossas essências em uma só moldura.",
         "A física explica a distância, mas o céu prova a unidade. Somos dois pontos sob a mesma abóbada celeste.",
         "Que a imensidão do céu de hoje te lembre que o meu amor por você não tem limites cartográficos.",
-        "O céu de Colombo hoje sopra um vento sul que carrega o meu 'eu te amo' até o calor de Goiânia.",
+        "O céu de Colombo hoje sobra um vento sul que carrega o meu 'eu te amo' até o calor de Goiânia.",
         "As estrelas são os pontos de GPS que o destino traçou para que nossas almas nunca se perdessem.",
         "A mesma lua que ilumina sua leitura do Vade Mecum é a que brilha sobre meus mapas de solo.",
         "A distância é uma grandeza física; nosso amor é uma constante universal que o céu apenas molda.",
@@ -794,7 +795,7 @@ const BIBLIOTECA_RELIQUIAS = {
         "O céu não tem cercas nem divisas; ele é a prova de que nosso amor é um território livre de qualquer embargo.",
         "As ondas de rádio cruzam o país, mas é o brilho da lua que faz o download direto do meu coração para o seu.",
         "Se a distância fosse medida em anos-luz, o céu de hoje diria que já chegamos ao nosso destino final: um ao lado do outro.",
-        "O vento que sopra no Sul hoje é o mensageiro que leva o oxigênio da minha vida para alimentar os seus sonhos aí.",
+        "O vento que sobra no Sul hoje é o mensageiro que leva o oxigênio da minha vida para alimentar os seus sonhos aí.",
         "Cada estrela cadente é uma petição de urgência que envio ao universo para que o tempo acelere até o nosso abraço.",
         "A estratosfera é o único lugar vasto o suficiente para guardar o arquivo completo de tudo o que planejamos juntos.",
         "Olhe para o horizonte: onde a terra parece terminar, é onde a nossa história ganha a imensidão do infinito.",
@@ -824,7 +825,7 @@ const BIBLIOTECA_RELIQUIAS = {
         "Suas raízes em mim são tão profundas que nenhuma intempérie do mundo consegue te arrancar.",
         "Não somos um plantio de temporada; somos uma floresta nativa de sentimentos inesgotáveis.",
         "A produtividade da minha alma triplicou desde que você se tornou o meu insumo principal.",
-        "Você é o direito adquirido que eu defendo com unhas e dentes perante qualquer tribunal da vida.",
+        "Você é o direito adquirido que eu defendo com unhas e das perante qualquer tribunal da vida.",
         "O adubo do nosso amor é a confiança; a colheita será a nossa vida inteira sob o mesmo teto.",
         "Sua voz é o nutriente que faltava para que meu dia pudesse realizar a fotossíntese completa.",
         "Nossa história é um contrato de adesão onde o coração aceitou todas as cláusulas de primeira.",
@@ -1950,58 +1951,59 @@ window.tocarEco = function() {
 
 // ==========================================
 // RELÍQUIA 3: CÁPSULA DO TEMPO (MULTIMÍDIA & FILA QUÂNTICA)
+// Totalmente isolado do Livro de Ouro
 // ==========================================
-let loopRelogioCapsula = null;
-let capsulaAtivaDados = null; 
-let capsulaAtivaId = null; 
-let totalCapsulasNaFila = 0;
+let loopRelogioFuturo = null;
+let capsulaFuturoDados = null; 
+let capsulaFuturoId = null; 
+let totalFuturoNaFila = 0;
 
-// Memórias de Anexos (Nomes 100% padronizados e interligados)
-let fotoCapsulaBase64 = null;
-let audioCapsulaBase64 = null;
-let mediaRecorderCapsula = null;
-let audioChunksCapsula = [];
-let audioReveladoCapsula = null; 
+let fotoFuturoBase64 = null;
+let audioFuturoBase64 = null;
+let mediaRecorderFuturo = null;
+let audioChunksFuturo = [];
+let audioReveladoFuturo = null; 
 
-window.abrirPainelCapsula = function() {
-    const container = document.getElementById('container-capsula');
-    if (container) container.classList.remove('escondido');
+window.abrirPainelFuturo = function() {
+    const container = document.getElementById('painel-capsula-futuro');
+    if (container) {
+        container.classList.remove('escondido');
+    }
     document.body.classList.add('modo-jogo-ativo'); 
     
-    // Oculta o menu inferior da tela
     const navInferior = document.querySelector('.menu-inferior');
     if (navInferior) navInferior.classList.add('escondido');
     
-    // Zera tudo com segurança ao abrir
-    fotoCapsulaBase64 = null;
-    audioCapsulaBase64 = null;
-    const statusAnexos = document.getElementById('status-anexos-capsula');
+    fotoFuturoBase64 = null;
+    audioFuturoBase64 = null;
+    
+    const statusAnexos = document.getElementById('status-anexos-futuro');
     if (statusAnexos) statusAnexos.innerText = "";
     
-    const dataAbertura = document.getElementById('data-abertura-capsula');
+    const dataAbertura = document.getElementById('data-abertura-futuro');
     if (dataAbertura) dataAbertura.value = "";
     
-    const textoCapsula = document.getElementById('texto-capsula');
+    const textoCapsula = document.getElementById('texto-futuro');
     if (textoCapsula) textoCapsula.value = "";
     
-    escutarCapsulaDoTempo();
+    escutarFuturoDoTempo();
 };
 
-window.fecharPainelCapsula = function() {
-    const container = document.getElementById('container-capsula');
-    if (container) container.classList.add('escondido');
+window.fecharPainelFuturo = function() {
+    const container = document.getElementById('painel-capsula-futuro');
+    if (container) {
+        container.classList.add('escondido');
+    }
     document.body.classList.remove('modo-jogo-ativo');
     
-    // Restaura o menu inferior ao sair
     const navInferior = document.querySelector('.menu-inferior');
     if (navInferior) navInferior.classList.remove('escondido');
     
-    if (loopRelogioCapsula) clearInterval(loopRelogioCapsula);
-    if (audioReveladoCapsula) { audioReveladoCapsula.pause(); audioReveladoCapsula = null; }
+    if (loopRelogioFuturo) clearInterval(loopRelogioFuturo);
+    if (audioReveladoFuturo) { audioReveladoFuturo.pause(); audioReveladoFuturo = null; }
 };
 
-// --- PROCESSAMENTO DE MÍDIAS ---
-window.processarFotoCapsula = function(event) {
+window.processarFotoFuturo = function(event) {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -2011,16 +2013,16 @@ window.processarFotoCapsula = function(event) {
         img.src = e.target.result;
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 800; // Compressão inteligente
+            const MAX_WIDTH = 800; 
             const scaleSize = MAX_WIDTH / img.width;
             canvas.width = MAX_WIDTH;
             canvas.height = img.height * scaleSize;
             
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            fotoCapsulaBase64 = canvas.toDataURL('image/jpeg', 0.6); // Salva na variável blindada
+            fotoFuturoBase64 = canvas.toDataURL('image/jpeg', 0.6); 
             
-            const statusAnexos = document.getElementById('status-anexos-capsula');
+            const statusAnexos = document.getElementById('status-anexos-futuro');
             if(statusAnexos) statusAnexos.innerText += " [📸 Foto Anexada]";
             if(window.Haptics) window.Haptics.toqueLeve();
         };
@@ -2028,12 +2030,12 @@ window.processarFotoCapsula = function(event) {
     reader.readAsDataURL(file);
 };
 
-window.toggleGravarAudioCapsula = async function() {
-    const btn = document.getElementById('btn-audio-capsula');
-    const statusDiv = document.getElementById('status-anexos-capsula');
+window.toggleGravarAudioFuturo = async function() {
+    const btn = document.getElementById('btn-audio-futuro');
+    const statusDiv = document.getElementById('status-anexos-futuro');
     if (!btn) return;
 
-    if (!mediaRecorderCapsula || mediaRecorderCapsula.state === 'inactive') {
+    if (!mediaRecorderFuturo || mediaRecorderFuturo.state === 'inactive') {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             let options = {};
@@ -2043,19 +2045,19 @@ window.toggleGravarAudioCapsula = async function() {
                 options = { mimeType: 'audio/webm' };
             }
             
-            mediaRecorderCapsula = new MediaRecorder(stream, options);
-            audioChunksCapsula = [];
+            mediaRecorderFuturo = new MediaRecorder(stream, options);
+            audioChunksFuturo = [];
 
-            mediaRecorderCapsula.ondataavailable = e => {
-                if (e.data.size > 0) audioChunksCapsula.push(e.data);
+            mediaRecorderFuturo.ondataavailable = e => {
+                if (e.data.size > 0) audioChunksFuturo.push(e.data);
             };
 
-            mediaRecorderCapsula.onstop = () => {
-                const blob = new Blob(audioChunksCapsula, { type: mediaRecorderCapsula.mimeType });
+            mediaRecorderFuturo.onstop = () => {
+                const blob = new Blob(audioChunksFuturo, { type: mediaRecorderFuturo.mimeType });
                 const reader = new FileReader();
                 reader.readAsDataURL(blob);
                 reader.onloadend = () => {
-                    audioCapsulaBase64 = reader.result; // Salva na variável blindada
+                    audioFuturoBase64 = reader.result; 
                     if (statusDiv) statusDiv.innerText += " [🎙️ Áudio Gravado]";
                     btn.innerText = "🎙️ Regravar Voz";
                     btn.style.backgroundColor = "";
@@ -2065,7 +2067,7 @@ window.toggleGravarAudioCapsula = async function() {
                 stream.getTracks().forEach(track => track.stop());
             };
 
-            mediaRecorderCapsula.start();
+            mediaRecorderFuturo.start();
             btn.style.backgroundColor = "rgba(255, 51, 102, 0.3)";
             btn.style.borderColor = "#ff3366";
             btn.innerText = "⏹️ Gravando... (Parar)";
@@ -2074,22 +2076,21 @@ window.toggleGravarAudioCapsula = async function() {
             console.error("Erro ao acessar microfone:", err);
             if (typeof mostrarToast === 'function') mostrarToast("Permita o uso do microfone!", "🎙️");
         }
-    } else if (mediaRecorderCapsula.state === 'recording') {
-        mediaRecorderCapsula.stop();
+    } else if (mediaRecorderFuturo.state === 'recording') {
+        mediaRecorderFuturo.stop();
     }
 };
 
-window.tocarAudioCapsulaLida = function() {
-    if (audioReveladoCapsula) {
-        audioReveladoCapsula.play();
-        const btn = document.getElementById('btn-tocar-audio-revelado');
+window.tocarAudioFuturoLida = function() {
+    if (audioReveladoFuturo) {
+        audioReveladoFuturo.play();
+        const btn = document.getElementById('btn-tocar-audio-futuro');
         if(btn) btn.innerText = "⏳ Tocando...";
-        audioReveladoCapsula.onended = () => { if(btn) btn.innerText = "▶ Ouvir Novamente"; };
+        audioReveladoFuturo.onended = () => { if(btn) btn.innerText = "▶ Ouvir Novamente"; };
     }
 };
 
-// --- A FILA DO FIREBASE E O RELÓGIO ---
-function escutarCapsulaDoTempo() {
+function escutarFuturoDoTempo() {
     if (!window.SantuarioApp || !window.MEU_NOME) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
@@ -2098,29 +2099,29 @@ function escutarCapsulaDoTempo() {
     onValue(refMinhasCapsulas, (snapshot) => {
         const dados = snapshot.val();
         if (!dados) {
-            capsulaAtivaDados = null; capsulaAtivaId = null; totalCapsulasNaFila = 0;
+            capsulaFuturoDados = null; capsulaFuturoId = null; totalFuturoNaFila = 0;
         } else {
             const listaCapsulas = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
-            totalCapsulasNaFila = listaCapsulas.length;
+            totalFuturoNaFila = listaCapsulas.length;
             listaCapsulas.sort((a, b) => a.dataAbertura - b.dataAbertura); 
-            capsulaAtivaDados = listaCapsulas[0];
-            capsulaAtivaId = listaCapsulas[0].id;
+            capsulaFuturoDados = listaCapsulas[0];
+            capsulaFuturoId = listaCapsulas[0].id;
         }
-        atualizarInterfaceCapsula();
+        atualizarInterfaceFuturo();
     });
 }
 
-function atualizarInterfaceCapsula() {
-    const formCriar = document.getElementById('form-criar-capsula');
-    const painelLeitura = document.getElementById('painel-leitura-capsula');
-    const iconeCadeado = document.getElementById('icone-cadeado-capsula');
-    const status = document.getElementById('status-capsula');
-    const relogio = document.getElementById('relogio-capsula');
+function atualizarInterfaceFuturo() {
+    const formCriar = document.getElementById('form-criar-futuro');
+    const painelLeitura = document.getElementById('painel-leitura-futuro');
+    const iconeCadeado = document.getElementById('icone-cadeado-futuro');
+    const status = document.getElementById('status-futuro');
+    const relogio = document.getElementById('relogio-futuro');
 
-    if (loopRelogioCapsula) clearInterval(loopRelogioCapsula);
-    if (audioReveladoCapsula) { audioReveladoCapsula.pause(); audioReveladoCapsula = null; }
+    if (loopRelogioFuturo) clearInterval(loopRelogioFuturo);
+    if (audioReveladoFuturo) { audioReveladoFuturo.pause(); audioReveladoFuturo = null; }
 
-    if (!capsulaAtivaDados) {
+    if (!capsulaFuturoDados) {
         if(formCriar) formCriar.classList.remove('escondido');
         if(painelLeitura) painelLeitura.classList.add('escondido');
         if(iconeCadeado) { iconeCadeado.innerText = "🔓"; iconeCadeado.classList.remove('trancado'); }
@@ -2128,48 +2129,46 @@ function atualizarInterfaceCapsula() {
         if(status) status.innerText = `Nenhuma cápsula no horizonte. Escreva para ${window.NOME_PARCEIRO}.`;
     } else {
         if(formCriar) formCriar.classList.add('escondido'); 
-        iniciarMotorDoTempoCapsula();
+        iniciarMotorDoTempoFuturo();
     }
 }
 
-function iniciarMotorDoTempoCapsula() {
-    const relogio = document.getElementById('relogio-capsula');
-    const iconeCadeado = document.getElementById('icone-cadeado-capsula');
-    const painelLeitura = document.getElementById('painel-leitura-capsula');
-    const status = document.getElementById('status-capsula');
-    const msgRevelada = document.getElementById('mensagem-revelada');
-    const imgRevelada = document.getElementById('img-revelada-capsula');
-    const boxAudio = document.getElementById('container-audio-revelado');
+function iniciarMotorDoTempoFuturo() {
+    const relogio = document.getElementById('relogio-futuro');
+    const iconeCadeado = document.getElementById('icone-cadeado-futuro');
+    const painelLeitura = document.getElementById('painel-leitura-futuro');
+    const status = document.getElementById('status-futuro');
+    const msgRevelada = document.getElementById('mensagem-revelada-futuro');
+    const imgRevelada = document.getElementById('img-revelada-futuro');
+    const boxAudio = document.getElementById('container-audio-futuro');
 
     const atualizar = () => {
         const agora = new Date().getTime();
-        const diferenca = capsulaAtivaDados.dataAbertura - agora;
+        const diferenca = capsulaFuturoDados.dataAbertura - agora;
 
         if (diferenca <= 0) {
-            clearInterval(loopRelogioCapsula);
+            clearInterval(loopRelogioFuturo);
             if(relogio) { relogio.innerText = "00:00:00:00"; relogio.classList.add('zerado'); }
             if(iconeCadeado) { iconeCadeado.innerText = "✨"; iconeCadeado.classList.remove('trancado'); }
             
-            let textoFila = totalCapsulasNaFila > 1 ? ` (+${totalCapsulasNaFila - 1} na fila!)` : "";
+            let textoFila = totalFuturoNaFila > 1 ? ` (+${totalFuturoNaFila - 1} na fila!)` : "";
             if(status) status.innerText = "A barreira do tempo foi rompida." + textoFila;
             
-            let txt = window.SantuarioCrypto ? window.SantuarioCrypto.decodificar(capsulaAtivaDados.mensagem) : capsulaAtivaDados.mensagem;
+            let txt = window.SantuarioCrypto ? window.SantuarioCrypto.decodificar(capsulaFuturoDados.mensagem) : capsulaFuturoDados.mensagem;
             if(msgRevelada) msgRevelada.innerText = txt || "Apenas memórias anexadas...";
             
-            // Revelação Limpa da Foto
-            if (capsulaAtivaDados.foto && imgRevelada) {
-                imgRevelada.src = capsulaAtivaDados.foto;
+            if (capsulaFuturoDados.foto && imgRevelada) {
+                imgRevelada.src = capsulaFuturoDados.foto;
                 imgRevelada.classList.remove('escondido');
             } else if(imgRevelada) { imgRevelada.classList.add('escondido'); imgRevelada.src = ""; }
 
-            // Revelação Limpa do Áudio
-            if (capsulaAtivaDados.audio && boxAudio) {
-                audioReveladoCapsula = new Audio(capsulaAtivaDados.audio);
+            if (capsulaFuturoDados.audio && boxAudio) {
+                audioReveladoFuturo = new Audio(capsulaFuturoDados.audio);
                 boxAudio.classList.remove('escondido');
             } else if(boxAudio) { boxAudio.classList.add('escondido'); }
 
             if(painelLeitura) painelLeitura.classList.remove('escondido');
-            if(window.Haptics && diferenca > -2000) navigator.vibrate([100, 50, 100]); // Vibra só na virada
+            if(window.Haptics && diferenca > -2000) navigator.vibrate([100, 50, 100]); 
         } else {
             const d = Math.floor(diferenca / (1000 * 60 * 60 * 24));
             const h = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -2180,7 +2179,7 @@ function iniciarMotorDoTempoCapsula() {
             if(relogio) relogio.innerText = `${formatar(d)}:${formatar(h)}:${formatar(m)}:${formatar(s)}`;
             if(iconeCadeado) { iconeCadeado.innerText = "🔒"; iconeCadeado.classList.add('trancado'); }
             
-            let textoFila = totalCapsulasNaFila > 1 ? ` (${totalCapsulasNaFila} cápsulas na fila)` : "";
+            let textoFila = totalFuturoNaFila > 1 ? ` (${totalFuturoNaFila} cápsulas na fila)` : "";
             if(status) status.innerText = `O espaço-tempo protege esta mensagem de ${window.NOME_PARCEIRO}.${textoFila}`;
             
             if(painelLeitura) painelLeitura.classList.add('escondido');
@@ -2190,15 +2189,14 @@ function iniciarMotorDoTempoCapsula() {
     };
 
     atualizar(); 
-    loopRelogioCapsula = setInterval(atualizar, 1000); 
+    loopRelogioFuturo = setInterval(atualizar, 1000); 
 }
 
-window.selarCapsula = function() {
-    const texto = document.getElementById('texto-capsula').value;
-    const dataInput = document.getElementById('data-abertura-capsula').value; 
+window.selarFuturo = function() {
+    const texto = document.getElementById('texto-futuro').value;
+    const dataInput = document.getElementById('data-abertura-futuro').value; 
 
-    // Bloqueia se tentar enviar vazio
-    if (!texto.trim() && !fotoCapsulaBase64 && !audioCapsulaBase64) {
+    if (!texto.trim() && !fotoFuturoBase64 && !audioFuturoBase64) {
         if(typeof mostrarToast === 'function') mostrarToast("Adicione pelo menos um texto, foto ou áudio!", "⚠️");
         return;
     }
@@ -2227,41 +2225,39 @@ window.selarCapsula = function() {
         autor: window.MEU_NOME
     };
     
-    // Anexa as mídias capturadas
-    if (fotoCapsulaBase64) capsuleData.foto = fotoCapsulaBase64;
-    if (audioCapsulaBase64) capsuleData.audio = audioCapsulaBase64;
+    if (fotoFuturoBase64) capsuleData.foto = fotoFuturoBase64;
+    if (audioFuturoBase64) capsuleData.audio = audioFuturoBase64;
 
     push(refDestino, capsuleData).then(() => {
         if(typeof mostrarToast === 'function') mostrarToast("Cápsula multimídia selada e enviada!", "🔒");
         if(window.Haptics) navigator.vibrate([50, 100, 50]);
         
-        // Zera os inputs do HTML e Limpa as variáveis
-        document.getElementById('texto-capsula').value = "";
-        document.getElementById('data-abertura-capsula').value = "";
-        fotoCapsulaBase64 = null;
-        audioCapsulaBase64 = null;
+        document.getElementById('texto-futuro').value = "";
+        document.getElementById('data-abertura-futuro').value = "";
+        fotoFuturoBase64 = null;
+        audioFuturoBase64 = null;
         
-        const statusAnexos = document.getElementById('status-anexos-capsula');
+        const statusAnexos = document.getElementById('status-anexos-futuro');
         if(statusAnexos) statusAnexos.innerText = "";
         
-        const btnAudio = document.getElementById('btn-audio-capsula');
+        const btnAudio = document.getElementById('btn-audio-futuro');
         if(btnAudio) {
             btnAudio.innerText = "🎙️ Gravar Voz";
             btnAudio.style.backgroundColor = "";
             btnAudio.style.borderColor = "";
         }
         
-        if (mediaRecorderCapsula && mediaRecorderCapsula.state === 'recording') {
-            mediaRecorderCapsula.stop();
+        if (mediaRecorderFuturo && mediaRecorderFuturo.state === 'recording') {
+            mediaRecorderFuturo.stop();
         }
     });
 };
 
-window.destruirCapsulaLida = function() {
-    if (!capsulaAtivaId) return;
+window.destruirFuturoLido = function() {
+    if (!capsulaFuturoId) return;
 
     const { db, ref, remove } = window.SantuarioApp.modulos;
-    const refMinhaCapsula = ref(db, 'capsulas_tempo/' + window.MEU_NOME.toLowerCase() + '/' + capsulaAtivaId);
+    const refMinhaCapsula = ref(db, 'capsulas_tempo/' + window.MEU_NOME.toLowerCase() + '/' + capsulaFuturoId);
     
     remove(refMinhaCapsula).then(() => {
         if(typeof mostrarToast === 'function') mostrarToast("Memória absorvida. Verificando o relógio seguinte...", "✨");
@@ -2338,6 +2334,39 @@ window.escutarRadarParceiro = function() {
         }
     });
 };
+
+// ==========================================
+// OLHEIRO INTELIGENTE: OCULTA O RADAR EM JOGOS E RELÍQUIAS
+// ==========================================
+window.addEventListener('load', () => {
+    const radar = document.getElementById('radar-telepresenca');
+    const modalReliquia = document.getElementById('modal-reliquia');
+    
+    if (!radar) return;
+
+    const verificarVisibilidadeRadar = () => {
+        // Verifica se o usuário está dentro de um jogo ou no Painel do Futuro
+        const emJogo = document.body.classList.contains('modo-jogo-ativo');
+        // Verifica se o modal das relíquias padrão está aberto
+        const emReliquia = modalReliquia && !modalReliquia.classList.contains('escondido');
+        
+        if (emJogo || emReliquia) {
+            radar.style.display = 'none'; // Esconde completamente
+        } else {
+            radar.style.display = 'flex'; // Devolve o radar
+        }
+    };
+
+    // Fica vigiando o "body" (ele muda quando entraremos em jogos ou na Cápsula)
+    const observerBody = new MutationObserver(verificarVisibilidadeRadar);
+    observerBody.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // Fica vigiando a janela das Relíquias (Planetário, Ecos, etc)
+    if (modalReliquia) {
+        const observerModal = new MutationObserver(verificarVisibilidadeRadar);
+        observerModal.observe(modalReliquia, { attributes: true, attributeFilter: ['class'] });
+    }
+});
 
 
 
@@ -2761,95 +2790,70 @@ window.enviarRespostaEspelho = function() {
 
 
 // ==========================================
-// EXPANSÃO 4: A ROTA DO DESTINO (Motor Raymarching SDF)
+// EXPANSÃO 4: A ROTA DO DESTINO (CORRIGIDA E APERFEIÇOADA)
 // ==========================================
 window.escutarRotaDestino = function() {
-    if (!window.SantuarioApp) return;
+    if (!window.SantuarioApp?.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const refRota = ref(db, 'rota_destino/estado');
     
-    const btnJornada = document.querySelector('.item-menu[data-alvo="jornada"]');
-    if (btnJornada && !window.jornadaMenuConfigurado) {
-        btnJornada.addEventListener('click', () => {
-            if (typeof window.injetarMotor3D === 'function') window.injetarMotor3D();
-            const tentarLigar = setInterval(() => {
-                if (typeof window.inicializarJornada3D === 'function') {
-                    window.inicializarJornada3D();
-                    clearInterval(tentarLigar);
-                }
-            }, 200);
-        });
-        window.jornadaMenuConfigurado = true;
-    }
-    
-    // Variável para a suavização matemática
-    window.ProgressoAlvoJornada = window.ProgressoAlvoJornada || 0;
-    
+    // Listener constante para atualizar o contador na tela
     onValue(refRota, (snapshot) => {
         const dados = snapshot.val() || { km: 0 };
-        let kmTotal = dados.km > 1300 ? 1300 : dados.km;
+        // Garante que o KM seja um número exato e não ultrapasse a meta de 1300
+        let kmTotal = Math.min(Number(dados.km || 0), 1300);
         
         const contador = document.getElementById('km-contador');
-        if (contador) contador.innerHTML = `${kmTotal} <span class="hud-max">/ 1300 KM</span>`;
+        if (contador) {
+            contador.innerHTML = `${kmTotal} <span class="hud-max">/ 1300 KM</span>`;
+        }
         
-        // Define o alvo (de 0.0 a 1.0) para a Placa de Vídeo buscar suavemente
+        // Atualiza o progresso para o motor 3D (0.0 a 1.0)
         window.ProgressoAlvoJornada = kmTotal / 1300;
     });
 };
 
 window.comprarCombustivel = function() {
-    const moedasDOM = document.getElementById('fazenda-capital') || document.getElementById('jardim-moedas');
-    if (moedasDOM) {
-        let saldoAtual = parseInt(moedasDOM.innerText) || 0;
-        if (saldoAtual < 100) {
-            if(typeof mostrarToast === 'function') mostrarToast("Vocês precisam de 100💰 para abastecer!", "⛽");
-            if(window.Haptics) window.Haptics.erro();
-            return;
-        }
-    }
-
+    if (!window.SantuarioApp?.modulos) return;
     const { db, ref, get, update } = window.SantuarioApp.modulos;
     const refRota = ref(db, 'rota_destino/estado');
     
+    // 1. Verifica se há moedas suficientes com segurança
+    const moedasAtuais = window.pontosDoCasal || 0;
+    if (moedasAtuais < 100) {
+        if(typeof mostrarToast === 'function') mostrarToast("Moedas insuficientes! Joguem mais para lucrar.", "💰");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    // 2. Busca o valor atual e imutável de KM para somar +5
     get(refRota).then((snapshot) => {
         let dados = snapshot.val() || { km: 0 };
-        if (dados.km >= 1300) {
-            if(typeof mostrarToast === 'function') mostrarToast("A viagem intergaláctica está completa. Vocês se encontraram!", "❤️");
+        let kmAtual = Number(dados.km || 0);
+
+        if (kmAtual >= 1300) {
+            if(typeof mostrarToast === 'function') mostrarToast("A Jornada já foi concluída! Vocês venceram a distância.", "✨");
             return;
         }
 
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-100, "Combustível Comprado!");
-
-        // NOVA PROGRESSÃO: 5 km por vez! (Tornando o jogo muito mais duradouro e valioso)
-        let novoKm = dados.km + 5;
-        if (novoKm > 1300) novoKm = 1300;
+        // 3. Desconta dinheiro local/globalmente e aumenta KM
+        if(typeof atualizarPontosCasal === 'function') {
+            atualizarPontosCasal(-100, "Combustível");
+        }
         
-        let payload = { km: novoKm };
+        let novoKm = Math.min(kmAtual + 5, 1300);
         
-        if (novoKm >= 325 && !dados.c325) {
-            payload.c325 = true;
-            setTimeout(() => { if(typeof mostrarToast === 'function') mostrarToast("Parada 1 (325km)! O primeiro marco foi superado.", "🎉"); }, 1000);
-        }
-        if (novoKm >= 650 && !dados.c650) {
-            payload.c650 = true;
-            setTimeout(() => { if(typeof mostrarToast === 'function') mostrarToast("650km! Vocês chegaram na exata metade do caminho!", "🔥"); }, 1000);
-        }
-        if (novoKm >= 975 && !dados.c975) {
-            payload.c975 = true;
-            setTimeout(() => { if(typeof mostrarToast === 'function') mostrarToast("975km! A gravidade de vocês já está se puxando...", "🚀"); }, 1000);
-        }
-        if (novoKm === 1300 && !dados.c1300) {
-            payload.c1300 = true;
-            setTimeout(() => { 
-                if(typeof mostrarToast === 'function') mostrarToast("O ENCONTRO MÁXIMO! A distância foi zerada.", "❤️"); 
-                if (typeof confetti === 'function') confetti({colors: ['#ff3366', '#D4AF37'], particleCount: 400, spread: 360});
-                if(window.Haptics) navigator.vibrate([100, 50, 200, 50, 300, 100, 500, 100, 800]);
-            }, 1000);
-        }
-
-        update(refRota, payload).then(() => {
-            if(typeof mostrarToast === 'function') mostrarToast("Motores ativados! +5 KM percorridos na maratona.", "🚗");
+        // 4. Salva a nova distância na nuvem
+        update(refRota, { km: novoKm }).then(() => {
+            if(typeof mostrarToast === 'function') mostrarToast(`Motores acesos! +5km percorridos.`, "🚀");
             if(window.Haptics) navigator.vibrate([30, 50, 30]);
+        }).catch(err => {
+            console.error("Erro ao atualizar Jornada:", err);
         });
     });
 };
+
+// O GATILHO MÁGICO: Garante que a função acorde sozinha quando o app carregar!
+window.addEventListener('load', () => {
+    setTimeout(window.escutarRotaDestino, 1000);
+});

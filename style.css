@@ -4943,35 +4943,169 @@ body.aura-ansiosa {
 }
 
 /* ==========================================
-   1. PERGAMINHO SAGRADO (ABA LEIS)
+   1. MAGNA CARTA (ABA LEIS - DESIGN JURÍDICO CLARO)
 ========================================== */
+.documento-juridico {
+    /* Fundo claro e elegante, imitando um papel pergaminho de alta gramatura */
+    background: linear-gradient(to bottom, #FCFAF5, #F2EFE9);
+    border: 1px solid rgba(212, 175, 55, 0.6);
+    padding: 25px 20px;
+    /* Sombras adaptadas para fundo claro, dando profundidade sem sujar a tela */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15), inset 0 0 40px rgba(212, 175, 55, 0.05);
+    position: relative;
+}
+
+.documento-juridico::before {
+    content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+    border: 1px dashed rgba(212, 175, 55, 0.4); pointer-events: none;
+}
+
+.cabecalho-doc { text-align: center; margin-bottom: 20px; }
+.brasao-santuario { font-size: 2.5rem; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+
+.titulo-magna-carta { 
+    font-family: 'Playfair Display', serif; 
+    color: var(--cor-primaria); 
+    font-size: 1.8rem; 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+    margin-bottom: 5px; 
+    /* Uma sombra sutil escura para o dourado se destacar no fundo claro */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.15); 
+}
+
+.subtitulo-doc { 
+    color: #555; /* Cinza médio elegante */
+    font-size: 0.75rem; 
+    letter-spacing: 3px; 
+    text-transform: uppercase; 
+    font-weight: bold;
+}
+
+.linha-divisoria-ouro { 
+    height: 1px; 
+    background: linear-gradient(90deg, transparent, var(--cor-primaria), transparent); 
+    margin: 20px 0; 
+    opacity: 0.8; 
+}
+
+.preambulo-container {
+    font-family: 'Cormorant Garamond', serif; 
+    font-size: 1.05rem; 
+    color: #333; /* Cinza chumbo/escuro para leitura fácil */
+    font-style: italic; 
+    line-height: 1.6; 
+    text-align: justify; 
+    margin-bottom: 30px;
+    padding: 0 10px; 
+    text-indent: 30px;
+    font-weight: 600; /* Dá peso visual à tinta no papel claro */
+}
+
+/* Formatação Rigorosa dos Artigos */
+.artigos-container { padding: 0 5px; }
 .lei-item {
-    background: rgba(0, 0, 0, 0.4);
-    border-left: 3px solid var(--cor-primaria);
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 0 10px 10px 0;
-    color: #eee;
-    font-size: 0.95rem;
+    margin-bottom: 20px; text-align: justify;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.lei-item.visivel { opacity: 1; transform: translateY(0); }
+
+.artigo-num { 
+    color: var(--cor-primaria); 
+    font-weight: bold; 
+    font-family: 'Playfair Display', serif; 
+    margin-right: 5px; 
+    text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.1);
+}
+
+.caput { 
+    color: #111; /* Preto quase absoluto para máximo contraste e seriedade */
+    font-size: 0.95rem; 
+    line-height: 1.5; 
+    font-weight: 500;
+}
+
+.paragrafo {
+    color: #444; /* Cinza escuro para diferenciar o parágrafo do Caput */
+    font-size: 0.85rem; 
     line-height: 1.4;
-    
-    /* A mágica da invisibilidade inicial */
-    opacity: 0;
-    transform: translateX(-30px);
-    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    margin-top: 8px; 
+    padding-left: 20px; 
+    text-indent: 15px; 
+    border-left: 2px solid rgba(212,175,55,0.5); /* Fio dourado mais nítido */
 }
 
-.lei-item strong {
-    color: var(--cor-primaria);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    margin-right: 5px;
+/* O Selo de Cera (Botão) */
+.area-selo-renovacao { text-align: center; margin-top: 40px; position: relative; }
+
+.status-juridico { 
+    font-family: monospace; 
+    font-size: 0.7rem; 
+    color: #666; /* Cinza médio */
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin-bottom: 15px; 
+    font-weight: bold;
 }
 
-/* Quando o Javascript colocar essa classe, a lei desliza para a tela */
-.lei-item.visivel {
-    opacity: 1;
-    transform: translateX(0);
+.selo-cera-btn {
+    width: 90px; height: 90px; border-radius: 50%;
+    /* O vermelho da cera fica incrível contrastando com o fundo creme */
+    background: radial-gradient(circle at 30% 30%, #d32f2f, #8b0000);
+    border: none; position: relative; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3), inset 0 -3px 8px rgba(0,0,0,0.5), inset 0 3px 8px rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.selo-cera-btn::before {
+    content: ''; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 2px dashed rgba(255,255,255,0.3); border-radius: 50%;
+}
+
+.selo-texto {
+    font-family: 'Playfair Display', serif; color: rgba(255,255,255,0.95);
+    font-size: 0.65rem; font-weight: bold; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Animação do carimbo ao clicar */
+.selo-cera-btn.carimbado { 
+    transform: scale(0.85) rotate(-5deg); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.8); 
+    filter: brightness(0.8); 
+}
+
+/* Assinaturas Digitais */
+.area-assinaturas { display: flex; justify-content: space-around; margin-top: 30px; opacity: 0; transition: opacity 1s; }
+.area-assinaturas.reveladas { opacity: 1; }
+.assinatura-box { text-align: center; width: 40%; }
+
+.assinatura-digital { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 1.8rem; 
+    color: var(--cor-primaria); 
+    font-style: italic; 
+    opacity: 0.95; 
+    display: block; 
+    margin-bottom: -5px; 
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
+}
+
+.linha-assinatura { 
+    height: 1px; 
+    background: #333; /* Linha de assinatura preta/chumbo */
+    width: 100%; 
+    margin-bottom: 5px; 
+}
+
+.cargo-assinatura { 
+    font-size: 0.65rem; 
+    color: #555; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    font-family: monospace; 
+    font-weight: bold; 
 }
 
 /* ==========================================
@@ -6257,14 +6391,15 @@ body.aura-ansiosa {
     0% { transform: scale(1); opacity: 1; }
     100% { transform: scale(2.8); opacity: 0; }
 }
+
 @keyframes pulsarCoracaoRecebendo {
     0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,51,102,0.4); }
     100% { transform: scale(1.15); box-shadow: 0 0 30px rgba(255,51,102,0.9); }
 }
 
-
-
-/* Amarra o Fundo do Botão de Surpresa à cor da Aura atual */
+/* ==========================================
+   BOTÃO SURPRESA (COR DO TEMA)
+========================================== */
 #btn-surpresa {
     background: var(--cor-primaria) !important; /* Fundo preenchido com a cor do tema */
     color: #000000 !important; /* Texto preto */
@@ -6758,8 +6893,6 @@ body.aura-ansiosa {
     box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.02) !important;
 }
 
-
-
 /* ==========================================
    HUD DA JORNADA (SCIFI INTERFACE)
 ========================================== */
@@ -6767,18 +6900,21 @@ body.aura-ansiosa {
     position: relative;
     z-index: 10;
     width: 100%;
-    height: 100%;
+    height: 100vh; /* Ajustado para cobrir a tela perfeitamente */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 50px 20px 100px 20px; /* Espaço para o menu inferior */
+    padding: 50px 20px 100px 20px; 
     box-sizing: border-box;
-    pointer-events: none; /* Deixa o dedo passar para o 3D */
+    /* FUNDAMENTAL: Deixa o dedo atravessar o container invisível e tocar no 3D */
+    pointer-events: none; 
 }
 
 .hud-topo {
     text-align: center;
     animation: descerHUD 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Reativa a leitura de clique apenas para o painel */
+    pointer-events: auto; 
 }
 
 .hud-titulo {
@@ -6822,7 +6958,8 @@ body.aura-ansiosa {
 
 .hud-base {
     text-align: center;
-    pointer-events: auto; /* Reativa o clique só aqui em baixo */
+    /* Reativa o toque APENAS na parte de baixo para clicar no botão */
+    pointer-events: auto; 
     animation: subirHUD 1.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -6833,6 +6970,8 @@ body.aura-ansiosa {
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 20px;
+    /* Desativa o clique no texto para não interferir com o arraste do 3D */
+    pointer-events: none; 
 }
 
 .hud-alerta-interacao .piscar {
@@ -6850,6 +6989,7 @@ body.aura-ansiosa {
     position: relative;
     overflow: hidden;
     transition: all 0.3s;
+    cursor: pointer;
 }
 
 .hud-btn-ignicao::before {
@@ -6892,3 +7032,74 @@ body.aura-ansiosa {
 
 
 
+/* Efeito de Martelo no Centro */
+.martelo-centro-impacto {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(2.5) rotate(-45deg) !important;
+    z-index: 10000;
+    animation: baterMarteloForte 0.6s ease-in forwards;
+}
+
+@keyframes baterMarteloForte {
+    0% { transform: translate(-50%, -150%) scale(3) rotate(-90deg); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(2.5) rotate(0deg); opacity: 1; }
+    70% { transform: translate(-50%, -40%) scale(2.2) rotate(20deg); }
+    100% { transform: translate(-50%, -50%) scale(2.5) rotate(0deg); }
+}
+
+/* Animação do Martelo batendo no centro da tela */
+.martelo-centro-impacto {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(3) rotate(-45deg) !important;
+    z-index: 10000 !important;
+    transition: all 0.3s ease-in;
+    animation: impactoMartelo 0.6s ease-out forwards;
+}
+
+@keyframes impactoMartelo {
+    0% { transform: translate(-50%, -150%) scale(4) rotate(-90deg); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(3) rotate(0deg); opacity: 1; }
+    70% { transform: translate(-50%, -45%) scale(2.8) rotate(10deg); }
+    100% { transform: translate(-50%, -50%) scale(3) rotate(0deg); }
+}
+
+/* Efeito de Vidro Quebrado */
+.efeito-tela-quebrada {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('https://www.transparenttextures.com/patterns/glass-knob.png'); /* Textura de vidro */
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: 9999;
+    pointer-events: none;
+    animation: flashImpacto 0.5s ease-out;
+}
+
+@keyframes flashImpacto {
+    0% { background-color: rgba(255, 255, 255, 0.6); }
+    100% { background-color: transparent; }
+}
+
+
+#painel-capsula-futuro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-color: var(--cor-fundo);
+    z-index: 10000; /* SUPERPOSIÇÃO MÁXIMA, nunca bugará atrás de outra tela */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#painel-capsula-futuro.escondido {
+    display: none !important; /* Blindagem pesada contra conflitos de display */
+}

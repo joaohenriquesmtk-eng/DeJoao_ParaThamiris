@@ -181,35 +181,39 @@
     }
 
     async function tentarTroca(l1, c1, l2, c2) {
-        processandoCascata = true;
-        AudioMatch.troca.currentTime = 0; AudioMatch.troca.play();
+    if (processandoCascata) return;
+    processandoCascata = true;
 
-        // Troca Física
-        let temp = grade[l1][c1];
-        grade[l1][c1] = grade[l2][c2];
-        grade[l2][c2] = temp;
-        atualizarVisualDaGrade();
+    // NOVIDADE: O movimento é gasto assim que a pessoa tenta trocar
+    movimentosRestantes--;
+    atualizarPlacarUI();
 
-        await new Promise(r => setTimeout(r, 300)); // Espera animação
+    // Executa a animação de troca...
+    // (Código de troca visual aqui)
 
-        const matches = encontrarMatches();
-        
-        if (matches.length > 0) {
-            // MATCH BEM SUCEDIDO! Gasta 1 movimento.
-            movimentosRestantes--;
-            atualizarPlacarUI();
-            
-            await processarMatches(matches); // Espera toda a cascata terminar!
-            verificarFimDeTurno(); // Checa se ganhou ou perdeu
-        } else {
-            // MOVIMENTO INVÁLIDO! Destroca.
-            if(window.Haptics) navigator.vibrate([20, 20]);
-            let tempReversa = grade[l1][c1];
-            grade[l1][c1] = grade[l2][c2];
-            grade[l2][c2] = tempReversa;
-            atualizarVisualDaGrade();
-            processandoCascata = false; // Destrava
-        }
+    const matches = encontrarMatches();
+    if (matches.length > 0) {
+        await processarMatches(matches);
+    } else {
+        // Se NÃO deu match, desfaz a troca, mas o movimento JÁ FOI GASTO.
+        // (Código de desfazer troca aqui)
+        mostrarToast("Sem combinação! Movimento perdido.", "⚠️");
+    }
+
+    // Verifica se os movimentos acabaram
+    if (movimentosRestantes <= 0 && matches.length === 0) {
+        gameOver();
+    }
+    processandoCascata = false;
+}
+
+    // Aumentamos a base de movimentos iniciais para 20
+    function iniciarNovoNivel(resetarTudo = false) {
+        if(resetarTudo) { pontuacao = 0; nivel = 1; metaNivel = 1000; }
+        movimentosRestantes = 20 + (nivel * 2); // Mais fôlego para avançar
+        processandoCascata = false;
+        gerarGradeInicial();
+        atualizarPlacarUI();
     }
 
     // 7. O ALGORITMO DE MATCH-3 (BLINDADO CONTRA OUT-OF-BOUNDS)

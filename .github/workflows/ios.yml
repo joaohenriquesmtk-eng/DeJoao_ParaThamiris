@@ -3,6 +3,13 @@ on:
   push:
     branches: [ main ]
 
+# ------------------------------------------------------------------
+# O SEGREDO: Desligamos qualquer pergunta ou interrupção do Capacitor
+# ------------------------------------------------------------------
+env:
+  CI: true
+  CAPACITOR_DISABLE_TELEMETRY: true
+
 jobs:
   build:
     runs-on: macos-latest
@@ -14,30 +21,41 @@ jobs:
         with:
           node-version: '22'
           
-      - name: Garantir a Identidade do Projeto
+      - name: Preparar o Terreno (Garantia Absoluta)
+        run: |
+          # Garantimos que a pasta www exista perfeitamente na nuvem
+          mkdir -p www
+          cp index.html www/ 2>/dev/null || true
+          cp -r assets www/ 2>/dev/null || true
+          cp *.js www/ 2>/dev/null || true
+          cp *.css www/ 2>/dev/null || true
+          
+          # Criamos a certidão de nascimento do aplicativo à força
+          echo '{
+            "appId": "com.joaoethamiris.santuario",
+            "appName": "Santuario",
+            "webDir": "www",
+            "bundledWebRuntime": false
+          }' > capacitor.config.json
+
+      - name: Instalar o Capacitor
         run: |
           npm install
-          npm install @capacitor/ios @capacitor/core @capacitor/cli
-          # Passo 1: Limpamos qualquer resquicio de configuracao antiga para evitar conflitos
-          rm -f capacitor.config.json capacitor.config.ts
-          # Passo 2: Inicializamos o projeto de forma limpa
-          npx cap init Santuario com.joaoethamiris.santuario --web-dir www
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
           
-      - name: Criar a pasta Web (O Passo Mágico)
+      - name: Fabricar a Plataforma iOS 
         run: |
-          # Passo 3: O Capacitor precisa que a pasta web exista ANTES de criar o iOS!
-          # Se o seu projeto não tem um comando de build (como npm run build),
-          # nós criamos a pasta www e um ficheiro index.html básico manualmente.
-          mkdir -p www
-          echo "<html><head><title>Santuário</title></head><body><h1>Santuário App</h1></body></html>" > www/index.html
-          
-      - name: Fabricar a Plataforma iOS do Zero Absoluto
-        run: |
+          # Agora o Capacitor vai trabalhar calado, do início ao fim!
           rm -rf ios
           npx cap add ios
           npx cap sync ios
-          
-      - name: Construir as Fundacoes da Apple (CocoaPods)
+
+      - name: Verificacao de Seguranca (A Prova do Crime)
+        run: |
+          # Isso vai imprimir na tela do GitHub se o Podfile finalmente nasceu
+          ls -la ios/App/Podfile || echo "Alerta: Podfile ainda sumido!"
+
+      - name: Instalar as Fundacoes da Apple (CocoaPods)
         run: |
           cd ios/App
           pod install --repo-update
@@ -54,7 +72,7 @@ jobs:
           cp -r App.app Payload/
           zip -r app.ipa Payload
           
-      - name: Entregar o Presente (Upload Artifact)
+      - name: Entregar o Presente Final
         uses: actions/upload-artifact@v4
         with:
           name: app-santuario-ios

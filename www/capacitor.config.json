@@ -1,5 +1,6 @@
 {
-  "appId": "com.seu.dominio",
+  "appId": "com.joaoethamiris.santuario",
   "appName": "Santuario",
-  "webDir": "www"
+  "webDir": "www",
+  "bundledWebRuntime": false
 }

@@ -17,14 +17,12 @@ jobs:
       - name: Instalar Dependencias do Projeto
         run: npm install
         
-      - name: Sincronizar Capacitor
-        run: npx cap sync ios
-        
-      - name: Instalar Pods e Gerar Workspace (A Magica do Mac)
+      - name: Fabricar iOS do Zero no Mac
         run: |
-          cd ios/App
-          pod install
-        
+          rm -rf ios
+          npx cap add ios
+          npx cap sync ios
+          
       - name: Fabricar o App no Mac Virtual
         run: |
           cd ios/App

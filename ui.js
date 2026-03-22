@@ -248,42 +248,42 @@ window.renovarVotos = () => {
     }
 };
 
-    // ==========================================
-    // 3. MOTOR DA ILHA DINÂMICA
-    // ==========================================
-    window.toastTimer = null; // Variável global para controlar o tempo
+// ==========================================
+// 3. MOTOR DA ILHA DINÂMICA
+// ==========================================
+window.toastTimer = null; // Variável global para controlar o tempo
 
-    window.mostrarToast = (mensagem, icone = "✨") => {
-        const ilha = document.getElementById('dynamic-island');
-        if (!ilha) return;
+window.mostrarToast = (mensagem, icone = "✨") => {
+    const ilha = document.getElementById('dynamic-island');
+    if (!ilha) return;
 
-        const textoEl = document.getElementById('island-text');
-        const iconeEl = document.getElementById('island-icon');
+    const textoEl = document.getElementById('island-text');
+    const iconeEl = document.getElementById('island-icon');
 
-        // Personaliza o ícone dependendo da mensagem
-        if (mensagem.toLowerCase().includes('pulso')) icone = "💖";
-        if (mensagem.toLowerCase().includes('erro')) icone = "❌";
+    // Personaliza o ícone dependendo da mensagem
+    if (mensagem.toLowerCase().includes('pulso')) icone = "💖";
+    if (mensagem.toLowerCase().includes('erro')) icone = "❌";
 
-        textoEl.innerText = mensagem;
-        iconeEl.innerText = icone;
+    textoEl.innerText = mensagem;
+    iconeEl.innerText = icone;
 
-        // Feedback Tátil (Se já tivermos instalado o Haptics no passo anterior)
-        if (window.Haptics && window.Haptics.toqueLeve) window.Haptics.toqueLeve();
+    // Feedback Tátil
+    if (window.Haptics && window.Haptics.toqueLeve) window.Haptics.toqueLeve();
 
-        // Expande a ilha!
-        ilha.classList.add('ativa');
+    // Expande a ilha!
+    ilha.classList.add('ativa');
 
-        // Se já tinha um aviso rodando, zera o cronômetro para não fechar na cara
-        if (window.toastTimer) clearTimeout(window.toastTimer);
+    // Se já tinha um aviso rodando, zera o cronômetro para não fechar na cara
+    if (window.toastTimer) clearTimeout(window.toastTimer);
 
-        // Encolhe a ilha e some depois de 3 segundos
-        window.toastTimer = setTimeout(() => {
-            ilha.classList.remove('ativa');
-        }, 3000);
-    };
+    // Encolhe a ilha e some depois de 3 segundos
+    window.toastTimer = setTimeout(() => {
+        ilha.classList.remove('ativa');
+    }, 3000);
+};
 
 // ==========================================
-// 10. MOTOR DE MICRO-INTERAÇÕES LOTTIE
+// 10. MOTOR DE MICRO-INTERAÇÕES LOTTIE (OTIMIZADO PARA GPU)
 // ==========================================
 window.LottieManager = {
     instancia: null,
@@ -309,9 +309,13 @@ window.LottieManager = {
         const url = animações[mood.toLowerCase()];
         if (!url) return;
 
+        /* MÁGICA DA GPU APLICADA: 
+           Mudança de 'svg' para 'canvas'.
+           Isso evita que a CPU tenha que recalcular curvas de vetor 60 vezes por segundo, 
+           transformando o Lottie em uma imagem rasterizada controlada pela placa de vídeo. */
         window.LottieManager.instancia = lottie.loadAnimation({
             container: container,
-            renderer: 'svg',
+            renderer: 'canvas',
             loop: true,
             autoplay: true,
             path: url

@@ -1844,108 +1844,48 @@ window.fecharCapsula = () => {
 };
 
 // ==========================================
-// RELÍQUIA 1: NOSSOS ECOS (Motor Cross-Platform iOS/Android)
+// RELÍQUIA 1: NOSSOS ECOS (LISTENER GLOBAL UNIFICADO)
 // ==========================================
-let gravadorDeVoz;
-let pedacosDeAudio = [];
 
-window.toggleGravacaoEco = async function() {
-    if (!gravadorDeVoz || gravadorDeVoz.state === "inactive") {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            
-            // DETECÇÃO DE SISTEMA: Deixa o iPhone gravar em mp4 e o Android em webm
-            let options = {};
-            if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                options = { mimeType: 'audio/mp4' }; // Salvação para o iPhone 14 Pro Max
-            } else if (MediaRecorder.isTypeSupported('audio/webm')) {
-                options = { mimeType: 'audio/webm' }; // Salvação para o Samsung A55
-            }
-
-            gravadorDeVoz = new MediaRecorder(stream, options);
-            pedacosDeAudio = [];
-
-            gravadorDeVoz.ondataavailable = e => {
-                if (e.data.size > 0) pedacosDeAudio.push(e.data);
-            };
-
-            gravadorDeVoz.onstop = () => {
-                // Cria o arquivo de áudio respeitando o formato nativo do celular
-                const blob = new Blob(pedacosDeAudio, { type: gravadorDeVoz.mimeType });
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => salvarEcoNoFirebase(reader.result);
-                
-                // Desliga fisicamente o microfone (Some o ícone de gravação do topo do celular)
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            gravadorDeVoz.start();
-            document.getElementById('status-eco').innerText = "Gravando mensagem... 🎙️";
-            document.getElementById('btn-gravar-eco').style.boxShadow = "0 0 15px #e74c3c";
-            document.getElementById('btn-gravar-eco').style.borderColor = "#e74c3c";
-            if(window.Haptics) window.Haptics.toqueForte();
-
-        } catch (err) {
-            console.error("Erro no microfone:", err);
-            if(typeof mostrarToast === 'function') mostrarToast("Permita o uso do microfone nas configurações do navegador!", "🎙️");
-        }
-    } else if (gravadorDeVoz.state === "recording") {
-        gravadorDeVoz.stop();
-        document.getElementById('status-eco').innerText = "Processando frequências...";
-        document.getElementById('btn-gravar-eco').style.boxShadow = "";
-        document.getElementById('btn-gravar-eco').style.borderColor = "var(--cor-primaria)";
-        if(window.Haptics) window.Haptics.sucesso();
-    }
-};
-
-function salvarEcoNoFirebase(base64) {
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    
-    // ALINHAMENTO COM AS REGRAS: Aponta exatamente para "ecos_recentes"
-    const refEco = ref(db, 'ecos_recentes/' + window.MEU_NOME.toLowerCase());
-    
-    set(refEco, {
-        audio: base64,
-        timestamp: Date.now()
-    }).then(() => {
-        document.getElementById('status-eco').innerText = "Voz enviada pelas estrelas! ✨";
-        if(window.Haptics) window.Haptics.sucesso();
-        setTimeout(() => {
-            const el = document.getElementById('status-eco');
-            if(el) el.innerText = "O cofre aguarda sua voz.";
-        }, 3000);
-    });
-}
-
-// Escuta em tempo real se a parceira mandou um áudio
+// Agora o aplicativo escuta uma única "Frequência" compartilhada por ambos!
 window.escutarEcosDoParceiro = function() {
-    if (!window.SantuarioApp || !window.NOME_PARCEIRO) return;
+    if (!window.SantuarioApp || !window.MEU_NOME) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    const refEcoParceiro = ref(db, 'ecos_recentes/' + window.NOME_PARCEIRO.toLowerCase());
-    onValue(refEcoParceiro, (snapshot) => {
+    // Frequência de rádio unificada do Santuário
+    const refEcoSantuario = ref(db, 'eco_santuario/frequencia_atual');
+    
+    onValue(refEcoSantuario, (snapshot) => {
         const dados = snapshot.val();
-        if (dados && dados.audio) {
-            window.ecoRecebidoAudio = new Audio(dados.audio);
-            const statusEco = document.getElementById('status-eco');
-            if (statusEco) statusEco.innerText = `Um novo eco de ${window.NOME_PARCEIRO} está aguardando! 🎵`;
+        const btnOuvir = document.getElementById('btn-ouvir-eco');
+        const statusEco = document.getElementById('status-eco');
+        
+        if (dados && dados.audioBase64) {
+            // Guarda o áudio e quem gravou na memória vital do celular
+            window.audioCarregado = dados.audioBase64;
+            window.autorEcoAtual = dados.autor;
+            
+            if (btnOuvir) btnOuvir.style.display = 'block';
+            
+            if (statusEco) {
+                if (dados.autor === window.MEU_NOME) {
+                    statusEco.innerText = "Sua voz está ecoando no espaço. 🎵";
+                    statusEco.style.color = "#aaa";
+                } else {
+                    statusEco.innerText = `Um eco de ${window.NOME_PARCEIRO} aguarda por você! 🎵`;
+                    statusEco.style.color = "#2ecc71";
+                }
+            }
+        } else {
+            window.audioCarregado = null;
+            window.autorEcoAtual = null;
+            if (btnOuvir) btnOuvir.style.display = 'none';
+            if (statusEco) {
+                statusEco.innerText = "O silêncio reina. Grave o primeiro eco.";
+                statusEco.style.color = "var(--cor-primaria)";
+            }
         }
     });
-};
-
-window.tocarEco = function() {
-    if (window.ecoRecebidoAudio) {
-        window.ecoRecebidoAudio.play();
-        document.getElementById('status-eco').innerText = `Ouvindo a voz de ${window.NOME_PARCEIRO}... 🎵`;
-        
-        window.ecoRecebidoAudio.onended = () => {
-            document.getElementById('status-eco').innerText = "O cofre aguarda sua voz.";
-        };
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast("Nenhum eco novo no horizonte.", "🌌");
-    }
 };
 
 

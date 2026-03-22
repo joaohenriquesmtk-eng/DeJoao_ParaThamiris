@@ -504,33 +504,34 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
     };
 
 // ==========================================
-    // UI/UX NÍVEL TITÃ: ECOS DO SANTUÁRIO (ÁUDIO 3D)
+    // UI/UX NÍVEL TITÃ: ECOS DO SANTUÁRIO (ÁUDIO 3D UNIFICADO E CORRIGIDO)
     // ==========================================
     
     // Variáveis Globais do Áudio
     window.ecoAudioContext = null;
     window.ecoAnalyser = null;
     window.ecoDataArray = null;
+    window.isEcoAtivo = false; 
     let mediaRecorder;
     let audioChunks = [];
     let audioAtual = new Audio();
     
     window.inicializarEco3D = () => {
         const container = document.getElementById('eco-3d');
-        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
+        if (!container || typeof THREE === 'undefined') return;
+        
+        // Limpeza profunda para evitar duplicatas caso a tela seja recarregada
+        container.innerHTML = "";
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight || 1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
         camera.position.z = 5;
 
-        // A Esfera de Fios de Ouro (A Alma do Áudio)
-        // Usamos Icosahedron com muitos detalhes para termos vértices suficientes para distorcer
         const geometry = new THREE.IcosahedronGeometry(1.5, 12);
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xD4AF37, 
@@ -543,53 +544,78 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         const esferaEco = new THREE.Mesh(geometry, material);
         scene.add(esferaEco);
 
-        // Salva a posição original dos vértices para podermos deformar e voltar ao normal
         const positionAttribute = geometry.attributes.position;
         const vertexOriginals = [];
         for (let i = 0; i < positionAttribute.count; i++) {
             vertexOriginals.push(new THREE.Vector3().fromBufferAttribute(positionAttribute, i));
         }
 
-        // Sono Quântico (Economia de Bateria)
+        // 1. CORREÇÃO DA TELA PRETA/INVISÍVEL: O 3D precisa saber quando o modal abre!
+        const atualizarTamanhoEco = () => {
+            if (container.clientWidth > 0 && container.clientHeight > 0) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        };
+        new ResizeObserver(atualizarTamanhoEco).observe(container);
+        atualizarTamanhoEco();
+
+        // 2. CORREÇÃO DO ÁUDIO AMBIENTE: Silenciador Brutal
         let ecoVisivel = false;
-        const observerEco = new IntersectionObserver((entries) => { ecoVisivel = entries[0].isIntersecting; });
+        const observerEco = new IntersectionObserver((entries) => { 
+            ecoVisivel = entries[0].isIntersecting; 
+            
+            if (ecoVisivel) {
+                // Silencia ABSOLUTAMENTE TUDO no app
+                document.querySelectorAll('audio').forEach(a => a.pause());
+                if (typeof pauseAudioJogos === 'function') pauseAudioJogos();
+                if (typeof pausarAmbiente === 'function') pausarAmbiente();
+                window.musicaNossaTocando = true; // Trava o motor de áudio global
+            } else {
+                // Devolve a música quando fechar o modal
+                window.musicaNossaTocando = false; 
+                const modal = document.getElementById('modal-reliquia');
+                if (modal && modal.classList.contains('escondido')) {
+                    if (typeof playAudioJogos === 'function') playAudioJogos();
+                    if (typeof tocarAmbiente === 'function') tocarAmbiente();
+                }
+            }
+        });
         observerEco.observe(container);
 
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
-            if (!window.RadarDePerformance.podeAnimar('eco-3d')) return;
+            if (!window.RadarDePerformance || !window.RadarDePerformance.podeAnimar('eco-3d')) return;
             if (!ecoVisivel) return;
 
             tempo += 0.01;
             esferaEco.rotation.y += 0.005;
             esferaEco.rotation.x += 0.002;
 
-            // FÍSICA DO SOM: Distorce os vértices se houver áudio tocando ou gravando
-            if (window.ecoAnalyser && window.ecoDataArray) {
+            // 3. CORREÇÃO DA DEFORMAÇÃO (Aumentando a Sensibilidade)
+            if (window.isEcoAtivo && window.ecoAnalyser && window.ecoDataArray) {
                 window.ecoAnalyser.getByteFrequencyData(window.ecoDataArray);
                 
-                // Pega a média de volume das frequências
                 let soma = 0;
                 for(let i=0; i < window.ecoDataArray.length; i++) soma += window.ecoDataArray[i];
                 let mediaVolume = soma / window.ecoDataArray.length;
                 
-                // Brilho reage ao volume
                 material.opacity = 0.3 + (mediaVolume / 255) * 0.7;
-                material.color.setHex(mediaVolume > 150 ? 0xffffff : 0xD4AF37); // Fica branco nos picos altos
+                material.color.setHex(mediaVolume > 100 ? 0xffffff : 0xD4AF37); // Fica branco mais fácil
 
-                // Deformação da malha 3D
                 const positions = geometry.attributes.position;
                 for (let i = 0; i < positions.count; i++) {
                     const vertex = vertexOriginals[i].clone();
-                    // Cria uma distorção baseada na frequência específica daquele vértice + ruído matemático
-                    const distorcao = 1 + (window.ecoDataArray[i % window.ecoDataArray.length] / 255) * 0.5;
+                    // Aumentei o multiplicador de 0.5 para 2.0 para a esfera pulsar de verdade!
+                    const distorcao = 1 + (window.ecoDataArray[i % window.ecoDataArray.length] / 255) * 2.0; 
                     vertex.multiplyScalar(distorcao);
                     positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
                 }
                 positions.needsUpdate = true;
             } else {
-                // Respiração normal se estiver em silêncio
+                // Respiração suave de descanso
                 const pos = geometry.attributes.position;
                 for (let i = 0; i < pos.count; i++) {
                     const vertex = vertexOriginals[i].clone();
@@ -605,81 +631,65 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         };
         animar();
 
-        // Buscar se já tem um eco salvo no banco ao iniciar
-        if(window.SantuarioApp && window.SantuarioApp.modulos) {
-            const { db, ref, onValue } = window.SantuarioApp.modulos;
-            onValue(ref(db, 'eco_diario'), (snapshot) => {
-                const dados = snapshot.val();
-                if (dados && dados.audioBase64) {
-                    window.audioCarregado = dados.audioBase64;
-                    document.getElementById('btn-ouvir-eco').style.display = 'block';
-                    document.getElementById('status-eco').innerText = `Eco deixado por ${dados.autor} às ${dados.hora}`;
-                    document.getElementById('status-eco').style.color = "#2ecc71";
+        // Feedback Inicial
+        if (window.audioCarregado) {
+            const btnOuvir = document.getElementById('btn-ouvir-eco');
+            const statusLabel = document.getElementById('status-eco');
+            if(btnOuvir) btnOuvir.style.display = 'block';
+            if (statusLabel) {
+                if (window.autorEcoAtual === window.MEU_NOME) {
+                    statusLabel.innerText = "Sua voz está ecoando no espaço. 🎵";
+                    statusLabel.style.color = "#aaa";
+                } else {
+                    statusLabel.innerText = `Um eco de ${window.NOME_PARCEIRO} aguarda por você! 🎵`;
+                    statusLabel.style.color = "#2ecc71";
                 }
-            });
+            }
         }
     };
 
-    // --- FUNÇÕES DE GRAVAÇÃO E PLAYBACK DE ÁUDIO ---
+// --- FUNÇÕES DE GRAVAÇÃO E PLAYBACK DE ÁUDIO ---
 
     window.iniciarGravacao = async () => {
         const btnGravar = document.getElementById('btn-gravar-eco');
         const status = document.getElementById('status-eco');
         
         try {
-            // Pede permissão e abre o microfone
+            // Mata qualquer áudio tocando por precaução antes de ouvir o microfone
+            document.querySelectorAll('audio').forEach(a => a.pause());
+
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             
-            // Configura o Analisador Web Audio para o 3D ler a voz em tempo real!
-            window.ecoAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            window.isEcoAtivo = true;
+
+            // 🚨 A GRANDE CORREÇÃO AQUI (SINGLETON):
+            // Cria o contexto APENAS se ele ainda não existir na memória do app.
+            if (!window.ecoAudioContext) {
+                window.ecoAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            // Apenas acorda o contexto se o celular o colocou para dormir
+            if (window.ecoAudioContext.state === 'suspended') {
+                await window.ecoAudioContext.resume();
+            }
+
             const source = window.ecoAudioContext.createMediaStreamSource(stream);
             window.ecoAnalyser = window.ecoAudioContext.createAnalyser();
             window.ecoAnalyser.fftSize = 64; 
             source.connect(window.ecoAnalyser);
             window.ecoDataArray = new Uint8Array(window.ecoAnalyser.frequencyBinCount);
 
-            // A MÁGICA CROSS-PLATFORM (A55 vs IPHONE):
             let opcoes = {};
             if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                opcoes = { mimeType: 'audio/webm;codecs=opus' }; // Padrão Android (A55)
+                opcoes = { mimeType: 'audio/webm;codecs=opus' };
             } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                opcoes = { mimeType: 'audio/mp4' }; // Padrão Apple (iPhone 14 Pro Max)
+                opcoes = { mimeType: 'audio/mp4' };
             }
 
-            // Inicia o gravador com o formato perfeito para o aparelho
             mediaRecorder = new MediaRecorder(stream, opcoes);
             audioChunks = [];
             mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-            mediaRecorder.start();
-
-            btnGravar.style.background = "#ff6b6b";
-            btnGravar.style.color = "#fff";
-            btnGravar.style.transform = "scale(1.2)";
-            status.innerText = "Capturando a sua voz... (Solte para enviar)";
-            status.style.color = "#ff6b6b";
-
-        } catch (err) {
-            status.innerText = "Permissão de microfone negada.";
-            console.error(err);
-        }
-    };
-
-    window.pararGravacao = () => {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-            mediaRecorder.stop();
-            const status = document.getElementById('status-eco');
-            const btnGravar = document.getElementById('btn-gravar-eco');
-            
-            btnGravar.style.background = "rgba(0,0,0,0.5)";
-            btnGravar.style.color = "var(--cor-primaria)";
-            btnGravar.style.transform = "scale(1)";
-            status.innerText = "Compactando e enviando para o espaço...";
-
-            // Desliga a leitura do microfone para poupar bateria
-            if (mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track => track.stop());
 
             mediaRecorder.onstop = () => {
-                // Cria o arquivo baseando-se no que o aparelho gravou (WebM ou MP4)
                 const tipoReal = mediaRecorder.mimeType || 'audio/mp4';
                 const audioBlob = new Blob(audioChunks, { type: tipoReal }); 
                 
@@ -687,60 +697,125 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
                 reader.readAsDataURL(audioBlob);
                 reader.onloadend = () => {
                     const base64Audio = reader.result;
-                    
-                    // Envia para o Firebase
                     if(window.SantuarioApp && window.SantuarioApp.modulos) {
                         const { db, ref, set } = window.SantuarioApp.modulos;
-                        const agora = new Date();
-                        set(ref(db, 'eco_diario'), {
+                        const refEcoDestino = ref(db, 'eco_santuario/frequencia_atual');
+                        
+                        set(refEcoDestino, {
                             audioBase64: base64Audio,
                             autor: window.MEU_NOME,
-                            hora: `${agora.getHours().toString().padStart(2, '0')}:${agora.getMinutes().toString().padStart(2, '0')}`,
-                            timestamp: agora.getTime()
+                            timestamp: Date.now()
                         }).then(() => {
-                            status.innerText = "Sua voz chegou ao destino.";
-                            status.style.color = "#2ecc71";
-                            window.ecoAnalyser = null;
+                            if (status) {
+                                status.innerText = "A sua voz viajou pelo espaço-tempo! ✨";
+                                status.style.color = "#2ecc71";
+                            }
+                            if (window.Haptics) window.Haptics.sucesso();
+                        }).catch(e => {
+                            console.error("Falha no upload espacial:", e);
+                            if (status) status.innerText = "Falha no envio da voz.";
                         });
                     }
                 };
             };
+
+            mediaRecorder.start();
+
+            if (btnGravar) {
+                btnGravar.style.background = "#ff6b6b";
+                btnGravar.style.color = "#fff";
+                btnGravar.style.transform = "scale(1.2)";
+                btnGravar.style.boxShadow = "0 0 15px #ff6b6b";
+            }
+            if (status) {
+                status.innerText = "Gravando sentimentos... (Solte para enviar)";
+                status.style.color = "#ff6b6b";
+            }
+
+            if(window.Haptics) window.Haptics.toqueForte();
+
+        } catch (err) {
+            if (status) status.innerText = "Acesso ao microfone foi negado.";
+            if (typeof mostrarToast === 'function') mostrarToast("Permita o microfone no navegador!", "🎙️");
         }
     };
 
-    window.tocarEco = () => {
-        if (!window.audioCarregado) return;
-        
-        // Configura o áudio
-        audioAtual.src = window.audioCarregado;
-        audioAtual.play();
+    window.pararGravacao = () => {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+            const status = document.getElementById('status-eco');
+            const btnGravar = document.getElementById('btn-gravar-eco');
+            
+            if (btnGravar) {
+                btnGravar.style.background = "rgba(0,0,0,0.5)";
+                btnGravar.style.color = "var(--cor-primaria)";
+                btnGravar.style.transform = "scale(1)";
+                btnGravar.style.boxShadow = "none";
+            }
+            if (status) {
+                status.innerText = "Sintonizando frequência e enviando...";
+                status.style.color = "var(--cor-primaria)";
+            }
 
-        // Configura o Analisador para o 3D reagir ao áudio gravado!
+            window.isEcoAtivo = false; 
+            if (mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track => track.stop());
+
+            mediaRecorder.stop();
+        }
+    };
+
+    window.tocarEco = async () => {
+        if (!window.audioCarregado) {
+            if(typeof mostrarToast === 'function') mostrarToast("Nenhum eco novo para ouvir.", "🌌");
+            return;
+        }
+        
+        // Garante absoluto silêncio de outros áudios do site
+        document.querySelectorAll('audio').forEach(a => a.pause());
+
+        audioAtual.src = window.audioCarregado;
+        
+        window.isEcoAtivo = true; 
+
+        // 🚨 PREVINE A CRIAÇÃO DE MÚLTIPLAS PLACAS DE SOM (Mantendo o Singleton)
         if (!window.ecoAudioContext) {
             window.ecoAudioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
+        if (window.ecoAudioContext.state === 'suspended') {
+            await window.ecoAudioContext.resume();
+        }
         
-        // Evita reconectar a mesma fonte 2 vezes e travar
+        window.ecoAnalyser = window.ecoAudioContext.createAnalyser();
+        window.ecoAnalyser.fftSize = 64;
+        window.ecoDataArray = new Uint8Array(window.ecoAnalyser.frequencyBinCount);
+
+        // Garante que a fonte do áudio atual seja criada APENAS uma vez
         if (!window.sourceAtual) {
             window.sourceAtual = window.ecoAudioContext.createMediaElementSource(audioAtual);
-            window.ecoAnalyser = window.ecoAudioContext.createAnalyser();
-            window.ecoAnalyser.fftSize = 64;
-            window.sourceAtual.connect(window.ecoAnalyser);
-            window.ecoAnalyser.connect(window.ecoAudioContext.destination); // Manda o som pra caixa de som do celular
-            window.ecoDataArray = new Uint8Array(window.ecoAnalyser.frequencyBinCount);
         }
-
-        // Retoma o contexto caso o navegador tenha bloqueado
-        if (window.ecoAudioContext.state === 'suspended') {
-            window.ecoAudioContext.resume();
-        }
+        
+        // Limpa conexões passadas e liga os cabos da música direto na esfera!
+        window.sourceAtual.disconnect();
+        window.sourceAtual.connect(window.ecoAnalyser);
+        window.ecoAnalyser.connect(window.ecoAudioContext.destination); 
 
         const status = document.getElementById('status-eco');
-        status.innerText = "Escutando...";
+        if (status) {
+            if (window.autorEcoAtual === window.MEU_NOME) {
+                status.innerText = "Ouvindo o seu próprio Eco...";
+            } else {
+                status.innerText = `Ouvindo o Eco de ${window.NOME_PARCEIRO}...`;
+            }
+        }
         
+        audioAtual.play().catch(e => console.error("Erro ao dar play no eco:", e));
+
         audioAtual.onended = () => {
-            status.innerText = "Eco finalizado.";
-            window.ecoAnalyser = null; // A esfera para de pular
+            if (status) {
+                status.innerText = window.autorEcoAtual === window.MEU_NOME 
+                    ? "Sua voz ecoou." 
+                    : "Eco finalizado. O espaço está aberto.";
+            }
+            window.isEcoAtivo = false; 
         };
     };
 

@@ -1003,6 +1003,7 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
+        // Exportação segura para o resto do app
         window.SantuarioDB = db;
         window.SantuarioAuth = auth;
         window.SantuarioDB_Functions = { ref, set, get, onValue };
@@ -1011,31 +1012,90 @@
         window.SantuarioApp.inicializado = true;
         window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction, push, update, messaging: getMessaging(app), getToken: getToken };
 
+        // IDs autorizados (Se tiverem mudado, a nova inteligência vai nos avisar)
         const IDS_AUTORIZADOS = {
             "Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",
             "meXVetR7D7b8d00Yuw8wjtRlpoi1": "thamiris"
         };
 
+        // LÓGICA DO BOTÃO DE LOGIN COM FEEDBACK TOTAL
+        const btnLogin = document.getElementById('btn-login-confirmar');
+        const erroDiv = document.getElementById('login-mensagem-erro');
+
+        if (btnLogin) {
+            btnLogin.onclick = async () => {
+                const email = document.getElementById('login-email').value.trim();
+                const senha = document.getElementById('login-senha').value;
+                
+                // Validação de campos vazios
+                if(!email || !senha) {
+                    if (erroDiv) erroDiv.innerText = "Por favor, preencha o e-mail e a senha.";
+                    if (window.Haptics) navigator.vibrate(40);
+                    return;
+                }
+
+                // Feedback visual de carregamento
+                btnLogin.innerText = "Sintonizando...";
+                if (erroDiv) erroDiv.innerText = "";
+
+                try {
+                    console.log("Enviando pedido ao Firebase...");
+                    await signInWithEmailAndPassword(auth, email, senha);
+                    console.log("Autenticação aceita!");
+                } catch (error) {
+                    // Se a senha estiver errada, a internet cair, etc.
+                    console.error("Erro detalhado no login:", error);
+                    btnLogin.innerText = "Acessar";
+                    if (erroDiv) erroDiv.innerText = "Acesso negado: E-mail ou senha incorretos.";
+                    if (window.Haptics) navigator.vibrate([50, 50, 50]);
+                }
+            };
+        }
+
+        // MOTOR DETETIVE: Monitora o que acontece APÓS o Firebase aceitar a senha
         onAuthStateChanged(auth, (user) => {
             const telaLogin = document.getElementById('tela-login');
+            
             if (user) {
+                console.log("Usuário verificado pelo Firebase. UID:", user.uid);
+                
+                // Confere se o UID do banco bate com o UID escrito no código
                 const perfilIdentificado = IDS_AUTORIZADOS[user.uid];
+                
                 if (perfilIdentificado) {
+                    // SUCESSO! O usuário existe e é autorizado
                     window.usuarioLogado = perfilIdentificado;
                     window.souJoao = (perfilIdentificado === 'joao');
                     window.MEU_NOME = window.souJoao ? "João" : "Thamiris";
                     window.NOME_PARCEIRO = window.souJoao ? "Thamiris" : "João";
+                    
                     if (typeof registrarLogin === 'function') registrarLogin(perfilIdentificado);
+                    
+                    // Animação de sumir a tela de login
                     if (telaLogin) {
                         telaLogin.style.opacity = '0';
                         setTimeout(() => { telaLogin.style.display = 'none'; }, 500);
                     }
+                    
                     window.dispatchEvent(new CustomEvent('loginSucesso', { detail: { user } }));
+                    console.log("Santuário aberto para:", window.MEU_NOME);
                 } else {
-                    auth.signOut();
+                    // BLOQUEIO DE SEGURANÇA: O Firebase aceitou a senha, mas o UID é novo/desconhecido!
+                    console.error("ALERTA: O UID fornecido pelo Firebase não está no código!", user.uid);
+                    
+                    if (erroDiv) {
+                        erroDiv.innerHTML = `UID Desconhecido detectado!<br><br>Copie este código e atualize no index.html:<br><strong style="color:#f1c40f; font-size:1.1rem;">${user.uid}</strong>`;
+                    }
+                    if (btnLogin) btnLogin.innerText = "Acessar";
+                    
+                    // Expulsa o usuário para segurança e impede a entrada
+                    auth.signOut(); 
                 }
             } else {
+                // Estado desconectado
+                console.log("Status: Ninguém logado no momento.");
                 if (telaLogin) telaLogin.style.display = 'flex';
+                if (btnLogin) btnLogin.innerText = "Acessar";
             }
         });
     </script>

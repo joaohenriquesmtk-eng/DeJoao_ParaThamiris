@@ -134,6 +134,7 @@ window.SantuarioApp.conectar = function() {
         if (postits.length > 0) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
     });
 
+    
     // 6. Listener do Cofre (Ecos Recentes)
         // Invoca o motor de áudio multiplataforma (Samsung/iPhone) construído no script.js
         if (typeof window.escutarEcosDoParceiro === 'function') {

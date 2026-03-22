@@ -34,100 +34,132 @@ window.RadarDePerformance = {
 window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar());
 
 
-    // ==========================================
-    // UI/UX NÍVEL DEUS: O GLOBO 3D (THREE.JS)
+// ==========================================
+    // UI/UX NÍVEL DEUS: O GLOBO 3D (BLINDADO CONTRA CRASH)
     // ==========================================
     
     window.inicializarGlobo3D = () => {
         const container = document.getElementById('globo-3d');
-        // CORREÇÃO: Previne duplicação de canvas que causa Context Loss no celular
-        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+        // Previne duplicação e garante que não criaremos canvas sobre canvas
+        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas') || container.querySelector('.orbe-css-fallback')) return;
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        // CORREÇÃO: Força o uso da placa de vídeo dedicada do celular (high-performance)
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" }); 
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        // CORREÇÃO: Limita o pixelRatio a 1.5. Celulares tem telas 3x ou 4x que "fritam" a memória de vídeo.
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
-        renderer.domElement.style.display = 'block';
-        renderer.domElement.style.margin = '0 auto';
-        container.appendChild(renderer.domElement);
+        // PROTEÇÃO VITAL: Se a tela carregar muito rápido e a div estiver com tamanho "zero", usamos um tamanho seguro (evita crash do Chrome no celular)
+        let largura = container.clientWidth || (window.innerWidth - 40);
+        let altura = container.clientHeight || 250;
 
-        const raioTerra = 5;
-        const geometriaTerra = new THREE.SphereGeometry(raioTerra, 32, 32);
-        const materialTerra = new THREE.MeshBasicMaterial({ 
-            color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.15 
-        });
-        const planeta = new THREE.Mesh(geometriaTerra, materialTerra);
-        scene.add(planeta);
-
-        const sistemaGlobal = new THREE.Group();
-        sistemaGlobal.add(planeta);
-        scene.add(sistemaGlobal);
-
-        const latColombo = -25.2917; const lonColombo = -49.2242;
-        const latGoiania = -16.6869; const lonGoiania = -49.2648;
-
-        const calcPosFromLatLon = (lat, lon, raio) => {
-            const phi = (90 - lat) * (Math.PI / 180);
-            const theta = (lon + 180) * (Math.PI / 180);
-            const x = -(raio * Math.sin(phi) * Math.cos(theta));
-            const z = (raio * Math.sin(phi) * Math.sin(theta));
-            const y = (raio * Math.cos(phi));
-            return new THREE.Vector3(x, y, z);
-        };
-
-        const posColombo = calcPosFromLatLon(latColombo, lonColombo, raioTerra);
-        const posGoiania = calcPosFromLatLon(latGoiania, lonGoiania, raioTerra);
-
-        const geometriaCidade = new THREE.SphereGeometry(0.15, 16, 16);
-        const materialCidade = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        
-        const pontoColombo = new THREE.Mesh(geometriaCidade, materialCidade);
-        pontoColombo.position.copy(posColombo);
-        sistemaGlobal.add(pontoColombo);
-
-        const pontoGoiania = new THREE.Mesh(geometriaCidade, materialCidade);
-        pontoGoiania.position.copy(posGoiania);
-        sistemaGlobal.add(pontoGoiania);
-
-        const pontoMedio = posColombo.clone().lerp(posGoiania, 0.5);
-        pontoMedio.normalize().multiplyScalar(raioTerra + 1.5); 
-
-        const curva = new THREE.QuadraticBezierCurve3(posColombo, pontoMedio, posGoiania);
-        const geometriaCurva = new THREE.BufferGeometry().setFromPoints(curva.getPoints(50));
-        const materialCurva = new THREE.LineBasicMaterial({ color: 0xff6b6b, linewidth: 2 });
-        sistemaGlobal.add(new THREE.Line(geometriaCurva, materialCurva));
-
-        camera.position.set(0, 0, 13);
-        sistemaGlobal.rotation.y = -0.8; 
-        sistemaGlobal.rotation.x = 0.2; 
-
-        // Sono Quântico
-        let globoVisivel = false;
-        const observerGlobo = new IntersectionObserver((entries) => { globoVisivel = entries[0].isIntersecting; });
-        observerGlobo.observe(container);
-
-        const animar = () => {
-            requestAnimationFrame(animar);
+        try {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
             
-            if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
-            if (!globoVisivel) return;
-            sistemaGlobal.rotation.y += 0.005;
-            renderer.render(scene, camera);
-        };
+            // Usamos "default" no Globo para não competir com a energia dos outros 3Ds pesados do app
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "default" }); 
+            
+            // Se o Chrome tentar dar "Carinha Triste", nós abortamos o processo antes e não fechamos o App!
+            renderer.domElement.addEventListener("webglcontextlost", function(event) {
+                event.preventDefault();
+                ativarFundoCSSDourado(container);
+            }, false);
 
-        window.addEventListener('resize', () => {
-            if(container.clientWidth > 0) {
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-            }
-        });
-        animar();
+            renderer.setSize(largura, altura);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); // Resolução ainda mais leve para a esfera
+            renderer.domElement.style.display = 'block';
+            renderer.domElement.style.margin = '0 auto';
+            container.appendChild(renderer.domElement);
+
+            const raioTerra = 5;
+            // OTIMIZAÇÃO: 24x24 tem visual idêntico a 32x32 em tela pequena, mas usa 50% menos memória
+            const geometriaTerra = new THREE.SphereGeometry(raioTerra, 24, 24);
+            const materialTerra = new THREE.MeshBasicMaterial({ 
+                color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.15 
+            });
+            const planeta = new THREE.Mesh(geometriaTerra, materialTerra);
+            scene.add(planeta);
+
+            const sistemaGlobal = new THREE.Group();
+            sistemaGlobal.add(planeta);
+            scene.add(sistemaGlobal);
+
+            const latColombo = -25.2917; const lonColombo = -49.2242;
+            const latGoiania = -16.6869; const lonGoiania = -49.2648;
+
+            const calcPosFromLatLon = (lat, lon, raio) => {
+                const phi = (90 - lat) * (Math.PI / 180);
+                const theta = (lon + 180) * (Math.PI / 180);
+                const x = -(raio * Math.sin(phi) * Math.cos(theta));
+                const z = (raio * Math.sin(phi) * Math.sin(theta));
+                const y = (raio * Math.cos(phi));
+                return new THREE.Vector3(x, y, z);
+            };
+
+            const posColombo = calcPosFromLatLon(latColombo, lonColombo, raioTerra);
+            const posGoiania = calcPosFromLatLon(latGoiania, lonGoiania, raioTerra);
+
+            // Cidades
+            const geometriaCidade = new THREE.SphereGeometry(0.15, 12, 12);
+            const materialCidade = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            
+            const pontoColombo = new THREE.Mesh(geometriaCidade, materialCidade);
+            pontoColombo.position.copy(posColombo);
+            sistemaGlobal.add(pontoColombo);
+
+            const pontoGoiania = new THREE.Mesh(geometriaCidade, materialCidade);
+            pontoGoiania.position.copy(posGoiania);
+            sistemaGlobal.add(pontoGoiania);
+
+            // Fio de luz entre as cidades
+            const pontoMedio = posColombo.clone().lerp(posGoiania, 0.5);
+            pontoMedio.normalize().multiplyScalar(raioTerra + 1.5); 
+            const curva = new THREE.QuadraticBezierCurve3(posColombo, pontoMedio, posGoiania);
+            const geometriaCurva = new THREE.BufferGeometry().setFromPoints(curva.getPoints(30));
+            const materialCurva = new THREE.LineBasicMaterial({ color: 0xff6b6b, linewidth: 1 });
+            sistemaGlobal.add(new THREE.Line(geometriaCurva, materialCurva));
+
+            camera.position.set(0, 0, 13);
+            sistemaGlobal.rotation.y = -0.8; 
+            sistemaGlobal.rotation.x = 0.2; 
+
+            // Sono Quântico
+            let globoVisivel = false;
+            const observerGlobo = new IntersectionObserver((entries) => { globoVisivel = entries[0].isIntersecting; });
+            observerGlobo.observe(container);
+
+            const animar = () => {
+                requestAnimationFrame(animar);
+                if (window.SantuarioAtivo === false) return;
+                if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
+                if (!globoVisivel) return;
+                sistemaGlobal.rotation.y += 0.005;
+                renderer.render(scene, camera);
+            };
+
+            window.addEventListener('resize', () => {
+                if(container.clientWidth > 0 && container.clientHeight > 0) {
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                }
+            });
+            animar();
+
+        } catch (erroFatal) {
+            console.error("GPU rejeitou o Globo. Acionando Plano B visual.", erroFatal);
+            ativarFundoCSSDourado(container);
+        }
     };
+
+    // A Mágica da Degradação Graciosa: Se faltar RAM, o app não quebra, ele mostra uma arte linda em CSS.
+    function ativarFundoCSSDourado(container) {
+        container.innerHTML = "";
+        container.innerHTML = `
+            <div class="orbe-css-fallback" style="
+                width: 140px; height: 140px; 
+                background: radial-gradient(circle at 30% 30%, rgba(212,175,55,0.4), transparent 70%); 
+                border-radius: 50%; border: 1px dashed rgba(212,175,55,0.3);
+                animation: respiracaoSantuario 4s infinite alternate; 
+                margin: 50px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(212,175,55,0.1);">
+                <div style="width: 10px; height: 10px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff, -40px 20px 0 2px #fff; animation: girarAnel 10s linear infinite;"></div>
+            </div>`;
+    }
 
     // ==========================================
     // UI/UX NÍVEL DEUS: AS 3 JÓIAS 3D

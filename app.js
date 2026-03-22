@@ -623,18 +623,28 @@ if (temaIcon && temaSelector) {
         }
     });
 
-    // FASE 2: A MÁGICA (Os motores pesados aguardam o Lazy Load terminar de baixar o 3D!)
+    // FASE 2: A MÁGICA (Escalonamento Quântico de Memória)
+    // Impede o celular de fritar ao tentar carregar 8 motores 3D no mesmo milissegundo.
     window.addEventListener('motor3DPronto', () => {
+        
+        // 1º Lote (Imediato): Apenas os elementos que estão na cara da Thamiris na tela Home
         if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D();
         if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D();
-        if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima();
-        if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico();
-        if(typeof inicializarEco3D === 'function') inicializarEco3D();
-        if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
-        if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico(); // O fundo global
         
-        // O GATILHO QUE FALTAVA PARA A ÁRVORE DA VIDA ACORDAR!
-        if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D();
+        // 2º Lote (Espera 1.5 segundos): Elementos pesados dos jogos e clima
+        setTimeout(() => {
+            if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima();
+            if(typeof inicializarEco3D === 'function') inicializarEco3D();
+            if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D(); // A Árvore
+        }, 1500);
+
+        // 3º Lote (Espera 3 segundos): Relíquias do Cofre que ela só vai ver se clicar
+        setTimeout(() => {
+            if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
+            if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        }, 3000);
+        
     });
 
 }); // Fecha o DOMContentLoaded

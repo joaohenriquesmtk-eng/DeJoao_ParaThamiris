@@ -17,7 +17,6 @@ window.RadarDePerformance = {
         }, { threshold: 0.05 });
 
         // Componentes que exigem GPU pesada
-        // Componentes que exigem GPU pesada
         const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d', 'coracao-3d', 'prisma-3d', 'planetario-3d-container'];
         pesados.forEach(id => {
             const el = document.getElementById(id);
@@ -39,41 +38,38 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
     // UI/UX NÍVEL DEUS: O GLOBO 3D (THREE.JS)
     // ==========================================
     
-window.inicializarGlobo3D = () => {
-    const container = document.getElementById('globo-3d');
-    if (!container || typeof THREE === 'undefined') return;
-
-    // Verifica se já há um canvas e evita duplicação
-    if (container.querySelector('canvas')) return;
-
-    // Função que realmente cria o globo
-    const criarGlobo = () => {
-        // Impede chamadas duplicadas
-        if (container.querySelector('canvas')) return;
+    window.inicializarGlobo3D = () => {
+        const container = document.getElementById('globo-3d');
+        // CORREÇÃO: Previne duplicação de canvas que causa Context Loss no celular
+        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
-
+        // CORREÇÃO: Força o uso da placa de vídeo dedicada do celular (high-performance)
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" }); 
+        
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        // CORREÇÃO: Limita o pixelRatio a 1.5. Celulares tem telas 3x ou 4x que "fritam" a memória de vídeo.
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
         renderer.domElement.style.display = 'block';
         renderer.domElement.style.margin = '0 auto';
         container.appendChild(renderer.domElement);
 
-        // Cria os objetos 3D (idêntico ao original)
         const raioTerra = 5;
         const geometriaTerra = new THREE.SphereGeometry(raioTerra, 32, 32);
         const materialTerra = new THREE.MeshBasicMaterial({ 
             color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.15 
         });
         const planeta = new THREE.Mesh(geometriaTerra, materialTerra);
+        scene.add(planeta);
+
         const sistemaGlobal = new THREE.Group();
         sistemaGlobal.add(planeta);
         scene.add(sistemaGlobal);
 
         const latColombo = -25.2917; const lonColombo = -49.2242;
         const latGoiania = -16.6869; const lonGoiania = -49.2648;
+
         const calcPosFromLatLon = (lat, lon, raio) => {
             const phi = (90 - lat) * (Math.PI / 180);
             const theta = (lon + 180) * (Math.PI / 180);
@@ -82,73 +78,56 @@ window.inicializarGlobo3D = () => {
             const y = (raio * Math.cos(phi));
             return new THREE.Vector3(x, y, z);
         };
+
         const posColombo = calcPosFromLatLon(latColombo, lonColombo, raioTerra);
         const posGoiania = calcPosFromLatLon(latGoiania, lonGoiania, raioTerra);
+
         const geometriaCidade = new THREE.SphereGeometry(0.15, 16, 16);
         const materialCidade = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
         const pontoColombo = new THREE.Mesh(geometriaCidade, materialCidade);
         pontoColombo.position.copy(posColombo);
         sistemaGlobal.add(pontoColombo);
+
         const pontoGoiania = new THREE.Mesh(geometriaCidade, materialCidade);
         pontoGoiania.position.copy(posGoiania);
         sistemaGlobal.add(pontoGoiania);
+
         const pontoMedio = posColombo.clone().lerp(posGoiania, 0.5);
-        pontoMedio.normalize().multiplyScalar(raioTerra + 1.5);
+        pontoMedio.normalize().multiplyScalar(raioTerra + 1.5); 
+
         const curva = new THREE.QuadraticBezierCurve3(posColombo, pontoMedio, posGoiania);
         const geometriaCurva = new THREE.BufferGeometry().setFromPoints(curva.getPoints(50));
         const materialCurva = new THREE.LineBasicMaterial({ color: 0xff6b6b, linewidth: 2 });
         sistemaGlobal.add(new THREE.Line(geometriaCurva, materialCurva));
 
         camera.position.set(0, 0, 13);
-        sistemaGlobal.rotation.y = -0.8;
-        sistemaGlobal.rotation.x = 0.2;
+        sistemaGlobal.rotation.y = -0.8; 
+        sistemaGlobal.rotation.x = 0.2; 
 
-        // ResizeObserver para manter o tamanho correto
-        const resizeObserver = new ResizeObserver(() => {
-            if (container.clientWidth > 0 && container.clientHeight > 0) {
+        // Sono Quântico
+        let globoVisivel = false;
+        const observerGlobo = new IntersectionObserver((entries) => { globoVisivel = entries[0].isIntersecting; });
+        observerGlobo.observe(container);
+
+        const animar = () => {
+            requestAnimationFrame(animar);
+            
+            if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
+            if (!globoVisivel) return;
+            sistemaGlobal.rotation.y += 0.005;
+            renderer.render(scene, camera);
+        };
+
+        window.addEventListener('resize', () => {
+            if(container.clientWidth > 0) {
                 renderer.setSize(container.clientWidth, container.clientHeight);
                 camera.aspect = container.clientWidth / container.clientHeight;
                 camera.updateProjectionMatrix();
             }
         });
-        resizeObserver.observe(container);
-
-        // Animação
-        let animFrame;
-        const animar = () => {
-            animFrame = requestAnimationFrame(animar);
-            if (!window.RadarDePerformance?.podeAnimar('globo-3d')) return;
-            sistemaGlobal.rotation.y += 0.005;
-            renderer.render(scene, camera);
-        };
         animar();
-
-        // Limpeza quando o container for removido (opcional, mas boa prática)
-        const observer = new MutationObserver((mutations) => {
-            if (!document.body.contains(container)) {
-                cancelAnimationFrame(animFrame);
-                resizeObserver.disconnect();
-                observer.disconnect();
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
     };
-
-    // Verifica se o container já tem tamanho
-    if (container.clientWidth > 0 && container.clientHeight > 0) {
-        criarGlobo();
-    } else {
-        // Aguarda o container ganhar tamanho (usando ResizeObserver)
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
-                observer.disconnect();
-                criarGlobo();
-            }
-        });
-        observer.observe(container);
-    }
-};
 
     // ==========================================
     // UI/UX NÍVEL DEUS: AS 3 JÓIAS 3D
@@ -179,7 +158,7 @@ window.inicializarGlobo3D = () => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -201,7 +180,6 @@ window.inicializarGlobo3D = () => {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
-            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance.podeAnimar('coracao-3d')) return;
             if (!coracaoVisivel) return; 
 
@@ -228,7 +206,7 @@ window.inicializarGlobo3D = () => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -285,7 +263,6 @@ window.inicializarGlobo3D = () => {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
-            if (window.SantuarioAtivo === false) return;
             const elGalaxia = document.getElementById('galaxia-3d-fundo');
             if (!elGalaxia || elGalaxia.clientWidth === 0) return;
             tempo += 0.001;
@@ -312,7 +289,7 @@ window.inicializarGlobo3D = () => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -434,7 +411,6 @@ window.inicializarGlobo3D = () => {
         const animar = () => {
             requestAnimationFrame(animar);
             
-            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance.podeAnimar('orbe-clima-3d')) return;
 
             // Trava Nativa e Inquebrável de Hibernação
@@ -480,7 +456,7 @@ window.inicializarGlobo3D = () => {
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
         camera.position.set(0, 5, 20); camera.lookAt(0, 0, 0);
 
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
@@ -509,12 +485,14 @@ window.inicializarGlobo3D = () => {
         window.addEventListener('touchend', limparToque);
 
         const clock = new THREE.Clock();
+        let telaAtiva = true;
+        document.addEventListener("visibilitychange", () => { telaAtiva = !document.hidden; });
 
         let ultimoFrame = 0; const intervaloFrame = 1000 / 30; 
 
         const animar = (tempoAtual) => {
             requestAnimationFrame(animar);
-            if (window.SantuarioAtivo === false) return;
+            if (!telaAtiva) return; 
             if (tempoAtual - ultimoFrame < intervaloFrame) return;
             ultimoFrame = tempoAtual;
 
@@ -559,16 +537,16 @@ window.inicializarGlobo3D = () => {
     
     window.inicializarEco3D = () => {
         const container = document.getElementById('eco-3d');
-        if (!container || typeof THREE === 'undefined') return;
+        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
         
         // Limpeza profunda para evitar duplicatas caso a tela seja recarregada
         container.innerHTML = "";
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight || 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
         
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
 
         camera.position.z = 5;
@@ -877,10 +855,10 @@ window.inicializarGlobo3D = () => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
         
         renderer.setSize(largura, altura);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.insertBefore(renderer.domElement, container.firstChild);
 
         camera.position.set(0, 5, 0);
@@ -1080,9 +1058,9 @@ window.inicializarGlobo3D = () => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, largura / altura, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         renderer.setSize(largura, altura);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
 
         camera.position.set(0, 0, 5);
@@ -1314,10 +1292,10 @@ window.inicializarPrisma3D = () => {
 
     const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         renderer.domElement.style.display = 'block';
         container.appendChild(renderer.domElement);
 
@@ -1448,148 +1426,6 @@ window.inicializarPrisma3D = () => {
     };
 
 
-// --- 3. PLANETÁRIO DE SONHOS (GALÁXIA PROCEDURAL) ---
-window.inicializarPlanetario3D = () => {
-    // Busca a tela da galáxia EXATAMENTE no modal que saltou na sua tela
-    const container = document.querySelector('#corpo-modal #planetario-3d-container');
-    
-    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
-    
-    const esqueleto = container.querySelector('#esqueleto-planetario');
-    if (esqueleto) esqueleto.remove();
-
-    camera.position.z = 12;
-    camera.position.y = 4;
-    camera.lookAt(0, 0, 0);
-
-    // Criação Quântica de Estrelas
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 2000;
-    const starPos = new Float32Array(starCount * 3);
-    const starColors = new Float32Array(starCount * 3);
-
-    for(let i=0; i < starCount; i++) {
-        const r = 12 * Math.sqrt(Math.random());
-        const theta = r * 0.5 + (Math.random() * 2 * Math.PI);
-        starPos[i*3] = r * Math.cos(theta) + (Math.random()-0.5)*2;
-        starPos[i*3+1] = (Math.random()-0.5) * 2;
-        starPos[i*3+2] = r * Math.sin(theta) + (Math.random()-0.5)*2;
-
-        const color = new THREE.Color();
-        color.setHSL(0.6 + (Math.random()*0.1), 0.8, 0.5 + Math.random()*0.5); 
-        starColors[i*3] = color.r; starColors[i*3+1] = color.g; starColors[i*3+2] = color.b;
-    }
-
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-
-    const starMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
-    const galaxy = new THREE.Points(starGeo, starMat);
-    scene.add(galaxy);
-
-    let tempo = 0;
-    const animar = () => {
-        requestAnimationFrame(animar);
-        const elPlanetario = document.getElementById('planetario-3d-container');
-        if (!elPlanetario || elPlanetario.clientWidth === 0) return;
-        tempo += 0.003;
-        galaxy.rotation.y = tempo;
-        
-        // Efeito visual caso exista uma Supernova 
-        if (window.quantidadeSupernovas > 0) {
-            const pulso = 1 + Math.sin(tempo * 10) * 0.05;
-            galaxy.scale.set(pulso, pulso, pulso);
-            starMat.size = 0.15 + Math.sin(tempo * 20) * 0.05;
-        }
-
-        renderer.render(scene, camera);
-    };
-    animar();
-};
-
-
-
-// --- 4. GALÁXIA INTERATIVA HUD (MESMO CÉU) ---
-window.inicializarGalaxia3D = () => {
-    // Busca o fundo da janela modal
-    const modais = document.querySelectorAll('#galaxia-3d-fundo');
-    const container = modais[modais.length - 1]; 
-    
-    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
-
-    camera.position.z = 15;
-
-    // Criação do Campo Estelar
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 2000;
-    const starPos = new Float32Array(starCount * 3);
-
-    for(let i=0; i < starCount; i++) {
-        starPos[i*3] = (Math.random() - 0.5) * 50;
-        starPos[i*3+1] = (Math.random() - 0.5) * 50;
-        starPos[i*3+2] = (Math.random() - 0.5) * 50;
-    }
-
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.9 });
-    const galaxy = new THREE.Points(starGeo, starMat);
-    scene.add(galaxy);
-
-    // Interatividade Real (O Fator UAU)
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    const onMove = (event) => {
-        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-        // Normaliza a posição do dedo para girar a galáxia
-        mouseX = (clientX / window.innerWidth) * 2 - 1;
-        mouseY = -(clientY / window.innerHeight) * 2 + 1;
-    };
-
-    container.addEventListener('mousemove', onMove);
-    container.addEventListener('touchmove', onMove, {passive: true});
-
-    let tempo = 0;
-    const animar = () => {
-        requestAnimationFrame(animar);
-        const elGalaxia = document.getElementById('galaxia-3d-fundo');
-        if (!elGalaxia || elGalaxia.clientWidth === 0) return;
-        tempo += 0.001;
-        
-        // Movimento inercial suave
-        targetX = mouseX * 1.5;
-        targetY = mouseY * 1.5;
-        
-        // Gira sozinha bem devagar, mas obedece ao dedo do usuário se ele tocar
-        galaxy.rotation.y += 0.001 + (targetX - galaxy.rotation.y) * 0.05;
-        galaxy.rotation.x += 0.001 + (targetY - galaxy.rotation.x) * 0.05;
-        
-        renderer.render(scene, camera);
-    };
-    animar();
-};
-
-
-
 // --- 5. O VÓRTICE ORGÂNICO INTERATIVO (RAYMARCHING & SDF) ---
 window.inicializarJornada3D = () => {
     const container = document.getElementById('jornada-3d-fundo');
@@ -1600,7 +1436,7 @@ window.inicializarJornada3D = () => {
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Otimização severa para celulares
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Otimização severa para celulares
     container.appendChild(renderer.domElement);
 
     const progressoData = { atual: 0.0 };
@@ -1747,7 +1583,7 @@ window.inicializarJornada3D = () => {
 
     const animar = () => {
         requestAnimationFrame(animar);
-        
+
         // MOTOR DE HIBERNAÇÃO (Para não queimar bateria em outras telas)
         if (telaJornada && telaJornada.classList.contains('escondido')) {
             tempoAnterior = performance.now(); 

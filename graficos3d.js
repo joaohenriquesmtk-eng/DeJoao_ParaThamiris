@@ -35,7 +35,43 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
 
 // ==========================================
-    // UI/UX NÍVEL DEUS: O GLOBO 3D (BLINDADO CONTRA CRASH)
+// MOTOR DE OTIMIZAÇÃO (RADAR 3D)
+// ==========================================
+window.RadarDePerformance = {
+    elementosVisiveis: new Set(),
+    
+    iniciar: () => {
+        // Observa se os componentes pesados estão na tela
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    window.RadarDePerformance.elementosVisiveis.add(entry.target.id);
+                } else {
+                    window.RadarDePerformance.elementosVisiveis.delete(entry.target.id);
+                }
+            });
+        }, { threshold: 0.05 });
+
+        // Componentes que exigem GPU pesada
+        const pesados = ['orbe-clima-3d', 'bussola-3d', 'carrossel-3d', 'globo-3d', 'eco-3d', 'coracao-3d', 'prisma-3d', 'planetario-3d-container'];
+        pesados.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+    },
+
+    // Retorna true APENAS se a aba atual está aberta E se o elemento rolou pra tela
+    podeAnimar: (id) => {
+        return window.RadarDePerformance.elementosVisiveis.has(id);
+    }
+};
+
+// Liga o radar assim que o app avisa que o 3D foi injetado
+window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar());
+
+
+    // ==========================================
+    // UI/UX NÍVEL DEUS: O GLOBO 3D (BLINDADO CONTRA CRASH E SAD FACE)
     // ==========================================
     
     window.inicializarGlobo3D = () => {
@@ -43,31 +79,36 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         // Previne duplicação e garante que não criaremos canvas sobre canvas
         if (!container || typeof THREE === 'undefined' || container.querySelector('canvas') || container.querySelector('.orbe-css-fallback')) return;
 
-        // PROTEÇÃO VITAL: Se a tela carregar muito rápido e a div estiver com tamanho "zero", usamos um tamanho seguro (evita crash do Chrome no celular)
+        // PROTEÇÃO VITAL: Se a tela carregar muito rápido e a div estiver com tamanho "zero", usamos um tamanho seguro
         let largura = container.clientWidth || (window.innerWidth - 40);
         let altura = container.clientHeight || 250;
+        
+        // A TRAVA DO CHROME: Essa variável avisa o Javascript para soltar o motor 3D se a GPU morrer
+        let isContextLost = false;
 
         try {
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
             
-            // Usamos "default" no Globo para não competir com a energia dos outros 3Ds pesados do app
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "default" }); 
+            // "high-performance" para exigir acesso nobre à Placa de Vídeo do celular
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" }); 
             
-            // Se o Chrome tentar dar "Carinha Triste", nós abortamos o processo antes e não fechamos o App!
+            // O DETETIVE DE MEMÓRIA: Se o Chrome cortar a energia do Canvas, ele é pego aqui no flagra
             renderer.domElement.addEventListener("webglcontextlost", function(event) {
-                event.preventDefault();
+                event.preventDefault(); // Impede o Chrome de colocar a "carinha triste"
+                isContextLost = true;   // Trava o loop de animação abaixo para não gerar erro fatal
+                console.warn("Placa de Vídeo rejeitou o Globo. Ativando Modo de Sobrevivência (CSS).");
                 ativarFundoCSSDourado(container);
             }, false);
 
             renderer.setSize(largura, altura);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); // Resolução ainda mais leve para a esfera
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); // Resolução suavizada para mobile
             renderer.domElement.style.display = 'block';
             renderer.domElement.style.margin = '0 auto';
             container.appendChild(renderer.domElement);
 
             const raioTerra = 5;
-            // OTIMIZAÇÃO: 24x24 tem visual idêntico a 32x32 em tela pequena, mas usa 50% menos memória
+            // OTIMIZAÇÃO: 24x24 consome absurdamente menos memória que 32x32 numa tela de bolso!
             const geometriaTerra = new THREE.SphereGeometry(raioTerra, 24, 24);
             const materialTerra = new THREE.MeshBasicMaterial({ 
                 color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.15 
@@ -124,6 +165,9 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             observerGlobo.observe(container);
 
             const animar = () => {
+                // A TRAVA DE SEGURANÇA: Se o Android matou a memória, a função morre de forma silenciosa e limpa
+                if (isContextLost) return; 
+                
                 requestAnimationFrame(animar);
                 if (window.SantuarioAtivo === false) return;
                 if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
@@ -132,8 +176,12 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
                 renderer.render(scene, camera);
             };
 
+            // O BLINDADOR DE REDIMENSIONAMENTO: Androids rodam "resize" adoidado quando rolam a tela. Isso queima o WebGL.
+            let ultimaLargura = container.clientWidth;
             window.addEventListener('resize', () => {
-                if(container.clientWidth > 0 && container.clientHeight > 0) {
+                // O código SÓ recalcula se o vidro realmente mudou de tamanho, poupando a GPU em 99% das vezes
+                if(container.clientWidth > 0 && container.clientWidth !== ultimaLargura) {
+                    ultimaLargura = container.clientWidth;
                     renderer.setSize(container.clientWidth, container.clientHeight);
                     camera.aspect = container.clientWidth / container.clientHeight;
                     camera.updateProjectionMatrix();
@@ -142,7 +190,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             animar();
 
         } catch (erroFatal) {
-            console.error("GPU rejeitou o Globo. Acionando Plano B visual.", erroFatal);
+            console.error("GPU rejeitou o Globo por completo. Acionando Plano B visual.", erroFatal);
             ativarFundoCSSDourado(container);
         }
     };
@@ -190,7 +238,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -212,6 +260,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance.podeAnimar('coracao-3d')) return;
             if (!coracaoVisivel) return; 
 
@@ -238,7 +287,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -295,6 +344,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             const elGalaxia = document.getElementById('galaxia-3d-fundo');
             if (!elGalaxia || elGalaxia.clientWidth === 0) return;
             tempo += 0.001;
@@ -321,7 +371,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -443,6 +493,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         const animar = () => {
             requestAnimationFrame(animar);
             
+            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance.podeAnimar('orbe-clima-3d')) return;
 
             // Trava Nativa e Inquebrável de Hibernação
@@ -488,7 +539,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
         camera.position.set(0, 5, 20); camera.lookAt(0, 0, 0);
 
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
@@ -524,6 +575,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const animar = (tempoAtual) => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             if (!telaAtiva) return; 
             if (tempoAtual - ultimoFrame < intervaloFrame) return;
             ultimoFrame = tempoAtual;
@@ -576,7 +628,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight || 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
@@ -638,6 +690,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance || !window.RadarDePerformance.podeAnimar('eco-3d')) return;
             if (!ecoVisivel) return;
 
@@ -887,7 +940,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
         
         renderer.setSize(largura, altura);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -938,6 +991,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             const elBussola = document.getElementById('bussola-3d');
         if (!elBussola || elBussola.clientWidth === 0) return;
             if (!window.RadarDePerformance.podeAnimar('bussola-3d')) return;
@@ -1196,18 +1250,18 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             const { db, ref, onValue } = window.SantuarioApp.modulos;
             onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
                 const dados = snapshot.val();
-                construirCarrossel(Array.isArray(dados) ? dados : []);
-
                 // O FIREBASE ENTREGOU AS FOTOS! Derrete o Esqueleto Cintilante!
                 const esqueletoCarrossel = document.getElementById('esqueleto-carrossel');
                 if (esqueletoCarrossel) {
                     setTimeout(() => esqueletoCarrossel.classList.add('esqueleto-oculto'), 600);
                 }
+                construirCarrossel(Array.isArray(dados) ? dados : []);
             });
         }
 
         const animar = () => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance.podeAnimar('carrossel-3d')) return;
             
             // AUTO-AJUSTE: Garante que o carrossel se ajusta à tela do A55
@@ -1419,6 +1473,7 @@ window.inicializarPrisma3D = () => {
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+            if (window.SantuarioAtivo === false) return;
             if (!window.RadarDePerformance.podeAnimar('prisma-3d')) return;
             if (!arvoreVisivel) return; 
 
@@ -1615,6 +1670,7 @@ window.inicializarJornada3D = () => {
 
     const animar = () => {
         requestAnimationFrame(animar);
+        if (window.SantuarioAtivo === false) return;
 
         // MOTOR DE HIBERNAÇÃO (Para não queimar bateria em outras telas)
         if (telaJornada && telaJornada.classList.contains('escondido')) {

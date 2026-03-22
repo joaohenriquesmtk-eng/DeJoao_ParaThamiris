@@ -245,30 +245,28 @@ window.addEventListener('DOMContentLoaded', () => {
     // Verifica o estado do botão de mensagem surpresa agora
     verificarEstadoBotaoSurpresa();
 
-// E a cada minuto, verifica se o dia mudou (para reativar à meia‑noite)
+    // E a cada minuto, verifica se o dia mudou (para reativar à meia‑noite)
     setInterval(verificarEstadoBotaoSurpresa, 60000);
 
     // ==========================================
-// Ícone de temas - abrir/fechar seletor
-// ==========================================
-const temaIcon = document.getElementById('tema-icon');
-const temaSelector = document.getElementById('tema-selector');
+    // Ícone de temas - abrir/fechar seletor
+    // ==========================================
+    const temaIcon = document.getElementById('tema-icon');
+    const temaSelector = document.getElementById('tema-selector');
 
-if (temaIcon && temaSelector) {
-    // Clicar no ícone abre/fecha o seletor
-    temaIcon.addEventListener('click', () => {
-        temaSelector.classList.toggle('escondido');
-    });
-
-    // Fechar o seletor ao escolher um tema (os botões já existem)
-    document.querySelectorAll('.btn-tema').forEach(btn => {
-        btn.addEventListener('click', () => {
-            temaSelector.classList.add('escondido');
+    if (temaIcon && temaSelector) {
+        // Clicar no ícone abre/fecha o seletor
+        temaIcon.addEventListener('click', () => {
+            temaSelector.classList.toggle('escondido');
         });
-    });
 
-    // Opcional: fechar o seletor se clicar fora dele? (mais complexo, não faremos agora)
-}
+        // Fechar o seletor ao escolher um tema (os botões já existem)
+        document.querySelectorAll('.btn-tema').forEach(btn => {
+            btn.addEventListener('click', () => {
+                temaSelector.classList.add('escondido');
+            });
+        });
+    }
 
     // Funções de mensagem surpresa (se existirem)
     if (typeof inicializarSurpresaDiaria === 'function') inicializarSurpresaDiaria();
@@ -290,7 +288,6 @@ if (temaIcon && temaSelector) {
             window.SantuarioApp.conectar();
         }
     });
-
 
     // --- MELHORIA UX: O TOQUE SECRETO (EASTER EGG) ---
     const timerSecreto = document.getElementById('timer-principal');
@@ -562,9 +559,7 @@ if (temaIcon && temaSelector) {
     };
 
 
-
-
-// ==========================================
+    // ==========================================
     // INICIALIZADOR GLOBAL MESTRE (O BOOT)
     // ==========================================
     
@@ -627,23 +622,27 @@ if (temaIcon && temaSelector) {
     // Impede o celular de fritar ao tentar carregar 8 motores 3D no mesmo milissegundo.
     window.addEventListener('motor3DPronto', () => {
         
-        // 1º Lote (Imediato): Apenas os elementos que estão na cara da Thamiris na tela Home
+        // 1º Lote (Imediato) - O essencial da Home para encantar os olhos
         if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D();
         if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D();
-        if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico(); // O fundo global
         
-        // 2º Lote (Espera 1.5 segundos): Elementos pesados dos jogos e clima
+        // 2º Lote (Espera 1 segundo) - O fundo do oceano e a Árvore
+        setTimeout(() => {
+            if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico();
+            if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D();
+        }, 1000);
+
+        // 3º Lote (Espera 2.5 segundos) - Itens dos menus que não estão visíveis
         setTimeout(() => {
             if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima();
             if(typeof inicializarEco3D === 'function') inicializarEco3D();
-            if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D(); // A Árvore
-        }, 1500);
+        }, 2500);
 
-        // 3º Lote (Espera 3 segundos): Relíquias do Cofre que ela só vai ver se clicar
+        // 4º Lote (Espera 4 segundos) - Relíquias Profundas
         setTimeout(() => {
             if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
             if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
-        }, 3000);
+        }, 4000);
         
     });
 

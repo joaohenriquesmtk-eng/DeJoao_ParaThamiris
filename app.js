@@ -522,6 +522,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if(typeof inicializarEco3D === 'function') inicializarEco3D();
         if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
         if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D();
 
         
         // NOTA DO ENGENHEIRO:

@@ -57,7 +57,7 @@
             
             <section id="home" class="tela ativo">
                 <div class="cartao-vidro" style="text-align: center;">
-                    <h2 style="color: var(--cor-primaria); font-weight: 300;">Santuário</h2>
+                    <h2 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 2rem;">Santuário</h2>
                     <p style="opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">Conexão Vital Estabelecida há:</p>
                     <div id="timer-principal" class="toque-secreto" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace; cursor: pointer; user-select: none;">
                         00d 00h 00m 00s
@@ -71,12 +71,46 @@
     <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: #ffffff;"></p>
 </div>
 
-<div class="cartao-vidro" style="margin-top: 20px; padding: 10px; display: flex; flex-direction: column; align-items: center;">
-                <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 5px;">A Nossa Conexão</h3>
-                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px; text-align: center;">Onde quer que você esteja, a luz nos encontra.</p>
-                
-                <div id="globo-3d" style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);"></div>
-            </div>
+<div class="cartao-vidro" style="margin-top: 20px; padding: 25px 10px; display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden;">
+    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 5px;">A Nossa Conexão</h3>
+    <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 25px; text-align: center; font-style: italic;">O amor não conhece distâncias, apenas laços infinitos.</p>
+    
+    <div id="infinito-dourado-container" style="width: 100%; height: 160px; position: relative; display: flex; justify-content: center; align-items: center;">
+        
+        <svg viewBox="0 0 240 100" style="width: 100%; height: 100%; overflow: visible;" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <linearGradient id="grad-infinito" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#3498db" /> <stop offset="50%" stop-color="#D4AF37" /> <stop offset="100%" stop-color="#ff6b6b" /> </linearGradient>
+                <filter id="brilho-infinito">
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+
+            <path id="trilha-base" d="M 120, 50 C 80, 100 20, 100 20, 50 C 20, 0 80, 0 120, 50 C 160, 100 220, 100 220, 50 C 220, 0 160, 0 120, 50 Z" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="2" stroke-dasharray="4 6" />
+            
+            <path class="cometa-infinito" d="M 120, 50 C 80, 100 20, 100 20, 50 C 20, 0 80, 0 120, 50 C 160, 100 220, 100 220, 50 C 220, 0 160, 0 120, 50 Z" fill="none" stroke="url(#grad-infinito)" stroke-width="3" filter="url(#brilho-infinito)" />
+            
+            <g transform="translate(20, 50)">
+                <circle class="pulso-estrela-azul" cx="0" cy="0" r="4" fill="none" stroke="#3498db" stroke-width="2" />
+                <circle cx="0" cy="0" r="5" fill="#fff" filter="url(#brilho-infinito)" />
+                <circle cx="0" cy="0" r="2" fill="#3498db" />
+                <text x="0" y="30" fill="#fff" font-size="9" font-family="'Playfair Display', serif" font-style="italic" text-anchor="middle" filter="url(#brilho-infinito)">Colombo</text>
+            </g>
+
+            <g transform="translate(220, 50)">
+                <circle class="pulso-estrela-rosa" cx="0" cy="0" r="4" fill="none" stroke="#ff6b6b" stroke-width="2" />
+                <circle cx="0" cy="0" r="5" fill="#fff" filter="url(#brilho-infinito)" />
+                <circle cx="0" cy="0" r="2" fill="#ff6b6b" />
+                <text x="0" y="30" fill="#fff" font-size="9" font-family="'Playfair Display', serif" font-style="italic" text-anchor="middle" filter="url(#brilho-infinito)">Goiânia</text>
+            </g>
+        </svg>
+    </div>
+</div>
 
                 <div class="particulas">
     <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
@@ -107,7 +141,7 @@
                 </div>
 
                 <div class="cartao-vidro" style="text-align: center; margin-top: 20px; display: flex; flex-direction: column; align-items: center; padding: 25px 20px;">
-                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 20px;">Pulso de Vida</h3>
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 20px;">Pulso de Vida</h3>
                     
                     <div class="area-pulso" style="position: relative; margin: 0; width: 100%; display: flex; flex-direction: column; align-items: center;">
                         <button id="btn-pulso" onclick="if(window.Haptics) window.Haptics.toqueForte(); enviarPulso()">
@@ -120,9 +154,14 @@
                     </div>
                 </div>
 
-                <div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 20px;">
-    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Como está seu coração agora?</h4>
-    <div id="coracao-3d" style="width: 100%; height: 130px; margin-bottom: 10px;"></div>
+<div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 5px;">
+    
+    <h4 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem">
+        Como está seu coração agora?
+    </h4>
+    
+    <div id="coracao-3d" style="width: 100%; height: 130px; margin-top: -30px; margin-bottom: 25px; position: relative; z-index: 1; pointer-events: none;"></div>
+    
     <div class="botoes-mood">
         <button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
         <button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
@@ -132,16 +171,14 @@
         <button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
         <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:10px; padding:8px; border-radius:10px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3);"></textarea>
     </div>
-
-    <div id="lottie-mood-container" style="width: 100px; height: 100px; margin: 0 auto; display: flex; align-items: center; justify-content: center;"></div>
-    
+        
     <div id="status-parceiro" style="margin-top: 10px; font-size: 0.95rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">
         Aguardando a sintonia do outro lado...
     </div>
 </div>
 
 <div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px;">
-    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; text-align: center;">Mural de Recados</h4>
+    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-align: center;">Mural de Recados</h4>
     <div id="area-postits" class="area-postits">
         </div>
     <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -151,7 +188,7 @@
 </div>
 
 <div class="cartao-vidro" id="cartao-espelho-alma" style="margin-top: 20px; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2);">
-                <div id="espelho-overlay" class="espelho-overlay"></div> <h3 class="titulo-cartao" style="text-align: center; color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(0,0,0,0.8);">🪞 O Espelho da Alma</h3>
+                <div id="espelho-overlay" class="espelho-overlay"></div> <h3 class="titulo-cartao" style="text-align: center; color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);">🪞 O Espelho da Alma</h3>
                 <p id="pergunta-espelho" style="font-size: 1.05rem; font-style: italic; text-align: center; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.9); line-height: 1.5;"></p>
 
                 <div id="estado-espelho-responder" class="escondido">
@@ -178,7 +215,7 @@
             </div>
 
                 <div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
-                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
                     <p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
                     
                     <div id="orbe-clima-3d" style="width: 100%; height: 230px; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;"></div>
@@ -206,7 +243,7 @@
 
                     <div class="cartao-vidro" id="cartao-temas" style="margin-top: 20px; border-color: rgba(255,255,255,0.1);">
                 <div class="cabecalho-colapsavel" onclick="toggleTemas()" style="display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative;">
-                    <h3 class="titulo-cartao" style="margin-bottom: 0; color: var(--cor-primaria); text-align: center; transition: color 0.4s ease;">Aura do Santuário</h3>
+                    <h3 class="titulo-cartao" style="margin-bottom: 0; color: var(--cor-primaria); text-align: center; font-family: 'Playfair Display', serif; font-size: 1.2rem;transition: color 0.4s ease;">Aura do Santuário</h3>
                     <span id="icone-toggle-temas" style="transition: transform 0.3s; color: var(--cor-primaria); font-size: 1.2rem; position: absolute; right: 0;">▼</span>
                 </div>
                 

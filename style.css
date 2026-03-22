@@ -7122,3 +7122,245 @@ body.aura-ansiosa {
     opacity: 0.65; /* Damos uma leve escurecida no vídeo para que os textos em branco e dourado tenham contraste perfeito e sejam fáceis de ler */
     transition: opacity 1s ease-in-out;
 }
+
+
+
+/* ==========================================
+   O CORAÇÃO DE NEON ORGÂNICO (SUBSTITUTO DO CRISTAL)
+========================================== */
+.coracao-neon-wrapper {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    /* Avisa a placa de vídeo para acelerar apenas o vetor, sem usar memória 3D pesada */
+    transform: translateZ(0); 
+}
+
+.coracao-svg {
+    width: 130px;
+    height: 130px;
+    overflow: visible;
+    /* A animação de batimento cardíaco duplo com curva orgânica (tum-tum) */
+    animation: batimentoCardiaco 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform-origin: center;
+}
+
+.linha-coracao {
+    fill: transparent;
+    stroke: #ff6b6b; /* Cor rosa amável padrão */
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* Transição deliciosa e lenta quando o sentimento muda */
+    transition: stroke 0.8s ease, fill 0.8s ease; 
+}
+
+@keyframes batimentoCardiaco {
+    0% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+
+
+/* ==========================================
+   A GALERIA HOLOGRÁFICA (CSS 3D CAROUSEL)
+========================================== */
+.galeria-holografica-wrapper {
+    width: 100%;
+    height: 250px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px; /* A lente de profundidade */
+    overflow: hidden;
+    /* Sombras que escurecem as laterais, focando o olhar no centro */
+    box-shadow: inset 20px 0 30px -10px rgba(0,0,0,0.8), inset -20px 0 30px -10px rgba(0,0,0,0.8);
+}
+
+.galeria-spinner {
+    position: relative;
+    width: 140px;  /* Largura base da foto */
+    height: 190px; /* Altura base da foto */
+    transform-style: preserve-3d; /* Permite que os filhos dobrem no espaço 3D */
+    will-change: transform;
+}
+
+.foto-item {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.1);
+    
+    /* O REFLEXO NO CHÃO NEGRO (Espelho D'água) */
+    -webkit-box-reflect: below 5px linear-gradient(transparent, transparent 70%, rgba(255,255,255,0.3));
+    
+    backface-visibility: visible;
+    cursor: grab;
+    
+    /* Efeito de vidro na foto se estiver vazia */
+    background-color: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foto-item:active {
+    cursor: grabbing;
+}
+
+.foto-vazia-texto {
+    padding: 15px;
+    text-align: center;
+    color: rgba(212, 175, 55, 0.8);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+}
+
+
+
+/* ==========================================
+   O PLANETÁRIO INTERATIVO (CANVAS 2D)
+========================================== */
+.estrela-comprada-2d {
+    position: absolute;
+    /* Começa no topo esquerdo 0, o Javascript vai movimentar usando transform */
+    top: 0; left: 0; 
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #fff, 0 0 35px #D4AF37;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto; /* Fundamental para poder clicar nela! */
+}
+
+.estrela-brilho {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    animation: pulsarEstrelaComprada 2s infinite alternate;
+}
+
+@keyframes pulsarEstrelaComprada {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.2; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.estrela-nome-tooltip {
+    position: absolute;
+    top: 25px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: #D4AF37;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    pointer-events: none;
+    white-space: nowrap;
+    border: 1px solid rgba(212,175,55,0.3);
+}
+
+.estrela-supernova {
+    animation: explodirSupernova 0.5s ease-out forwards;
+}
+
+@keyframes explodirSupernova {
+    0% { transform: scale(1); background: #fff; box-shadow: 0 0 20px #D4AF37; }
+    50% { transform: scale(5); background: #D4AF37; box-shadow: 0 0 100px #D4AF37; opacity: 1; }
+    100% { transform: scale(10); opacity: 0; }
+}
+
+
+/* ==========================================
+   O LAÇO DO INFINITO (A NOSSA CONEXÃO)
+========================================== */
+.cometa-infinito {
+    stroke-dasharray: 100 500; /* Tamanho da luz e tamanho do vazio */
+    stroke-linecap: round;
+    animation: viajarInfinito 6s linear infinite;
+}
+
+@keyframes viajarInfinito {
+    0% { stroke-dashoffset: 600; }
+    100% { stroke-dashoffset: 0; }
+}
+
+.pulso-estrela-azul {
+    animation: pulsarAura 2s infinite ease-out;
+}
+.pulso-estrela-rosa {
+    animation: pulsarAura 2s infinite ease-out 1s; /* Bate em tempo diferente de Colombo */
+}
+
+@keyframes pulsarAura {
+    0% { r: 4; stroke-opacity: 1; stroke-width: 2; }
+    100% { r: 20; stroke-opacity: 0; stroke-width: 0.5; }
+}
+
+
+
+/* ==========================================
+   ANIMAÇÃO GLOBAL DO MARTELO (TRIBUNAL DO AFETO)
+========================================== */
+#martelo-overlay-global {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    pointer-events: none; /* A tela não trava os toques */
+    z-index: 999999; /* Hierarquia divina, acima de qualquer modal */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3); /* Escurece sutilmente o fundo durante a batida */
+}
+
+.martelo-svg-wrapper {
+    /* O pivô de giro fica na ponta inferior do cabo */
+    transform-origin: 50% 100%; 
+    opacity: 0;
+    z-index: 2;
+    filter: drop-shadow(0 15px 15px rgba(0,0,0,0.8));
+}
+
+.martelo-luz-fundo {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+/* Cinemática: Levanta armado (90 graus) -> Bate Reto (0 graus) -> Quica levemente */
+@keyframes baterMartelo {
+    0% { transform: rotate(90deg) translateY(-150px) scale(0.8); opacity: 0; }
+    15% { transform: rotate(45deg) translateY(0) scale(1.1); opacity: 1; }
+    25% { transform: rotate(0deg) translateY(0) scale(1); opacity: 1; } /* IMPACTO TOTALMENTE RETO! */
+    35% { transform: rotate(15deg) translateY(0); opacity: 1; } /* Quique natural da madeira */
+    100% { transform: rotate(15deg) translateY(0); opacity: 0; }
+}
+
+/* Cinemática: Explosão do flash de luz */
+@keyframes explodirLuzMartelo {
+    0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}

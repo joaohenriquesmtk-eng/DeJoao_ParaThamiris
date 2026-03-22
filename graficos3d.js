@@ -127,70 +127,81 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         animar();
     };
 
-    // ==========================================
-    // UI/UX NÍVEL DEUS: AS 3 JÓIAS 3D
+// ==========================================
+    // UI/UX NÍVEL DEUS: AS 3 JÓIAS 3D (E VETORIAIS)
     // ==========================================
 
-    // --- 1. O CORAÇÃO DE CRISTAL ---
-    window.ritmoCoracao = 1;      
-    window.corCoracao = 0xff6b6b; 
-
-    // Espera o sistema inteiro carregar antes de interceptar os cliques
+    // --- 1. O CORAÇÃO DE NEON ORGÂNICO (Ex-Cristal 3D) ---
+    
+    // Ouve as mudanças de humor e altera a física do Coração em tempo real
     window.addEventListener('motor3DPronto', () => {
         const enviarMoodOriginal = window.enviarMood;
+        
         window.enviarMood = function(estado) {
-            if (estado === 'ansiosa') { window.ritmoCoracao = 3.5; window.corCoracao = 0xf39c12; } 
-            else if (estado === 'cansada') { window.ritmoCoracao = 0.5; window.corCoracao = 0x3498db; } 
-            else if (estado === 'triste') { window.ritmoCoracao = 0.8; window.corCoracao = 0x8e44ad; } 
-            else if (estado === 'radiante') { window.ritmoCoracao = 2; window.corCoracao = 0xf1c40f; } 
-            else if (estado === 'apaixonada') { window.ritmoCoracao = 2.5; window.corCoracao = 0xff6b6b; } 
-            else { window.ritmoCoracao = 1.5; window.corCoracao = 0xffffff; } 
+            const coracaoSvg = document.querySelector('.coracao-svg');
+            const linha = document.querySelector('.linha-coracao');
+            const glow = document.querySelector('#glow-coracao feGaussianBlur');
             
+            if (coracaoSvg && linha && glow) {
+                // Reseta para o estado neutro antes de aplicar o novo
+                linha.style.fill = 'transparent';
+                glow.setAttribute('stdDeviation', '3');
+                
+                if (estado === 'ansiosa') { 
+                    coracaoSvg.style.animationDuration = '0.6s'; // Coração acelerado
+                    linha.style.stroke = '#f39c12'; // Laranja de alerta
+                    glow.setAttribute('stdDeviation', '4');
+                } else if (estado === 'cansada') { 
+                    coracaoSvg.style.animationDuration = '4s'; // Quase parando
+                    linha.style.stroke = '#3498db'; // Azul melancólico
+                    glow.setAttribute('stdDeviation', '1.5');
+                } else if (estado === 'triste') { 
+                    coracaoSvg.style.animationDuration = '3s'; // Suspiros lentos
+                    linha.style.stroke = '#8e44ad'; // Roxo
+                    glow.setAttribute('stdDeviation', '2');
+                } else if (estado === 'radiante') { 
+                    coracaoSvg.style.animationDuration = '1.2s'; // Batida alegre
+                    linha.style.stroke = '#f1c40f'; // Dourado do Santuário
+                    glow.setAttribute('stdDeviation', '5'); // Brilho forte
+                } else if (estado === 'apaixonada') { 
+                    coracaoSvg.style.animationDuration = '0.9s'; // Taquicardia de amor
+                    linha.style.stroke = '#ff4757'; // Vermelho vivo
+                    linha.style.fill = 'rgba(255, 71, 87, 0.15)'; // Preenche o peito
+                    glow.setAttribute('stdDeviation', '6'); // Aura imensa
+                } else { 
+                    coracaoSvg.style.animationDuration = '1.5s'; // Ritmo normal
+                    linha.style.stroke = '#ff6b6b'; 
+                }
+            }
+            
+            // Chama a sua função original que salva no Firebase
             if (enviarMoodOriginal) enviarMoodOriginal(estado);
         };
     });
 
+    // Constrói o coração na tela usando SVG 100% puro e sem WebGL
     window.inicializarCoracao3D = () => {
         const container = document.getElementById('coracao-3d');
-        if (!container || typeof THREE === 'undefined') return;
+        if (!container || container.querySelector('.coracao-neon-wrapper')) return;
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.domElement.style.display = 'block';
-        renderer.domElement.style.margin = '0 auto';
-        container.appendChild(renderer.domElement);
-
-        const coracao = new THREE.Mesh(
-            new THREE.IcosahedronGeometry(2, 0), 
-            new THREE.MeshBasicMaterial({ color: window.corCoracao, wireframe: true, transparent: true, opacity: 0.8 })
-        );
-        scene.add(coracao);
-        camera.position.z = 7;
-
-        let coracaoVisivel = false;
-        const observerCoracao = new IntersectionObserver((entries) => { coracaoVisivel = entries[0].isIntersecting; });
-        observerCoracao.observe(container);
-
-        let tempo = 0;
-        const animar = () => {
-            requestAnimationFrame(animar);
-            if (!window.RadarDePerformance.podeAnimar('coracao-3d')) return;
-            if (!coracaoVisivel) return; 
-
-            tempo += 0.05 * window.ritmoCoracao;
-            coracao.material.color.setHex(window.corCoracao);
-            const batimento = 1 + Math.pow(Math.sin(tempo), 4) * 0.2;
-            coracao.scale.set(batimento, batimento, batimento);
-            coracao.rotation.y += 0.01;
-            coracao.rotation.x += 0.005;
-            
-            renderer.render(scene, camera);
-        };
-        animar();
+        // Limpa qualquer resquício de Canvas e injeta o vetor incandescente
+        container.innerHTML = `
+            <div class="coracao-neon-wrapper">
+                <svg class="coracao-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <filter id="glow-coracao" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <path class="linha-coracao" d="M50,88.9 C50,88.9 15.5,59.3 15.5,35.2 C15.5,23.1 24.8,13.8 36.5,13.8 C43.2,13.8 47.7,16.9 50,21.4 C52.3,16.9 56.8,13.8 63.5,13.8 C75.2,13.8 84.5,23.1 84.5,35.2 C84.5,59.3 50,88.9 50,88.9 Z" filter="url(#glow-coracao)"/>
+                </svg>
+            </div>
+        `;
     };
 
 
@@ -427,7 +438,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
     };
 
 // ==========================================
-    // UI/UX NÍVEL TITÃ: ECOS DO SANTUÁRIO (ÁUDIO 3D UNIFICADO E CORRIGIDO)
+    // UI/UX NÍVEL TITÃ: O OSCILOSCÓPIO DA ALMA (HIPER-REATIVO)
     // ==========================================
     
     // Variáveis Globais do Áudio
@@ -441,62 +452,108 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
     
     window.inicializarEco3D = () => {
         const container = document.getElementById('eco-3d');
-        if (!container || typeof THREE === 'undefined') return;
+        if (!container || container.querySelector('canvas')) return;
         
-        // Limpeza profunda para evitar duplicatas caso a tela seja recarregada
-        container.innerHTML = "";
+        container.innerHTML = `
+            <div class="osciloscopio-wrapper" style="width: 100%; height: 180px; display: flex; align-items: center; justify-content: center; transform: translateZ(0);">
+                <canvas id="canvas-eco" style="width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(212,175,55,0.4));"></canvas>
+            </div>
+        `;
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight || 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
+        const canvas = document.getElementById('canvas-eco');
+        const ctx = canvas.getContext('2d');
 
-        camera.position.z = 5;
-
-        const geometry = new THREE.IcosahedronGeometry(1.5, 12);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xD4AF37, 
-            wireframe: true, 
-            transparent: true, 
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-        
-        const esferaEco = new THREE.Mesh(geometry, material);
-        scene.add(esferaEco);
-
-        const positionAttribute = geometry.attributes.position;
-        const vertexOriginals = [];
-        for (let i = 0; i < positionAttribute.count; i++) {
-            vertexOriginals.push(new THREE.Vector3().fromBufferAttribute(positionAttribute, i));
-        }
-
-        // 1. CORREÇÃO DA TELA PRETA/INVISÍVEL: O 3D precisa saber quando o modal abre!
-        const atualizarTamanhoEco = () => {
-            if (container.clientWidth > 0 && container.clientHeight > 0) {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
+        const redimensionar = () => {
+            const rect = container.getBoundingClientRect();
+            if (rect.width > 0) {
+                canvas.width = rect.width * (window.devicePixelRatio || 1);
+                canvas.height = 180 * (window.devicePixelRatio || 1);
             }
         };
-        new ResizeObserver(atualizarTamanhoEco).observe(container);
-        atualizarTamanhoEco();
+        window.addEventListener('resize', redimensionar);
+        
+        let tempo = 0;
 
-        // 2. CORREÇÃO DO ÁUDIO AMBIENTE: Silenciador Brutal
+        // 3. O PINCEL HIPER-REATIVO: Mistura ondas fluidas com tremores vocais
+        const desenharLinha = (dadosReais, volumeGlobal, offsetFase, multiplicadorAmplitude, cor, blur) => {
+            const largura = canvas.width;
+            const altura = canvas.height;
+            const centroY = altura / 2;
+
+            ctx.beginPath();
+            ctx.lineWidth = 2 * (window.devicePixelRatio || 1); // Linha levemente mais fina para o tremor ficar nítido
+            ctx.strokeStyle = cor;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.shadowBlur = blur;
+            ctx.shadowColor = cor;
+
+            const pontos = 100; // Aumentamos a resolução da linha para ela poder "tremer"
+            const espacamento = largura / pontos;
+            
+            // Força global do som (0.0 a 1.0)
+            const energiaAudio = Math.min(volumeGlobal / 255, 1); 
+
+            // A MÁGICA DA FREQUÊNCIA: 
+            // No silêncio tem 6 curvas. Se gritar, salta para 25 curvas frenéticas.
+            const ondas1 = 6 + (energiaAudio * 20);
+            const ondas2 = 10 + (energiaAudio * 15);
+            
+            // A MÁGICA DA VELOCIDADE: 
+            // O tempo passa 4x mais rápido quando há voz, criando o efeito de "eletricidade".
+            const tempoDinamico = tempo * (1 + energiaAudio * 4); 
+
+            for (let i = 0; i <= pontos; i++) {
+                const x = i * espacamento;
+                const nx = i / pontos; 
+                
+                // Amarra as pontas no centro da tela
+                const suavizadorBordas = Math.sin(nx * Math.PI); 
+
+                // A onda base fluida (que acelera e multiplica com a voz)
+                const onda1Base = Math.sin(nx * ondas1 + tempoDinamico + offsetFase);
+                const onda2Base = Math.sin(nx * ondas2 - tempoDinamico + offsetFase);
+                const ondaCombinada = (onda1Base + onda2Base) / 2;
+
+                // O TREMOR DA VOZ (A extração pura das frequências graves/agudas)
+                let vibracaoVoz = 0;
+                if (dadosReais && dadosReais.length > 0) {
+                    // Mapeia o X atual para um índice no array de áudio
+                    const idx = Math.floor(nx * (dadosReais.length / 2)); 
+                    const forcaLocal = dadosReais[idx] / 255;
+                    // Adiciona uma micro-onda rapidíssima que reage apenas se houver som naquele tom
+                    vibracaoVoz = Math.cos(nx * 80 + tempoDinamico * 10) * (forcaLocal * 35);
+                }
+
+                // A altura final da onda cresce absurdamente com o volume
+                const amplitudeAtual = (12 + (energiaAudio * 120)) * (window.devicePixelRatio || 1);
+
+                // Junta a onda base + o tremor da voz
+                const yOffset = (ondaCombinada * amplitudeAtual + vibracaoVoz) * multiplicadorAmplitude * suavizadorBordas;
+                const y = centroY + yOffset;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    const prevX = (i - 1) * espacamento;
+                    const cpX = prevX + espacamento / 2;
+                    ctx.quadraticCurveTo(cpX, y, x, y);
+                }
+            }
+            ctx.stroke();
+        };
+
+        // 4. Silenciador e Radar
         let ecoVisivel = false;
         const observerEco = new IntersectionObserver((entries) => { 
             ecoVisivel = entries[0].isIntersecting; 
-            
             if (ecoVisivel) {
-                // Silencia ABSOLUTAMENTE TUDO no app
                 document.querySelectorAll('audio').forEach(a => a.pause());
                 if (typeof pauseAudioJogos === 'function') pauseAudioJogos();
                 if (typeof pausarAmbiente === 'function') pausarAmbiente();
-                window.musicaNossaTocando = true; // Trava o motor de áudio global
+                window.musicaNossaTocando = true;
+                setTimeout(redimensionar, 100); 
             } else {
-                // Devolve a música quando fechar o modal
                 window.musicaNossaTocando = false; 
                 const modal = document.getElementById('modal-reliquia');
                 if (modal && modal.classList.contains('escondido')) {
@@ -507,54 +564,41 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         });
         observerEco.observe(container);
 
-        let tempo = 0;
+        // 5. O Loop de Renderização
         const animar = () => {
             requestAnimationFrame(animar);
-            if (!window.RadarDePerformance || !window.RadarDePerformance.podeAnimar('eco-3d')) return;
-            if (!ecoVisivel) return;
+            if (!ecoVisivel || window.SantuarioAtivo === false) return;
+            if (canvas.width === 0) redimensionar();
 
-            tempo += 0.01;
-            esferaEco.rotation.y += 0.005;
-            esferaEco.rotation.x += 0.002;
+            tempo += 0.05; // Velocidade de repouso (bem calma)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 3. CORREÇÃO DA DEFORMAÇÃO (Aumentando a Sensibilidade)
+            let volumeMedio = 0;
+            let dadosDeFrequencia = null;
+            
+            // Coleta a Força da Voz E as Frequências
             if (window.isEcoAtivo && window.ecoAnalyser && window.ecoDataArray) {
                 window.ecoAnalyser.getByteFrequencyData(window.ecoDataArray);
+                dadosDeFrequencia = window.ecoDataArray;
                 
                 let soma = 0;
-                for(let i=0; i < window.ecoDataArray.length; i++) soma += window.ecoDataArray[i];
-                let mediaVolume = soma / window.ecoDataArray.length;
-                
-                material.opacity = 0.3 + (mediaVolume / 255) * 0.7;
-                material.color.setHex(mediaVolume > 100 ? 0xffffff : 0xD4AF37); // Fica branco mais fácil
-
-                const positions = geometry.attributes.position;
-                for (let i = 0; i < positions.count; i++) {
-                    const vertex = vertexOriginals[i].clone();
-                    // Aumentei o multiplicador de 0.5 para 2.0 para a esfera pulsar de verdade!
-                    const distorcao = 1 + (window.ecoDataArray[i % window.ecoDataArray.length] / 255) * 2.0; 
-                    vertex.multiplyScalar(distorcao);
-                    positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
+                for (let j = 0; j < window.ecoDataArray.length; j++) {
+                    soma += window.ecoDataArray[j];
                 }
-                positions.needsUpdate = true;
-            } else {
-                // Respiração suave de descanso
-                const pos = geometry.attributes.position;
-                for (let i = 0; i < pos.count; i++) {
-                    const vertex = vertexOriginals[i].clone();
-                    vertex.multiplyScalar(1 + Math.sin(tempo * 2 + vertex.y) * 0.05);
-                    pos.setXYZ(i, vertex.x, vertex.y, vertex.z);
-                }
-                pos.needsUpdate = true;
-                material.color.setHex(0xD4AF37);
-                material.opacity = 0.4;
+                volumeMedio = soma / window.ecoDataArray.length; 
             }
 
-            renderer.render(scene, camera);
-        };
-        animar();
+            const isAtivo = window.isEcoAtivo && volumeMedio > 0;
+            const rgbCor = isAtivo ? '255, 107, 107' : '212, 175, 55';
 
-        // Feedback Inicial
+            // Chama o pincel passando os DADOS do array e o VOLUME global
+            desenharLinha(dadosDeFrequencia, volumeMedio, 0, 1, `rgba(${rgbCor}, 1)`, 15);      
+            desenharLinha(dadosDeFrequencia, volumeMedio, 2, 0.6, `rgba(${rgbCor}, 0.5)`, 5);   
+            desenharLinha(dadosDeFrequencia, volumeMedio, 4, -0.6, `rgba(${rgbCor}, 0.5)`, 5);  
+        };
+
+        animar(); 
+
         if (window.audioCarregado) {
             const btnOuvir = document.getElementById('btn-ouvir-eco');
             const statusLabel = document.getElementById('status-eco');
@@ -570,6 +614,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             }
         }
     };
+
 
 // --- FUNÇÕES DE GRAVAÇÃO E PLAYBACK DE ÁUDIO ---
 
@@ -950,155 +995,133 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
     }
 
 // ==========================================
-    // UI/UX NÍVEL TITÃ: CARROSSEL DE HORIZONTES (GALERIA 3D)
+    // UI/UX NÍVEL TITÃ: A GALERIA HOLOGRÁFICA (CSS 3D)
     // ==========================================
-    
     window.inicializarCarrossel3D = () => {
         const container = document.getElementById('carrossel-3d');
-        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+        // Previne duplicatas caso a aba seja aberta e fechada várias vezes
+        if (!container || container.querySelector('.galeria-holografica-wrapper')) return;
 
-        let largura = container.clientWidth || (window.innerWidth - 60);
-        let altura = container.clientHeight || 250;
+        // Injeta o "Palco 3D" no HTML
+        container.innerHTML = `
+            <div class="galeria-holografica-wrapper">
+                <div class="galeria-spinner" id="galeria-spinner">
+                    </div>
+            </div>
+        `;
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, largura / altura, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(largura, altura);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
-
-        camera.position.set(0, 0, 5);
-        scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-
-        const carrosselGroup = new THREE.Group();
-        scene.add(carrosselGroup);
-
-        const geometriaQuadro = new THREE.PlaneGeometry(2, 2.5);
-        const texturaCarregador = new THREE.TextureLoader();
-        let quadros = [];
+        const spinner = document.getElementById('galeria-spinner');
+        let anguloAtual = 0;
         let timerCliqueLongo;
 
-        const construirCarrossel = (fotosArray) => {
-            while(carrosselGroup.children.length > 0){ carrosselGroup.remove(carrosselGroup.children[0]); }
-            quadros = [];
-            const corTema = getComputedStyle(document.documentElement).getPropertyValue('--cor-primaria').trim() || "#D4AF37";
+        // --- A MÁGICA DE CONSTRUÇÃO DO CILINDRO ---
+        const construirGaleriaCSS = (fotosArray) => {
+            spinner.innerHTML = ''; 
 
             if (!fotosArray || fotosArray.length === 0) {
-                const matVazio = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
-                const quadro = new THREE.Mesh(geometriaQuadro, matVazio);
-                const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: new THREE.Color(corTema) }));
-                quadro.add(borda);
-                carrosselGroup.add(quadro);
-                quadros.push(quadro);
+                spinner.innerHTML = `
+                    <div class="foto-item">
+                        <div class="foto-vazia-texto">O horizonte aguarda<br>nossas memórias.</div>
+                    </div>`;
                 return;
             }
 
-            const raio = Math.max(3, fotosArray.length * 0.7);
-            const anguloPasso = (Math.PI * 2) / fotosArray.length;
+            const quantidade = fotosArray.length;
+            const anguloPorFoto = 360 / quantidade;
+            
+            // O Raio de distanciamento: Calcula automaticamente o tamanho do cilindro 
+            // com base em quantas fotos vocês adicionaram, para elas não se esmagarem.
+            const raioZ = Math.max(140, (quantidade * 130) / (2 * Math.PI));
 
             fotosArray.forEach((fotoBase64, index) => {
-                texturaCarregador.load(fotoBase64, (textura) => {
-                    const material = new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide, transparent: true });
-                    const quadro = new THREE.Mesh(geometriaQuadro, material);
-                    const angulo = index * anguloPasso;
-                    quadro.position.set(Math.sin(angulo) * raio, 0, Math.cos(angulo) * raio);
-                    quadro.rotation.y = angulo;
-                    quadro.userData = { index: index }; 
-
-                    const borda = new THREE.LineSegments(new THREE.EdgesGeometry(geometriaQuadro), new THREE.LineBasicMaterial({ color: 0xD4AF37 }));
-                    quadro.add(borda);
-                    carrosselGroup.add(quadro);
-                    quadros.push(quadro);
+                const div = document.createElement('div');
+                div.className = 'foto-item';
+                // Posiciona a foto no espaço 3D exato
+                div.style.transform = `rotateY(${index * anguloPorFoto}deg) translateZ(${raioZ}px)`;
+                div.style.backgroundImage = `url(${fotoBase64})`;
+                
+                // Lógica de segurar para apagar (Exclusão)
+                div.addEventListener('pointerdown', () => {
+                    timerCliqueLongo = setTimeout(() => {
+                        window.confirmarExclusaoFoto(index);
+                        if(window.Haptics) window.Haptics.toqueForte();
+                    }, 1200);
                 });
+                
+                // Cancela o timer se soltar ou arrastar o dedo
+                div.addEventListener('pointerup', () => clearTimeout(timerCliqueLongo));
+                div.addEventListener('pointerleave', () => clearTimeout(timerCliqueLongo));
+
+                spinner.appendChild(div);
             });
         };
 
-        let isDragging = false, previousX = 0, velocidadeGiro = 0.005;
+        // --- MOTOR DE FÍSICA: ARRASTE E INÉRCIA ---
+        let isDragging = false;
+        let startX = 0;
+        let velocidade = 0;
+        let animationFrameId;
 
-        const iniciarAoTocar = (e) => {
+        const onPointerDown = (e) => {
             isDragging = true;
-            const x = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
-            const y = e.clientY || (e.touches && e.touches.length > 0 ? e.touches[0].clientY : undefined);
-            if (x === undefined || y === undefined) return;
-            
-            previousX = x;
-            velocidadeGiro = 0;
-
-            const rect = container.getBoundingClientRect();
-            const mouse = new THREE.Vector2(
-                ((x - rect.left) / container.clientWidth) * 2 - 1,
-                -((y - rect.top) / container.clientHeight) * 2 + 1
-            );
-            const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(quadros);
-
-            if (intersects.length > 0 && intersects[0].object.userData.index !== undefined) {
-                timerCliqueLongo = setTimeout(() => {
-                    window.confirmarExclusaoFoto(intersects[0].object.userData.index);
-                }, 1200);
-            }
+            startX = e.clientX || (e.touches && e.touches[0].clientX);
+            velocidade = 0;
+            cancelAnimationFrame(animationFrameId);
+            spinner.style.transition = 'none'; // Desliga transição pro dedo guiar a roda
         };
 
-        const moverAoTocar = (e) => {
+        const onPointerMove = (e) => {
             if (!isDragging) return;
-            const x = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
-            if (x === undefined) return;
-            
-            const delta = x - previousX;
-            carrosselGroup.rotation.y += delta * 0.01;
-            velocidadeGiro = delta * 0.002;
-            previousX = x;
-            clearTimeout(timerCliqueLongo);
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const deltaX = x - startX;
+            velocidade = deltaX * 0.3; // Multiplicador de sensibilidade do dedo
+            anguloAtual += velocidade;
+            spinner.style.transform = `rotateY(${anguloAtual}deg)`;
+            startX = x;
+            clearTimeout(timerCliqueLongo); // Cancelar a exclusão se estiver apenas rodando a galeria
         };
 
-        const finalizarToque = () => {
+        const onPointerUp = () => {
             isDragging = false;
-            clearTimeout(timerCliqueLongo);
+            // Efeito de inércia (continua rodando e freando suavemente ao soltar)
+            const aplicarInercia = () => {
+                if (Math.abs(velocidade) > 0.1) {
+                    anguloAtual += velocidade;
+                    velocidade *= 0.95; // O atrito do ar freiando a roda
+                    spinner.style.transform = `rotateY(${anguloAtual}deg)`;
+                    animationFrameId = requestAnimationFrame(aplicarInercia);
+                }
+            };
+            aplicarInercia();
         };
 
-        container.addEventListener('mousedown', iniciarAoTocar);
-        window.addEventListener('mousemove', moverAoTocar);
-        window.addEventListener('mouseup', finalizarToque);
-        container.addEventListener('touchstart', iniciarAoTocar, {passive: true});
-        window.addEventListener('touchmove', moverAoTocar, {passive: false});
-        window.addEventListener('touchend', finalizarToque);
+        container.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove, {passive: true});
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
 
-        if(window.SantuarioApp && window.SantuarioApp.modulos) {
+        // --- COMUNICAÇÃO COM O BANCO DE DADOS (FIREBASE) ---
+        if (window.SantuarioApp && window.SantuarioApp.modulos) {
             const { db, ref, onValue } = window.SantuarioApp.modulos;
             onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
                 const dados = snapshot.val();
-                construirCarrossel(Array.isArray(dados) ? dados : []);
+                construirGaleriaCSS(Array.isArray(dados) ? dados : []);
 
-                // O FIREBASE ENTREGOU AS FOTOS! Derrete o Esqueleto Cintilante!
-                const esqueletoCarrossel = document.getElementById('esqueleto-carrossel');
-                if (esqueletoCarrossel) {
-                    setTimeout(() => esqueletoCarrossel.classList.add('esqueleto-oculto'), 600);
-                }
+                // Remove o esqueleto de carregamento cintilante quando as fotos baixarem
+                const esqueleto = document.getElementById('esqueleto-carrossel');
+                if (esqueleto) setTimeout(() => esqueleto.classList.add('esqueleto-oculto'), 500);
             });
         }
 
-        const animar = () => {
-            requestAnimationFrame(animar);
-            if (!window.RadarDePerformance.podeAnimar('carrossel-3d')) return;
-            
-            // AUTO-AJUSTE: Garante que o carrossel se ajusta à tela do A55
-            if (container.clientWidth > 0 && Math.abs(container.clientWidth - largura) > 5) {
-                largura = container.clientWidth;
-                altura = container.clientHeight || 250;
-                camera.aspect = largura / altura;
-                camera.updateProjectionMatrix();
-                renderer.setSize(largura, altura);
+        // --- GIRA SOZINHO (Modo Contemplação) ---
+        const autoRotacionar = () => {
+            if (!isDragging && Math.abs(velocidade) <= 0.1 && window.RadarDePerformance.podeAnimar('carrossel-3d')) {
+                anguloAtual -= 0.15; // Gira suavemente para a esquerda
+                spinner.style.transform = `rotateY(${anguloAtual}deg)`;
             }
-            
-            carrosselGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
-            if (!isDragging) {
-                carrosselGroup.rotation.y += velocidadeGiro;
-                velocidadeGiro = velocidadeGiro * 0.95 + 0.005 * 0.05;
-            }
-            renderer.render(scene, camera);
+            requestAnimationFrame(autoRotacionar);
         };
-        animar();
+        autoRotacionar();
     };
 
     window.confirmarExclusaoFoto = (index) => {
@@ -1330,72 +1353,218 @@ window.inicializarPrisma3D = () => {
     };
 
 
-// --- 3. PLANETÁRIO DE SONHOS (GALÁXIA PROCEDURAL) ---
-window.inicializarPlanetario3D = () => {
-    // Busca a tela da galáxia EXATAMENTE no modal que saltou na sua tela
-    const container = document.querySelector('#corpo-modal #planetario-3d-container');
-    
-    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+// ==========================================
+    // UI/UX NÍVEL TITÃ: O PLANETÁRIO INTERATIVO (CÉU SUPER POVOADO)
+    // ==========================================
+    window.inicializarPlanetario3D = () => {
+        const container = document.querySelector('#modal-reliquia #planetario-3d-container');
+        if (!container || container.querySelector('.planetario-canvas-wrapper')) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
-    
-    const esqueleto = container.querySelector('#esqueleto-planetario');
-    if (esqueleto) esqueleto.remove();
-
-    camera.position.z = 12;
-    camera.position.y = 4;
-    camera.lookAt(0, 0, 0);
-
-    // Criação Quântica de Estrelas
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 2000;
-    const starPos = new Float32Array(starCount * 3);
-    const starColors = new Float32Array(starCount * 3);
-
-    for(let i=0; i < starCount; i++) {
-        const r = 12 * Math.sqrt(Math.random());
-        const theta = r * 0.5 + (Math.random() * 2 * Math.PI);
-        starPos[i*3] = r * Math.cos(theta) + (Math.random()-0.5)*2;
-        starPos[i*3+1] = (Math.random()-0.5) * 2;
-        starPos[i*3+2] = r * Math.sin(theta) + (Math.random()-0.5)*2;
-
-        const color = new THREE.Color();
-        color.setHSL(0.6 + (Math.random()*0.1), 0.8, 0.5 + Math.random()*0.5); 
-        starColors[i*3] = color.r; starColors[i*3+1] = color.g; starColors[i*3+2] = color.b;
-    }
-
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-
-    const starMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
-    const galaxy = new THREE.Points(starGeo, starMat);
-    scene.add(galaxy);
-
-    let tempo = 0;
-    const animar = () => {
-        requestAnimationFrame(animar);
-        const elPlanetario = document.getElementById('planetario-3d-container');
-        if (!elPlanetario || elPlanetario.clientWidth === 0) return;
-        tempo += 0.003;
-        galaxy.rotation.y = tempo;
+        // ========================================================
+        // 🎛️ PAINEL DE CONTROLE DO UNIVERSO (AJUSTE AO SEU GOSTO)
+        // ========================================================
         
-        // Efeito visual caso exista uma Supernova 
-        if (window.quantidadeSupernovas > 0) {
-            const pulso = 1 + Math.sin(tempo * 10) * 0.05;
-            galaxy.scale.set(pulso, pulso, pulso);
-            starMat.size = 0.15 + Math.sin(tempo * 20) * 0.05;
+        // 1. Quantas estrelas existem no total? (Quanto maior, mais lotado. Recomendo entre 5000 e 15000)
+        const QUANTIDADE_ESTRELAS = 8000; 
+        
+        // 2. Qual o tamanho do espaço? (Quanto MENOR o número, mais "espremidas" e densas as estrelas ficam na tela. Recomendo 2000)
+        const TAMANHO_UNIVERSO = 2000; 
+        
+        // 3. Quantidade de "Poeira Estelar" fina (0.85 = 85% das estrelas serão pontinhos pequenos ao fundo)
+        const PROPORCAO_POEIRA = 0.85; 
+        
+        // 4. Velocidade em que o universo gira sozinho quando você não está arrastando (Recomendo -0.15)
+        const VELOCIDADE_ROTACAO_X = -0.15;
+        const VELOCIDADE_ROTACAO_Y = -0.05;
+
+        // ========================================================
+
+        // Injeta o Palco de Desenho 2D
+        container.insertAdjacentHTML('afterbegin', `
+            <div class="planetario-canvas-wrapper" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden; background: radial-gradient(circle at center, #0a0e17 0%, #000 100%); cursor: grab;">
+                <canvas id="canvas-planetario" style="display: block; width: 100%; height: 100%;"></canvas>
+                <div id="constelacao-casal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+            </div>
+        `);
+
+        const esqueleto = container.querySelector('#esqueleto-planetario');
+        if (esqueleto) esqueleto.style.display = 'none';
+
+        const canvas = container.querySelector('#canvas-planetario');
+        const ctx = canvas.getContext('2d');
+        const constelacaoCasal = container.querySelector('#constelacao-casal');
+
+        // Redimensionamento de Alta Definição
+        const redimensionar = () => {
+            const rect = container.getBoundingClientRect();
+            if (rect.width > 0) {
+                canvas.width = rect.width * (window.devicePixelRatio || 1);
+                canvas.height = rect.height * (window.devicePixelRatio || 1);
+            }
+        };
+        window.addEventListener('resize', redimensionar);
+        redimensionar();
+
+        // Forja das Estrelas
+        const estrelasBackground = [];
+
+        for (let i = 0; i < QUANTIDADE_ESTRELAS; i++) {
+            const isPoeira = Math.random() < PROPORCAO_POEIRA; 
+            
+            estrelasBackground.push({
+                x: Math.random() * TAMANHO_UNIVERSO,
+                y: Math.random() * TAMANHO_UNIVERSO,
+                raio: isPoeira ? (Math.random() * 0.6 + 0.2) : (Math.random() * 1.5 + 0.8),
+                alfaBase: Math.random() * 0.5 + 0.1,
+                fase: Math.random() * Math.PI * 2,
+                velocidadePiscar: Math.random() * 0.005 + 0.001, 
+                camada: Math.random() 
+            });
         }
 
-        renderer.render(scene, camera);
+        // A Física da Câmera
+        let cameraX = 0;
+        let cameraY = 0;
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+        let velX = VELOCIDADE_ROTACAO_X; 
+        let velY = VELOCIDADE_ROTACAO_Y;
+        let planetarioVisivel = true; 
+
+        const wrapper = container.querySelector('.planetario-canvas-wrapper');
+
+        const onPointerDown = (e) => {
+            isDragging = true;
+            lastX = e.clientX || (e.touches && e.touches[0].clientX);
+            lastY = e.clientY || (e.touches && e.touches[0].clientY);
+            velX = 0; velY = 0;
+            wrapper.style.cursor = 'grabbing';
+        };
+
+        const onPointerMove = (e) => {
+            if (!isDragging) return;
+            const currentX = e.clientX || (e.touches && e.touches[0].clientX);
+            const currentY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            const dx = currentX - lastX;
+            const dy = currentY - lastY;
+            
+            cameraX += dx;
+            cameraY += dy;
+            
+            velX = dx * 0.1;
+            velY = dy * 0.1;
+            
+            lastX = currentX;
+            lastY = currentY;
+        };
+
+        const onPointerUp = () => {
+            isDragging = false;
+            wrapper.style.cursor = 'grab';
+        };
+
+        wrapper.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove, { passive: true });
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+
+        const observer = new IntersectionObserver((entries) => {
+            planetarioVisivel = entries[0].isIntersecting;
+        });
+        observer.observe(container);
+
+        // Renderização
+        const animarPlanetario = () => {
+            requestAnimationFrame(animarPlanetario);
+            if (!planetarioVisivel || window.SantuarioAtivo === false) return;
+
+            if (!isDragging) {
+                cameraX += velX;
+                cameraY += velY;
+                if (Math.abs(velX) > Math.abs(VELOCIDADE_ROTACAO_X)) velX *= 0.95; else velX = VELOCIDADE_ROTACAO_X;
+                if (Math.abs(velY) > Math.abs(VELOCIDADE_ROTACAO_Y)) velY *= 0.95; else velY = VELOCIDADE_ROTACAO_Y;
+            }
+
+            const largura = canvas.width;
+            const altura = canvas.height;
+            const dpr = window.devicePixelRatio || 1;
+
+            ctx.clearRect(0, 0, largura, altura);
+
+            estrelasBackground.forEach(estrela => {
+                const multiplicadorParallax = 0.3 + (estrela.camada * 0.7);
+                
+                let renderX = ((estrela.x + cameraX * multiplicadorParallax) % TAMANHO_UNIVERSO);
+                let renderY = ((estrela.y + cameraY * multiplicadorParallax) % TAMANHO_UNIVERSO);
+                
+                if (renderX < 0) renderX += TAMANHO_UNIVERSO;
+                if (renderY < 0) renderY += TAMANHO_UNIVERSO;
+
+                if (renderX < largura / dpr + 15 && renderY < altura / dpr + 15) {
+                    estrela.fase += estrela.velocidadePiscar;
+                    const brilho = Math.abs(Math.sin(estrela.fase)) * 0.6; 
+                    
+                    ctx.fillStyle = `rgba(255, 255, 255, ${estrela.alfaBase + brilho})`;
+                    
+                    if (estrela.raio < 0.8) {
+                        ctx.fillRect(renderX * dpr, renderY * dpr, estrela.raio * 2 * dpr, estrela.raio * 2 * dpr);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(renderX * dpr, renderY * dpr, estrela.raio * dpr, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            });
+
+            if (constelacaoCasal && window.estrelasCompradasGlobais) {
+                const elementos = constelacaoCasal.children;
+                for (let i = 0; i < elementos.length; i++) {
+                    const el = elementos[i];
+                    const dadosEstrela = window.estrelasCompradasGlobais[i];
+                    if(dadosEstrela) {
+                        // Multiplica pelas coordenadas para espalhar bem no tamanho do Universo ajustado
+                        let posX = ((dadosEstrela.x * (TAMANHO_UNIVERSO/100) + cameraX) % TAMANHO_UNIVERSO);
+                        let posY = ((dadosEstrela.y * (TAMANHO_UNIVERSO/100) + cameraY) % TAMANHO_UNIVERSO);
+                        
+                        if (posX < 0) posX += TAMANHO_UNIVERSO;
+                        if (posY < 0) posY += TAMANHO_UNIVERSO;
+
+                        el.style.transform = `translate(${posX}px, ${posY}px)`;
+                    }
+                }
+            }
+        };
+
+        animarPlanetario();
+
+        window.renderizarEstrelasCompradas = (estrelasArray) => {
+            if (!constelacaoCasal) return;
+            constelacaoCasal.innerHTML = ''; 
+            
+            window.estrelasCompradasGlobais = estrelasArray;
+
+            estrelasArray.forEach((estrela, index) => {
+                const el = document.createElement('div');
+                el.className = 'estrela-comprada-2d';
+                
+                el.innerHTML = `
+                    <div class="estrela-brilho"></div>
+                    <span class="estrela-nome-tooltip">${estrela.nome}</span>
+                `;
+
+                el.addEventListener('pointerdown', (e) => {
+                    e.stopPropagation(); 
+                    el.classList.add('estrela-supernova');
+                    if(window.Haptics) window.Haptics.toqueLeve();
+                    setTimeout(() => window.mostrarModalEstrela(estrela), 400);
+                });
+
+                constelacaoCasal.appendChild(el);
+            });
+        };
     };
-    animar();
-};
 
 
 
@@ -1660,3 +1829,5 @@ window.addEventListener('motor3DPronto', () => {
         window.inicializarJornada3D();
     }
 });
+
+

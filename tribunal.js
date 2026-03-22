@@ -258,31 +258,84 @@ function atualizarPlacar() {
     }
 }
 
-// ANIMAÇÃO DO MARTELO (Mover para o centro e aparecer apenas no clique)
+// ANIMAÇÃO DO MARTELO GLOBAL (Sobrepõe toda a tela)
 window.baterMarteloVisual = function() {
-    const martelo = document.getElementById('martelo-3d');
-    
-    // 1. Torna o martelo visível apenas agora
-    martelo.classList.remove('escondido');
-    
-    // 2. Cria o efeito de tela quebrada
-    const crack = document.createElement('div');
-    crack.className = 'efeito-tela-quebrada';
-    document.body.appendChild(crack);
+    // 1. Evita que o jogador clique duas vezes seguidas
+    let container = document.getElementById('martelo-overlay-global');
+    if (container && container.style.display === 'flex') return; 
 
-    // 3. Aplica a animação de impacto
-    martelo.classList.add('martelo-centro-impacto');
-    
-    if(AudioTribunal.impacto) AudioTribunal.impacto.play();
-    if(window.navigator.vibrate) navigator.vibrate([100, 50, 200]);
+    // 2. O Veredito Antecipado (A animação precisa saber a cor da luz antes de bater)
+    const acerto = (tribunal.somaAtual === tribunal.metaAtual);
 
-    // 4. Limpa tudo e julga após a animação
+    // 3. Forja o Martelo 100% Vetorial na raiz do documento (Fora da caixa do jogo)
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'martelo-overlay-global';
+        container.innerHTML = `
+            <div class="martelo-luz-fundo"></div>
+            <div class="martelo-svg-wrapper">
+                <svg viewBox="0 0 100 100" width="200" height="200">
+                    <defs>
+                        <linearGradient id="grad-madeira" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#4a2a18" />
+                            <stop offset="50%" stop-color="#6b4226" />
+                            <stop offset="100%" stop-color="#3e2312" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="44" y="40" width="12" height="55" rx="6" fill="url(#grad-madeira)" />
+                    <rect x="20" y="20" width="60" height="26" rx="5" fill="url(#grad-madeira)" />
+                    <rect x="28" y="20" width="4" height="26" fill="#D4AF37" />
+                    <rect x="68" y="20" width="4" height="26" fill="#D4AF37" />
+                    <path d="M 20 22 L 15 25 L 15 41 L 20 44 Z" fill="#3e2312"/>
+                    <path d="M 80 22 L 85 25 L 85 41 L 80 44 Z" fill="#3e2312"/>
+                </svg>
+            </div>
+        `;
+        document.body.appendChild(container);
+    }
+
+    const luz = container.querySelector('.martelo-luz-fundo');
+    const martelo = container.querySelector('.martelo-svg-wrapper');
+    
+    // 4. Prepara a lona
+    container.style.display = 'flex';
+    luz.style.animation = 'none';
+    martelo.style.animation = 'none';
+    void container.offsetWidth; // Reflow mágico
+
+    // 5. As Cores da Sentença
+    if (acerto) {
+        luz.style.background = 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(212,175,55,0.6) 30%, transparent 70%)';
+        luz.style.boxShadow = '0 0 80px rgba(255,255,255,0.8)';
+    } else {
+        luz.style.background = 'radial-gradient(circle, rgba(255,71,87,0.95) 0%, rgba(200,0,0,0.6) 30%, transparent 70%)';
+        luz.style.boxShadow = '0 0 80px rgba(255,71,87,0.8)';
+    }
+
+    // 6. A Gravidade (O martelo desce)
+    martelo.style.animation = 'baterMartelo 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+    
+    // 7. O Impacto (Onda de choque e som exatos na hora que bate na "mesa")
     setTimeout(() => {
-        martelo.classList.remove('martelo-centro-impacto');
-        martelo.classList.add('escondido'); // Esconde o martelo de novo
-        crack.remove();
+        luz.style.animation = 'explodirLuzMartelo 0.8s ease-out forwards';
+        
+        if (AudioTribunal.impacto) AudioTribunal.impacto.play();
+        if (window.navigator.vibrate) navigator.vibrate([100, 50, 200]);
+
+        // Se errou, rachamos a tela (drama extra)
+        if (!acerto) {
+            const crack = document.createElement('div');
+            crack.className = 'efeito-tela-quebrada';
+            document.body.appendChild(crack);
+            setTimeout(() => crack.remove(), 1000);
+        }
+    }, 150);
+
+    // 8. O Veridito Final (Limpa a tela e julga os pontos)
+    setTimeout(() => {
+        container.style.display = 'none';
         julgarCaso(); 
-    }, 800);
+    }, 1000);
 };
 
 function julgarCaso() {

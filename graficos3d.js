@@ -39,19 +39,31 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
     // UI/UX NÍVEL DEUS: O GLOBO 3D (THREE.JS)
     // ==========================================
     
-    window.inicializarGlobo3D = () => {
-        const container = document.getElementById('globo-3d');
-        if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
+window.inicializarGlobo3D = () => {
+    const container = document.getElementById('globo-3d');
+    if (!container || typeof THREE === 'undefined' || container.querySelector('canvas')) return;
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" }); 
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
-        renderer.domElement.style.display = 'block';
-        renderer.domElement.style.margin = '0 auto';
-        container.appendChild(renderer.domElement);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" }); 
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
+    renderer.domElement.style.display = 'block';
+    renderer.domElement.style.margin = '0 auto';
+    container.appendChild(renderer.domElement);
+
+    // ========== ADIÇÃO DO RESIZE OBSERVER ==========
+    const atualizarTamanhoGlobo = () => {
+        if (container.clientWidth > 0 && container.clientHeight > 0) {
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+        }
+    };
+    new ResizeObserver(atualizarTamanhoGlobo).observe(container);
+    atualizarTamanhoGlobo(); // configura tamanho inicial
+    // ==============================================
 
         const raioTerra = 5;
         const geometriaTerra = new THREE.SphereGeometry(raioTerra, 32, 32);

@@ -519,6 +519,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D(); // O Globo da Conexão
         if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D(); // O Coração do Mood
         if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima(); // A Sintonia do Clima
+        if(typeof inicializarEco3D === 'function') inicializarEco3D();
+        if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
+        if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+
         
         // NOTA DO ENGENHEIRO:
         // Removemos o carregamento simultâneo do Eco, da Bússola, do Carrossel e da Árvore.

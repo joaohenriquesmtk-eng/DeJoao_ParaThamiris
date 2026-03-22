@@ -7103,3 +7103,22 @@ body.aura-ansiosa {
 #painel-capsula-futuro.escondido {
     display: none !important; /* Blindagem pesada contra conflitos de display */
 }
+
+
+/* ==========================================
+   FUNDO CINEMATOGRÁFICO EM VÍDEO (GALÁXIA)
+========================================== */
+.video-fundo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* A Mágica do Object-Fit: Faz o vídeo preencher toda a tela, cortando as bordas que sobrarem, sem NUNCA achatar ou distorcer a galáxia */
+    object-fit: cover; 
+    /* O z-index negativo mais profundo garante que o vídeo fique atrás das telas, cartões de vidro e botões */
+    z-index: -5; 
+    pointer-events: none; /* O dedo dela vai atravessar o vídeo e clicar nos botões do app */
+    opacity: 0.65; /* Damos uma leve escurecida no vídeo para que os textos em branco e dourado tenham contraste perfeito e sejam fáceis de ler */
+    transition: opacity 1s ease-in-out;
+}

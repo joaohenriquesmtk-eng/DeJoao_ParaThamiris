@@ -516,7 +516,6 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('motor3DPronto', () => {
         
         // 1. CARREGAMENTO IMEDIATO: Tudo o que está visível de cara!
-        if(typeof inicializarOceanoQuantico === 'function') inicializarOceanoQuantico(); // O fundo brilhante
         if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D(); // O Globo da Conexão
         if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D(); // O Coração do Mood
         if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima(); // A Sintonia do Clima

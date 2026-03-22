@@ -1095,7 +1095,7 @@ window.fecharModal = function(apenasLimpar = false) {
 };
 
 // ==========================================
-// GERENCIADOR DE TELAS DOS JOGOS (MEMÓRIA INTELIGENTE E BLINDADA)
+// GERENCIADOR DE TELAS (MEMÓRIA INTELIGENTE E BLINDADA)
 // ==========================================
 window.abrirJogo = function(tipo) {
     // 1. Esconde a interface principal de jogos, a navegação inferior e o áudio
@@ -1131,12 +1131,14 @@ window.abrirJogo = function(tipo) {
             const moedasUI = document.getElementById('termo-moedas');
             if (moedasUI) moedasUI.innerText = window.pontosDoCasal || 0;
 
+            // A MÁGICA: SEMPRE cria a grade se ela não existir, INDEPENDENTE de ter ganho ou não!
             const gradeTermo = document.getElementById("grade-termo");
             if (gradeTermo && gradeTermo.children.length === 0) {
                 if (typeof inicializarTermo === 'function') inicializarTermo();
                 else if (typeof window.inicializarTermo === 'function') window.inicializarTermo();
             }
 
+            // DEPOIS da grade existir, verifica se já venceu hoje para ativar o visual de vitória
             if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
                 if (typeof window.reconstruirVitoriaTermo === 'function') window.reconstruirVitoriaTermo();
             }
@@ -1163,9 +1165,6 @@ window.abrirJogo = function(tipo) {
             if(typeof iniciarMiniFazenda === 'function') iniciarMiniFazenda();
         }
         else if (tipo === 'jardim') {
-            // INICIA O MOTOR 3D DA ÁRVORE DA VIDA APENAS AGORA QUE A TELA FOI ABERTA!
-            if (typeof window.inicializarPrisma3D === 'function') window.inicializarPrisma3D();
-            
             if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
             const capitalUI = document.getElementById('jardim-moedas');
             if (capitalUI) capitalUI.innerText = window.pontosDoCasal || 0;
@@ -2334,8 +2333,9 @@ window.toggleTemas = function() {
 };
 
 // ==========================================
-// CHAVE MESTRA DO COFRE (ABERTURA COM LAZY LOAD DO 3D)
+// CHAVE MESTRA DO COFRE (CORREÇÃO DA JANELA VAZIA)
 // ==========================================
+// Essa trava impede que a função se duplique se você recarregar a página
 if (!window.abrirReliquiaBlindada) {
     const abrirReliquiaOriginal = window.abrirReliquia;
     
@@ -2356,30 +2356,9 @@ if (!window.abrirReliquiaBlindada) {
                 if (typeof window.escutarPlanetario === 'function') {
                     window.escutarPlanetario();
                 }
-                
-                // INICIA O 3D APENAS AGORA QUE ELA ABRIU
-                setTimeout(() => { if (typeof inicializarPlanetario3D === 'function') inicializarPlanetario3D(); }, 150);
             }
         } 
-        else if (['ecos', 'bussola', 'carrossel'].includes(tipo)) {
-            if (event) event.preventDefault();
-            const modal = document.getElementById('modal-reliquia');
-            const corpo = document.getElementById('corpo-modal');
-            const template = document.getElementById(`cartao-${tipo}`);
-            
-            if (template && corpo && modal) {
-                corpo.appendChild(template);
-                modal.classList.remove('escondido');
-
-                // INICIA O 3D DOS COFRES ESCONDIDOS APENAS AGORA QUE A CAIXA FOI ABERTA!
-                setTimeout(() => { 
-                    if (tipo === 'ecos' && typeof window.inicializarEco3D === 'function') window.inicializarEco3D();
-                    if (tipo === 'bussola' && typeof window.inicializarBussola3D === 'function') window.inicializarBussola3D();
-                    if (tipo === 'carrossel' && typeof window.inicializarCarrossel3D === 'function') window.inicializarCarrossel3D();
-                    window.dispatchEvent(new Event('resize')); 
-                }, 150); 
-            }
-        }
+        // Se for qualquer outra relíquia antiga, usa a sua função original intacta:
         else if (abrirReliquiaOriginal) {
             abrirReliquiaOriginal(event, tipo);
         }

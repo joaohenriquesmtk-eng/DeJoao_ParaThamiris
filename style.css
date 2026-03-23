@@ -7082,59 +7082,95 @@ body.aura-ansiosa {
 }
 
 
-
 /* ==========================================
-   CARROSSEL 3D OTIMIZADO (ZERO TRAVAMENTOS)
+   CARROSSEL COVER FLOW (EFEITO DISCO DE VINIL)
 ========================================== */
-.galeria-holografica-wrapper { 
-    width: 100%; 
-    height: 250px; 
-    position: relative; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    perspective: 1200px; /* Lente ajustada para não quebrar a borda */
-    overflow: hidden; 
+.visor-cinematografico {
+    width: 100%;
+    height: 280px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Fundo escuro para dar profundidade ao 3D */
+    box-shadow: inset 20px 0 30px -15px rgba(0,0,0,0.9), inset -20px 0 30px -15px rgba(0,0,0,0.9);
+    border-radius: 12px;
 }
 
-.galeria-spinner { 
-    position: relative; 
-    width: 140px; 
-    height: 190px; 
-    transform-style: preserve-3d; 
-    will-change: transform; /* Aceleração de hardware restrita apenas à rotação */
+.coverflow-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* A Lente da Câmera 3D */
+    perspective: 1200px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Impede que a tela puxe para o lado, focando a energia no deslize do dedo */
+    touch-action: pan-y; 
 }
 
-.foto-item { 
-    position: absolute; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    border-radius: 12px; 
-    background-size: cover; 
-    background-position: center; 
-    border: 2px solid rgba(212, 175, 55, 0.4); 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.8); 
-    
-    /* 🚨 A CURA DO PISCA-PISCA: Esconde as costas das imagens e isola a pintura! */
+.coverflow-item {
+    position: absolute;
+    width: 150px;
+    height: 220px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    /* Transição mágica e fluida do celular */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, filter 0.4s ease;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    transform: translateZ(0);
-
-    cursor: grab; 
-    background-color: #111; /* Fundo sólido para cobrir vazios */
-    display: flex; align-items: center; justify-content: center; 
+    cursor: pointer;
+    background-color: #111;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
-.foto-item:active { cursor: grabbing; }
+.coverflow-item:active {
+    cursor: grabbing;
+}
 
-.foto-vazia-texto {
-    padding: 15px;
-    text-align: center;
-    color: rgba(212, 175, 55, 0.8);
+/* O nome de quem postou a foto */
+.autor-memoria {
+    color: #FFD700;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+    padding: 4px 12px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 20px;
+    border: 1px solid rgba(212,175,55,0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Só mostra o nome se a foto estiver no centro (em foco) */
+.coverflow-item.foco .autor-memoria {
+    opacity: 1;
+}
+
+.memoria-vazia {
+    flex: 0 0 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(212, 175, 55, 0.6);
     font-family: 'Playfair Display', serif;
     font-style: italic;
     font-size: 0.95rem;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+    line-height: 1.4;
+    text-align: center;
+    padding: 20px;
 }
 
 

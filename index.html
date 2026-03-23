@@ -989,13 +989,14 @@
             <p id="status-bussola" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 5px; height: 15px;"></p>
         </div>
 
-        <div id="cartao-carrossel" style="text-align: center; width: 100%;">
+     <div id="cartao-carrossel" style="text-align: center; width: 100%;">
             <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Carrossel de Horizontes</h3>
-            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Nossas visões compartilhadas.</p>
-            <div id="carrossel-3d" style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 15px; overflow: hidden; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); position: relative; touch-action: none;">
-                <div id="esqueleto-carrossel" class="esqueleto-cintilante"></div>
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
+            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px;">Deslize ou toque nas laterais para girar.</p>
+            
+            <div id="visor-cinematografico" class="visor-cinematografico">
+                </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
                 <input type="file" id="input-foto-horizonte" accept="image/*" style="display: none;" onchange="processarFotoHorizonte(event)">
                 <button id="btn-add-foto" class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); background: rgba(0,0,0,0.5);" onclick="document.getElementById('input-foto-horizonte').click()">📸 Adicionar</button>
                 <button class="btn-acao" style="width: auto; padding: 10px 20px; font-size: 0.9rem; border: 2px solid #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,0.1);" onclick="limparCarrosselHorizontes()">🗑️ Limpar</button>

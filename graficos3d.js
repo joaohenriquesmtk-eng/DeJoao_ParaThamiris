@@ -994,134 +994,194 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         }
     }
 
-// ==========================================
-    // UI/UX NÍVEL TITÃ: A GALERIA HOLOGRÁFICA (CSS 3D)
+/// ==========================================
+    // UI/UX NÍVEL TITÃ: CARROSSEL COVER FLOW (DISCOS DE VINIL)
     // ==========================================
+    
+    // A Ignição Blindada: Só liga o motor do carrossel DEPOIS que o Firebase estiver 100% pronto!
+    window.carrosselIniciado = false;
+
+    window.addEventListener('loginSucesso', () => {
+        if (!window.carrosselIniciado) {
+            window.escutarCarrosselHorizontes();
+        }
+    });
+
+    // Função de segurança caso o app carregue de formas inesperadas
     window.inicializarCarrossel3D = () => {
-        const container = document.getElementById('carrossel-3d');
-        // Previne duplicatas caso a aba seja aberta e fechada várias vezes
-        if (!container || container.querySelector('.galeria-holografica-wrapper')) return;
+        if (!window.carrosselIniciado) {
+            window.escutarCarrosselHorizontes();
+        }
+    };
 
-        // Injeta o "Palco 3D" no HTML
-        container.innerHTML = `
-            <div class="galeria-holografica-wrapper">
-                <div class="galeria-spinner" id="galeria-spinner">
+    window.escutarCarrosselHorizontes = function() {
+        if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+        
+        window.carrosselIniciado = true; // Trava para não duplicar conexões
+        const { db, ref, onValue } = window.SantuarioApp.modulos;
+        
+        const refCarrossel = ref(db, 'horizontes/fotos'); 
+        
+        onValue(refCarrossel, (snapshot) => {
+            const dados = snapshot.val();
+            
+            // Procura a tela do carrossel
+            let visor = document.querySelector('#corpo-modal #visor-cinematografico');
+            if (!visor) visor = document.querySelector('#reliquias-templates #visor-cinematografico');
+            if (!visor) return;
+
+            visor.innerHTML = '';
+
+            // Se o Firebase estiver vazio
+            if (!dados) {
+                visor.innerHTML = `
+                    <div class="memoria-vazia">
+                        <span style="font-size: 3rem; margin-bottom: 10px; filter: grayscale(1); opacity: 0.5;">📸</span>
+                        <p>O rolo de filme está vazio.<br>Adicione o primeiro horizonte de hoje.</p>
                     </div>
-            </div>
-        `;
-
-        const spinner = document.getElementById('galeria-spinner');
-        let anguloAtual = 0;
-        let timerCliqueLongo;
-
-        // --- A MÁGICA DE CONSTRUÇÃO DO CILINDRO ---
-        const construirGaleriaCSS = (fotosArray) => {
-            spinner.innerHTML = ''; 
-
-            if (!fotosArray || fotosArray.length === 0) {
-                spinner.innerHTML = `
-                    <div class="foto-item">
-                        <div class="foto-vazia-texto">O horizonte aguarda<br>nossas memórias.</div>
-                    </div>`;
+                `;
                 return;
             }
 
-            const quantidade = fotosArray.length;
-            const anguloPorFoto = 360 / quantidade;
+            // Tratamento à prova de falhas para Arrays do Firebase
+            let arrayDeFotos = [];
+            if (Array.isArray(dados)) {
+                arrayDeFotos = [...dados];
+            } else {
+                arrayDeFotos = Object.values(dados);
+            }
             
-            // O Raio de distanciamento: Calcula automaticamente o tamanho do cilindro 
-            // com base em quantas fotos vocês adicionaram, para elas não se esmagarem.
-            const raioZ = Math.max(140, (quantidade * 130) / (2 * Math.PI));
+            // Inverte para as fotos novas aparecerem na frente
+            window.fotosCoverFlow = arrayDeFotos.filter(f => f).reverse();
+            window.activeCoverIndex = 0; 
 
-            fotosArray.forEach((fotoBase64, index) => {
-                const div = document.createElement('div');
-                div.className = 'foto-item';
-                // Posiciona a foto no espaço 3D exato
-                div.style.transform = `rotateY(${index * anguloPorFoto}deg) translateZ(${raioZ}px)`;
-                div.style.backgroundImage = `url(${fotoBase64})`;
+            if (window.fotosCoverFlow.length === 0) {
+                 visor.innerHTML = `
+                    <div class="memoria-vazia">
+                        <span style="font-size: 3rem; margin-bottom: 10px; filter: grayscale(1); opacity: 0.5;">📸</span>
+                        <p>O rolo de filme está vazio.<br>Adicione o primeiro horizonte de hoje.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'coverflow-wrapper';
+
+            window.fotosCoverFlow.forEach((fotoBase64, index) => {
+                const divCartao = document.createElement('div');
+                divCartao.className = 'coverflow-item';
+                divCartao.style.backgroundImage = `url('${fotoBase64}')`;
                 
-                // Lógica de segurar para apagar (Exclusão)
-                div.addEventListener('pointerdown', () => {
+                // --- LINHA REMOVIDA AQUI (Não há mais texto sobre a foto) ---
+                
+                // Lógica de exclusão com clique longo
+                let timerCliqueLongo;
+                let arrastando = false;
+
+                divCartao.addEventListener('pointerdown', () => {
+                    arrastando = false;
                     timerCliqueLongo = setTimeout(() => {
-                        window.confirmarExclusaoFoto(index);
+                        if (arrastando) return;
+                        const realIndex = (window.fotosCoverFlow.length - 1) - index; 
+                        window.confirmarExclusaoFoto(realIndex);
                         if(window.Haptics) window.Haptics.toqueForte();
                     }, 1200);
                 });
                 
-                // Cancela o timer se soltar ou arrastar o dedo
-                div.addEventListener('pointerup', () => clearTimeout(timerCliqueLongo));
-                div.addEventListener('pointerleave', () => clearTimeout(timerCliqueLongo));
+                // Tocar em uma foto lateral traz ela para o centro
+                divCartao.addEventListener('click', () => {
+                    if (!arrastando && window.activeCoverIndex !== index) {
+                        window.activeCoverIndex = index;
+                        window.atualizarFisicaCoverFlow(wrapper);
+                        if(window.Haptics) window.Haptics.toqueLeve();
+                    }
+                });
 
-                spinner.appendChild(div);
+                divCartao.addEventListener('pointermove', () => arrastando = true);
+                divCartao.addEventListener('pointerup', () => clearTimeout(timerCliqueLongo));
+                divCartao.addEventListener('pointerleave', () => clearTimeout(timerCliqueLongo));
+                
+                wrapper.appendChild(divCartao);
             });
-        };
 
-        // --- MOTOR DE FÍSICA: ARRASTE E INÉRCIA ---
-        let isDragging = false;
-        let startX = 0;
-        let velocidade = 0;
-        let animationFrameId;
+            visor.appendChild(wrapper);
+            window.atualizarFisicaCoverFlow(wrapper);
+            window.adicionarSwipeCoverFlow(wrapper);
+        });
+    };
 
-        const onPointerDown = (e) => {
-            isDragging = true;
-            startX = e.clientX || (e.touches && e.touches[0].clientX);
-            velocidade = 0;
-            cancelAnimationFrame(animationFrameId);
-            spinner.style.transition = 'none'; // Desliga transição pro dedo guiar a roda
-        };
+    // A MÁGICA 3D: Posiciona cada carta no espaço como Discos de Vinil
+    window.atualizarFisicaCoverFlow = function(wrapper) {
+        const items = wrapper.querySelectorAll('.coverflow-item');
+        const active = window.activeCoverIndex;
 
-        const onPointerMove = (e) => {
-            if (!isDragging) return;
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const deltaX = x - startX;
-            velocidade = deltaX * 0.3; // Multiplicador de sensibilidade do dedo
-            anguloAtual += velocidade;
-            spinner.style.transform = `rotateY(${anguloAtual}deg)`;
-            startX = x;
-            clearTimeout(timerCliqueLongo); // Cancelar a exclusão se estiver apenas rodando a galeria
-        };
+        items.forEach((item, index) => {
+            let offset = index - active;
+            let absOffset = Math.abs(offset);
 
-        const onPointerUp = () => {
-            isDragging = false;
-            // Efeito de inércia (continua rodando e freando suavemente ao soltar)
-            const aplicarInercia = () => {
-                if (Math.abs(velocidade) > 0.1) {
-                    anguloAtual += velocidade;
-                    velocidade *= 0.95; // O atrito do ar freiando a roda
-                    spinner.style.transform = `rotateY(${anguloAtual}deg)`;
-                    animationFrameId = requestAnimationFrame(aplicarInercia);
-                }
-            };
-            aplicarInercia();
-        };
-
-        container.addEventListener('pointerdown', onPointerDown);
-        window.addEventListener('pointermove', onPointerMove, {passive: true});
-        window.addEventListener('pointerup', onPointerUp);
-        window.addEventListener('pointercancel', onPointerUp);
-
-        // --- COMUNICAÇÃO COM O BANCO DE DADOS (FIREBASE) ---
-        if (window.SantuarioApp && window.SantuarioApp.modulos) {
-            const { db, ref, onValue } = window.SantuarioApp.modulos;
-            onValue(ref(db, 'horizontes/fotos'), (snapshot) => {
-                const dados = snapshot.val();
-                construirGaleriaCSS(Array.isArray(dados) ? dados : []);
-
-                // Remove o esqueleto de carregamento cintilante quando as fotos baixarem
-                const esqueleto = document.getElementById('esqueleto-carrossel');
-                if (esqueleto) setTimeout(() => esqueleto.classList.add('esqueleto-oculto'), 500);
-            });
-        }
-
-        // --- GIRA SOZINHO (Modo Contemplação) ---
-        const autoRotacionar = () => {
-            if (!isDragging && Math.abs(velocidade) <= 0.1 && window.RadarDePerformance.podeAnimar('carrossel-3d')) {
-                anguloAtual -= 0.15; // Gira suavemente para a esquerda
-                spinner.style.transform = `rotateY(${anguloAtual}deg)`;
+            if (offset === 0) {
+                // FOTO DO CENTRO (Em Foco)
+                item.style.transform = `translateX(0px) translateZ(40px) rotateY(0deg)`;
+                item.style.zIndex = 10;
+                item.style.opacity = 1;
+                item.style.filter = 'brightness(1)';
+                item.classList.add('foco');
+            } else if (offset < 0) {
+                // FOTOS DA ESQUERDA (Empilhadas)
+                item.style.transform = `translateX(${offset * 45 - 60}px) translateZ(${absOffset * -50}px) rotateY(45deg)`;
+                item.style.zIndex = 10 - absOffset;
+                item.style.opacity = Math.max(1 - absOffset * 0.25, 0); 
+                item.style.filter = 'brightness(0.4)';
+                item.classList.remove('foco');
+            } else {
+                // FOTOS DA DIREITA (Empilhadas)
+                item.style.transform = `translateX(${offset * 45 + 60}px) translateZ(${absOffset * -50}px) rotateY(-45deg)`;
+                item.style.zIndex = 10 - absOffset;
+                item.style.opacity = Math.max(1 - absOffset * 0.25, 0);
+                item.style.filter = 'brightness(0.4)';
+                item.classList.remove('foco');
             }
-            requestAnimationFrame(autoRotacionar);
+        });
+    };
+
+    // O GATILHO DO DEDO: Detecta o arraste (Swipe)
+    window.adicionarSwipeCoverFlow = function(wrapper) {
+        let startX = 0;
+        let isDown = false;
+
+        wrapper.addEventListener('pointerdown', (e) => {
+            isDown = true;
+            startX = e.clientX || (e.touches && e.touches[0].clientX);
+        });
+
+        const liberarDedo = (e) => {
+            if (!isDown) return;
+            isDown = false;
+            let endX = e.clientX || (e.changedTouches ? e.changedTouches[0].clientX : startX);
+            let diff = startX - endX;
+
+            // Se deslizou o dedo para a esquerda (Avançar)
+            if (diff > 40) {
+                if (window.activeCoverIndex < window.fotosCoverFlow.length - 1) {
+                    window.activeCoverIndex++;
+                    window.atualizarFisicaCoverFlow(wrapper);
+                    if(window.Haptics) window.Haptics.toqueLeve();
+                }
+            } 
+            // Se deslizou o dedo para a direita (Voltar)
+            else if (diff < -40) {
+                if (window.activeCoverIndex > 0) {
+                    window.activeCoverIndex--;
+                    window.atualizarFisicaCoverFlow(wrapper);
+                    if(window.Haptics) window.Haptics.toqueLeve();
+                }
+            }
         };
-        autoRotacionar();
+
+        wrapper.addEventListener('pointerup', liberarDedo);
+        wrapper.addEventListener('pointerleave', () => isDown = false);
+        wrapper.addEventListener('touchend', liberarDedo);
     };
 
     window.confirmarExclusaoFoto = (index) => {
@@ -1129,9 +1189,10 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             const { db, ref, get, set } = window.SantuarioApp.modulos;
             const r = ref(db, 'horizontes/fotos');
             get(r).then(s => {
-                let f = s.val() || [];
-                f.splice(index, 1);
-                set(r, f);
+                let f = s.val();
+                let arr = Array.isArray(f) ? [...f] : Object.values(f || {});
+                arr.splice(index, 1);
+                set(r, arr);
             });
         }
     };
@@ -1172,7 +1233,7 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const scale = Math.min(600 / img.width, 800 / img.height, 1);
+                const scale = Math.min(800 / img.width, 1000 / img.height, 1);
                 canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
                 
@@ -1185,10 +1246,12 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
                 const r = ref(db, 'horizontes/fotos');
                 
                 get(r).then(s => {
-                    let f = s.val() || [];
-                    f.push(base64);
-                    if(f.length > 8) f.shift(); 
-                    return set(r, f);
+                    let f = s.val();
+                    let arr = Array.isArray(f) ? [...f] : Object.values(f || {});
+                    arr.push(base64);
+                    // Aumentei o rolo de fotos para 15 para vocês terem bastante espaço
+                    if(arr.length > 15) arr.shift(); 
+                    return set(r, arr);
                 }).then(() => {
                     if(status) {
                         status.innerText = "✅ Visão compartilhada com sucesso!";

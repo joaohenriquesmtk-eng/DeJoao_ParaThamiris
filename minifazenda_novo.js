@@ -56,9 +56,11 @@ let fazenda = {
 let loopSimulador = null;
 
 // ==========================================
-// PERSISTÊNCIA DA FAZENDA
+// PERSISTÊNCIA DA FAZENDA E MOTOR DO TEMPO
 // ==========================================
 function salvarFazenda() {
+    // 🚨 CARIMBO DO TEMPO: Salva o momento exato em que a fazenda foi fechada
+    fazenda.ultimaAtualizacao = Date.now();
     localStorage.setItem('estado_minifazenda_ultimate', JSON.stringify(fazenda));
 }
 
@@ -66,24 +68,132 @@ function carregarFazenda() {
     const salvo = localStorage.getItem('estado_minifazenda_ultimate');
     if (salvo) {
         try {
-            // Fusão de save (caso haja propriedades novas)
             const dadosSalvos = JSON.parse(salvo);
             fazenda = { ...fazenda, ...dadosSalvos };
             fazenda.maquinas = { ...{ tratorComprado: false, aspersorComprado: false }, ...dadosSalvos.maquinas };
             fazenda.tempo = { ...{ estacaoIndex: 0, diasPassados: 0, ticks: 0 }, ...dadosSalvos.tempo };
+            // Garante que a chave exista
+            if (!fazenda.ultimaAtualizacao) fazenda.ultimaAtualizacao = Date.now();
         } catch (e) {
             console.error("Erro ao ler save da fazenda", e);
         }
+    } else {
+        fazenda.ultimaAtualizacao = Date.now();
     }
 }
 
-// 3. INICIALIZAÇÃO APRIMORADA
+// 🚨 A MAGIA DOS GRANDES JOGOS: CÁLCULO DE PROGRESSO OFFLINE (AFK)
+function calcularProgressoOffline() {
+    if (!fazenda.ultimaAtualizacao) return;
+
+    const agora = Date.now();
+    const diferencaMs = agora - fazenda.ultimaAtualizacao;
+    const segundosOffline = Math.floor(diferencaMs / 1000);
+
+    // Se ficou menos de 10 segundos fora, ignora para não causar saltos bruscos
+    if (segundosOffline < 10) return; 
+
+    // Limita a simulação a 24 horas reais (86400 segundos) para não quebrar a matemática e incentivar o retorno diário
+    const tempoSimulado = Math.min(segundosOffline, 86400); 
+
+    // 1. AVANÇA O RELÓGIO E AS ESTAÇÕES
+    fazenda.tempo.ticks += tempoSimulado;
+    let diasAdicionais = Math.floor(fazenda.tempo.ticks / 60);
+    fazenda.tempo.ticks = fazenda.tempo.ticks % 60;
+
+    if (diasAdicionais > 0) {
+        fazenda.tempo.diasPassados += diasAdicionais;
+        let estacoesPassadas = Math.floor(fazenda.tempo.diasPassados / 7);
+        fazenda.tempo.diasPassados = fazenda.tempo.diasPassados % 7;
+        fazenda.tempo.estacaoIndex = (fazenda.tempo.estacaoIndex + estacoesPassadas) % 4;
+    }
+
+    const estacaoAtual = estacoesAno[fazenda.tempo.estacaoIndex];
+
+    // 2. SIMULA A VACA OFFLINE
+    if (fazenda.pecuaria.vacaComprada) {
+        // Se ela tinha pouca fome quando você saiu, ela gerou leite enquanto a fome subia
+        if (fazenda.pecuaria.vacaFome < 50) {
+            let leiteGerado = Math.floor(Math.random() * 3) + 1;
+            fazenda.silo.leite += leiteGerado;
+        }
+        // Aplica a fome massiva do tempo offline
+        fazenda.pecuaria.vacaFome = Math.min(100, fazenda.pecuaria.vacaFome + (tempoSimulado * 0.05));
+    }
+
+    // 3. SIMULA A PLANTAÇÃO OFFLINE
+    let colheitasProntas = 0;
+    
+    fazenda.terrenos.forEach(t => {
+        if (t.livre && t.planta && t.progresso < 100) {
+            
+            // Aspersores protegem a água infinitamente. Se não tiver, o solo seca.
+            if (fazenda.maquinas.aspersorComprado) {
+                t.umidade = 100;
+            } else {
+                t.umidade = Math.max(0, t.umidade - (tempoSimulado * 0.05));
+            }
+
+            // Os nutrientes desgastam
+            t.npk = Math.max(0, t.npk - (tempoSimulado * 0.01));
+            t.ph = Math.max(4.0, t.ph - (tempoSimulado * 0.001));
+
+            // Acúmulo de estresse por abandono (A menos que tenha aspersor e NPK alto na saída)
+            if (t.umidade === 0 || t.npk < 20) {
+                t.planta.estresse += Math.floor(tempoSimulado * 0.1);
+            }
+
+            // Motor Matemático de Crescimento Acelerado (Fast-Forward)
+            let taxa = 1;
+            if (t.ph < 5.5) taxa *= 0.5;
+            if (fazenda.maquinas.tratorComprado) taxa *= 1.5;
+            if (t.planta.estacaoIdeal === estacaoAtual.id) taxa *= 2.0;
+
+            // Cresce proporcionalmente ao tempo fora (assumindo que bebeu a água residual)
+            let crescimentoAbsoluto = (100 / t.planta.ciclo) * taxa * tempoSimulado;
+            
+            // Penalidade de secura extrema: só cresce 30% da capacidade se a água zerou no meio do caminho
+            if (!fazenda.maquinas.aspersorComprado && t.umidade === 0) {
+                crescimentoAbsoluto *= 0.3; 
+            }
+
+            t.progresso += crescimentoAbsoluto;
+
+            if (t.progresso >= 100) {
+                t.progresso = 100;
+                colheitasProntas++;
+            }
+        }
+    });
+
+    // 4. O FEEDBACK AO JOGADOR (Mostra o que aconteceu na ausência dele)
+    setTimeout(() => {
+        let tempoTxt = tempoSimulado < 3600 
+                       ? `${Math.floor(tempoSimulado / 60)} min` 
+                       : `${Math.floor(tempoSimulado / 3600)} horas`;
+
+        if (colheitasProntas > 0) {
+            if(typeof mostrarToast === 'function') mostrarToast(`Sua fazenda progrediu por ${tempoTxt}! Há plantas prontas!`, "🌟");
+        } else {
+            if(typeof mostrarToast === 'function') mostrarToast(`Você ficou offline por ${tempoTxt}. O tempo na fazenda passou!`, "⏳");
+        }
+    }, 1500);
+
+    // Salva o novo estado atualizado
+    salvarFazenda();
+}
+
+// 3. INICIALIZAÇÃO APRIMORADA (AGORA COM PROGRESSO OFFLINE)
 window.iniciarMiniFazenda = function() {
     carregarFazenda(); 
+    
+    // 🚨 INVOCAÇÃO DA MÁQUINA DO TEMPO AQUI
+    calcularProgressoOffline();
+    
     document.getElementById('fazenda-capital').innerText = window.pontosDoCasal;
     
     sincronizarTribunal();
-    injetarPainelEstacoes(); // Adiciona UI das estações sem mexer no HTML base
+    injetarPainelEstacoes(); 
     
     atualizarVisuaisAnimatronics();
     renderizarTerrenos();

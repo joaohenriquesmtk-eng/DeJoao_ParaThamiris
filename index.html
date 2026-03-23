@@ -112,34 +112,6 @@
     </div>
 </div>
 
-                <div class="particulas">
-    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    <div class="particula" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    <div class="particula" style="top: 50%; left: 50%; animation-delay: 2s;"></div>
-    <div class="particula" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
-    <div class="particula" style="top: 90%; left: 10%; animation-delay: 1s;"></div>
-    <div class="particula" style="top: 50%; left: 60%; animation-delay: 3s;"></div>
-    <div class="particula" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    </div>
-
-                <div class="cartao-vidro" id="frase-do-dia">
-                    <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
-                </div>
-
                 <div class="cartao-vidro" style="text-align: center; margin-top: 20px; display: flex; flex-direction: column; align-items: center; padding: 25px 20px;">
                     <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 20px;">Pulso de Vida</h3>
                     
@@ -153,6 +125,23 @@
                         <span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
                     </div>
                 </div>
+
+
+<div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px;">
+    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-align: center;">Mural de Recados</h4>
+    <div id="area-postits" class="area-postits">
+        </div>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none;">
+        <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 10px 15px;">📌 Fixar</button>
+    </div>
+</div>                
+
+                <div class="cartao-vidro" id="frase-do-dia">
+                    <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
+                </div>
+
+
 
 <div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 5px;">
     
@@ -177,15 +166,7 @@
     </div>
 </div>
 
-<div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px;">
-    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-align: center;">Mural de Recados</h4>
-    <div id="area-postits" class="area-postits">
-        </div>
-    <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none;">
-        <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 10px 15px;">📌 Fixar</button>
-    </div>
-</div>
+
 
 <div class="cartao-vidro" id="cartao-espelho-alma" style="margin-top: 20px; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2);">
                 <div id="espelho-overlay" class="espelho-overlay"></div> <h3 class="titulo-cartao" style="text-align: center; color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);">🪞 O Espelho da Alma</h3>

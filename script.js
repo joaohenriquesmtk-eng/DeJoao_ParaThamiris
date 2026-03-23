@@ -1891,9 +1891,12 @@ window.escutarEcosDoParceiro = function() {
         const btnOuvir = document.getElementById('btn-ouvir-eco');
         const statusEco = document.getElementById('status-eco');
         
-        if (dados && dados.audioBase64) {
-            // Guarda o áudio e quem gravou na memória vital do celular
-            window.audioCarregado = dados.audioBase64;
+        // Aceita tanto a chave antiga (se houver cache) quanto a URL nova
+        const urlOuBase64 = dados ? (dados.audioUrl || dados.audioBase64) : null;
+        
+        if (dados && urlOuBase64) {
+            // Guarda a URL na memória vital do celular
+            window.audioCarregado = urlOuBase64;
             window.autorEcoAtual = dados.autor;
             
             if (btnOuvir) btnOuvir.style.display = 'block';
@@ -2163,7 +2166,7 @@ function iniciarMotorDoTempoFuturo() {
     loopRelogioFuturo = setInterval(atualizar, 1000); 
 }
 
-window.selarFuturo = function() {
+window.selarFuturo = async function() {
     const texto = document.getElementById('texto-futuro').value;
     const dataInput = document.getElementById('data-abertura-futuro').value; 
 
@@ -2184,25 +2187,54 @@ window.selarFuturo = function() {
         return;
     }
 
-    const textoCriptografado = window.SantuarioCrypto ? window.SantuarioCrypto.codificar(texto) : texto;
-    const { db, ref, push } = window.SantuarioApp.modulos;
+    // 🚨 INÍCIO DA ENGENHARIA DE ARMAZENAMENTO (CLOUD STORAGE) 🚨
+    if(typeof mostrarToast === 'function') mostrarToast("Criptografando e fazendo upload pro espaço... Aguarde!", "🚀");
     
-    const refDestino = ref(db, 'capsulas_tempo/' + window.NOME_PARCEIRO.toLowerCase());
+    // Desativa o botão para não clicar duas vezes enquanto carrega o arquivo
+    const btnSelar = document.querySelector('#form-criar-futuro .btn-acao');
+    if (btnSelar) btnSelar.disabled = true;
 
-    const capsuleData = {
-        mensagem: textoCriptografado,
-        dataCriacao: agora,
-        dataAbertura: dataAbertura,
-        autor: window.MEU_NOME
-    };
-    
-    if (fotoFuturoBase64) capsuleData.foto = fotoFuturoBase64;
-    if (audioFuturoBase64) capsuleData.audio = audioFuturoBase64;
+    try {
+        const { db, ref: dbRef, push, storage, storageRef, uploadString, getDownloadURL } = window.SantuarioApp.modulos;
+        const refDestino = dbRef(db, 'capsulas_tempo/' + window.NOME_PARCEIRO.toLowerCase());
+        
+        let urlFoto = null;
+        let urlAudio = null;
+        const idUnico = Date.now().toString();
 
-    push(refDestino, capsuleData).then(() => {
-        if(typeof mostrarToast === 'function') mostrarToast("Cápsula multimídia selada e enviada!", "🔒");
+        // 1. Upa a Foto pro Disco (Se existir) e guarda apenas a URL
+        if (fotoFuturoBase64) {
+            const fotoRef = storageRef(storage, `capsulas/${window.MEU_NOME}_foto_${idUnico}`);
+            await uploadString(fotoRef, fotoFuturoBase64, 'data_url');
+            urlFoto = await getDownloadURL(fotoRef);
+        }
+
+        // 2. Upa o Áudio pro Disco (Se existir) e guarda apenas a URL
+        if (audioFuturoBase64) {
+            const audioRef = storageRef(storage, `capsulas/${window.MEU_NOME}_audio_${idUnico}`);
+            await uploadString(audioRef, audioFuturoBase64, 'data_url');
+            urlAudio = await getDownloadURL(audioRef);
+        }
+
+        // 3. Salva SÓ O TEXTO E OS LINKS no banco de dados (Custo zero de banda!)
+        const textoCriptografado = window.SantuarioCrypto ? window.SantuarioCrypto.codificar(texto) : texto;
+        const capsuleData = {
+            mensagem: textoCriptografado,
+            dataCriacao: agora,
+            dataAbertura: dataAbertura,
+            autor: window.MEU_NOME
+        };
+        
+        if (urlFoto) capsuleData.foto = urlFoto;
+        if (urlAudio) capsuleData.audio = urlAudio;
+
+        await push(refDestino, capsuleData);
+
+        // Sucesso Total
+        if(typeof mostrarToast === 'function') mostrarToast("Cápsula selada e guardada com sucesso!", "🔒");
         if(window.Haptics) navigator.vibrate([50, 100, 50]);
         
+        // Limpeza visual
         document.getElementById('texto-futuro').value = "";
         document.getElementById('data-abertura-futuro').value = "";
         fotoFuturoBase64 = null;
@@ -2221,7 +2253,12 @@ window.selarFuturo = function() {
         if (mediaRecorderFuturo && mediaRecorderFuturo.state === 'recording') {
             mediaRecorderFuturo.stop();
         }
-    });
+    } catch (error) {
+        console.error("Erro ao fazer upload da cápsula:", error);
+        if(typeof mostrarToast === 'function') mostrarToast("Erro na conexão estelar. Tente novamente.", "❌");
+    } finally {
+        if (btnSelar) btnSelar.disabled = false;
+    }
 };
 
 window.destruirFuturoLido = function() {

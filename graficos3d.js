@@ -514,26 +514,49 @@ window.otimizadorDeResize = function(func, delay = 100) {
                 
                 const reader = new FileReader();
                 reader.readAsDataURL(audioBlob);
-                reader.onloadend = () => {
+                reader.onloadend = async () => {
                     const base64Audio = reader.result;
                     if(window.SantuarioApp && window.SantuarioApp.modulos) {
-                        const { db, ref, set } = window.SantuarioApp.modulos;
-                        const refEcoDestino = ref(db, 'eco_santuario/frequencia_atual');
-                        
-                        set(refEcoDestino, {
-                            audioBase64: base64Audio,
-                            autor: window.MEU_NOME,
-                            timestamp: Date.now()
-                        }).then(() => {
+                        const { db, ref, set, storage, storageRef, uploadString, getDownloadURL } = window.SantuarioApp.modulos;
+                        const status = document.getElementById('status-eco');
+
+                        try {
+                            if (status) {
+                                status.innerText = "Transmitindo voz para as estrelas... 🚀";
+                                status.style.color = "var(--cor-primaria)";
+                            }
+
+                            // 1. Faz upload do Áudio Pesado para o Cloud Storage
+                            const idUnico = Date.now();
+                            const caminhoStorage = `ecos/${window.MEU_NOME}_frequencia_${idUnico}`;
+                            const audioStorageRef = storageRef(storage, caminhoStorage);
+                            
+                            await uploadString(audioStorageRef, base64Audio, 'data_url');
+                            
+                            // 2. Pega a URL pública e levinha gerada
+                            const urlAudio = await getDownloadURL(audioStorageRef);
+
+                            // 3. Salva APENAS a URL no Realtime Database (Economia massiva de banda)
+                            const refEcoDestino = ref(db, 'eco_santuario/frequencia_atual');
+                            await set(refEcoDestino, {
+                                audioUrl: urlAudio, // Usando o link leve
+                                autor: window.MEU_NOME,
+                                timestamp: Date.now()
+                            });
+
                             if (status) {
                                 status.innerText = "A sua voz viajou pelo espaço-tempo! ✨";
                                 status.style.color = "#2ecc71";
                             }
                             if (window.Haptics) window.Haptics.sucesso();
-                        }).catch(e => {
+
+                        } catch (e) {
                             console.error("Falha no upload espacial:", e);
-                            if (status) status.innerText = "Falha no envio da voz.";
-                        });
+                            if (status) {
+                                status.innerText = "Falha no envio da voz.";
+                                status.style.color = "#e74c3c";
+                            }
+                        }
                     }
                 };
             };
@@ -1081,7 +1104,7 @@ window.otimizadorDeResize = function(func, delay = 100) {
             const img = new Image();
             img.src = e.target.result;
             
-            img.onload = () => {
+            img.onload = async () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 const scale = Math.min(800 / img.width, 1000 / img.height, 1);
@@ -1093,29 +1116,40 @@ window.otimizadorDeResize = function(func, delay = 100) {
                 
                 if(status) status.innerText = "🚀 Transmitindo para o horizonte...";
 
-                const { db, ref, get, set } = window.SantuarioApp.modulos;
-                const r = ref(db, 'horizontes/fotos');
-                
-                get(r).then(s => {
+                try {
+                    const { db, ref, get, set, storage, storageRef, uploadString, getDownloadURL } = window.SantuarioApp.modulos;
+                    
+                    // 1. Upload da imagem renderizada para o Storage
+                    const idUnico = Date.now();
+                    const caminhoStorage = `horizontes/foto_${window.MEU_NOME}_${idUnico}.jpg`;
+                    const fotoStorageRef = storageRef(storage, caminhoStorage);
+                    
+                    await uploadString(fotoStorageRef, base64, 'data_url');
+                    const urlFoto = await getDownloadURL(fotoStorageRef);
+
+                    // 2. Puxa a lista atual de fotos e salva APENAS o link gerado
+                    const r = ref(db, 'horizontes/fotos');
+                    const s = await get(r);
                     let f = s.val();
                     let arr = Array.isArray(f) ? [...f] : Object.values(f || {});
-                    arr.push(base64);
-                    // Aumentei o rolo de fotos para 15 para vocês terem bastante espaço
+                    
+                    arr.push(urlFoto); // Salva apenas o link minúsculo
                     if(arr.length > 15) arr.shift(); 
-                    return set(r, arr);
-                }).then(() => {
+                    
+                    await set(r, arr);
+
                     if(status) {
                         status.innerText = "✅ Visão compartilhada com sucesso!";
                         status.style.color = "#2ecc71";
                         setTimeout(() => { status.innerText = ""; status.style.color = "var(--cor-primaria)"; }, 4000);
                     }
-                }).catch(err => {
-                    console.error("Erro ao salvar foto:", err);
+                } catch (err) {
+                    console.error("Erro ao salvar foto no Storage:", err);
                     if(status) { status.innerText = "❌ Ocorreu um erro no envio."; status.style.color = "#ff6b6b"; }
-                }).finally(() => {
+                } finally {
                     if(btn) { btn.disabled = false; btn.style.opacity = "1"; }
                     event.target.value = ''; 
-                });
+                }
             };
             img.onerror = () => {
                 if(status) status.innerText = "❌ Arquivo de imagem inválido.";

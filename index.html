@@ -24,7 +24,8 @@
         "imports": {
           "@firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
           "@firebase/database": "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js",
-          "@firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
+          "@firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js",
+          "@firebase/storage": "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js"
         }
       }
     </script>
@@ -1098,6 +1099,8 @@
         import { getDatabase, ref, set, get, onValue, runTransaction, push, update } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
         import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js';
+        // 🚨 IMPORTAÇÃO DO STORAGE
+        import { getStorage, ref as storageRef, uploadString, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js'; 
 
         const firebaseConfig = {
             apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
@@ -1113,6 +1116,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
+        const storage = getStorage(app); // 🚨 ATIVA O DISCO RÍGIDO
 
         // Exportação segura para o resto do app
         window.SantuarioDB = db;
@@ -1121,8 +1125,14 @@
 
         window.SantuarioApp = window.SantuarioApp || {};
         window.SantuarioApp.inicializado = true;
-        window.SantuarioApp.modulos = { db, ref, onValue, set, get, runTransaction, push, update, messaging: getMessaging(app), getToken: getToken };
-
+        
+        // 🚨 INJETA O STORAGE NA MEMÓRIA GLOBAL PARA SER USADO NOS JOGOS
+        window.SantuarioApp.modulos = { 
+            db, ref, onValue, set, get, runTransaction, push, update, 
+            messaging: getMessaging(app), getToken: getToken,
+            storage, storageRef, uploadString, getDownloadURL, deleteObject 
+        };
+    
         // IDs autorizados (Se tiverem mudado, a nova inteligência vai nos avisar)
         const IDS_AUTORIZADOS = {
             "Qb9ZWjumzhRWYm3Rrb5phpZjj4H2": "joao",

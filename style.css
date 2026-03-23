@@ -121,7 +121,7 @@ body {
     padding-top: env(safe-area-inset-top);
 }
 
-/* Efeito vidro */
+/* Efeito vidro (BLINDADO NA GPU) */
 .cartao-vidro {
     background: var(--cor-vidro);
     backdrop-filter: blur(20px);
@@ -131,10 +131,13 @@ body {
     padding: 20px;
     margin: 15px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-    /* Delega o peso do vidro fosco (blur) direto para o chip de vídeo (GPU) */
+    
+    /* Delegação de Hardware Extrema */
     transform: translateZ(0);
-    will-change: transform;
+    will-change: transform, backdrop-filter;
     backface-visibility: hidden;
+    
+    animation: respiracaoSantuario 6s infinite alternate ease-in-out;
 }
 
 /* ===== MENU INFERIOR ===== */
@@ -143,14 +146,40 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
     background: rgba(15, 15, 15, 0.8);
     backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+    -webkit-backdrop-filter: blur(10px);
+    display: flex; justify-content: space-around; align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: 999;
+    position: fixed; bottom: 0; width: 100%; z-index: 999;
+    /* BLINDAGEM */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
+}
+
+/* BARRA SUPERIOR DOS JOGOS */
+.top-bar {
+    height: 60px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; z-index: 10; flex-shrink: 0;
+    /* BLINDAGEM */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
+}
+
+/* PAINEL LATERAL DA FAZENDA */
+.painel-area {
+    width: 300px;
+    background: var(--cor-vidro);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 15px; overflow-y: auto; flex-shrink: 0; height: 100%; padding-bottom: 40px;
+    /* BLINDAGEM */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
 }
 
 .item-menu {
@@ -714,18 +743,27 @@ body.modo-jogo-ativo .tela {
 
 .modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 20px;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; padding: 20px;
+    /* BLINDAGEM */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
+}
+
+.modal-emergencia {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(139, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; transition: opacity 0.5s;
+    /* BLINDAGEM */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
 }
 
 .conteudo-modal {
@@ -7363,4 +7401,13 @@ body.aura-ansiosa {
 @keyframes explodirLuzMartelo {
     0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+
+/* BLINDAGEM GLOBAL PARA OS VIDROS DE 30PX DOS JOGOS */
+[id^="container-"] .cartao-vidro {
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
 }

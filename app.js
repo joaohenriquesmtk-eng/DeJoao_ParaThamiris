@@ -440,21 +440,31 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // MOTOR DO VIDRO MAGNÉTICO + GLARE (NÍVEL 9)
+    // MOTOR DO VIDRO MAGNÉTICO + GLARE (OTIMIZADO PARA GPU)
     // ==========================================
     window.ativarVidroMagnetico = () => {
         if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', (e) => {
-                const tiltX = Math.min(Math.max((e.beta || 0) - 45, -10), 10); 
-                const tiltY = Math.min(Math.max(e.gamma || 0, -10), 10);
-                const glareX = (e.gamma || 0) * 1.5;
-                const glareY = ((e.beta || 0) - 45) * 1.5;
+            let animacaoPendente = false;
 
-                document.documentElement.style.setProperty('--tilt-x', `${tiltX / -2}deg`);
-                document.documentElement.style.setProperty('--tilt-y', `${tiltY / 2}deg`);
-                document.documentElement.style.setProperty('--glare-x', `${glareX}`);
-                document.documentElement.style.setProperty('--glare-y', `${glareY}`);
-            });
+            window.addEventListener('deviceorientation', (e) => {
+                // Se a placa de vídeo ainda não processou o último quadro, ignora a leitura do sensor
+                if (animacaoPendente) return;
+                animacaoPendente = true;
+
+                requestAnimationFrame(() => {
+                    const tiltX = Math.min(Math.max((e.beta || 0) - 45, -10), 10); 
+                    const tiltY = Math.min(Math.max(e.gamma || 0, -10), 10);
+                    const glareX = (e.gamma || 0) * 1.5;
+                    const glareY = ((e.beta || 0) - 45) * 1.5;
+
+                    document.documentElement.style.setProperty('--tilt-x', `${tiltX / -2}deg`);
+                    document.documentElement.style.setProperty('--tilt-y', `${tiltY / 2}deg`);
+                    document.documentElement.style.setProperty('--glare-x', `${glareX}`);
+                    document.documentElement.style.setProperty('--glare-y', `${glareY}`);
+                    
+                    animacaoPendente = false; // Libera para a próxima leitura
+                });
+            }, { passive: true }); // passive: true avisa o navegador que não vamos travar o scroll
         }
     };
 

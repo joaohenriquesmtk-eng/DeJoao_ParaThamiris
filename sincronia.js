@@ -145,7 +145,6 @@ const bancoPerguntasSincronia = [
     "Na nossa futura cozinha, quem vai lavar a louça na maioria das vezes?",
     "Uma palavra que resume a nossa capacidade de superar a distância:",
     "Quem é mais provável de rir em uma situação onde deveria ficar sério?",
-    "Qual adjetivo descreve perfeitamente o nosso beijo?",
     "Quem tem mais chance de se perder usando o GPS (João ou Thamiris)?",
     "Se o nosso amor fosse um animal da minifazenda, seria Forte como um Touro ou Leal como um Cão?",
     "Quem tem mais ciúme de pessoas comentando nas fotos de antigamente?",
@@ -430,26 +429,34 @@ function sortearNovaPergunta() {
 // ==========================================
 // 5. INICIALIZAÇÃO E CONEXÃO COM O FIREBASE REALTIME DATABASE
 // ==========================================
+// Variável para guardar o controle remoto da antena do Firebase
+window.desligarAntenaSincronia = null; 
+
 window.iniciarSincronia = function() {
     console.log("Abrindo conexão quântica...");
     
-    // Puxa as ferramentas do Firebase que você já tem no seu app
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos) {
-        console.error("Módulos do Firebase não encontrados!");
-        return;
-    }
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
 
-    // Referência ao "nó" do jogo de sincronia no banco de dados
     const sincRef = ref(db, 'jogos/sincronia_casal');
 
-    // O LISTENER DE TEMPO REAL: Fica escutando as mudanças (Substitui o onSnapshot)
-    onValue(sincRef, (snapshot) => {
+    // Desliga a antena antiga antes de ligar uma nova (Evita clonagem)
+    if (window.desligarAntenaSincronia) {
+        window.desligarAntenaSincronia();
+    }
+
+    // 🚨 A MÁGICA: O Firebase retorna uma função de "desligar" quando usamos o onValue no SDK Modular
+    window.desligarAntenaSincronia = onValue(sincRef, (snapshot) => {
         if (snapshot.exists()) {
             rodadaAtual = snapshot.val();
-            atualizarInterfaceSincronia(); // Esta função injeta a pergunta no HTML!
+            const perguntaAindaExiste = bancoPerguntasSincronia.includes(rodadaAtual.pergunta);
+            
+            if (!perguntaAindaExiste) {
+                iniciarNovaInvestigacao();
+                return; 
+            }
+            atualizarInterfaceSincronia(); 
         } else {
-            // Primeira vez rodando o jogo, cria o banco
             iniciarNovaInvestigacao();
         }
     });

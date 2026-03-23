@@ -49,8 +49,18 @@ window.SantuarioApp.modulos = null;
 
 window.SantuarioApp.conectar = function() {
     if (!this.inicializado || !this.modulos) return;
+    
+    // 🚨 A TRAVA DE TITÃ: Se já estiver conectado e vigiando, aborta para não clonar os listeners!
+    if (this.conectado) {
+        console.log("Satélite já está em órbita. Ignorando reconexão duplicada.");
+        return;
+    }
+    
     const { db, ref, onValue } = this.modulos;
     console.log("Satélite do Santuário Conectado!");
+
+    // Tranca a porta para impedir clones
+    this.conectado = true; 
 
     const refPulsoParceiro = ref(db, 'pulsos/' + window.NOME_PARCEIRO.toLowerCase());
     onValue(refPulsoParceiro, (snapshot) => {

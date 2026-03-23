@@ -1076,14 +1076,25 @@ window.fecharModal = function(apenasLimpar = false) {
     const corpo = document.getElementById('corpo-modal');
     const gaveta = document.getElementById('reliquias-templates');
     
-    // 🚨 CORREÇÃO MUSICAL: Para a música sincronizada e retoma o som do jogo
+    // 🚨 1. EXTINTOR DE ÁUDIO: Para a música sincronizada e o áudio da cápsula
     const audioSinc = document.getElementById('audio-sincronizado');
     if (audioSinc && !audioSinc.paused) {
         audioSinc.pause();
         if (typeof playAudioJogos === 'function') playAudioJogos(); 
     }
+    if (typeof audioReveladoFuturo !== 'undefined' && audioReveladoFuturo) {
+        audioReveladoFuturo.pause();
+        audioReveladoFuturo = null;
+    }
+
+    // 🚨 2. EXTINTOR DE CRONÔMETRO: Mata o timer da Cápsula do Futuro
+    if (typeof loopRelogioFuturo !== 'undefined' && loopRelogioFuturo) {
+        clearInterval(loopRelogioFuturo);
+        loopRelogioFuturo = null;
+    }
     
     if (gaveta && corpo) {
+        // Guarda os elementos 3D vivos na gaveta ANTES de limpar o modal!
         ['ecos', 'bussola', 'carrossel'].forEach(id => {
             const el = document.getElementById(`cartao-${id}`);
             if (el && corpo.contains(el)) gaveta.appendChild(el);
@@ -1156,6 +1167,8 @@ window.abrirJogo = function(tipo) {
             }
         }
         else if (tipo === 'julgamento') {
+            window.julgamentoAtivo = true; // 🚨 A CHAVE MESTRA: Liga o jogo toda vez que a tela for aberta!
+            
             const julga = document.getElementById("julgamento-grade");
             if (julga && julga.children.length === 0) {
                 if (typeof iniciarJulgamento === 'function') iniciarJulgamento();

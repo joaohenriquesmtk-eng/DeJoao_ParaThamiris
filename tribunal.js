@@ -1,5 +1,5 @@
 // ============================================================================
-// TRIBUNAL DO AFETO - RPG JURÍDICO (PADRÃO OURO)
+// TRIBUNAL DO AFETO - RPG JURÍDICO (O ABISMO COGNITIVO - MATEMÁTICA PERFEITA)
 // ============================================================================
 
 // 1. ÁUDIOS DE ALTA QUALIDADE (Engine Sonora)
@@ -12,12 +12,11 @@ const AudioTribunal = {
     dica: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3')
 };
 
-// Ajuste de volume
 Object.values(AudioTribunal).forEach(som => som.volume = 0.6);
 
 let tribunal = {
     nivel: 1,
-    estrelas: 3, // Vidas
+    estrelas: 3, 
     metaAtual: 0,
     somaAtual: 0,
     cartasSelecionadas: [],
@@ -77,7 +76,7 @@ window.fecharDossieTribunal = function() {
     document.getElementById('dossie-tribunal').classList.add('escondido');
 };
 
-// BANCO DE DADOS (CASOS E PROVAS)
+// BANCO DE DADOS 
 const bancoDeCasos = [
     { titulo: "O Roubo do Cobertor", desc: "Durante a madrugada chuvosa, o réu puxou 80% do cobertor. Prove sua inocência!", base: 12, tags: ["sono", "casa"] },
     { titulo: "A Marmita Desaparecida", desc: "A última coxinha foi devorada sem aviso prévio. O júri exige provas exatas!", base: 18, tags: ["comida", "casa"] },
@@ -149,18 +148,28 @@ function iniciarNovoCaso() {
     tribunal.cartasSelecionadas = [];
     tribunal.testemunhaAtiva = null;
     tribunal.cartasGarantidasParaDica = [];
+    
     const maoEl = document.getElementById('tribunal-mao');
     if(maoEl) maoEl.innerHTML = '';
     const areaTest = document.getElementById('area-testemunha');
     if(areaTest) areaTest.classList.add('escondido');
+    
     const casoSorteado = bancoDeCasos[Math.floor(Math.random() * bancoDeCasos.length)];
     tribunal.casoAtual = casoSorteado; 
-    tribunal.metaAtual = casoSorteado.base + Math.floor(Math.random() * (tribunal.nivel * 3)); 
+    
+    // ☠️ HIPER-ESCALONAMENTO 
+    let escalonamentoZ = Math.pow(2.4, tribunal.nivel - 1); 
+    tribunal.metaAtual = Math.floor(casoSorteado.base * escalonamentoZ) + Math.floor(Math.random() * (25 * Math.pow(tribunal.nivel, 2))); 
+    
     document.getElementById('tribunal-titulo-caso').innerText = casoSorteado.titulo;
     document.getElementById('tribunal-descricao-caso').innerText = casoSorteado.desc;
     document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
     document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
-    if (Math.random() < 0.35) invocarTestemunha(); 
+    
+    // ☠️ TESTEMUNHAS INEVITÁVEIS (95% de chance após nível 3)
+    let chanceTestemunha = tribunal.nivel >= 3 ? 0.95 : 0.30; 
+    if (Math.random() < chanceTestemunha) invocarTestemunha(); 
+    
     gerarCartasMesa();
     atualizarPlacar();
 }
@@ -168,13 +177,12 @@ function iniciarNovoCaso() {
 function invocarTestemunha() {
     const test = bancoTestemunhas[Math.floor(Math.random() * bancoTestemunhas.length)];
     tribunal.testemunhaAtiva = test.regra; 
-    if (test.regra === 'pares' && tribunal.metaAtual % 2 !== 0) tribunal.metaAtual++;
-    else if (test.regra === 'impares' && tribunal.metaAtual % 2 !== 0) tribunal.metaAtual++;
-    else if (test.regra === 'menor15' && tribunal.metaAtual > 28) tribunal.metaAtual = 28;
+    
     document.getElementById('icone-testemunha').innerText = test.icone;
     document.getElementById('nome-testemunha').innerText = test.nome;
     document.getElementById('tribunal-regra-testemunha').innerText = test.msg;
     document.getElementById('area-testemunha').classList.remove('escondido');
+    
     AudioTribunal.erro.currentTime = 0;
     AudioTribunal.erro.play();
     if(window.Haptics) navigator.vibrate([80, 50, 80]);
@@ -183,28 +191,156 @@ function invocarTestemunha() {
 function gerarCartasMesa() {
     const maoEl = document.getElementById('tribunal-mao');
     const quantidadeCartas = 8;
-    let val1 = Math.floor(tribunal.metaAtual / 2);
-    let val2 = tribunal.metaAtual - val1;
-    if (tribunal.testemunhaAtiva === 'impares') { if (val1 % 2 === 0) { val1--; val2++; } }
-    else if (tribunal.testemunhaAtiva === 'pares') { if (val1 % 2 !== 0) { val1--; val2++; } }
-    let valores = [{ v: val1, garantida: true }, { v: val2, garantida: true }];
-    while(valores.length < quantidadeCartas) {
-        let numAleatorio = Math.floor(Math.random() * (tribunal.metaAtual - 2)) + 1;
-        valores.push({ v: numAleatorio, garantida: false });
+    
+    // 1. Determina a quantidade EXATA de cartas que formarão a solução
+    let numPartesAlvo = Math.min(7, 4 + Math.floor(tribunal.nivel / 3));
+    if (tribunal.testemunhaAtiva === 'max3') numPartesAlvo = Math.min(numPartesAlvo, 3);
+    if (tribunal.testemunhaAtiva === 'menor15') numPartesAlvo = 7; 
+    
+    // ========================================================================
+    // 🚨 A MÁGICA DA GARANTIA: CALIBRANDO A META PARA SER 100% SOLUCIONÁVEL
+    // ========================================================================
+    if (tribunal.testemunhaAtiva === 'pares') {
+        if (tribunal.metaAtual % 2 !== 0) tribunal.metaAtual++;
+    } 
+    else if (tribunal.testemunhaAtiva === 'impares') {
+        // MATEMÁTICA PURA: A soma de N números ímpares carrega a mesma paridade de N.
+        // Se precisamos somar 4 cartas, a meta DEVE ser par. Se precisamos de 5, DEVE ser ímpar.
+        if (tribunal.metaAtual % 2 !== numPartesAlvo % 2) {
+            tribunal.metaAtual++; 
+        }
+    } 
+    else if (tribunal.testemunhaAtiva === 'menor15') {
+        // Se todas as cartas precisam ser menores que 15, o teto físico é N * 14.
+        let maxS = numPartesAlvo * 14;
+        let minS = numPartesAlvo * 1;
+        if (tribunal.metaAtual > maxS) tribunal.metaAtual = Math.floor(Math.random() * 20) + 70; // Trava dentro do possível
+        if (tribunal.metaAtual < minS) tribunal.metaAtual = minS;
     }
+    
+    // Segurança final: A meta nunca pode ser menor que o número de cartas
+    if (tribunal.metaAtual < numPartesAlvo) tribunal.metaAtual = numPartesAlvo;
+
+    // Atualiza a tela com a Meta Perfeita e inquebrável
+    document.getElementById('tribunal-meta').innerText = tribunal.metaAtual;
+
+    // ========================================================================
+    // ALGORITMO DE DIVISÃO DETERMINÍSTICA (Constrói do zero, não depende de sorte)
+    // ========================================================================
+    let valoresGarantidos = new Array(numPartesAlvo).fill(0);
+    let step = 1;
+    let maxVal = Infinity;
+
+    // Preenche as bases de acordo com a regra
+    if (tribunal.testemunhaAtiva === 'pares') {
+        valoresGarantidos.fill(2);
+        step = 2;
+    } else if (tribunal.testemunhaAtiva === 'impares') {
+        valoresGarantidos.fill(1);
+        step = 2; // Pula de 2 em 2 para continuar ímpar
+    } else if (tribunal.testemunhaAtiva === 'menor15') {
+        valoresGarantidos.fill(1);
+        step = 1;
+        maxVal = 14;
+    } else {
+        valoresGarantidos.fill(1);
+        step = 1;
+    }
+
+    let currentSum = valoresGarantidos.reduce((a, b) => a + b, 0);
+    let remaining = tribunal.metaAtual - currentSum;
+
+    // Distribui o saldo restante em pedaços legais (sem quebrar a regra)
+    while (remaining > 0) {
+        let idx = Math.floor(Math.random() * numPartesAlvo);
+        let add = step;
+
+        // Se os números forem imensos, adiciona em blocos grandes para poupar processamento
+        if (maxVal === Infinity) {
+            if (remaining > 5000) add = step === 1 ? 1000 : 1000;
+            else if (remaining > 500) add = step === 1 ? 100 : 100;
+            else if (remaining > 50) add = step === 1 ? 10 : 10;
+        }
+
+        if (valoresGarantidos[idx] + add <= maxVal && remaining >= add) {
+            valoresGarantidos[idx] += add;
+            remaining -= add;
+        }
+    }
+
+    // NÚMEROS FEIOS (Anti-Rounding) quando o jogo não tem regras ativas
+    if (!tribunal.testemunhaAtiva) {
+        for (let i = 0; i < numPartesAlvo - 1; i++) {
+            let v = valoresGarantidos[i];
+            let lastDigit = v % 10;
+            if (![3, 7, 9].includes(lastDigit) && v > 10) {
+                let feios = [3, 7, 9];
+                let novoDigito = feios[Math.floor(Math.random() * feios.length)];
+                let diff = novoDigito - lastDigit;
+                valoresGarantidos[i] += diff;
+                valoresGarantidos[numPartesAlvo - 1] -= diff; // Subtrai da última para manter a conta exata
+            }
+        }
+        // Reparo de segurança (caso o balanço tenha jogado algum número pra zero ou negativo)
+        for (let i = 0; i < numPartesAlvo; i++) {
+            if (valoresGarantidos[i] <= 0) {
+                let repor = 1 - valoresGarantidos[i];
+                valoresGarantidos[i] += repor;
+                let maxIdx = 0;
+                for(let j=1; j<numPartesAlvo; j++) if(valoresGarantidos[j] > valoresGarantidos[maxIdx]) maxIdx = j;
+                valoresGarantidos[maxIdx] -= repor;
+            }
+        }
+    }
+
+    let valores = valoresGarantidos.map(v => ({ v: v, garantida: true }));
+
+    // ========================================================================
+    // A MIRAGEM (Criando as iscas matemáticas perfeitas)
+    // ========================================================================
+    let indexAlvoBait = Math.floor(Math.random() * valoresGarantidos.length);
+    let cartaVitimada = valoresGarantidos[indexAlvoBait];
+    
+    while(valores.length < quantidadeCartas) {
+        let isca;
+        
+        if (valores.length === valoresGarantidos.length) {
+            // Isca Mestra: Falta exatamente 1 passo para ganhar ou perder
+            isca = cartaVitimada + (Math.random() < 0.5 ? step : -step);
+        } else {
+            // Iscas secundárias
+            let ruido = Math.floor(Math.random() * 8) + 1;
+            isca = valoresGarantidos[Math.floor(Math.random() * valoresGarantidos.length)] + (Math.random() < 0.5 ? (ruido * step) : -(ruido * step));
+        }
+        
+        // As iscas não podem quebrar as regras (se quebrarem, você adivinha a isca de cara)
+        if (isca <= 0) isca = cartaVitimada + (step * 2);
+        if (tribunal.testemunhaAtiva === 'menor15' && isca >= 15) isca = 14;
+        if (tribunal.testemunhaAtiva === 'pares' && isca % 2 !== 0) isca++;
+        if (tribunal.testemunhaAtiva === 'impares' && isca % 2 === 0) isca++;
+        
+        valores.push({ v: isca, garantida: false });
+    }
+    
     valores.sort(() => Math.random() - 0.5); 
+    
     let provasRelacionadas = bancoDeProvas.filter(prova => prova.tags.some(tag => tribunal.casoAtual.tags.includes(tag)));
     let provasRestantes = bancoDeProvas.filter(prova => !prova.tags.some(tag => tribunal.casoAtual.tags.includes(tag)));
     provasRelacionadas.sort(() => Math.random() - 0.5);
     provasRestantes.sort(() => Math.random() - 0.5);
+    
     let filaDeProvas = [...provasRelacionadas, ...provasRestantes];
+    
     valores.forEach((item, index) => {
         const carta = document.createElement('div');
         carta.className = 'carta-tribunal';
         const provaSelecionada = filaDeProvas[index % filaDeProvas.length];
+        
+        let fontSize = item.v.toString().length > 4 ? '1.5rem' : '1.8rem';
+        
         carta.innerHTML = `
             <div class="carta-icone" style="font-size: 2.2rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));">${provaSelecionada.icone}</div>
-            <div class="carta-valor">${item.v}</div>
+            <div class="carta-valor" style="font-size: ${fontSize};">${item.v}</div>
             <div class="carta-nome-prova">${provaSelecionada.nome}</div>
         `;
         carta.onclick = () => selecionarCarta(carta, item.v);
@@ -236,6 +372,7 @@ function selecionarCarta(elementoCarta, valor) {
         if (bloqueado) { mostrarToast(motivo, "🚨"); AudioTribunal.erro.play(); return; }
     }
     AudioTribunal.carta.currentTime = 0; AudioTribunal.carta.play();
+    
     if (elementoCarta.classList.contains('selecionada')) {
         elementoCarta.classList.remove('selecionada');
         tribunal.somaAtual -= valor;
@@ -258,16 +395,13 @@ function atualizarPlacar() {
     }
 }
 
-// ANIMAÇÃO DO MARTELO GLOBAL (Sobrepõe toda a tela)
+// ANIMAÇÃO DO MARTELO GLOBAL 
 window.baterMarteloVisual = function() {
-    // 1. Evita que o jogador clique duas vezes seguidas
     let container = document.getElementById('martelo-overlay-global');
     if (container && container.style.display === 'flex') return; 
 
-    // 2. O Veredito Antecipado (A animação precisa saber a cor da luz antes de bater)
     const acerto = (tribunal.somaAtual === tribunal.metaAtual);
 
-    // 3. Forja o Martelo 100% Vetorial na raiz do documento (Fora da caixa do jogo)
     if (!container) {
         container = document.createElement('div');
         container.id = 'martelo-overlay-global';
@@ -297,13 +431,11 @@ window.baterMarteloVisual = function() {
     const luz = container.querySelector('.martelo-luz-fundo');
     const martelo = container.querySelector('.martelo-svg-wrapper');
     
-    // 4. Prepara a lona
     container.style.display = 'flex';
     luz.style.animation = 'none';
     martelo.style.animation = 'none';
-    void container.offsetWidth; // Reflow mágico
+    void container.offsetWidth; 
 
-    // 5. As Cores da Sentença
     if (acerto) {
         luz.style.background = 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(212,175,55,0.6) 30%, transparent 70%)';
         luz.style.boxShadow = '0 0 80px rgba(255,255,255,0.8)';
@@ -312,17 +444,14 @@ window.baterMarteloVisual = function() {
         luz.style.boxShadow = '0 0 80px rgba(255,71,87,0.8)';
     }
 
-    // 6. A Gravidade (O martelo desce)
     martelo.style.animation = 'baterMartelo 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards';
     
-    // 7. O Impacto (Onda de choque e som exatos na hora que bate na "mesa")
     setTimeout(() => {
         luz.style.animation = 'explodirLuzMartelo 0.8s ease-out forwards';
         
         if (AudioTribunal.impacto) AudioTribunal.impacto.play();
         if (window.navigator.vibrate) navigator.vibrate([100, 50, 200]);
 
-        // Se errou, rachamos a tela (drama extra)
         if (!acerto) {
             const crack = document.createElement('div');
             crack.className = 'efeito-tela-quebrada';
@@ -331,7 +460,6 @@ window.baterMarteloVisual = function() {
         }
     }, 150);
 
-    // 8. O Veridito Final (Limpa a tela e julga os pontos)
     setTimeout(() => {
         container.style.display = 'none';
         julgarCaso(); 
@@ -354,7 +482,8 @@ function julgarCaso() {
             estatisticasTribunal.perdidos++; salvarEstatisticas();
             setTimeout(voltarMenuJogos, 2000);
         } else {
-            mostrarToast(`Objeção! Vidas: ${tribunal.estrelas}`, "❌");
+            let diferenca = Math.abs(tribunal.metaAtual - tribunal.somaAtual);
+            mostrarToast(`Errou por ${diferenca}! Vidas: ${tribunal.estrelas}`, "❌");
             tribunal.somaAtual = 0;
             document.querySelectorAll('.carta-tribunal.selecionada').forEach(c => c.classList.remove('selecionada'));
             tribunal.cartasSelecionadas = [];

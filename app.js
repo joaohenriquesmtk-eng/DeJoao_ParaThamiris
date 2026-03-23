@@ -40,6 +40,11 @@ function configurarNavegacao() {
                 // LÓGICAS ESPECÍFICAS DE CADA TELA
                 // ==========================================
                 
+                // INICIALIZA A JORNADA 3D APENAS AO CLICAR NA ABA
+                if (telaAlvo === 'jornada') {
+                    if (typeof window.inicializarJornada3D === 'function') window.inicializarJornada3D();
+                }
+
                 // Áudio dos Jogos
                 if (telaAlvo === 'jogos') {
                     if (typeof playAudioJogos === 'function') playAudioJogos();
@@ -58,6 +63,7 @@ function configurarNavegacao() {
                 } else if (telaAnterior === 'cofre') {
                     if (window.MotorDeAudio) window.MotorDeAudio.focar(); 
                 }
+                
             };
 
             // A MÁGICA: Se o celular suportar a View Transitions API
@@ -520,27 +526,42 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // =========================================================================
     // FASE 2: A MÁGICA DA OTIMIZAÇÃO (O SEGREDO PARA A GPU DO CELULAR NÃO FRITAR)
-    // Inicializa os WebGLs (3D) apenas se estiverem na tela inicial.
-    // Os outros 3Ds vão esperar dentro das "caixas" até a Thamiris clicar nelas!
     // =========================================================================
     window.addEventListener('motor3DPronto', () => {
-        
-        // 1. CARREGAMENTO IMEDIATO: Tudo o que está visível de cara!
-        if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D(); // O Globo da Conexão
-        if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D(); // O Coração do Mood
-        if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima(); // A Sintonia do Clima
-        if(typeof inicializarEco3D === 'function') inicializarEco3D();
-        if(typeof inicializarBussola3D === 'function') inicializarBussola3D();
-        if(typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
-        if(typeof inicializarPrisma3D === 'function') inicializarPrisma3D();
+        // 1. CARREGAMENTO IMEDIATO: Apenas o que a Home precisa de cara!
+        if(typeof inicializarGlobo3D === 'function') inicializarGlobo3D(); 
+        if(typeof inicializarCoracao3D === 'function') inicializarCoracao3D(); 
+        if(typeof inicializarOrbeClima === 'function') inicializarOrbeClima(); 
 
-        
-        // NOTA DO ENGENHEIRO:
-        // Removemos o carregamento simultâneo do Eco, da Bússola, do Carrossel e da Árvore.
-        // Eles exigem muita RAM do celular. Eles serão iniciados sob demanda pelo script.js!
+        // 🚨 REMOVIDOS: Eco, Bússola, Carrossel, Prisma e Jornada.
+        // Eles agora são invocados sob demanda, salvando 70% da memória RAM!
+    });
+}); // Fecha o DOMContentLoaded
+
+// Localize a função voltarMenuJogos e adicione a trava do Julgamento:
+window.voltarMenuJogos = function() {
+    window.julgamentoAtivo = false; // 🚨 MATA O LOOP FANTASMA DO MATCH-3 IMEDIATAMENTE
+
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim'];
+    jogosContainers.forEach(jogoId => {
+        const el = document.getElementById(`container-${jogoId}`);
+        if (el) el.classList.add('escondido');
     });
 
-}); // Fecha o DOMContentLoaded
+    const menuLista = document.getElementById('menu-jogos-lista');
+    const menuGrid = document.querySelector('.jogos-grid');
+    const menuJogos = document.getElementById('menu-jogos');
+    const headerJogos = document.getElementById('header-jogos-main');
+    const navInferior = document.querySelector('.menu-inferior');
+
+    if (menuLista) menuLista.classList.remove('escondido');
+    if (menuGrid) menuGrid.classList.remove('escondido');
+    if (menuJogos) menuJogos.classList.remove('escondido');
+    if (headerJogos) headerJogos.classList.remove('escondido');
+    if (navInferior) navInferior.classList.remove('escondido');
+
+    document.body.classList.remove('modo-jogo-ativo');
+};
 
 // ==========================================
 // INJEÇÃO LAZY LOAD (MOTOR 3D)

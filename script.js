@@ -1064,7 +1064,13 @@ window.abrirReliquia = function(event, tipo) {
     else if (['ecos', 'bussola', 'carrossel'].includes(tipo)) {
         const template = document.getElementById(`cartao-${tipo}`);
         if(template) corpo.appendChild(template);
-        // Desperta os motores 3D (se existirem)
+        
+        // 🚨 O GATILHO INTELIGENTE: Acorda o motor 3D específico na hora exata
+        if (tipo === 'bussola' && typeof inicializarBussola3D === 'function') inicializarBussola3D();
+        if (tipo === 'ecos' && typeof inicializarEco3D === 'function') inicializarEco3D();
+        if (tipo === 'carrossel' && typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        
+        // Desperta os motores 3D que já existiam
         setTimeout(() => window.dispatchEvent(new Event('resize')), 100); 
     }
 
@@ -1178,6 +1184,7 @@ window.abrirJogo = function(tipo) {
             if(typeof iniciarMiniFazenda === 'function') iniciarMiniFazenda();
         }
         else if (tipo === 'jardim') {
+            if (typeof inicializarPrisma3D === 'function') inicializarPrisma3D(); // Acorda a Árvore
             if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
             const capitalUI = document.getElementById('jardim-moedas');
             if (capitalUI) capitalUI.innerText = window.pontosDoCasal || 0;

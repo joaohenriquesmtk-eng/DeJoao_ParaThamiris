@@ -204,76 +204,6 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
         `;
     };
 
-
-    // --- 3. A GALÁXIA PARTICULAR ---
-    window.inicializarGalaxia3D = () => {
-        const container = document.getElementById('galaxia-3d');
-        if (!container || typeof THREE === 'undefined' || container.innerHTML !== "") return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
-
-        const particulasCount = 2000;
-        const posicoes = new Float32Array(particulasCount * 3);
-        const cores = new Float32Array(particulasCount * 3);
-        const colorBase = new THREE.Color(0xD4AF37); 
-
-        for(let i = 0; i < particulasCount; i++) {
-            const i3 = i * 3;
-            const raio = Math.random() * 6;
-            const angulo = raio * 3 + (Math.random() * Math.PI * 2);
-            
-            posicoes[i3] = Math.cos(angulo) * raio + ((Math.random() - 0.5) * 0.8);
-            posicoes[i3+1] = ((Math.random() - 0.5) * 0.3) * (raio * 0.5); 
-            posicoes[i3+2] = Math.sin(angulo) * raio + ((Math.random() - 0.5) * 0.8);
-
-            const mixedColor = colorBase.clone();
-            mixedColor.lerp(new THREE.Color(0x3498db), Math.random() * (raio / 6));
-            cores[i3] = mixedColor.r; cores[i3+1] = mixedColor.g; cores[i3+2] = mixedColor.b;
-        }
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(posicoes, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(cores, 3));
-
-        const galaxia = new THREE.Points(geometry, new THREE.PointsMaterial({
-            size: 0.05, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
-        }));
-        scene.add(galaxia);
-
-        camera.position.set(0, 4, 7);
-        camera.lookAt(0,0,0);
-
-        let interacaoX = 0, interacaoY = 0;
-        const moverGalaxia = (e) => {
-            const rect = container.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            interacaoX = ((clientX - rect.left) / container.clientWidth) * 2 - 1;
-            interacaoY = -((clientY - rect.top) / container.clientHeight) * 2 + 1;
-        };
-        container.addEventListener('mousemove', moverGalaxia);
-        container.addEventListener('touchmove', moverGalaxia, {passive: true});
-
-        let galaxiaVisivel = false;
-        const observer = new IntersectionObserver((entries) => { galaxiaVisivel = entries[0].isIntersecting; });
-        observer.observe(container);
-
-        const animar = () => {
-            requestAnimationFrame(animar);
-            if (!galaxiaVisivel) return;
-            galaxia.rotation.y += 0.003 + (interacaoX * 0.02);
-            galaxia.rotation.x = interacaoY * 0.2;
-            renderer.render(scene, camera);
-        };
-        animar();
-    };
-
 // ==========================================
     // UI/UX NÍVEL DEUS: ORBE DA SINCRONIA (APOGEU)
     // ==========================================
@@ -1885,12 +1815,3 @@ window.inicializarJornada3D = () => {
     };
     animar();
 };
-
-// O GATILHO MÁGICO DO 3D: Isso garante que a Jornada renderize assim que a GPU ligar
-window.addEventListener('motor3DPronto', () => {
-    if (typeof window.inicializarJornada3D === 'function') {
-        window.inicializarJornada3D();
-    }
-});
-
-

@@ -107,9 +107,10 @@ function sincronizarTribunal() {
     }
 }
 
-// 4. O MOTOR (Clima Vivo, Plantas, Animais, Bolsa)
+let ciclosDeSalvamento = 0;
+
+// 4. O MOTOR AGRONÔMICO (Altamente Otimizado)
 function motorAgronomico() {
-    // A. SISTEMA DE CLIMA VIVO E EFEITOS (O Motor Visual)
     const climaElemento = document.getElementById('fazenda-clima-texto');
     let climaAPI = climaElemento ? climaElemento.innerText.toLowerCase() : '';
     
@@ -119,22 +120,20 @@ function motorAgronomico() {
     const horaAtual = new Date().getHours();
     const deNoite = horaAtual >= 18 || horaAtual < 6;
 
-    // Controlando as camadas de CSS (Chuva e Vagalumes)
     const overlayClima = document.getElementById('clima-overlay');
     const overlayVagalumes = document.getElementById('vagalumes-overlay');
 
     if (overlayClima) {
-        if (estaChovendo) overlayClima.className = 'camada-clima clima-chuva';
-        else if (deNoite) overlayClima.className = 'camada-clima clima-noite';
-        else overlayClima.className = 'camada-clima';
+        const novaClasse = estaChovendo ? 'camada-clima clima-chuva' : (deNoite ? 'camada-clima clima-noite' : 'camada-clima');
+        if (overlayClima.className !== novaClasse) overlayClima.className = novaClasse;
     }
 
     if (overlayVagalumes) {
-        if (deNoite && !estaChovendo) overlayVagalumes.classList.remove('escondido');
-        else overlayVagalumes.classList.add('escondido');
+        const mostrarVagalumes = deNoite && !estaChovendo;
+        if (mostrarVagalumes && overlayVagalumes.classList.contains('escondido')) overlayVagalumes.classList.remove('escondido');
+        else if (!mostrarVagalumes && !overlayVagalumes.classList.contains('escondido')) overlayVagalumes.classList.add('escondido');
     }
 
-    // B. FLUTUAÇÃO DA BOLSA DE VALORES
     if (Math.random() < 0.1) {
         const velhaSoja = fazenda.mercado.soja;
         fazenda.mercado.soja = Math.floor(Math.random() * (180 - 90)) + 90;
@@ -148,16 +147,12 @@ function motorAgronomico() {
         animarPreco('preco-leite', fazenda.mercado.leite);
     }
 
-    // C. PECUÁRIA (Vaca produzindo leite)
     if (fazenda.pecuaria.vacaComprada) {
-        fazenda.pecuaria.vacaFome += 1;
-        if (fazenda.pecuaria.vacaFome > 100) fazenda.pecuaria.vacaFome = 100;
-        
+        fazenda.pecuaria.vacaFome = Math.min(100, fazenda.pecuaria.vacaFome + 1);
         if (fazenda.pecuaria.vacaFome < 50 && Math.random() < 0.2) {
             fazenda.silo.leite += 1;
             renderizarSiloEMercado();
         }
-        
         const statusVaca = document.getElementById('status-vaca');
         if (statusVaca) {
             statusVaca.innerText = `Fome: ${fazenda.pecuaria.vacaFome}%`;
@@ -165,19 +160,20 @@ function motorAgronomico() {
         }
     }
 
-    // D. DESENVOLVIMENTO AGRONÔMICO (Impactado pelo Clima Vivo)
+    let houveCrescimento = false;
+
     fazenda.terrenos.forEach((t, index) => {
-        // Se chove, enche o lençol freático (grátis)
-        if (estaChovendo) t.umidade = 100;
+        if (estaChovendo && t.umidade !== 100) {
+            t.umidade = 100;
+            houveCrescimento = true;
+        }
 
         if (!t.livre && t.planta) {
-            // A planta consome os recursos. Se o dia está muito quente, a evaporação DOBRA.
             const taxaEvaporacao = diaQuente ? 2 : 1;
             t.umidade = Math.max(0, t.umidade - taxaEvaporacao);
             t.npk = Math.max(0, t.npk - 0.5);
             t.ph = Math.max(4.0, t.ph - 0.01);
             
-            // Ataque de Pragas: A chuva aumenta a chance de fungo, o tempo seco atrai mais mato/inseto
             let chancePraga = estaChovendo ? 0.02 : 0.01; 
             if (!t.praga && Math.random() < chancePraga) {
                 t.praga = estaChovendo ? 'fungo' : 'mato';
@@ -187,16 +183,25 @@ function motorAgronomico() {
             let taxaCrescimento = 1;
             if (t.ph < 5.5) taxaCrescimento *= 0.5;
             if (t.umidade === 0 || t.npk === 0 || t.praga) taxaCrescimento = 0;
-            
             if (fazenda.maquinas.tratorComprado) taxaCrescimento *= 1.5;
 
-            t.progresso += (100 / t.planta.ciclo) * taxaCrescimento;
-            if (t.progresso >= 100) t.progresso = 100;
+            if (taxaCrescimento > 0 && t.progresso < 100) {
+                t.progresso += (100 / t.planta.ciclo) * taxaCrescimento;
+                if (t.progresso >= 100) t.progresso = 100;
+                houveCrescimento = true;
+            }
         }
     });
 
-    renderizarTerrenos();
-    salvarFazenda(); // Salva o crescimento das plantas a cada segundo!
+    // Atualiza o DOM apenas se houver uma planta se desenvolvendo ativamente
+    if (houveCrescimento) renderizarTerrenos();
+
+    // 🚨 A OTIMIZAÇÃO CRÍTICA: Salva no disco apenas a cada 5 segundos para não causar 'Stuttering'
+    ciclosDeSalvamento++;
+    if (ciclosDeSalvamento >= 5) {
+        salvarFazenda();
+        ciclosDeSalvamento = 0;
+    }
 }
 
 // 5. RENDERIZAÇÃO E INTERAÇÃO

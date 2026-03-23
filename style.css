@@ -121,65 +121,55 @@ body {
     padding-top: env(safe-area-inset-top);
 }
 
-/* Efeito vidro (BLINDADO NA GPU) */
+/* ==========================================
+   ACRÍLICO PREMIUM (Substitui o vidro pesado)
+   100% de performance, 0% de travamentos
+========================================== */
 .cartao-vidro {
-    background: var(--cor-vidro);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Fundo quase sólido para esconder a necessidade de desfoque */
+    background: rgba(18, 18, 20, 0.85); 
+    
+    /* Bordas e brilhos que simulam a refração da luz no acrílico */
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
     padding: 20px;
     margin: 15px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
     
-    /* Delegação de Hardware Extrema */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
-    backface-visibility: hidden;
+    /* Sombra externa para destacar e sombra interna para dar volume de vidro */
+    box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.02);
     
     animation: respiracaoSantuario 6s infinite alternate ease-in-out;
 }
 
-/* ===== MENU INFERIOR ===== */
+/* ===== MENU INFERIOR ACRÍLICO ===== */
 .menu-inferior {
     height: calc(60px + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
-    background: rgba(15, 15, 15, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(12, 12, 14, 0.95);
     display: flex; justify-content: space-around; align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
     position: fixed; bottom: 0; width: 100%; z-index: 999;
-    /* BLINDAGEM */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
 }
 
-/* BARRA SUPERIOR DOS JOGOS */
+/* BARRA SUPERIOR DOS JOGOS ACRÍLICO */
 .top-bar {
     height: 60px;
-    background: var(--cor-vidro);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(12, 12, 14, 0.95);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 15px; z-index: 10; flex-shrink: 0;
-    /* BLINDAGEM */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
 }
 
-/* PAINEL LATERAL DA FAZENDA */
+/* PAINEL LATERAL DA FAZENDA ACRÍLICO */
 .painel-area {
     width: 300px;
-    background: var(--cor-vidro);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(18, 18, 20, 0.95);
     border-left: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: -5px 0 20px rgba(0,0,0,0.8);
     padding: 15px; overflow-y: auto; flex-shrink: 0; height: 100%; padding-bottom: 40px;
-    /* BLINDAGEM */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
 }
 
 .item-menu {
@@ -744,26 +734,10 @@ body.modo-jogo-ativo .tela {
 .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    /* Escurece a tela quase totalmente para focar no conteúdo */
+    background: rgba(5, 5, 8, 0.92);
     display: flex; align-items: center; justify-content: center;
     z-index: 9999; padding: 20px;
-    /* BLINDAGEM */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
-}
-
-.modal-emergencia {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(139, 0, 0, 0.8);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999; transition: opacity 0.5s;
-    /* BLINDAGEM */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
 }
 
 .conteudo-modal {
@@ -1233,7 +1207,7 @@ body.modo-jogo-ativo .tela {
 }
 
 /* ==========================================
-   TRIBUNAL DO AFETO - CONTAINER COM EFEITO VIDRO
+   TRIBUNAL DO AFETO - CONTAINER
 ========================================== */
 #container-tribunal .cartao-vidro {
     max-width: 500px;
@@ -1241,14 +1215,8 @@ body.modo-jogo-ativo .tela {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100dvh - 20px) !important; /* antes era 100px */
+    max-height: calc(100dvh - 20px) !important;
     overflow-y: auto;
-    background: var(--cor-vidro);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 28px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
 }
 
 /* ==========================================
@@ -1406,7 +1374,7 @@ body.modo-jogo-ativo .tela {
 }
 
 /* ==========================================
-   SINCRONIA - CONTAINER COM EFEITO VIDRO
+   SINCRONIA - CONTAINER 
 ========================================== */
 #container-sincronia .cartao-vidro {
     max-width: 500px;
@@ -1416,12 +1384,6 @@ body.modo-jogo-ativo .tela {
     flex-direction: column;
     max-height: calc(100dvh - 100px);
     overflow-y: auto;
-    background: var(--cor-vidro);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 28px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
 }
 
 #container-sincronia .header-jogos h3 {
@@ -1552,7 +1514,7 @@ body.modo-jogo-ativo .tela {
 }
 
 /* ==========================================
-   SOLO FÉRTIL - CONTAINER COM EFEITO VIDRO
+   SOLO FÉRTIL - CONTAINER
 ========================================== */
 #container-jardim .cartao-vidro {
     max-width: 500px;
@@ -1560,14 +1522,8 @@ body.modo-jogo-ativo .tela {
     padding: 25px 20px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100dvh - 100px); /* Ajuste para caber melhor */
+    max-height: calc(100dvh - 100px);
     overflow-y: auto;
-    background: var(--cor-vidro);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 28px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
 }
 
 #container-jardim h3 {
@@ -1763,15 +1719,12 @@ body.modo-jogo-ativo .tela {
 }
 
 /* ==========================================
-   JULGAMENTO DA SAFRA - VISUAL 3D E ANIMAÇÕES
+   JULGAMENTO DA SAFRA - VISUAL
 ========================================== */
 #container-julgamento .cartao-vidro {
     max-width: 500px;
     margin: 10px auto;
     padding: 15px;
-    background: var(--cor-vidro);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 28px;
 }
 
 #julgamento-grade {
@@ -2204,7 +2157,7 @@ body.modo-jogo-ativo .tela {
 }
 
 /* ==========================================
-   TERMO - CONTAINER COM EFEITO VIDRO
+   TERMO - CONTAINER 
 ========================================== */
 #container-termo .cartao-vidro {
     max-width: 500px;
@@ -2214,12 +2167,6 @@ body.modo-jogo-ativo .tela {
     flex-direction: column;
     max-height: calc(100dvh - 100px);
     overflow-y: auto;
-    background: var(--cor-vidro);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 28px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
 }
 
 /* ==========================================
@@ -4112,14 +4059,6 @@ body.modo-alerta {
     gap: 15px;
 }
 
-.modal-emergencia {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(139, 0, 0, 0.8); /* Vermelho profundo com transparência */
-    backdrop-filter: blur(15px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999; transition: opacity 0.5s;
-}
 
 .emergencia-conteudo {
     background: #1a0000;
@@ -4254,11 +4193,7 @@ body.noite { background: radial-gradient(circle at top right, var(--cor-fundo), 
     to { background-position: 200% center; }
 }
 
-/* 3. REFLEXO DE CRISTAL NOS CARTÕES */
-.cartao-vidro {
-    position: relative;
-    overflow: hidden; /* Não deixa o reflexo vazar para fora do cartão */
-}
+
 /* A camada de luz invisível que fica por cima do vidro */
 .cartao-vidro::before {
     content: '';
@@ -4270,11 +4205,7 @@ body.noite { background: radial-gradient(circle at top right, var(--cor-fundo), 
     pointer-events: none; /* Para não atrapalhar os cliques dela */
     z-index: 10;
 }
-/* Quando ativada pelo JS, a luz atravessa o cartão */
-.cartao-vidro.reflexo-ativo::before {
-    left: 200%;
-    transition: left 1s ease-in-out;
-}
+
 
 /* ==========================================
    UI/UX POÉTICA: O TATO E A DISTÂNCIA
@@ -4375,15 +4306,6 @@ body {
     width: 150px;
     height: 1px;
     background: linear-gradient(90deg, #D4AF37, transparent);
-}
-
-/* 3. PREPARAÇÃO PARA OS CARTÕES MAGNÉTICOS */
-.cartao-vidro {
-    /* Define a perspectiva 3D para o cartão poder girar */
-    transform-style: preserve-3d;
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-    /* Evita que o cartão trave a tela */
-    will-change: transform;
 }
 
 /* ==========================================
@@ -4652,42 +4574,6 @@ body {
     pointer-events: none !important; /* Impede o clique */
     filter: grayscale(100%);
     transition: all 0.3s ease;
-}
-
-/* ==========================================
-   9. BRILHO DE REFLEXO (GLARE EFFECT)
-========================================== */
-.cartao-vidro {
-    position: relative;
-    overflow: hidden; /* Garante que o brilho não vaze */
-    transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-    transition: transform 0.1s ease-out;
-    will-change: transform;
-}
-
-/* A CAMADA DE LUZ (GLARE) */
-.cartao-vidro::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    /* Um feixe de luz linear e suave */
-    background: linear-gradient(
-        115deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0) 30%,
-        rgba(255, 255, 255, 0.15) 45%,
-        rgba(255, 255, 255, 0.25) 50%,
-        rgba(255, 255, 255, 0.15) 55%,
-        rgba(255, 255, 255, 0) 70%,
-        transparent 100%
-    );
-    /* A mágica: a luz corre no sentido oposto à inclinação para simular reflexo real */
-    transform: translateX(calc(var(--glare-x, 0) * 1%)) translateY(calc(var(--glare-y, 0) * 1%));
-    pointer-events: none;
-    z-index: 5;
 }
 
 /* ==========================================
@@ -7057,16 +6943,7 @@ body.aura-ansiosa {
 
 
 
-/* ==========================================
-   OTIMIZAÇÃO DE RENDERIZAÇÃO (CORRIGIDA)
-========================================== */
-.modal-reliquia, 
-.cartao-vidro {
-    will-change: transform, opacity;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transform: translateZ(0); 
-}
+
 
 
 
@@ -7403,11 +7280,371 @@ body.aura-ansiosa {
     100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
 }
 
-
-/* BLINDAGEM GLOBAL PARA OS VIDROS DE 30PX DOS JOGOS */
-[id^="container-"] .cartao-vidro {
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
+.modal-emergencia {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    /* Vermelho escuro profundo com transparência, SEM BLUR PESADO */
+    background: rgba(80, 0, 0, 0.90);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; transition: opacity 0.5s;
 }
+
+
+
+
+
+
+
+
+
+/* ==========================================
+   CONFIGURAÇÕES GLOBAIS E TEMAS
+========================================== */
+:root {
+    --cor-fundo: #090909;
+    --cor-primaria: #D4AF37;
+    --cor-agronomia: #2ecc71;
+    --cor-vidro: rgba(255, 255, 255, 0.05);
+    --fonte-padrao: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.tema-azul { --cor-primaria: #3498db; --cor-fundo: #0a0f1a; }
+.tema-rosa { --cor-primaria: #e84393; --cor-fundo: #1a0f17; }
+.tema-verde { --cor-primaria: #2ecc71; --cor-fundo: #0f1a0f; }
+.tema-roxo { --cor-primaria: #9b59b6; --cor-fundo: #1a0f1a; }
+.tema-rubi { --cor-primaria: #e74c3c; --cor-fundo: #1a0a0a; }
+.tema-safira { --cor-primaria: #0984e3; --cor-fundo: #0a101a; }
+.tema-ambar { --cor-primaria: #f39c12; --cor-fundo: #1a140a; }
+.tema-turquesa { --cor-primaria: #00cec9; --cor-fundo: #001010; }
+.tema-coral { --cor-primaria: #ff7f50; --cor-fundo: #1a0b08; }
+.tema-lotus { --cor-primaria: #fd79a8; --cor-fundo: #140510; }
+.tema-onix { --cor-primaria: #bdc3c7; --cor-fundo: #050505; }
+
+.btn-cidade-ativo { background: var(--cor-primaria) !important; color: #000 !important; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+
+.tema-diamante { --cor-primaria: #00e5ff; --cor-fundo: #000a12; --cor-vidro: rgba(0, 229, 255, 0.05); }
+.tema-diamante .texto-ouro-vivo {
+    background: linear-gradient(90deg, #00e5ff, #ffffff, #00e5ff); background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: brilho-ouro 3s linear infinite;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    background-color: var(--cor-fundo); color: #ffffff; font-family: var(--fonte-padrao);
+    line-height: 1.6; overflow: hidden; height: 100dvh;
+    transition: background 5s ease-in-out, background-color 1.5s ease, box-shadow 1.5s ease;
+    --x-luz: 50%; --y-luz: 50%;
+    background: radial-gradient(circle at var(--x-luz) var(--y-luz), rgba(212, 175, 55, 0.08) 0%, var(--cor-fundo) 50%, #050505 100%) !important;
+}
+
+#app-shell { display: flex; flex-direction: column; height: 100dvh; padding-top: env(safe-area-inset-top); }
+
+.escondido { display: none !important; }
+.tela { animation: surgirSuave 0.4s ease-out; height: 100dvh; overflow-y: auto !important; padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+body.modo-jogo-ativo .tela { padding-bottom: env(safe-area-inset-bottom); }
+
+@keyframes surgirSuave { from { opacity: 0; transform: translateY(15px); filter: blur(4px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+
+/* ==========================================
+   ACRÍLICO PREMIUM (O FIM DOS TRAVAMENTOS)
+========================================== */
+.cartao-vidro {
+    background: rgba(18, 18, 20, 0.85); 
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px; padding: 20px; margin: 15px;
+    box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.02);
+    animation: respiracaoSantuario 6s infinite alternate ease-in-out;
+    position: relative; overflow: hidden;
+}
+
+@keyframes respiracaoSantuario {
+    0% { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 0px rgba(212, 175, 55, 0); border-color: rgba(255, 255, 255, 0.1); }
+    100% { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.3); }
+}
+
+/* O Reflexo Magnético do Acrílico */
+.cartao-vidro::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.15) 55%, rgba(255, 255, 255, 0) 70%, transparent 100%);
+    transform: translateX(calc(var(--glare-x, 0) * 1%)) translateY(calc(var(--glare-y, 0) * 1%));
+    pointer-events: none; z-index: 5;
+}
+
+.menu-inferior {
+    height: calc(60px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(12, 12, 14, 0.95); display: flex; justify-content: space-around; align-items: center;
+    border-top: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+    position: fixed; bottom: 0; width: 100%; z-index: 999;
+}
+
+.top-bar {
+    height: 60px; background: rgba(12, 12, 14, 0.95); border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; z-index: 10; flex-shrink: 0;
+}
+
+.painel-area {
+    width: 300px; background: rgba(18, 18, 20, 0.95); border-left: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: -5px 0 20px rgba(0,0,0,0.8); padding: 15px; overflow-y: auto; flex-shrink: 0; height: 100%; padding-bottom: 40px;
+}
+
+.item-menu {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666;
+    text-decoration: none; transition: all 0.2s ease; border-radius: 20px; overflow: hidden; position: relative; padding: 6px 12px;
+}
+.item-menu:active { background-color: rgba(212, 175, 55, 0.15); transform: scale(0.92); }
+.item-menu.ativo { color: var(--cor-primaria); }
+.icone-menu { font-size: 20px; margin-bottom: 3px; }
+.item-menu span:last-child { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+
+@media (max-width: 380px) { .icone-menu { font-size: 18px; } .item-menu span:last-child { font-size: 8px; } }
+
+/* ==========================================
+   MODAIS E BOTTOM SHEETS (LIMPOS)
+========================================== */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 8, 0.92); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+.modal-emergencia { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(80, 0, 0, 0.90); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s; }
+
+.conteudo-modal {
+    width: 100%; max-width: 350px; background: rgba(18, 18, 20, 0.95); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px; padding: 30px 20px; position: relative; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); text-align: center;
+    max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.fechar-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; color: var(--cor-primaria); cursor: pointer; line-height: 1; }
+#corpo-modal iframe { width: 100%; height: 400px; margin-top: 15px; border: 1px solid var(--cor-primaria); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); animation: slideUp 0.5s ease-out; }
+
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7);
+    z-index: 99999; opacity: 1; transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex; align-items: flex-end; justify-content: center; box-sizing: border-box;
+}
+.modal-overlay.escondido { opacity: 0; pointer-events: none; }
+.modal-overlay.escondido .bottom-sheet { transform: translateY(100%); }
+
+.bottom-sheet {
+    width: 100%; box-sizing: border-box; max-height: 90dvh; background: rgba(15, 20, 30, 0.95);
+    border-top: 1px solid rgba(212, 175, 55, 0.3); border-radius: 30px 30px 0 0; padding: 15px 25px 40px 25px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5); transform: translateY(0); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative; overflow-y: auto;
+}
+.drag-handle { width: 50px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; margin: 0 auto 25px auto; cursor: grab; }
+
+/* ==========================================
+   BOTÕES E TOASTS
+========================================== */
+.btn-acao {
+    background: var(--cor-primaria); color: #000; border: none; padding: 12px 25px; border-radius: 50px;
+    font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; position: relative; overflow: hidden;
+}
+.btn-acao::after, .btn-refresh::after {
+    content: ''; position: absolute; top: -50%; left: -60%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent); transform: rotate(25deg); transition: left 0.5s;
+}
+.btn-acao:hover::after, .btn-refresh:hover::after { left: 100%; }
+
+[id^="container-"] .btn-voltar, [id^="container-"] .btn-info, .btn-mute-jogo {
+    background: transparent; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 30px;
+    padding: 8px 15px; cursor: pointer; transition: all 0.2s; font-weight: bold; font-size: 1rem; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+}
+[id^="container-"] .btn-info, .btn-mute-jogo { border-radius: 50%; width: 38px; height: 38px; padding: 0; font-size: 1.2rem; }
+[id^="container-"] .btn-voltar:active, [id^="container-"] .btn-info:active, .btn-mute-jogo:active { background: var(--cor-primaria); color: #000; }
+
+.btn-refresh { background: rgba(18, 18, 20, 0.85); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 15px 25px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; display: inline-block; position: relative; overflow: hidden; }
+.btn-refresh:active { transform: scale(0.95); background: rgba(212, 175, 55, 0.2); }
+
+#toast, .toast, .toast-notificacao, [id*="toast"] {
+    max-width: 90vw !important; width: max-content !important; box-sizing: border-box !important; white-space: normal !important;
+    word-wrap: break-word !important; text-align: center !important; padding: 15px 20px !important; line-height: 1.5 !important;
+    border-radius: 12px !important; z-index: 9999999 !important;
+}
+
+/* ==========================================
+   TELA DE LOGIN
+========================================== */
+#tela-login { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background-color: var(--cor-fundo); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; transition: opacity 0.5s ease; }
+.login-container { width: 100%; max-width: 300px; text-align: center; }
+.login-logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--cor-primaria); margin-bottom: 30px; font-style: italic; }
+.login-input { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(18, 18, 20, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: white; font-size: 1rem; outline: none; }
+.login-input:focus { border-color: var(--cor-primaria); }
+.btn-entrar { width: 100%; padding: 12px; background: var(--cor-primaria); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+.login-erro { color: #ff4d4d; font-size: 0.9rem; margin-top: 10px; min-height: 20px; }
+
+/* ==========================================
+   SPLASH SCREEN, OFFLINE E EFEITOS VÍDEO
+========================================== */
+#splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--cor-fundo); z-index: 99999; display: flex; justify-content: center; align-items: center; transition: opacity 1s ease-in-out, visibility 1s ease-in-out; }
+#splash-screen.oculto { opacity: 0; visibility: hidden; }
+.splash-conteudo { text-align: center; animation: pulsarSplash 2.5s infinite alternate ease-in-out; }
+.splash-coracao { font-size: 4.5rem; filter: drop-shadow(0 0 20px rgba(212,175,55,0.8)); display: block; margin-bottom: 15px;}
+.splash-titulo { font-family: 'Playfair Display', serif; color: var(--cor-primaria); font-size: 3rem; font-style: italic; letter-spacing: 3px; text-shadow: 0 0 10px rgba(212,175,55,0.3);}
+@keyframes pulsarSplash { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
+
+.aviso-offline {
+    position: fixed; top: 0; left: 0; width: 100%; background: rgba(10, 15, 26, 0.95);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3); color: var(--cor-primaria); z-index: 10000;
+    display: flex; align-items: center; padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
+    gap: 15px; transform: translateY(0); transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+}
+.aviso-offline.escondido { transform: translateY(-100%); }
+.icone-offline { font-size: 2rem; animation: flutuarOffline 3s ease-in-out infinite; }
+.texto-offline strong { display: block; font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 3px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+.texto-offline p { font-size: 0.75rem; color: #ccc; margin: 0; line-height: 1.2; }
+@keyframes flutuarOffline { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.desativado-offline { opacity: 0.3 !important; pointer-events: none !important; filter: grayscale(100%); transition: all 0.3s ease; }
+
+.video-fundo { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -5; pointer-events: none; opacity: 0.65; transition: opacity 1s ease-in-out; }
+
+.fundo-climatico { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; transition: opacity 1.5s ease; opacity: 0; }
+.fundo-estrelado { opacity: 1; background-image: radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(1.5px 1.5px at 60px 80px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 120px 40px, rgba(212, 175, 55, 0.8), rgba(0,0,0,0)), radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0,0,0,0)); background-repeat: repeat; background-size: 200px 200px; animation: estrelasPiscando 4s infinite alternate; }
+.fundo-chuva { opacity: 0.6; background-image: linear-gradient(160deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0) 50%); background-size: 20px 100px; animation: chuvaCaindo 0.6s linear infinite; }
+@keyframes estrelasPiscando { 0% { opacity: 0.3; transform: scale(1); } 100% { opacity: 0.8; transform: scale(1.02); } }
+@keyframes chuvaCaindo { 0% { background-position: 0 0; } 100% { background-position: 10vw 100vh; } }
+
+body.aura-triste { background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%); box-shadow: inset 0 0 100px rgba(52, 152, 219, 0.2); }
+body.aura-apaixonada { background: radial-gradient(circle at top, #2d111d 0%, #090909 100%); box-shadow: inset 0 0 150px rgba(232, 67, 147, 0.15); }
+body.aura-ansiosa { background: radial-gradient(circle at center, #1a1a0f 0%, #090909 100%); animation: pulsarAnsiedade 2s infinite alternate; }
+@keyframes pulsarAnsiedade { 0% { box-shadow: inset 0 0 20px rgba(243, 156, 18, 0.1); } 100% { box-shadow: inset 0 0 80px rgba(243, 156, 18, 0.3); } }
+body.modo-cansada { background-color: #030303 !important; }
+body.modo-cansada .cartao-vidro { background: rgba(10, 10, 20, 0.85); border-color: rgba(100, 149, 237, 0.3); }
+body.modo-alerta { animation: piscarAlertaRed 2s infinite alternate !important; }
+@keyframes piscarAlertaRed { 0% { box-shadow: inset 0 0 0px rgba(255, 0, 0, 0); } 100% { box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.4); } }
+
+/* ==========================================
+   UI/UX: DETALHES, TEXTOS, PARTICULAS
+========================================== */
+.texto-ouro-vivo {
+    background: linear-gradient(110deg, #D4AF37 20%, #FFFDE7 40%, #FFFFFF 50%, #FFFDE7 60%, #D4AF37 80%);
+    background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text;
+    animation: brilhoOuro 4s linear infinite; display: inline-block;
+}
+@keyframes brilhoOuro { to { background-position: 200% center; } }
+
+.cursor-piscante::after { content: '|'; animation: piscarCursor 0.8s infinite; color: var(--cor-primaria); font-weight: bold; margin-left: 3px; }
+@keyframes piscarCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.texto-embacado { filter: blur(6px); opacity: 0.7; transition: filter 2.5s ease-out, opacity 2.5s ease-out; cursor: pointer; user-select: none; }
+.texto-embacado.revelado { filter: blur(0px); opacity: 1; }
+
+.fio-de-ouro { position: fixed; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255, 255, 255, 0.03); z-index: 99999; pointer-events: none; }
+.fio-de-ouro::after { content: ''; position: absolute; top: 0; left: -150px; width: 150px; height: 100%; background: linear-gradient(90deg, transparent, #D4AF37, transparent); animation: viajarFio 5s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes viajarFio { 0% { left: -150px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; box-shadow: inset 0 0 10px rgba(212, 175, 55, 0); pointer-events: none; z-index: 99998; animation: respiracaoBorda 8s infinite alternate ease-in-out; }
+@keyframes respiracaoBorda { 0% { box-shadow: inset 0 0 10px rgba(212, 175, 55, 0); } 100% { box-shadow: inset 0 0 40px rgba(212, 175, 55, 0.15); } }
+
+.particulas { transition: transform 0.1s ease-out; will-change: transform; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.particula { position: absolute; width: 3px; height: 3px; background-color: #D4AF37; border-radius: 50%; box-shadow: 0 0 8px 2px rgba(212, 175, 55, 0.6); animation: magiaVagalume 12s infinite ease-in-out; opacity: 0; }
+@keyframes magiaVagalume { 0% { transform: translateY(10dvh) translateX(0) scale(0.5); opacity: 0; } 20% { opacity: 0.8; } 50% { transform: translateY(-40dvh) translateX(30px) scale(1.2); opacity: 0.4; } 80% { opacity: 0.8; } 100% { transform: translateY(-100dvh) translateX(-20px) scale(0.5); opacity: 0; } }
+
+.particula-toque { position: fixed; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%) scale(0); background: radial-gradient(circle, var(--cor-primaria) 0%, transparent 70%); mix-blend-mode: screen; z-index: 99999; animation: explosaoEstelar 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+@keyframes explosaoEstelar { 0% { width: 10px; height: 10px; opacity: 0.8; transform: translate(-50%, -50%) scale(1); } 100% { width: 120px; height: 120px; opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+
+.estrela-cadente { position: fixed; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px 2px #D4AF37, 0 0 20px 4px #FFF; z-index: 9999; pointer-events: none; opacity: 0; animation: cairEstrela 3s linear infinite;}
+.estrela-cadente::before { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: 150px; height: 1px; background: linear-gradient(90deg, #D4AF37, transparent); }
+@keyframes cairEstrela { 0% { transform: translate(0, 0) rotate(0deg); opacity: 1; } 100% { transform: translate(100px, 100px) rotate(45deg); opacity: 0; } }
+
+.esqueleto-cintilante { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 20, 30, 0.8); border-radius: inherit; z-index: 10; overflow: hidden; transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+.esqueleto-cintilante::after { content: ''; position: absolute; top: 0; left: -100%; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent); animation: cintilar 1.5s infinite; }
+@keyframes cintilar { 100% { left: 100%; } }
+.esqueleto-oculto { opacity: 0; pointer-events: none; }
+
+.saindo { animation: sumirSuave 0.3s ease-in forwards !important; }
+@keyframes sumirSuave { from { opacity: 1; transform: translateY(0); filter: blur(0); } to { opacity: 0; transform: translateY(-15px); filter: blur(4px); } }
+
+.palavra-revelada { display: inline-block; opacity: 0; transform: translateY(12px) rotate(1deg); filter: blur(4px); animation: revelarPalavra 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; white-space: pre-wrap; }
+@keyframes revelarPalavra { 0% { opacity: 0; transform: translateY(12px) rotate(1deg); filter: blur(4px); } 100% { opacity: 1; transform: translateY(0) rotate(0); filter: blur(0); } }
+
+/* ==========================================
+   ILHA DINÂMICA
+========================================== */
+.ilha-dinamica {
+    position: fixed; top: max(15px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) scale(0.5) translateY(-50px);
+    background: #000000; color: #ffffff; padding: 6px 16px; border-radius: 40px; display: flex; align-items: center; gap: 8px;
+    z-index: 999999; box-shadow: 0 10px 30px rgba(0,0,0,0.6); opacity: 0; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); pointer-events: none; white-space: nowrap;
+}
+.ilha-dinamica.ativa { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); padding: 12px 24px; }
+.island-icon { font-size: 1.1rem; }
+.island-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.95rem; font-weight: 500; letter-spacing: 0.3px; }
+
+/* ==========================================
+   HOME & GERAL UI
+========================================== */
+.cartao-saudacao { position: relative; background: #D4AF37 !important; border: 2px solid rgba(255, 255, 255, 0.4) !important; border-radius: 28px; display: flex !important; align-items: center; justify-content: center; text-align: center; min-height: 80px; margin: 15px; padding: 15px 35px; overflow: hidden; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 0 25px rgba(0, 0, 0, 0.15) !important; z-index: 1; }
+.cartao-saudacao::before { content: ''; position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: radial-gradient(circle at center, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 60%); background-size: 50% 50%; animation: sedaMovimento 18s infinite linear; pointer-events: none; z-index: 1; }
+.cartao-saudacao::after { content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transform: skewX(-30deg); animation: reflexoPrestige 8s infinite cubic-bezier(0.4, 0, 0.2, 1); z-index: 2; }
+#saudacao-personalizada { font-family: 'Playfair Display', serif !important; font-style: italic; font-size: 1.35rem; font-weight: 600; color: #121212 !important; margin: 0; position: relative; z-index: 3; letter-spacing: -0.2px; line-height: 1.2; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2); }
+.estrela-canto { position: absolute; top: 10px; right: 12px; font-size: 22px; z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); animation: rotacionarSelo 6s infinite linear; display: inline-block; }
+@keyframes sedaMovimento { 0% { transform: translate(0, 0); } 50% { transform: translate(-15%, -15%); } 100% { transform: translate(0, 0); } }
+@keyframes reflexoPrestige { 0% { left: -150%; } 25% { left: 150%; } 100% { left: 150%; } }
+@keyframes rotacionarSelo { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+#frase-do-dia { padding: 20px; text-align: center; position: relative; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+.container-frase { position: relative; padding: 20px 40px; }
+.aspas-decorativa { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--cor-primaria); opacity: 0.4; position: absolute; line-height: 1; }
+.aspas-decorativa:first-child { top: -10px; left: 0; }
+.aspas-decorativa:last-child { bottom: -40px; right: 0; }
+.texto-itálico { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: #e0e0e0; line-height: 1.6; margin: 0; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
+
+#timer-principal { animation: pulsarTimer 3s infinite ease-in-out; }
+@keyframes pulsarTimer { 0% { text-shadow: 0 0 2px var(--cor-primaria); } 50% { text-shadow: 0 0 10px var(--cor-primaria); } 100% { text-shadow: 0 0 2px var(--cor-primaria); } }
+
+.container-clima { display: flex; justify-content: space-between; margin: 0 15px; gap: 10px; }
+.mini-card-clima { background: rgba(18, 18, 20, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; padding: 12px; flex: 1; text-align: center; }
+.mini-card-clima .cidade { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; display: block; margin-bottom: 5px; }
+.dados-clima { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: bold; font-size: 1.1rem; }
+
+.area-pulso { text-align: center; margin: 30px 0; position: relative; }
+.feedback-pulso { position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--cor-primaria); opacity: 0; transition: 0.5s ease-out; white-space: nowrap; }
+.feedback-pulso.visivel { opacity: 1; bottom: -22px; }
+
+.coracao-neon-wrapper { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; position: relative; }
+.coracao-svg { width: 130px; height: 130px; overflow: visible; animation: batimentoCardiaco 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1); transform-origin: center; }
+.linha-coracao { fill: transparent; stroke: #ff6b6b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.8s ease, fill 0.8s ease; }
+@keyframes batimentoCardiaco { 0%, 30%, 100% { transform: scale(1); } 15%, 45% { transform: scale(1.15); } }
+
+.botoes-mood { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.btn-mood { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(212, 175, 55, 0.3); color: white; padding: 10px; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; }
+.btn-mood:active { transform: scale(0.95); background: rgba(212, 175, 55, 0.2); }
+
+.postit { color: #1a1a1a; padding: 12px 15px; border-radius: 2px 15px 15px 15px; font-family: 'Playfair Display', serif; box-shadow: 2px 4px 10px rgba(0,0,0,0.3); position: relative; animation: surgirLetra 0.4s ease-out; margin-bottom: 8px; }
+.postit-joao { background: linear-gradient(145deg, #f9e076, #e6c84c); border-left: 5px solid #b38b2c; }
+.postit-thamiris { background: linear-gradient(145deg, #e6e6fa, #d8bfd8); border-left: 5px solid #a67c9c; }
+.postit-autor { font-size: 0.8rem; text-transform: uppercase; font-weight: bold; opacity: 0.8; }
+.btn-fixar, .btn-curtir { background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 20px; padding: 4px 10px; font-size: 0.7rem; cursor: pointer; margin-top: 4px; transition: 0.2s; }
+.btn-fixar:hover, .btn-curtir:hover { background: var(--cor-primaria); color: #000; }
+.btn-curtir { border-color: #ff6b6b; color: #ff6b6b; }
+.btn-curtir:hover { background: #ff6b6b; color: white; }
+
+#cartao-espelho-alma { position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); }
+.espelho-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(255,255,255,0.08) 60%, rgba(0,0,0,0.8) 100%); z-index: -1; pointer-events: none; }
+.efeito-estilhaco { animation: vidroQuebrando 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes vidroQuebrando { 0% { filter: blur(8px) brightness(2.5); transform: scale(1.05); } 30% { filter: blur(4px) brightness(1.5); transform: scale(0.98); } 60% { filter: blur(0px) brightness(1); transform: scale(1.02); } 100% { filter: blur(0px) brightness(1); transform: scale(1); } }
+
+
+
+.btn-clima-toggle { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(52, 152, 219, 0.3); color: #aaa; padding: 8px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-family: var(--fonte-padrao); display: flex; gap: 8px; align-items: center; }
+.btn-clima-toggle:hover { background: rgba(52, 152, 219, 0.2); color: #fff; }
+.btn-clima-toggle.ativo { background: linear-gradient(145deg, #3498db, #2980b9); color: #fff; border-color: #3498db; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); transform: scale(1.05); }
+
+#btn-surpresa { background: var(--cor-primaria) !important; color: #000000 !important; border: none !important; box-shadow: 0 0 15px var(--cor-primaria) !important; transition: all 0.4s ease; font-weight: bold; }
+#btn-surpresa:not(.btn-desativado):active { transform: scale(0.95); filter: brightness(1.2); }
+.btn-desativado { opacity: 0.4 !important; pointer-events: none !important; cursor: not-allowed !important; filter: grayscale(0.8) !important; transition: all 0.3s ease !important; }
+
+.btn-tema { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 10px 5px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px); flex: 1 1 calc(30% - 10px); text-align: center; }
+.btn-tema.ativo { background: var(--cor-primaria) !important; color: #000 !important; box-shadow: 0 0 12px var(--cor-primaria); transform: scale(1.05); }
+.cabecalho-colapsavel:active { opacity: 0.7; }
+.tema-icon { position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); right: 15px; width: 50px; height: 50px; background: var(--cor-primaria); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); z-index: 1000; transition: transform 0.2s; }
+.tema-icon:active { transform: scale(0.9); }
+.tema-selector { position: fixed; bottom: calc(140px + env(safe-area-inset-bottom)); right: 15px; width: 250px; z-index: 1001; }
+.tema-selector .cartao-vidro { background: rgba(20, 20, 20, 0.95); border: 1px solid var(--cor-primaria); }
+@media (max-width: 450px) { .tema-selector { width: 200px; right: 10px; } }
+
+.grade-jogos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 10px; }
+.item-jogo-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 10px; text-align: center; cursor: pointer; border-radius: 18px; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s; user-select: none; }
+.item-jogo-grid:active { transform: scale(0.92); box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
+.item-jogo-grid .icone-jogo-img { width: 50px; height: 50px; margin-bottom: 12px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(212, 175, 55, 0.4)); }
+.titulo-jogo-grid { color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 4px; line-height: 1.1; }
+.desc-jogo-grid { font-size: 0.7rem; color: #ccc; line-height: 1.2; }
+

@@ -35,97 +35,18 @@ window.RadarDePerformance = {
 window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar());
 
 
-    // ==========================================
-    // UI/UX NÍVEL DEUS: O GLOBO 3D (THREE.JS)
-    // ==========================================
-    
-    window.inicializarGlobo3D = () => {
-        const container = document.getElementById('globo-3d');
-        if (!container || typeof THREE === 'undefined') return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); 
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio); 
-        renderer.domElement.style.display = 'block';
-        renderer.domElement.style.margin = '0 auto';
-        container.appendChild(renderer.domElement);
-
-        const raioTerra = 5;
-        const geometriaTerra = new THREE.SphereGeometry(raioTerra, 32, 32);
-        const materialTerra = new THREE.MeshBasicMaterial({ 
-            color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.15 
-        });
-        const planeta = new THREE.Mesh(geometriaTerra, materialTerra);
-        scene.add(planeta);
-
-        const sistemaGlobal = new THREE.Group();
-        sistemaGlobal.add(planeta);
-        scene.add(sistemaGlobal);
-
-        const latColombo = -25.2917; const lonColombo = -49.2242;
-        const latGoiania = -16.6869; const lonGoiania = -49.2648;
-
-        const calcPosFromLatLon = (lat, lon, raio) => {
-            const phi = (90 - lat) * (Math.PI / 180);
-            const theta = (lon + 180) * (Math.PI / 180);
-            const x = -(raio * Math.sin(phi) * Math.cos(theta));
-            const z = (raio * Math.sin(phi) * Math.sin(theta));
-            const y = (raio * Math.cos(phi));
-            return new THREE.Vector3(x, y, z);
-        };
-
-        const posColombo = calcPosFromLatLon(latColombo, lonColombo, raioTerra);
-        const posGoiania = calcPosFromLatLon(latGoiania, lonGoiania, raioTerra);
-
-        const geometriaCidade = new THREE.SphereGeometry(0.15, 16, 16);
-        const materialCidade = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        
-        const pontoColombo = new THREE.Mesh(geometriaCidade, materialCidade);
-        pontoColombo.position.copy(posColombo);
-        sistemaGlobal.add(pontoColombo);
-
-        const pontoGoiania = new THREE.Mesh(geometriaCidade, materialCidade);
-        pontoGoiania.position.copy(posGoiania);
-        sistemaGlobal.add(pontoGoiania);
-
-        const pontoMedio = posColombo.clone().lerp(posGoiania, 0.5);
-        pontoMedio.normalize().multiplyScalar(raioTerra + 1.5); 
-
-        const curva = new THREE.QuadraticBezierCurve3(posColombo, pontoMedio, posGoiania);
-        const geometriaCurva = new THREE.BufferGeometry().setFromPoints(curva.getPoints(50));
-        const materialCurva = new THREE.LineBasicMaterial({ color: 0xff6b6b, linewidth: 2 });
-        sistemaGlobal.add(new THREE.Line(geometriaCurva, materialCurva));
-
-        camera.position.set(0, 0, 13);
-        sistemaGlobal.rotation.y = -0.8; 
-        sistemaGlobal.rotation.x = 0.2; 
-
-        // Sono Quântico
-        let globoVisivel = false;
-        const observerGlobo = new IntersectionObserver((entries) => { globoVisivel = entries[0].isIntersecting; });
-        observerGlobo.observe(container);
-
-        const animar = () => {
-            requestAnimationFrame(animar);
-            
-            if (!window.RadarDePerformance.podeAnimar('globo-3d')) return;
-            if (!globoVisivel) return;
-            sistemaGlobal.rotation.y += 0.005;
-            renderer.render(scene, camera);
-        };
-
-        window.addEventListener('resize', () => {
-            if(container.clientWidth > 0) {
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-            }
-        });
-        animar();
+// ==========================================
+// ESCUDO CONTRA EVENT STORMS (DEBOUNCE)
+// ==========================================
+window.otimizadorDeResize = function(func, delay = 100) {
+    let timeout;
+    return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(this, arguments);
+        }, delay);
     };
+};
 
 // ==========================================
     // UI/UX NÍVEL DEUS: AS 3 JÓIAS 3D (E VETORIAIS)
@@ -323,13 +244,13 @@ window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar
             window.mudarClimaOrbe(dados.condicao, dados.eNoite);
         }
 
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', window.otimizadorDeResize(() => {
             if(container.clientWidth > 0) {
                 renderer.setSize(container.clientWidth, container.clientHeight);
                 camera.aspect = container.clientWidth / container.clientHeight;
                 camera.updateProjectionMatrix();
             }
-        });
+        }));
 
         let tempo = 0;
         const animar = () => {
@@ -1335,13 +1256,13 @@ window.inicializarPrisma3D = () => {
             renderer.render(scene, camera);
         };
         
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', window.otimizadorDeResize(() => {
             if(container.clientWidth > 0) {
                 renderer.setSize(container.clientWidth, container.clientHeight);
                 camera.aspect = container.clientWidth / container.clientHeight;
                 camera.updateProjectionMatrix();
             }
-        });
+        }));
         animar();
     };
 

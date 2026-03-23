@@ -193,8 +193,8 @@ function motorAgronomico() {
         }
     });
 
-    // Atualiza o DOM apenas se houver uma planta se desenvolvendo ativamente
-    if (houveCrescimento) renderizarTerrenos();
+    // Atualiza o DOM SEM destruir o HTML, poupando a bateria e a RAM do celular
+    if (houveCrescimento) atualizarVisuaisSemDestruirDOM();
 
     // 🚨 A OTIMIZAÇÃO CRÍTICA: Salva no disco apenas a cada 5 segundos para não causar 'Stuttering'
     ciclosDeSalvamento++;
@@ -208,7 +208,7 @@ function motorAgronomico() {
 function renderizarTerrenos() {
     const grade = document.getElementById('grade-fazenda');
     if (!grade) return;
-    grade.innerHTML = '';
+    grade.innerHTML = ''; // Apenas destrói o DOM quando uma semente é plantada ou colhida
 
     fazenda.terrenos.forEach((t, index) => {
         const canteiro = document.createElement('div');
@@ -220,16 +220,17 @@ function renderizarTerrenos() {
             return;
         }
 
+        // 🚨 MUDANÇA MESTRA: Adicionados IDs dinâmicos para podermos manipular sem destruir o DOM
         let htmlMedidores = `
             <div class="medidores-solo">
-                <div class="barra-medidor" title="Água"><div class="preenchimento-agua" style="width: ${t.umidade}%;"></div></div>
-                <div class="barra-medidor" title="NPK"><div class="preenchimento-npk" style="width: ${t.npk}%;"></div></div>
-                <div class="barra-medidor" title="pH (Ideal > 6.0)"><div class="preenchimento-ph" style="width: ${(t.ph / 7) * 100}%; background: ${t.ph < 5.5 ? '#e74c3c' : '#2ecc71'}"></div></div>
+                <div class="barra-medidor" title="Água"><div id="agua-terreno-${index}" class="preenchimento-agua" style="width: ${t.umidade}%;"></div></div>
+                <div class="barra-medidor" title="NPK"><div id="npk-terreno-${index}" class="preenchimento-npk" style="width: ${t.npk}%;"></div></div>
+                <div class="barra-medidor" title="pH (Ideal > 6.0)"><div id="ph-terreno-${index}" class="preenchimento-ph" style="width: ${(t.ph / 7) * 100}%; background: ${t.ph < 5.5 ? '#e74c3c' : '#2ecc71'}"></div></div>
             </div>
-            <div style="position: absolute; top: 25px; left: 5px; font-size: 0.7rem; color: #aaa;">pH: ${t.ph.toFixed(1)}</div>
+            <div id="texto-ph-${index}" style="position: absolute; top: 25px; left: 5px; font-size: 0.7rem; color: #aaa;">pH: ${t.ph.toFixed(1)}</div>
         `;
 
-        let htmlPraga = t.praga ? `<div class="alerta-praga">${t.praga === 'mato' ? '🌿' : '🍄'}</div>` : '';
+        let htmlPraga = t.praga ? `<div id="praga-terreno-${index}" class="alerta-praga">${t.praga === 'mato' ? '🌿' : '🍄'}</div>` : `<div id="praga-terreno-${index}" class="alerta-praga escondido"></div>`;
 
         let htmlPlanta = `<div style="color: #aaa; margin-bottom: 10px;">Solo Vazio</div>`;
         if (t.planta) {
@@ -239,13 +240,52 @@ function renderizarTerrenos() {
             } else {
                 htmlPlanta = `<div style="font-size: ${1 + (t.progresso/100)}rem; opacity: 0.7;">🌱</div>
                               <div style="width: 80%; height: 5px; background: rgba(0,0,0,0.5); margin-bottom: 10px; border-radius: 3px;">
-                                <div style="width: ${t.progresso}%; height: 100%; background: #D4AF37;"></div>
+                                <div id="progresso-planta-${index}" style="width: ${t.progresso}%; height: 100%; background: #D4AF37;"></div>
                               </div>`;
             }
         }
 
         canteiro.innerHTML = htmlMedidores + htmlPraga + htmlPlanta;
         grade.appendChild(canteiro);
+    });
+}
+
+// 🚨 FUNÇÃO NOVA: Atualiza apenas as barras de progresso via CSS direto (Custo zero de CPU)
+function atualizarVisuaisSemDestruirDOM() {
+    fazenda.terrenos.forEach((t, index) => {
+        if (!t.livre) return;
+
+        const barraAgua = document.getElementById(`agua-terreno-${index}`);
+        const barraNpk = document.getElementById(`npk-terreno-${index}`);
+        const barraPh = document.getElementById(`ph-terreno-${index}`);
+        const textoPh = document.getElementById(`texto-ph-${index}`);
+        const pragaEl = document.getElementById(`praga-terreno-${index}`);
+        const barraProgresso = document.getElementById(`progresso-planta-${index}`);
+
+        if (barraAgua) barraAgua.style.width = `${t.umidade}%`;
+        if (barraNpk) barraNpk.style.width = `${t.npk}%`;
+        if (barraPh) {
+            barraPh.style.width = `${(t.ph / 7) * 100}%`;
+            barraPh.style.background = t.ph < 5.5 ? '#e74c3c' : '#2ecc71';
+        }
+        if (textoPh) textoPh.innerText = `pH: ${t.ph.toFixed(1)}`;
+        
+        if (pragaEl) {
+            if (t.praga) {
+                pragaEl.innerText = t.praga === 'mato' ? '🌿' : '🍄';
+                pragaEl.classList.remove('escondido');
+            } else {
+                pragaEl.classList.add('escondido');
+            }
+        }
+
+        if (barraProgresso && t.planta) {
+            barraProgresso.style.width = `${t.progresso}%`;
+            // Se chegou a 100%, precisamos recriar o bloco inteiro para mostrar o botão de colher
+            if (t.progresso >= 100) {
+                renderizarTerrenos();
+            }
+        }
     });
 }
 

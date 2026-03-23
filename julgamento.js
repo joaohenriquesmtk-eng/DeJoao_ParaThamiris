@@ -342,10 +342,44 @@
 
     function atualizarVisualDaGrade() {
         const tabuleiro = document.getElementById('julgamento-grade');
-        tabuleiro.innerHTML = '';
+        
+        // Se a grade ainda está vazia (início do jogo), criamos as "caixas" vazias uma única vez
+        if (tabuleiro.children.length === 0) {
+            for (let l = 0; l < LINHAS; l++) {
+                for (let c = 0; c < COLUNAS; c++) {
+                    criarElementoVisual(l, c, { emoji: '', cor: 'transparent' });
+                }
+            }
+        }
+
+        // Agora, nós apenas atualizamos o que está DENTRO das caixas já existentes! (Alta performance)
         for (let l = 0; l < LINHAS; l++) {
             for (let c = 0; c < COLUNAS; c++) {
-                if (grade[l][c]) criarElementoVisual(l, c, grade[l][c]);
+                const el = document.getElementById(`joia-${l}-${c}`);
+                if (el) {
+                    const joiaAtual = grade[l][c];
+                    
+                    if (joiaAtual) {
+                        el.innerText = joiaAtual.emoji;
+                        el.style.filter = `drop-shadow(0 0 8px ${joiaAtual.cor})`;
+                        el.style.opacity = '1';
+                        
+                        if (joiaAtual.emoji === SEMENTE_DOURADA) {
+                            el.classList.add('semente-dourada');
+                        } else {
+                            el.classList.remove('semente-dourada');
+                        }
+                        
+                        // Garante que não ficou preso na animação de explosão
+                        el.classList.remove('anim-explodindo'); 
+                    } else {
+                        // Se o espaço estiver vazio na matriz (durante a gravidade), apagamos a peça visualmente
+                        el.innerText = '';
+                        el.style.filter = 'none';
+                        el.style.opacity = '0';
+                        el.classList.remove('semente-dourada');
+                    }
+                }
             }
         }
     }

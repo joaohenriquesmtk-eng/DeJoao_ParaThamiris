@@ -7084,56 +7084,48 @@ body.aura-ansiosa {
 
 
 /* ==========================================
-   A GALERIA HOLOGRÁFICA (CSS 3D CAROUSEL)
+   CARROSSEL 3D OTIMIZADO (ZERO TRAVAMENTOS)
 ========================================== */
-.galeria-holografica-wrapper {
-    width: 100%;
-    height: 250px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1000px; /* A lente de profundidade */
-    overflow: hidden;
-    /* Sombras que escurecem as laterais, focando o olhar no centro */
-    box-shadow: inset 20px 0 30px -10px rgba(0,0,0,0.8), inset -20px 0 30px -10px rgba(0,0,0,0.8);
+.galeria-holografica-wrapper { 
+    width: 100%; 
+    height: 250px; 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    perspective: 1200px; /* Lente ajustada para não quebrar a borda */
+    overflow: hidden; 
 }
 
-.galeria-spinner {
-    position: relative;
-    width: 140px;  /* Largura base da foto */
-    height: 190px; /* Altura base da foto */
-    transform-style: preserve-3d; /* Permite que os filhos dobrem no espaço 3D */
-    will-change: transform;
+.galeria-spinner { 
+    position: relative; 
+    width: 140px; 
+    height: 190px; 
+    transform-style: preserve-3d; 
+    will-change: transform; /* Aceleração de hardware restrita apenas à rotação */
 }
 
-.foto-item {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border-radius: 12px;
-    background-size: cover;
-    background-position: center;
-    border: 2px solid rgba(212, 175, 55, 0.4);
-    box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.1);
+.foto-item { 
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    border-radius: 12px; 
+    background-size: cover; 
+    background-position: center; 
+    border: 2px solid rgba(212, 175, 55, 0.4); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.8); 
     
-    /* O REFLEXO NO CHÃO NEGRO (Espelho D'água) */
-    -webkit-box-reflect: below 5px linear-gradient(transparent, transparent 70%, rgba(255,255,255,0.3));
-    
-    backface-visibility: visible;
-    cursor: grab;
-    
-    /* Efeito de vidro na foto se estiver vazia */
-    background-color: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /* 🚨 A CURA DO PISCA-PISCA: Esconde as costas das imagens e isola a pintura! */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+
+    cursor: grab; 
+    background-color: #111; /* Fundo sólido para cobrir vazios */
+    display: flex; align-items: center; justify-content: center; 
 }
 
-.foto-item:active {
-    cursor: grabbing;
-}
+.foto-item:active { cursor: grabbing; }
 
 .foto-vazia-texto {
     padding: 15px;
@@ -7430,35 +7422,7 @@ body.modo-jogo-ativo .tela { padding-bottom: env(safe-area-inset-bottom); }
 }
 .drag-handle { width: 50px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; margin: 0 auto 25px auto; cursor: grab; }
 
-/* ==========================================
-   BOTÕES E TOASTS
-========================================== */
-.btn-acao {
-    background: var(--cor-primaria); color: #000; border: none; padding: 12px 25px; border-radius: 50px;
-    font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; position: relative; overflow: hidden;
-}
-.btn-acao::after, .btn-refresh::after {
-    content: ''; position: absolute; top: -50%; left: -60%; width: 200%; height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent); transform: rotate(25deg); transition: left 0.5s;
-}
-.btn-acao:hover::after, .btn-refresh:hover::after { left: 100%; }
 
-[id^="container-"] .btn-voltar, [id^="container-"] .btn-info, .btn-mute-jogo {
-    background: transparent; border: 2px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 30px;
-    padding: 8px 15px; cursor: pointer; transition: all 0.2s; font-weight: bold; font-size: 1rem; text-decoration: none;
-    display: inline-flex; align-items: center; justify-content: center; line-height: 1;
-}
-[id^="container-"] .btn-info, .btn-mute-jogo { border-radius: 50%; width: 38px; height: 38px; padding: 0; font-size: 1.2rem; }
-[id^="container-"] .btn-voltar:active, [id^="container-"] .btn-info:active, .btn-mute-jogo:active { background: var(--cor-primaria); color: #000; }
-
-.btn-refresh { background: rgba(18, 18, 20, 0.85); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 15px 25px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; display: inline-block; position: relative; overflow: hidden; }
-.btn-refresh:active { transform: scale(0.95); background: rgba(212, 175, 55, 0.2); }
-
-#toast, .toast, .toast-notificacao, [id*="toast"] {
-    max-width: 90vw !important; width: max-content !important; box-sizing: border-box !important; white-space: normal !important;
-    word-wrap: break-word !important; text-align: center !important; padding: 15px 20px !important; line-height: 1.5 !important;
-    border-radius: 12px !important; z-index: 9999999 !important;
-}
 
 /* ==========================================
    TELA DE LOGIN

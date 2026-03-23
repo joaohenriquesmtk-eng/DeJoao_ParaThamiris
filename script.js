@@ -33,8 +33,13 @@ let telaAtual = 'home';
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
 
-// 1. MOTOR DO TEMPO
+// 1. MOTOR DO TEMPO (ARQUITETURA DE ALTA PERFORMANCE)
+const timerElementoGlobal = document.getElementById("timer-principal");
+let ultimoTempoRenderizado = "";
+
 function atualizarMotorDoTempo() {
+    if (!timerElementoGlobal) return;
+    
     const agora = new Date().getTime();
     const diferenca = agora - dataInicio;
     const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
@@ -43,26 +48,30 @@ function atualizarMotorDoTempo() {
     const segundos = Math.floor((diferenca % (1000 * 60)) / 1000);
     const formatar = (n) => n < 10 ? "0" + n : n;
 
-    const timerElemento = document.getElementById("timer-principal");
-    if (timerElemento) {
-        timerElemento.innerHTML = `${dias}d ${formatar(horas)}h ${formatar(minutos)}m ${formatar(segundos)}s`;
+    const novoTempo = `${dias}d ${formatar(horas)}h ${formatar(minutos)}m ${formatar(segundos)}s`;
+
+    // A MÁGICA: Só perturba o navegador se o texto realmente mudar, e usa textContent (30% mais rápido e não re-renderiza HTML)
+    if (ultimoTempoRenderizado !== novoTempo) {
+        timerElementoGlobal.textContent = novoTempo;
+        ultimoTempoRenderizado = novoTempo;
     }
 }
 
 // 2. CONFIGURAÇÃO DA PLANILHA EXTERNA E MÁQUINA DE ESCREVER
 const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1Rr4fdzLLW-Xu4jrf7qotZ_r67mOJrTDQxtZMKxUF8UijZI0Uxj3dwnjzaX_I7dq5MpEepB3SjsMI/pub?output=csv";
 
-// Função mágica que digita o texto e adiciona o Vidro Embaçado
+// Função mágica que digita o texto (OTIMIZADA PARA ZERO GARGALOS)
 function digitarTexto(elemento, texto, velocidade = 40) {
-    elemento.innerHTML = '';
-    elemento.classList.add('cursor-piscante');
-    // Já começa com o texto embaçado
-    elemento.classList.add('texto-embacado'); 
+    elemento.textContent = ''; // Limpeza limpa sem invocar o parser de HTML
+    elemento.classList.add('cursor-piscante', 'texto-embacado'); 
     
     let i = 0;
+    let textoAcumulado = ""; // Memória temporária (RAM)
+    
     function digitar() {
         if (i < texto.length) {
-            elemento.innerHTML += texto.charAt(i);
+            textoAcumulado += texto.charAt(i);
+            elemento.textContent = textoAcumulado; // textContent ignora re-renderização pesada
             i++;
             setTimeout(digitar, velocidade);
         } else {
@@ -72,19 +81,14 @@ function digitarTexto(elemento, texto, velocidade = 40) {
             let tempoToque;
             const desembaçarVidro = (e) => {
                 if(e.type === 'touchstart') e.preventDefault();
-                // A Thamiris precisa segurar o dedo por 1 segundo para começar a limpar
                 tempoToque = setTimeout(() => {
                     elemento.classList.add('revelado');
-                    // Vibra bem levinho para avisar que ela conseguiu ler
                     if (navigator.vibrate) navigator.vibrate([30]); 
                 }, 1000);
             };
             
-            const cancelarDesembaçar = () => {
-                clearTimeout(tempoToque);
-            };
+            const cancelarDesembaçar = () => clearTimeout(tempoToque);
 
-            // Adiciona os eventos de toque
             elemento.addEventListener('touchstart', desembaçarVidro, {passive: false});
             elemento.addEventListener('touchend', cancelarDesembaçar);
             elemento.addEventListener('mousedown', desembaçarVidro);
@@ -2411,7 +2415,6 @@ window.escutarPlanetario = function() {
     onValue(refPlanetario, (snapshot) => {
         const dados = snapshot.val();
         
-        // A MÁGICA DO ALVO: Atualiza a lista do Modal se ele estiver aberto. Se não, atualiza o esqueleto invisível.
         let lista = document.querySelector('#corpo-modal #lista-estrelas-planetario');
         if (!lista) lista = document.querySelector('#reliquias-templates #lista-estrelas-planetario');
         if (!lista) return;
@@ -2422,19 +2425,19 @@ window.escutarPlanetario = function() {
             return;
         }
 
-        lista.innerHTML = "";
         let countSupernovas = 0;
-
-        // Ordena para que as estrelas recém-criadas fiquem no topo
         const arrayEstrelas = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
         arrayEstrelas.sort((a, b) => a.realizado - b.realizado || b.dataCriacao - a.dataCriacao);
+
+        // 🚨 BUFFER DE MEMÓRIA: Montamos o HTML inteiro fora do DOM para evitar o colapso do navegador!
+        let htmlBuffer = "";
 
         arrayEstrelas.forEach(estrela => {
             const dataCriacao = new Date(estrela.dataCriacao).toLocaleDateString('pt-BR');
             const isSupernova = estrela.realizado;
             if(isSupernova) countSupernovas++;
 
-            lista.innerHTML += `
+            htmlBuffer += `
                 <div class="estrela-item ${isSupernova ? 'supernova' : ''}">
                     <div>
                         <div class="estrela-nome">${estrela.nome} ${isSupernova ? '✨' : ''}</div>
@@ -2447,6 +2450,8 @@ window.escutarPlanetario = function() {
             `;
         });
         
+        // Injeta tudo no HTML de uma única vez (Performance impecável)
+        lista.innerHTML = htmlBuffer;
         window.quantidadeSupernovas = countSupernovas;
     });
 };

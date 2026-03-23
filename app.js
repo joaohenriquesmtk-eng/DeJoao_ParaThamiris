@@ -538,11 +538,13 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 }); // Fecha o DOMContentLoaded
 
-// Localize a função voltarMenuJogos e adicione a trava do Julgamento:
+// Localize a função voltarMenuJogos e adicione a trava do Julgamento, Contratos e Defesa:
 window.voltarMenuJogos = function() {
     window.julgamentoAtivo = false; // 🚨 MATA O LOOP FANTASMA DO MATCH-3 IMEDIATAMENTE
 
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim'];
+    // 🚨 ADICIONADO 'contratos' e 'defesa' NA LISTA DE JOGOS PARA ESCONDER
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos'];
+    
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');

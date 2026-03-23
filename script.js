@@ -29,18 +29,24 @@ window.pausarAmbiente = () => {
         audioJogos.pause();
     }
 };
+
 let telaAtual = 'home';
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
+// 🚨 A DATA E HORA EXATA DO REENCONTRO (O MOMENTO EM QUE A DISTÂNCIA ZERA)
+// Altere esta data para o dia e horário que o cronômetro deve congelar para sempre
+const dataCongelamento = new Date("2026-03-23T09:31:07").getTime(); 
 
-// 1. MOTOR DO TEMPO (ARQUITETURA DE ALTA PERFORMANCE)
-const timerElementoGlobal = document.getElementById("timer-principal");
-let ultimoTempoRenderizado = "";
-
+// 1. MOTOR DO TEMPO
 function atualizarMotorDoTempo() {
-    if (!timerElementoGlobal) return;
+    let agora = new Date().getTime();
     
-    const agora = new Date().getTime();
+    // 🚨 A TRAVA: Se o momento atual já passou da data de congelamento, 
+    // o "agora" passa a ser fixo na data do encontro. O tempo para de passar.
+    if (agora >= dataCongelamento) {
+        agora = dataCongelamento; 
+    }
+
     const diferenca = agora - dataInicio;
     const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
     const horas = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -48,12 +54,9 @@ function atualizarMotorDoTempo() {
     const segundos = Math.floor((diferenca % (1000 * 60)) / 1000);
     const formatar = (n) => n < 10 ? "0" + n : n;
 
-    const novoTempo = `${dias}d ${formatar(horas)}h ${formatar(minutos)}m ${formatar(segundos)}s`;
-
-    // A MÁGICA: Só perturba o navegador se o texto realmente mudar, e usa textContent (30% mais rápido e não re-renderiza HTML)
-    if (ultimoTempoRenderizado !== novoTempo) {
-        timerElementoGlobal.textContent = novoTempo;
-        ultimoTempoRenderizado = novoTempo;
+    const timerElemento = document.getElementById("timer-principal");
+    if (timerElemento) {
+        timerElemento.innerHTML = `${dias}d ${formatar(horas)}h ${formatar(minutos)}m ${formatar(segundos)}s`;
     }
 }
 
@@ -1134,8 +1137,8 @@ window.abrirJogo = function(tipo) {
     
     document.body.classList.add('modo-jogo-ativo');
 
-    // 2. Esconde TODOS os containers de jogos por segurança
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim'];
+    // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1193,6 +1196,10 @@ window.abrirJogo = function(tipo) {
             const capitalUI = document.getElementById('jardim-moedas');
             if (capitalUI) capitalUI.innerText = window.pontosDoCasal || 0;
             setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+        }
+        // 🚨 INTEGRAÇÕES FINAIS (CONTRATOS E DEFESA)
+        else if (tipo === 'contratos') {
+            if (typeof window.iniciarContratos === 'function') window.iniciarContratos();
         }
     }
 };

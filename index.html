@@ -429,6 +429,12 @@
         <p class="desc-jogo-grid">Combine as provas</p>
     </div>
 
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('contratos')">
+        <img src="assets/icones-jogos/contratos.png" alt="Contratos" class="icone-jogo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2950/2950669.png'">
+        <h4 class="titulo-jogo-grid">Contratos da Terra</h4>
+        <p class="desc-jogo-grid">Exporte e lucre</p>
+    </div>
+
 </div>
 
 <div id="container-tribunal" class="escondido">
@@ -511,6 +517,90 @@
         </div>
     </div>
 </div>
+
+<div id="container-contratos" class="escondido">
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(52, 152, 219, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesContratos()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 15px rgba(52, 152, 219, 0.3); color: #3498db; border-color: #3498db;">💼 Mercado Global</span>
+        </div>
+    </div>
+
+    <div class="conteudo-contratos">
+        <div id="instrucoes-contratos" class="escondido cartao-instrucoes" style="border-left: 5px solid #3498db;">
+            <h4 style="color: #3498db;">📜 Manual de Exportação</h4>
+            <ul style="font-size: 0.85rem;">
+                <li>Escolha uma safra abundante do seu <b>Silo da Fazenda</b> para exportar.</li>
+                <li>A negociação dura <b>3 Turnos</b>. A Receita Federal ou a Alfândega atacarão o valor do seu produto.</li>
+                <li>Jogue cartas de <b>Direito (Defesas)</b> para anular ataques ou <b>Agronomia (Buffs)</b> para aumentar o multiplicador.</li>
+                <li>Assine o contrato no 3º turno e o dinheiro irá direto para o capital do Santuário!</li>
+            </ul>
+        </div>
+
+        <div id="contratos-tela-selecao" class="tela-jogo-interna" style="width: 100%; max-width: 450px;">
+            <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px; padding: 15px; border-color: #3498db;">
+                <h3 style="color: #3498db; font-family: 'Playfair Display', serif;">Câmara de Comércio</h3>
+                <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">Selecione a commodity para exportação</p>
+            </div>
+            <div id="contratos-lista-silo" class="grade-jogos">
+                </div>
+        </div>
+
+        <div id="contratos-tela-mesa" class="tela-jogo-interna escondido" style="width: 100%; max-width: 450px;">
+            
+            <div class="painel-recursos" style="border-color: #3498db; box-shadow: inset 0 2px 5px rgba(52,152,219,0.5), 0 4px 0 #1a2a3a; margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;">
+                    <span style="font-size: 0.65rem; color: #b2bec3; text-transform: uppercase;">Safra</span>
+                    <span style="color: #fff; font-size: 0.9rem;"><span id="contrato-safra-nome">Café</span> (<span id="contrato-safra-qtd">0</span>)</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;">
+                    <span style="font-size: 0.65rem; color: #b2bec3; text-transform: uppercase;">Turno</span>
+                    <span style="color: #fff; font-size: 0.9rem;"><span id="contrato-turno-atual">1</span> / 3</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;">
+                    <span style="font-size: 0.65rem; color: #b2bec3; text-transform: uppercase;">Valor/Multi</span>
+                    <span id="contrato-multiplicador-valor" style="color: #FFD700; font-size: 1.1rem; text-shadow: 0 0 5px #d35400;">1.00x</span>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: -10px; margin-bottom: 15px;">
+                <span style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Valor Base Bruto:</span> <span style="color: #2ecc71; font-weight: bold; font-size: 1.1rem;">R$ <span id="contrato-valor-base">0</span></span>
+            </div>
+
+            <div class="testemunha-card" style="border-color: #e74c3c; background: linear-gradient(145deg, rgba(231, 76, 60, 0.15), rgba(0,0,0,0.6)); margin: 0 auto 20px auto; width: 100%; position: relative; min-height: 110px;">
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #e74c3c; color: white; padding: 2px 12px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">Ataque do Mercado</div>
+                <div id="carta-oponente-mesa" class="carta-jogada-pro vazia" style="display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; padding-top: 10px;">
+                    Aguardando lance do mercado...
+                </div>
+            </div>
+
+            <div class="cartao-vidro" style="padding: 15px; margin: 0 auto; width: 100%; border-color: #3498db; display: flex; flex-direction: column; align-items: center;">
+                <h4 style="color: #3498db; margin-bottom: 15px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; text-align: center;">Sua Resposta (Escolha 1 Carta)</h4>
+                <div id="mao-jogador" class="mesa-cartas-rpg">
+                    </div>
+            </div>
+        </div>
+
+        <div id="contratos-tela-resultado" class="tela-jogo-interna escondido" style="width: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+            <div class="cartao-vidro" style="text-align: center; padding: 40px 20px; width: 100%; border-color: #2ecc71; box-shadow: 0 10px 40px rgba(46, 204, 113, 0.2);">
+                <div style="font-size: 4rem; margin-bottom: 10px; animation: pular 2s infinite ease-in-out;">🤝</div>
+                <h2 style="color: #2ecc71; font-family: 'Playfair Display', serif; margin-bottom: 5px; font-size: 2.2rem;">Contrato Assinado!</h2>
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 25px;">Os fundos foram transferidos para o cofre do Santuário.</p>
+                
+                <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 1px dashed rgba(46, 204, 113, 0.5); margin-bottom: 30px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">
+                    <span style="font-size: 0.8rem; color: #ccc; text-transform: uppercase; letter-spacing: 2px;">Lucro Líquido</span>
+                    <div id="contrato-lucro-final" style="color: #FFD700; font-size: 2.8rem; font-family: monospace; font-weight: bold; margin-top: 5px; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);">R$ 0</div>
+                </div>
+
+                <button class="btn-acao btn-julgar-rpg" onclick="voltarSelecaoContratos()" style="background: linear-gradient(145deg, #3498db, #2980b9); box-shadow: 0 6px 0 #1a2a3a, 0 10px 20px rgba(0,0,0,0.5);">Nova Negociação</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                 <div id="container-termo" class="escondido">
     <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10;">
@@ -1202,6 +1292,8 @@
     <script src="sincronia.js"></script>
     <script src="script.js"></script> 
     <script src="app.js"></script>
+    <script src="contratos.js"></script>
+
 
 
     <div id="painel-capsula-futuro" class="escondido">

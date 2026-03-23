@@ -7648,3 +7648,72 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 .titulo-jogo-grid { color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 4px; line-height: 1.1; }
 .desc-jogo-grid { font-size: 0.7rem; color: #ccc; line-height: 1.2; }
 
+
+
+/* ==========================================
+   CONTRATOS DA TERRA - O PADRÃO OURO
+========================================== */
+#container-contratos {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: radial-gradient(circle at top, #0d1b2a 0%, var(--cor-fundo) 100%);
+    z-index: 100; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.conteudo-contratos {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 20px 10px 100px 10px; overflow-y: auto; width: 100%;
+}
+
+.tela-jogo-interna {
+    display: flex; flex-direction: column; width: 100%;
+    animation: surgirSuave 0.4s ease-out;
+}
+
+/* Cartões do Silo (Tela Inicial) */
+.card-exportacao-pro {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-radius: 18px; padding: 20px 10px; text-align: center;
+    cursor: pointer; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5); user-select: none;
+}
+.card-exportacao-pro:active { transform: scale(0.92); box-shadow: 0 0 15px rgba(52, 152, 219, 0.3); }
+.card-exportacao-pro.bloqueado { opacity: 0.5; filter: grayscale(100%); pointer-events: none; border-color: #555; }
+
+.card-exportacao-pro .icone-safra { font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 5px 10px rgba(52, 152, 219, 0.4)); }
+.card-exportacao-pro h3 { color: #3498db; font-size: 1.1rem; font-family: 'Playfair Display', serif; margin-bottom: 5px; }
+.card-exportacao-pro p { font-size: 0.8rem; color: #ccc; margin: 2px 0; }
+
+/* Carta de Ataque do Mercado (Oponente) */
+.carta-jogada-pro {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 15px;
+    color: #fff; text-align: left; padding: 5px;
+    animation: popupSuave 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.carta-jogada-pro.vazia { color: #888; font-style: italic; font-size: 0.95rem; justify-content: center; animation: none; }
+.carta-oponente-icone { font-size: 3rem; filter: drop-shadow(0 0 10px rgba(231,76,60,0.6)); }
+.carta-oponente-dados h3 { color: #e74c3c; font-size: 1rem; margin-bottom: 4px; text-transform: uppercase; font-weight: bold; }
+.carta-oponente-dados .penalidade { background: #111; padding: 4px 8px; border-radius: 6px; font-family: monospace; color: #FFD700; font-size: 0.9rem; border: 1px solid #e74c3c; display: inline-block; box-shadow: 0 0 10px rgba(231,76,60,0.2); }
+
+/* Cartas de Mão do Jogador (Herdando a Física do Tribunal) */
+.carta-deck-pro {
+    background: linear-gradient(145deg, #f0e6d2, #fff0d0);
+    border: 3px solid #3498db; border-radius: 12px; padding: 8px 4px;
+    width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 0 #1a2a3a, 0 6px 10px rgba(0,0,0,0.2);
+    color: #2c3e50; user-select: none;
+}
+.carta-deck-pro:active { transform: scale(0.9); box-shadow: 0 2px 0 #1a2a3a; }
+.carta-deck-pro.agr { border-color: #2ecc71; background: linear-gradient(145deg, #e8f8f5, #d1f2eb); }
+.carta-deck-pro.dir { border-color: #9b59b6; background: linear-gradient(145deg, #f5eef8, #e8daef); }
+
+.carta-deck-pro .icone { font-size: 1.6rem; margin-bottom: 5px; }
+.carta-deck-pro .titulo { font-weight: bold; font-size: 0.6rem; line-height: 1.1; margin-bottom: 5px; height: 26px; display: flex; align-items: center; justify-content: center; }
+.carta-deck-pro .efeito { font-size: 0.7rem; font-weight: bold; color: #fff; background: #2c3e50; border-radius: 20px; padding: 2px 6px; margin-top: auto; }
+.carta-deck-pro.agr .efeito { background: #27ae60; }
+.carta-deck-pro.dir .efeito { background: #8e44ad; }
+
+@keyframes popupSuave { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }

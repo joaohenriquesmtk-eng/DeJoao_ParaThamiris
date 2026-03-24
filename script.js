@@ -1138,7 +1138,7 @@ window.abrirJogo = function(tipo) {
     document.body.classList.add('modo-jogo-ativo');
 
     // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1201,12 +1201,23 @@ window.abrirJogo = function(tipo) {
         else if (tipo === 'contratos') {
             if (typeof window.iniciarContratos === 'function') window.iniciarContratos();
         }
+
+        else if (tipo === 'estufa') {
+            if (typeof window.iniciarInterfaceEstufa === 'function') window.iniciarInterfaceEstufa();
+        }
+
+        else if (tipo === 'cartorio') {
+            if (typeof window.inicializarCartorio === 'function') window.inicializarCartorio();
+        }
     }
 };
 
 window.voltarMenuJogos = function() {
+    window.julgamentoAtivo = false; // Trava do Julgamento
+    window.defesaAtiva = false; // Trava do Tower Defense
+
     // 1. Esconde todos os jogos abertos
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1227,6 +1238,9 @@ window.voltarMenuJogos = function() {
 
     // Retira o ajuste de tela cheia do corpo do app
     document.body.classList.remove('modo-jogo-ativo');
+
+    // 🚨 A MÁGICA FINAL: Assim que voltar pro menu principal, o áudio retorna!
+    if (typeof playAudioJogos === 'function') playAudioJogos();
 };
 
 // 9. LEIS

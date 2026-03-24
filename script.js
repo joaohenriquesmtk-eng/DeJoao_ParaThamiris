@@ -165,6 +165,9 @@ function salvarEstadoTermo() {
     sessionStorage.setItem('termo_estado', JSON.stringify(estado));
 }
 
+// Função auxiliar para ignorar acentos e cedilhas
+const normalizarPalavra = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+
 // ==========================================
 // CONSTRUÇÃO DO ORÁCULO DE CRISTAL (TERMO)
 // ==========================================
@@ -287,7 +290,7 @@ function removerLetra() {
     }
 }
 
-// O Grande Veredito com Animação em Cascata
+// O Grande Veredito com Revelação Ortográfica Automática
 window.verificarPalavra = function() {
     if (letraAtual !== 5) {
         if(typeof mostrarToast === 'function') mostrarToast("A palavra precisa ter 5 letras!", "⚠️");
@@ -295,20 +298,22 @@ window.verificarPalavra = function() {
         return;
     }
 
-    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
-    const palpite = grade[tentativaAtual].join("");
-    let letrasRestantes = palavraFinal.split(""); 
+    const palavraOriginal = window.PALAVRA_DO_DIA || "AMADA";
+    const palavraNormalizada = normalizarPalavra(palavraOriginal);
+    const palpite = grade[tentativaAtual].join(""); 
+    
+    let letrasRestantes = palavraNormalizada.split(""); 
     let statusClasses = ["ausente", "ausente", "ausente", "ausente", "ausente"];
 
-    // 1ª Passagem: Verifica as CORRETAS (Verde)
+    // 1ª Passagem: Verifica as CORRETAS
     for (let i = 0; i < 5; i++) {
-        if (palpite[i] === palavraFinal[i]) {
+        if (palpite[i] === palavraNormalizada[i]) {
             statusClasses[i] = "correta";
             letrasRestantes[i] = null; 
         }
     }
 
-    // 2ª Passagem: Verifica as PRESENTES (Amarelo)
+    // 2ª Passagem: Verifica as PRESENTES
     for (let i = 0; i < 5; i++) {
         if (statusClasses[i] !== "correta") {
             const indexNaPalavra = letrasRestantes.indexOf(palpite[i]);
@@ -319,55 +324,46 @@ window.verificarPalavra = function() {
         }
     }
 
-    // A MÁGICA DO FLIP 3D EM CASCATA
     let acertos = 0;
-    
-    // Desativa o botão temporariamente para evitar spam de cliques
     const btnVerificar = document.getElementById("btn-verificar");
     if(btnVerificar) btnVerificar.disabled = true;
 
     for (let i = 0; i < 5; i++) {
-        // Cria o atraso em cascata (0ms, 300ms, 600ms, 900ms, 1200ms)
         setTimeout(() => {
             const quadrado = document.getElementById(`q-${tentativaAtual}-${i}`);
             if (quadrado) {
-                // Inicia o giro 3D
                 quadrado.classList.add("anim-flip");
                 
-                // No meio do giro (300ms), muda a cor!
+                // No meio da animação, trocamos a cor E injetamos o acento!
                 setTimeout(() => {
                     quadrado.classList.add(statusClasses[i]);
-                    quadrado.style.color = "#000"; // Força a cor do texto para preto
-                    if(window.Haptics) navigator.vibrate(30); // Vibra a cada letra revelada!
+                    // 🚨 A MÁGICA: A letra no visor ganha o acento original
+                    quadrado.innerText = palavraOriginal[i]; 
+                    quadrado.style.color = "#000"; 
+                    if(window.Haptics) navigator.vibrate(30);
                 }, 300);
             }
 
-            // Atualiza a cor no Teclado
+            // Teclado continua sem acento (pois os botões não mudam)
             setTimeout(() => {
                 const tecla = document.getElementById(`tecla-${palpite[i]}`);
                 if (tecla) {
-                    if (statusClasses[i] === "correta") {
-                        tecla.className = `tecla correta`;
-                    } else if (statusClasses[i] === "presente" && !tecla.classList.contains("correta")) {
-                        tecla.className = `tecla presente`;
-                    } else if (statusClasses[i] === "ausente" && !tecla.classList.contains("correta") && !tecla.classList.contains("presente")) {
-                        tecla.className = `tecla ausente`;
-                    }
+                    if (statusClasses[i] === "correta") tecla.className = `tecla correta`;
+                    else if (statusClasses[i] === "presente" && !tecla.classList.contains("correta")) tecla.className = `tecla presente`;
+                    else if (statusClasses[i] === "ausente" && !tecla.classList.contains("correta") && !tecla.classList.contains("presente")) tecla.className = `tecla ausente`;
                 }
             }, 300);
 
             if (statusClasses[i] === "correta") acertos++;
 
-            // Se for a última letra da linha, checa se ganhou ou perdeu
             if (i === 4) {
                 setTimeout(() => {
-                    if(btnVerificar) btnVerificar.disabled = false; // Reativa o botão
+                    if(btnVerificar) btnVerificar.disabled = false;
                     
                     if (acertos === 5) {
                         if(typeof mostrarToast === 'function') mostrarToast("O Oráculo revelou a verdade!", "✨");
                         if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]);
                         if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 150, spread: 100});
-                        
                         if(typeof finalizarVitoria === 'function') finalizarVitoria();
                         
                     } else {
@@ -376,15 +372,15 @@ window.verificarPalavra = function() {
                         salvarEstadoTermo();
                         
                         if (tentativaAtual >= 6) {
-                            if(typeof mostrarToast === 'function') mostrarToast(`Sua jornada falhou. A palavra era: ${palavraFinal}`, "💔");
+                            if(typeof mostrarToast === 'function') mostrarToast(`Sua jornada falhou. A palavra era: ${palavraOriginal}`, "💔");
                             if(window.Haptics) window.Haptics.erro();
                             const reset = document.getElementById('termo-reset-container');
                             if(reset) reset.classList.remove('escondido');
                         }
                     }
-                }, 400); // Espera o último flip terminar
+                }, 400);
             }
-        }, i * 300); // Multiplicador de tempo para a cascata
+        }, i * 300);
     }
 };
 
@@ -492,40 +488,30 @@ function resetarTermo() {
 // ==========================================
 window.usarDicaAmor = function() {
     const moedasAtuais = window.pontosDoCasal || 0;
-
     if (moedasAtuais < 10) {
-        if(typeof mostrarToast === 'function') mostrarToast("Vocês precisam de 10💰 cultivadas na Fazenda ou Tribunal para a dica!", "🔒");
+        if(typeof mostrarToast === 'function') mostrarToast("Vocês precisam de 10💰!", "🔒");
         if(window.Haptics) window.Haptics.erro();
         return;
     }
 
-    const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+    const palavraOriginal = window.PALAVRA_DO_DIA || "AMADA";
+    const palavraNormalizada = normalizarPalavra(palavraOriginal);
     
     if (letraAtual < 5) {
-        // Desconta os pontos globalmente
         if (typeof atualizarPontosCasal === 'function') {
             atualizarPontosCasal(-10, "Dica de Amor Oráculo");
         }
-
-        // Atualiza o visor de saldo na hora!
         const visorMoedas = document.getElementById('termo-moedas');
         if (visorMoedas) visorMoedas.innerText = window.pontosDoCasal;
 
-        const letraCorreta = palavraFinal[letraAtual];
-        adicionarLetra(letraCorreta);
+        // Entrega a letra sem acento para o teclado aceitar
+        const letraDica = palavraNormalizada[letraAtual];
+        adicionarLetra(letraDica);
 
-        const elogios = [
-            "Seu sorriso ilumina mais que essas letras.",
-            "Mesmo de longe, sinto sua intuição aguçada.",
-            "Um empurrãozinho para a mulher mais inteligente que conheço.",
-            "Sua dedicação me inspira. Aqui está uma luz!"
-        ];
-        const elogioSorteado = elogios[Math.floor(Math.random() * elogios.length)];
-        
-        if(typeof mostrarToast === 'function') mostrarToast(elogioSorteado, "💖");
+        if(typeof mostrarToast === 'function') mostrarToast("Uma luz brilha no Oráculo...", "💖");
         if(window.Haptics) window.Haptics.sucesso();
     } else {
-        if(typeof mostrarToast === 'function') mostrarToast("A linha já está cheia, apague uma letra antes de pedir a dica!", "⚠️");
+        if(typeof mostrarToast === 'function') mostrarToast("A linha já está cheia!", "⚠️");
     }
 };
 
@@ -541,37 +527,41 @@ function restaurarEstadoTermo() {
             letraAtual = estado.letraAtual;
             grade = estado.grade;
 
-            for (let i = 0; i <= tentativaAtual; i++) {
+            const palavraOriginal = window.PALAVRA_DO_DIA || "AMADA";
+            const palavraNormalizada = normalizarPalavra(palavraOriginal);
+
+            for (let i = 0; i < 6; i++) {
                 for (let j = 0; j < 5; j++) {
                     const quadrado = document.getElementById(`q-${i}-${j}`);
                     if (quadrado && grade[i] && grade[i][j]) {
-                        quadrado.innerText = grade[i][j];
-                        quadrado.classList.add("preenchido"); // Mantém o brilho interno
+                        
+                        quadrado.classList.add("preenchido");
                         
                         if (i < tentativaAtual) { 
-                            // Linhas já chutadas (Aplica as cores finais)
-                            const letra = grade[i][j];
-                            const palavraFinal = window.PALAVRA_DO_DIA || "AMADA";
+                            // 🚨 A MÁGICA: Recupera o acento na restauração
+                            quadrado.innerText = palavraOriginal[j]; 
                             
-                            if (letra === palavraFinal[j]) quadrado.classList.add("correta");
-                            else if (palavraFinal.includes(letra)) quadrado.classList.add("presente");
+                            const letraPalpite = grade[i][j];
+                            if (letraPalpite === palavraNormalizada[j]) quadrado.classList.add("correta");
+                            else if (palavraNormalizada.includes(letraPalpite)) quadrado.classList.add("presente");
                             else quadrado.classList.add("ausente");
                             
-                            quadrado.style.color = "#000"; // Força a cor do texto para dar contraste
+                            quadrado.style.color = "#000";
                             
-                            // Pinta o teclado também para a Thamiris não se perder!
-                            const tecla = document.getElementById(`tecla-${letra}`);
+                            const tecla = document.getElementById(`tecla-${letraPalpite}`);
                             if (tecla) {
-                                if (letra === palavraFinal[j]) tecla.className = "tecla correta";
-                                else if (palavraFinal.includes(letra) && !tecla.classList.contains("correta")) tecla.className = "tecla presente";
+                                if (letraPalpite === palavraNormalizada[j]) tecla.className = "tecla correta";
+                                else if (palavraNormalizada.includes(letraPalpite) && !tecla.classList.contains("correta")) tecla.className = "tecla presente";
                                 else if (!tecla.classList.contains("correta") && !tecla.classList.contains("presente")) tecla.className = "tecla ausente";
                             }
+                        } else {
+                            // Letras que ainda estão sendo digitadas na linha atual
+                            quadrado.innerText = grade[i][j];
                         }
                     }
                 }
             }
         } catch (e) {
-            console.warn('Memória do Oráculo corrompida. Recriando destino...');
             sessionStorage.removeItem('termo_estado');
         }
     }
@@ -1138,7 +1128,7 @@ window.abrirJogo = function(tipo) {
     document.body.classList.add('modo-jogo-ativo');
 
     // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'hidratacao', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1209,6 +1199,42 @@ window.abrirJogo = function(tipo) {
         else if (tipo === 'cartorio') {
             if (typeof window.inicializarCartorio === 'function') window.inicializarCartorio();
         }
+
+        else if (tipo === 'banco') {
+            if (typeof window.inicializarBanco === 'function') window.inicializarBanco();
+        }
+
+        else if (tipo === 'pericia') {
+            if (typeof window.inicializarPericia === 'function') window.inicializarPericia();
+        }
+
+        else if (tipo === 'logistica') {
+            if (typeof window.inicializarLogistica === 'function') window.inicializarLogistica();
+        }
+
+        else if (tipo === 'hidratacao') {
+            if (typeof window.inicializarHidratacao === 'function') window.inicializarHidratacao();
+        }
+
+        else if (tipo === 'agenda') {
+            if (typeof window.inicializarAgenda === 'function') window.inicializarAgenda();
+        }
+
+        else if (tipo === 'roleta') {
+            if (typeof window.inicializarRoleta === 'function') window.inicializarRoleta();
+        }
+
+        else if (tipo === 'guardiao') {
+            if (typeof window.inicializarGuardiao === 'function') window.inicializarGuardiao();
+        }
+
+        else if (tipo === 'cinema') {
+            if (typeof window.inicializarCinema === 'function') window.inicializarCinema();
+        }
+
+        else if (tipo === 'correio') {
+            if (typeof window.inicializarCorreio === 'function') window.inicializarCorreio();
+        }
     }
 };
 
@@ -1217,7 +1243,7 @@ window.voltarMenuJogos = function() {
     window.defesaAtiva = false; // Trava do Tower Defense
 
     // 1. Esconde todos os jogos abertos
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'hidratacao', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');

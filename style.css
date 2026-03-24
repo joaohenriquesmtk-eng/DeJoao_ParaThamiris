@@ -7902,3 +7902,872 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     80% { transform: scale(1.1) rotate(0deg); opacity: 1; }
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
+
+
+
+/* ==========================================
+   BANCO CENTRAL DO SANTUÁRIO (PREMIUM UI)
+========================================== */
+.badge-carteira-banco {
+    background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.4);
+    padding: 8px 15px; border-radius: 20px; display: flex; align-items: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.cartao-black-patrimonio {
+    background: linear-gradient(135deg, #1f1f23 0%, #08080a 100%);
+    border-radius: 16px; padding: 25px; position: relative; overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.1);
+    border: 1px solid #333; margin-bottom: 30px;
+}
+.brilho-cartao {
+    position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent 40%, rgba(212,175,55,0.1) 50%, transparent 60%);
+    animation: brilhoCard 6s infinite linear; pointer-events: none; z-index: 1;
+}
+@keyframes brilhoCard { 0% { transform: translate(-30%, -30%) rotate(45deg); } 100% { transform: translate(30%, 30%) rotate(45deg); } }
+
+.btn-nova-meta {
+    background: transparent; border: 1px solid #D4AF37; color: #D4AF37;
+    padding: 8px 16px; border-radius: 20px; font-family: 'Playfair Display', serif;
+    font-size: 0.9rem; cursor: pointer; transition: all 0.3s;
+}
+.btn-nova-meta:active { background: rgba(212,175,55,0.2); transform: scale(0.95); }
+
+/* Cartões de Fundos (Investimentos) */
+.cartao-fundo-investimento {
+    background: rgba(15, 15, 18, 0.9); border-radius: 12px; padding: 20px;
+    border: 1px solid rgba(255,255,255,0.05); position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s;
+}
+.barra-progresso-base {
+    width: 100%; height: 14px; background: #050505; border-radius: 7px;
+    margin: 15px 0; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.9);
+    position: relative;
+}
+.barra-progresso-fluxo {
+    height: 100%; background: linear-gradient(90deg, #b08d28, #FFD700, #f1c40f);
+    border-radius: 7px; position: relative; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 0 15px rgba(212,175,55,0.5);
+}
+.barra-progresso-fluxo::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    animation: fluxoEnergia 2s infinite linear;
+}
+@keyframes fluxoEnergia { 100% { left: 200%; } }
+
+.btn-aporte-luxo {
+    background: rgba(46,204,113,0.1); border: 1px solid #2ecc71; color: #2ecc71;
+    padding: 12px; border-radius: 8px; font-weight: 900; width: 100%;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn-aporte-luxo:active { transform: scale(0.97); background: rgba(46,204,113,0.2); }
+
+/* Modais Fintech */
+.modal-financeiro {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    z-index: 99999; display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.3s;
+}
+.cartao-modal-financeiro {
+    width: 90%; max-width: 360px; background: #0a0a0c; border: 1px solid #D4AF37;
+    border-radius: 16px; padding: 30px 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    animation: deslizarCima 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.titulo-modal-fin {
+    color: #D4AF37; font-family: 'Playfair Display', serif; text-align: center;
+    font-size: 1.6rem; margin-bottom: 10px;
+}
+.input-grupo-fin { margin-bottom: 20px; }
+.input-grupo-fin label { display: block; color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.input-grupo-fin input[type="text"] {
+    width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px;
+    border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem; transition: border 0.3s;
+}
+.input-grupo-fin input[type="text"]:focus { border-color: #D4AF37; }
+
+.input-com-icone {
+    display: flex; align-items: center; background: #000; border: 1px solid #333;
+    border-radius: 8px; padding: 0 12px; transition: border 0.3s;
+}
+.input-com-icone:focus-within { border-color: #D4AF37; box-shadow: 0 0 10px rgba(212,175,55,0.2); }
+.icone-input { font-size: 1.2rem; color: #D4AF37; }
+.input-com-icone input {
+    flex: 1; background: transparent; border: none; color: #FFD700; padding: 12px;
+    font-family: monospace; font-size: 1.2rem; outline: none; text-align: right;
+}
+
+.btn-fin-rapido {
+    background: rgba(255,255,255,0.05); border: 1px solid #333; color: #aaa;
+    padding: 6px 15px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: all 0.2s;
+}
+.btn-fin-rapido:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+
+.botoes-modal-fin { display: flex; gap: 12px; margin-top: 10px; }
+.btn-fin-cancelar { flex: 1; background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.btn-fin-confirmar { flex: 2; background: linear-gradient(145deg, #D4AF37, #f1c40f); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
+.btn-fin-confirmar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+
+/* ==========================================
+   PERÍCIA DO AFETO (CSI AGRONÔMICO) - GOD TIER UX
+========================================== */
+.cartao-caso-investigacao {
+    background: linear-gradient(135deg, rgba(20,20,22,0.95), rgba(5,5,8,0.98));
+    border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #3498db;
+    border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6); position: relative; overflow: hidden;
+}
+.cartao-caso-investigacao:active { transform: scale(0.96); border-color: #3498db; box-shadow: 0 0 20px rgba(52,152,219,0.3); }
+.cartao-caso-investigacao.concluido { border-left-color: #2ecc71; opacity: 0.7; }
+.cartao-caso-investigacao.concluido::after {
+    content: 'CASO ENCERRADO'; position: absolute; top: 15px; right: -30px;
+    background: #2ecc71; color: #000; font-weight: 900; font-size: 0.6rem; padding: 5px 30px; transform: rotate(45deg); letter-spacing: 2px;
+}
+
+.cartao-depoimento {
+    background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(15px);
+    border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 12px; padding: 25px;
+    box-shadow: inset 0 0 40px rgba(231, 76, 60, 0.05), 0 15px 30px rgba(0,0,0,0.8);
+    position: relative;
+}
+
+/* O Design das Cartas de Prova */
+.prova-pericia-card {
+    background: linear-gradient(145deg, rgba(25,35,45,0.9), rgba(10,15,20,0.95));
+    border: 1px solid rgba(52,152,219,0.3); border-radius: 10px; padding: 15px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; transition: all 0.2s; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+.prova-pericia-card:active { transform: scale(0.92); }
+.prova-pericia-card.selecionada {
+    border-color: #e74c3c; background: linear-gradient(145deg, rgba(231,76,60,0.15), rgba(0,0,0,0.9));
+    box-shadow: 0 0 20px rgba(231,76,60,0.5), inset 0 0 10px rgba(231,76,60,0.3);
+    transform: translateY(-5px);
+}
+.prova-icone { font-size: 2.2rem; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5)); }
+.prova-nome { font-size: 0.75rem; color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+/* O Botão Colossal */
+.btn-objecao-suprema {
+    width: 100%; padding: 20px; font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900;
+    color: #fff; background: linear-gradient(145deg, #c0392b, #8b0000); border: 2px solid #ff4d4d;
+    border-radius: 12px; box-shadow: 0 10px 30px rgba(192, 57, 43, 0.6), inset 0 2px 5px rgba(255,255,255,0.3);
+    cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 3px; position: relative; overflow: hidden;
+}
+.btn-objecao-suprema::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+.btn-objecao-suprema:hover::before { left: 100%; transition: 0.5s; }
+.btn-objecao-suprema:active { transform: scale(0.96) translateY(4px); box-shadow: 0 2px 10px rgba(192, 57, 43, 0.6); }
+.btn-objecao-suprema.desativado { background: #333; border-color: #555; color: #777; box-shadow: none; pointer-events: none; opacity: 0.6; }
+
+/* Animações Cinemáticas */
+@keyframes socoObjecao {
+    0% { transform: scale(3) rotate(-15deg); opacity: 0; }
+    20% { transform: scale(0.9) rotate(5deg); opacity: 1; }
+    40% { transform: scale(1.1) rotate(-2deg); opacity: 1; }
+    80% { transform: scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: scale(1.5) rotate(0deg); opacity: 0; }
+}
+.animacao-tremor-tela { animation: tremorTela 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes tremorTela {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate3d(-10px, 5px, 0); }
+    20%, 40%, 60%, 80% { transform: translate3d(10px, -5px, 0); }
+}
+
+
+/* ==========================================
+   ROTA DE ESCOAMENTO (LOGÍSTICA) - GOD TIER UX
+========================================== */
+.logistica-timer-bg {
+    width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+.logistica-timer-fill {
+    width: 100%; height: 100%; background: linear-gradient(90deg, #f1c40f, #2ecc71);
+    transition: width 1s linear, background 0.5s; box-shadow: 0 0 10px rgba(46,204,113,0.5);
+}
+.timer-critico { background: linear-gradient(90deg, #e74c3c, #c0392b) !important; box-shadow: 0 0 15px rgba(231,76,60,0.8) !important; }
+
+.tabuleiro-grid-logistica {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+    background: #000; padding: 6px; border-radius: 12px; border: 2px solid #222;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
+    width: 100%; max-width: 400px; aspect-ratio: 1/1; position: relative;
+}
+
+.tile-logistica {
+    background: linear-gradient(145deg, #151515, #0a0a0a); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; transition: transform 0.1s, box-shadow 0.3s;
+    border: 1px solid rgba(255,255,255,0.03); color: #333; /* Cor base das ruas apagadas */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+.tile-logistica:active { transform: scale(0.92); }
+.tile-logistica.nao-interativo { cursor: default; }
+.tile-logistica.nao-interativo:active { transform: none; }
+
+/* O Brilho Neon Quântico do Fluxo */
+.tile-logistica.fluxo-ativo {
+    color: #FFD700; /* Asfalto vira Ouro Neon */
+    background: linear-gradient(145deg, #2a2000, #110d00);
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.3), 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+.tile-logistica svg {
+    width: 100%; height: 100%; display: block;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Rotação Elástica */
+    filter: drop-shadow(0 0 3px currentColor);
+}
+
+.btn-iniciar-rota {
+    background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000;
+    border: none; padding: 15px 30px; border-radius: 8px; font-weight: 900;
+    font-size: 1.1rem; letter-spacing: 2px; cursor: pointer;
+    box-shadow: 0 10px 20px rgba(241,196,15,0.4); transition: all 0.2s; font-family: 'Playfair Display', serif;
+}
+.btn-iniciar-rota:active { transform: scale(0.95); box-shadow: 0 5px 10px rgba(241,196,15,0.4); }
+
+/* Marcadores de Início e Fim */
+.badge-silo, .badge-porto {
+    position: absolute; top: 2px; left: 2px; font-size: 0.6rem; font-weight: 900;
+    color: #000; padding: 2px 5px; border-radius: 4px; z-index: 5;
+}
+.badge-silo { background: #3498db; }
+.badge-porto { background: #e74c3c; }
+
+
+
+/* ==========================================
+   HIDRATAÇÃO QUÂNTICA (CRYO-TUBES) - GOD TIER UX
+========================================== */
+.estacao-cilindro {
+    display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1;
+}
+
+.nome-estacao {
+    font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 3px;
+    font-family: monospace; text-shadow: 0 0 5px rgba(255,255,255,0.2);
+}
+
+.status-sincronia-agua {
+    font-size: 0.6rem; display: inline-block; vertical-align: super;
+}
+
+/* O Cilindro de Vidro em Si */
+.cilindro-vidro {
+    width: 90px; height: 260px; border-radius: 45px;
+    background: rgba(10, 15, 25, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.9),
+        inset -5px -5px 15px rgba(0, 212, 255, 0.1),
+        0 15px 30px rgba(0,0,0,0.8);
+    position: relative; overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+/* O Reflexo Especular da Luz no Vidro Curvo */
+.reflexo-vidro {
+    position: absolute; top: 2%; left: 8%; width: 15%; height: 96%;
+    background: linear-gradient(to right, rgba(255,255,255,0.4), transparent);
+    border-radius: 20px; pointer-events: none; z-index: 10;
+    filter: blur(1px); mix-blend-mode: overlay;
+}
+
+/* Marcações de Litragem na lateral do tubo */
+.marcas-medicao {
+    position: absolute; right: 5px; top: 10%; height: 80%; width: 10px;
+    border-left: 1px solid rgba(255,255,255,0.2); z-index: 8; pointer-events: none;
+    background-image: repeating-linear-gradient(to bottom, 
+        rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 2px, 
+        transparent 2px, transparent 15%);
+}
+
+/* O Líquido Base */
+.liquido-preenchimento {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; /* Alterado via JS */
+    background: linear-gradient(to top, #001f3f, #0088ff);
+    box-shadow: 0 0 30px rgba(0, 136, 255, 0.6);
+    transition: height 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 1;
+}
+
+.liquido-parceiro-cor {
+    background: linear-gradient(to top, #3f001f, #ff0055) !important;
+    box-shadow: 0 0 30px rgba(255, 0, 85, 0.6) !important;
+}
+
+/* As Ondas do Topo do Líquido */
+.onda-liquida-topo {
+    position: absolute; top: -15px; left: 0; width: 200%; height: 25px;
+    z-index: 2;
+}
+.onda-liquida-topo svg { width: 100%; height: 100%; }
+.onda-tras { fill: rgba(255,255,255,0.3); animation: ondaMovimento 4s infinite linear; }
+.onda-frente { fill: rgba(255,255,255,0.5); animation: ondaMovimento 3s infinite linear reverse; }
+
+@keyframes ondaMovimento {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Partículas (Bolhas) Subindo */
+.bolhas-container { position: absolute; bottom: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+.bolha-h2o {
+    position: absolute; bottom: -10px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.1));
+    border-radius: 50%; border: 1px solid rgba(255,255,255,0.3);
+    animation: bolhaSubindo var(--velocidade) ease-in forwards;
+}
+@keyframes bolhaSubindo {
+    0% { transform: translateY(0) scale(1) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translateY(-50%) scale(1.2) translateX(5px); }
+    90% { opacity: 0.8; }
+    100% { transform: translateY(-260px) scale(0.8) translateX(-5px); opacity: 0; }
+}
+
+/* Painel Digital de Medição */
+.painel-digital-agua {
+    background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 5px 15px; border-radius: 8px;
+    font-family: monospace; font-size: 1.5rem; font-weight: bold; color: #fff;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.9), 0 5px 10px rgba(0,0,0,0.5);
+    min-width: 80px; text-align: center; display: flex; align-items: baseline; justify-content: center; gap: 5px;
+}
+.unidade-ml { font-size: 0.7rem; color: #00d4ff; text-transform: uppercase; }
+
+/* A Válvula de Injeção (Botão) */
+.valvula-injecao-agua {
+    background: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
+    border: 2px solid #00d4ff; border-radius: 16px; padding: 20px 30px;
+    width: 100%; max-width: 320px; cursor: pointer; position: relative; overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 2px 10px rgba(255,255,255,0.2);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.valvula-injecao-agua:active {
+    transform: scale(0.92) translateY(5px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.8), inset 0 10px 20px rgba(0,0,0,0.9);
+    border-color: #00ffcc;
+}
+.anel-brilho {
+    position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(0,212,255,0.3) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.valvula-injecao-agua:hover .anel-brilho { opacity: 1; animation: rodarBrilho 4s infinite linear; }
+@keyframes rodarBrilho { 100% { transform: rotate(360deg); } }
+
+.conteudo-valvula { display: flex; align-items: center; justify-content: center; gap: 15px; color: #fff; position: relative; z-index: 2; }
+
+
+
+/* ==========================================
+   PAUTA DE AUDIÊNCIAS (TITAN TIER UX)
+========================================== */
+.btn-novo-evento-titan {
+    background: linear-gradient(145deg, #111, #000); color: #D4AF37;
+    border: 1px solid rgba(212,175,55,0.4); padding: 8px 20px; border-radius: 30px;
+    font-weight: 900; font-family: 'Playfair Display', serif; letter-spacing: 2px;
+    cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.9), inset 0 0 10px rgba(212,175,55,0.1);
+    transition: all 0.3s;
+}
+.btn-novo-evento-titan:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.9), inset 0 0 20px rgba(212,175,55,0.3); }
+
+/* Cartões do Tempo (High-End Glassmorphism) */
+.cartao-tempo-titan {
+    background: linear-gradient(135deg, rgba(20,20,22,0.85) 0%, rgba(5,5,5,0.95) 100%);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 25px;
+    position: relative; display: flex; align-items: center; gap: 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.05);
+    overflow: hidden; backdrop-filter: blur(10px);
+}
+.cartao-tempo-titan::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,0.5), transparent);
+}
+
+/* O Astrolábio Esquerdo (Progresso Circular) */
+.astrolabio-box { position: relative; width: 100px; height: 100px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.anel-tempo-svg { transform: rotate(-90deg); width: 100%; height: 100%; filter: drop-shadow(0 0 8px rgba(212,175,55,0.5)); }
+.anel-tempo-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 6; }
+.anel-tempo-progresso {
+    fill: none; stroke: #D4AF37; stroke-width: 6; stroke-linecap: round;
+    stroke-dasharray: 283; stroke-dashoffset: 283; transition: stroke-dashoffset 1s linear, stroke 0.5s;
+}
+.icone-astrolabio { position: absolute; font-size: 2.5rem; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); }
+
+/* A Direita: Informações e Nixie Tubes */
+.dados-tempo-box { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+.cabecalho-tempo { display: flex; justify-content: space-between; align-items: flex-start; }
+.titulo-evento-titan { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+.data-evento-titan { display: block; font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-family: monospace; margin-top: 5px; }
+.btn-deletar-titan { background: transparent; border: none; color: #555; font-size: 1.2rem; cursor: pointer; transition: color 0.3s; padding: 0; }
+.btn-deletar-titan:hover { color: #e74c3c; }
+
+/* Display Nixie Tube (Neumorphism Inset) - CORRIGIDO (Mais Espaçoso) */
+.grid-nixie { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 8px; /* Gap levemente reduzido para alargar as caixas */
+    margin-top: 10px;
+}
+.bloco-nixie {
+    background: #050505; 
+    border-radius: 8px; 
+    padding: 12px 2px; /* Reduzido o padding lateral interno para dar espaço ao número */
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: inset 0 5px 15px rgba(0,0,0,1), 0 1px 1px rgba(255,255,255,0.1);
+    border: 1px solid rgba(0,0,0,0.8); 
+    position: relative;
+}
+.bloco-nixie::before {
+    content: ''; position: absolute; top: 2px; left: 10%; width: 80%; height: 30%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent); border-radius: 8px; pointer-events: none;
+}
+.numero-nixie {
+    font-family: monospace; 
+    font-size: 1.6rem; /* Reduzido de 2.2rem para caberem 3 dígitos com folga */
+    font-weight: 900; 
+    color: #FFD700;
+    text-shadow: 0 0 15px rgba(212,175,55,0.8), 0 0 30px rgba(212,175,55,0.4);
+    line-height: 1; 
+    letter-spacing: 0px; /* Removido o valor negativo que espremia os números */
+    margin-bottom: 5px;
+}
+.label-nixie { font-size: 0.55rem; color: #666; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+
+/* Estado de Urgência (Menos de 24h) */
+.evento-emergencia { border-color: rgba(231,76,60,0.6); animation: pulsarEmergencia 2s infinite; }
+.evento-emergencia .anel-tempo-progresso { stroke: #e74c3c; filter: drop-shadow(0 0 10px #e74c3c); }
+.evento-emergencia .numero-nixie { color: #ff6b6b; text-shadow: 0 0 15px rgba(231,76,60,0.8), 0 0 30px rgba(231,76,60,0.5); }
+@keyframes pulsarEmergencia {
+    0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(231,76,60,0.1); }
+    50% { box-shadow: 0 20px 50px rgba(231,76,60,0.3), inset 0 0 40px rgba(231,76,60,0.2); }
+}
+
+/* Modal Titan */
+.cartao-modal-titan {
+    width: 90%; max-width: 400px; background: #0a0a0c; border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 20px; padding: 35px 25px; box-shadow: 0 30px 60px rgba(0,0,0,1);
+    position: relative; overflow: hidden; animation: deslizarCima 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.glow-modal-titan {
+    position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 100px; background: radial-gradient(ellipse, rgba(212,175,55,0.2), transparent);
+    filter: blur(20px); pointer-events: none;
+}
+.input-titan {
+    width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    color: #fff; padding: 15px; border-radius: 12px; outline: none; transition: border 0.3s, box-shadow 0.3s;
+    box-shadow: inset 0 5px 10px rgba(0,0,0,0.8);
+}
+.input-titan:focus { border-color: #D4AF37; box-shadow: inset 0 5px 10px rgba(0,0,0,0.8), 0 0 15px rgba(212,175,55,0.2); }
+.btn-icone-titan { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; transition: all 0.2s; filter: grayscale(1) opacity(0.4); }
+.btn-icone-titan.ativo { filter: grayscale(0) opacity(1); transform: scale(1.2); text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+
+
+/* ==========================================
+   O VEREDITO CULINÁRIO (SUPREME TIER UX)
+========================================== */
+/* Moldura do Cassino */
+.roleta-anel-externo {
+    width: 360px; height: 360px; border-radius: 50%;
+    background: linear-gradient(145deg, #111, #000);
+    padding: 10px; margin: 20px 0 40px 0; position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,1), inset 0 2px 10px rgba(255,255,255,0.1), 0 0 50px rgba(255,71,87,0.15);
+}
+.roleta-anel-interno {
+    width: 100%; height: 100%; border-radius: 50%; position: relative;
+    background: #000; box-shadow: inset 0 10px 30px rgba(0,0,0,0.9);
+}
+
+/* O Segredo da Nitidez (Canvas comprimido) */
+.canvas-retina-render {
+    width: 100%; height: 100%; border-radius: 50%;
+    transform-origin: center center;
+    transition: transform cubic-bezier(0.1, 0.85, 0.15, 1); /* Curva de Desaceleração Perfeita */
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+}
+
+/* A Agulha Suprema */
+.roleta-agulha-suprema {
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    width: 34px; height: 46px; z-index: 20;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(to bottom, #fff, #e74c3c);
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.9));
+    transform-origin: top center; transition: transform 0.05s linear;
+}
+.roleta-agulha-brilho {
+    position: absolute; top: 0; left: 10%; width: 80%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+    clip-path: polygon(50% 100%, 0 0, 100% 0); opacity: 0.5; pointer-events: none;
+}
+.agulha-tremendo-titan { transform: translateX(-50%) rotate(20deg); }
+
+/* O Botão de Arcade Físico */
+.btn-arcade-3d {
+    background: linear-gradient(180deg, #ff4757, #d63031);
+    border: none; border-radius: 50px; width: 100%; max-width: 340px;
+    padding: 20px 0; cursor: pointer; outline: none; position: relative;
+    box-shadow: 0 15px 25px rgba(255,71,87,0.4), inset 0 2px 5px rgba(255,255,255,0.3);
+    /* A Mágica do Botão Físico */
+    border-bottom: 8px solid #8b0000;
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-arcade-texto {
+    color: #fff; font-family: 'Playfair Display', serif; font-size: 1.6rem;
+    font-weight: 900; letter-spacing: 4px; text-transform: uppercase;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5); pointer-events: none;
+}
+.btn-arcade-3d:active {
+    transform: translateY(8px);
+    border-bottom: 0px solid #8b0000;
+    box-shadow: 0 5px 10px rgba(255,71,87,0.4), inset 0 5px 10px rgba(0,0,0,0.4);
+}
+.btn-arcade-3d:disabled { filter: grayscale(1); opacity: 0.6; pointer-events: none; }
+
+/* Texto Épico do Vencedor */
+.texto-revelacao-vencedor {
+    color: #fff; font-family: 'Playfair Display', serif; font-size: 2.2rem;
+    text-align: center; opacity: 0; transform: scale(0.8) translateY(10px);
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-shadow: 0 0 20px rgba(212,175,55,0);
+}
+.revelacao-ativa {
+    opacity: 1; transform: scale(1) translateY(0); color: #FFD700;
+    text-shadow: 0 0 30px rgba(212,175,55,0.8), 0 0 10px rgba(212,175,55,0.5);
+}
+
+/* Fichas do Cassino (Inputs) */
+.painel-fichas-roleta {
+    width: 100%; padding: 25px; border-radius: 16px;
+    background: linear-gradient(135deg, rgba(20,10,10,0.9), rgba(5,0,0,0.95));
+    border: 1px solid rgba(255,71,87,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+}
+.input-ficha-roleta {
+    flex: 1; background: #050505; border: 1px solid #333; color: #fff; padding: 15px;
+    border-radius: 12px; outline: none; font-size: 1.1rem; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+    transition: border 0.3s, box-shadow 0.3s;
+}
+.input-ficha-roleta:focus { border-color: #ff4757; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 0 15px rgba(255,71,87,0.2); }
+.btn-add-ficha {
+    background: rgba(255,71,87,0.1); border: 1px solid #ff4757; color: #ff4757;
+    padding: 0 25px; border-radius: 12px; font-weight: 900; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-add-ficha:active { transform: scale(0.9); background: rgba(255,71,87,0.3); }
+
+.tag-ficha-ouro {
+    background: linear-gradient(145deg, #222, #111); border: 1px solid rgba(212,175,55,0.4);
+    color: #fff; padding: 10px 18px; border-radius: 30px; font-size: 0.9rem; font-weight: bold;
+    display: flex; align-items: center; gap: 10px; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+    animation: fadeTagTitan 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes fadeTagTitan { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+.btn-remover-ficha { background: none; border: none; color: #ff4757; font-size: 1.2rem; cursor: pointer; transition: transform 0.2s; }
+.btn-remover-ficha:hover { transform: scale(1.3) rotate(90deg); color: #ff6b81; }
+
+
+/* ==========================================
+   O GUARDIÃO VETORIAL (TITAN TIER UX)
+========================================== */
+/* A Base e o Holograma */
+.camara-holografica-pet {
+    position: relative; width: 100%; height: 280px; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end; margin-bottom: 30px;
+}
+.pedestal-holograma {
+    width: 220px; height: 35px; background: radial-gradient(ellipse at center, #111 0%, #000 100%);
+    border-radius: 50%; border: 2px solid var(--pet-cor-base, #fd9644);
+    box-shadow: 0 10px 40px rgba(0,0,0,1), 0 0 30px var(--pet-cor-base, #fd9644), inset 0 5px 15px rgba(255,255,255,0.05);
+    position: relative; z-index: 1; display: flex; align-items: center; justify-content: center;
+    transition: box-shadow 0.5s, border-color 0.5s;
+}
+.anel-rotativo-pedestal {
+    width: 180px; height: 15px; border-radius: 50%; border: 1px dashed var(--pet-cor-base, #fd9644);
+    animation: girarAnel 10s infinite linear; opacity: 0.5; transition: border-color 0.5s;
+}
+@keyframes girarAnel { 100% { transform: rotate(360deg); } }
+
+.feixe-luz-holograma {
+    position: absolute; bottom: 15px; width: 180px; height: 260px;
+    background: linear-gradient(to top, var(--pet-cor-base, #fd9644) 0%, transparent 100%);
+    clip-path: polygon(20% 0, 80% 0, 100% 100%, 0% 100%);
+    z-index: 0; pointer-events: none; opacity: 0.15;
+    animation: pulsarLuzHolograma 4s infinite alternate; transition: background 0.5s;
+}
+@keyframes pulsarLuzHolograma { 0% { opacity: 0.1; filter: blur(5px); } 100% { opacity: 0.3; filter: blur(8px); } }
+
+/* O Pet Vetorial (Low-Poly SVG) */
+.pet-vivo-animacao {
+    position: relative; z-index: 5; margin-bottom: -20px;
+    animation: respiracaoPet 3s ease-in-out infinite, flutuarPet 5s ease-in-out infinite;
+    transform-origin: bottom center; transition: all 0.5s;
+}
+.svg-guardiao-holograma {
+    filter: drop-shadow(0 15px 20px rgba(0,0,0,0.9));
+}
+/* Cores dinâmicas injetadas via CSS Variable */
+.poligonos-pet polygon { transition: all 0.5s; stroke: var(--pet-cor-base, #fd9644); stroke-width: 1; }
+.poly-fundo { fill: rgba(0,0,0,0.8); }
+.poly-lateral { fill: color-mix(in srgb, var(--pet-cor-base) 20%, transparent); }
+.poly-frente { fill: color-mix(in srgb, var(--pet-cor-base) 40%, transparent); }
+.poly-focinho { fill: color-mix(in srgb, var(--pet-cor-base) 10%, transparent); }
+#pet-olho-esq, #pet-olho-dir { transition: d 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* Estados do Pet */
+.pet-dormindo { animation: respiracaoPetDormindo 6s ease-in-out infinite !important; filter: brightness(0.6); }
+.pet-comendo { animation: pularAlegre 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2 !important; }
+.pet-glitch { animation: cyberGlitch 0.3s infinite !important; }
+
+@keyframes respiracaoPet { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(0.96) scaleX(1.02); } }
+@keyframes respiracaoPetDormindo { 0%, 100% { transform: scaleY(1) scaleX(1) translateY(10px); } 50% { transform: scaleY(0.9) scaleX(1.05) translateY(10px); } }
+@keyframes flutuarPet { 0%, 100% { top: 0px; } 50% { top: -12px; } }
+@keyframes pularAlegre { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-40px) scale(1.1); } }
+@keyframes cyberGlitch { 
+    0% { transform: translate(0); filter: hue-rotate(0deg); } 
+    20% { transform: translate(-3px, 2px); filter: hue-rotate(90deg); } 
+    40% { transform: translate(3px, -2px); filter: hue-rotate(0deg); } 
+    60% { transform: translate(-3px, -2px); } 
+    100% { transform: translate(0); } 
+}
+
+#pet-zzz {
+    position: absolute; top: 0; right: 0; font-size: 1.5rem; font-family: monospace; font-weight: bold;
+    color: var(--pet-cor-base); text-shadow: 0 0 10px var(--pet-cor-base);
+    animation: flutuarZzz 2.5s infinite; pointer-events: none;
+}
+@keyframes flutuarZzz { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translate(25px, -40px) scale(1.5); opacity: 0; } }
+
+/* O HUD Biométrico (Sci-Fi Segmented Bars) */
+.painel-biometrico-pet {
+    width: 100%; background: linear-gradient(135deg, rgba(15,18,22,0.9), rgba(5,8,10,0.95));
+    border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 25px 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.9), inset 0 2px 10px rgba(255,255,255,0.02);
+    display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; backdrop-filter: blur(10px);
+}
+.linha-status-pet { display: flex; align-items: center; gap: 15px; }
+.icone-status-pet { font-size: 1.2rem; width: 30px; text-align: center; filter: grayscale(0.5); }
+
+.hud-barra-fundo {
+    flex: 1; height: 14px; background: rgba(0,0,0,0.6); border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1); overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,1);
+}
+.hud-barra-segmentada {
+    height: 100%; width: 100%; transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* O Segredo do LED Segmentado */
+    background-color: var(--cor-hud);
+    background-image: repeating-linear-gradient(to right, transparent, transparent 4px, rgba(0,0,0,0.8) 4px, rgba(0,0,0,0.8) 6px);
+    box-shadow: 0 0 15px var(--cor-hud);
+}
+.texto-porcentagem-pet { font-family: monospace; font-size: 1rem; font-weight: 900; width: 45px; text-align: right; text-shadow: 0 0 10px currentColor; }
+
+/* Botões de Ação de Alta Tecnologia */
+.grade-acoes-pet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+.btn-acao-pet {
+    background: linear-gradient(145deg, #151515, #0a0a0a); border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px; padding: 15px 5px; display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 0 0 1px transparent;
+    transition: all 0.3s; position: relative; overflow: hidden;
+}
+.btn-acao-pet::before {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+    background: var(--cor-btn); box-shadow: 0 -2px 10px var(--cor-btn); transition: height 0.3s;
+}
+.btn-acao-pet:active { transform: translateY(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+.btn-acao-pet:hover::before { height: 100%; opacity: 0.1; }
+.btn-pet-titulo { color: #fff; font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; }
+.btn-pet-custo { font-family: monospace; font-size: 0.7rem; color: var(--cor-btn); text-transform: uppercase; font-weight: bold; z-index: 2; }
+
+
+
+/* ==========================================
+   CINE QUÂNTICO (MULTIPLEX TITAN TIER UX)
+========================================== */
+.painel-controle-cinema {
+    width: calc(100% - 40px); margin: 20px; display: flex; gap: 10px;
+    background: rgba(20,20,20,0.8); padding: 15px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+.input-cinema-titan {
+    flex: 1; background: #050505; border: 1px solid #333; color: #fff; padding: 12px 15px;
+    border-radius: 8px; outline: none; font-size: 1rem; transition: all 0.3s;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.9);
+}
+.input-cinema-titan:focus { border-color: #e50914; box-shadow: inset 0 2px 10px rgba(0,0,0,0.9), 0 0 15px rgba(229,9,20,0.3); }
+
+.btn-injetar-video {
+    background: rgba(229,9,20,0.1); border: 1px solid #e50914; color: #e50914;
+    padding: 0 20px; border-radius: 8px; font-weight: 900; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s; font-family: monospace;
+}
+.btn-injetar-video:active { transform: scale(0.95); background: rgba(229,9,20,0.3); }
+
+/* O Palco e a Tela */
+.palco-cinema-titan {
+    width: calc(100% - 40px); aspect-ratio: 16/9; position: relative;
+    margin-bottom: 40px; margin-top: 10px;
+}
+.ambilight-glow {
+    position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+    background: #00d4ff; filter: blur(40px); opacity: 0.1; z-index: 0;
+    transition: background 2s, opacity 2s; pointer-events: none;
+}
+.tela-projetor {
+    width: 100%; height: 100%; background: #000; border-radius: 12px;
+    position: relative; z-index: 1; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,1), 0 0 0 2px #222;
+}
+#player-youtube { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2; border: none; }
+
+/* Tela Estática (Quando vazio) */
+.tela-estatica-ruido {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: repeating-linear-gradient(0deg, #111 0px, #111 2px, #050505 2px, #050505 4px);
+    transition: opacity 1s;
+}
+
+/* Contagem Regressiva Cinematográfica */
+.overlay-contagem-titan {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center;
+}
+#numero-contagem-cinema {
+    font-family: monospace; font-size: 8rem; font-weight: 900; color: #fff;
+    text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 10px #00d4ff;
+    animation: pulsoContagem 1s infinite;
+}
+@keyframes pulsoContagem { 0% { transform: scale(2); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0; } }
+
+/* Assentos Biométricos (Painel de Sincronia) */
+.painel-assentos-sincronia {
+    width: calc(100% - 40px); display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(145deg, #111, #080808); border-radius: 16px; padding: 20px;
+    border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+    margin-bottom: 30px;
+}
+.assento-cinema { display: flex; align-items: center; gap: 15px; flex: 1; }
+.luz-status-assento {
+    width: 16px; height: 16px; border-radius: 50%; background: #333;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); transition: all 0.5s;
+}
+.luz-status-assento.pronto { background: #00ffcc; box-shadow: 0 0 15px #00ffcc, inset 0 0 5px #fff; }
+.nome-assento { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: bold; margin-bottom: 2px; }
+.status-texto-assento { font-family: monospace; font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Botão de Chave Dupla */
+.btn-chave-sincronia {
+    width: calc(100% - 40px); padding: 20px; border-radius: 12px; border: none;
+    background: linear-gradient(145deg, #222, #111); color: #888;
+    display: flex; align-items: center; justify-content: center; gap: 15px;
+    font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; letter-spacing: 2px;
+    cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.05);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.btn-chave-sincronia.ativado {
+    background: linear-gradient(145deg, #00d4ff, #00a2ff); color: #000;
+    box-shadow: 0 15px 30px rgba(0,212,255,0.4), inset 0 5px 10px rgba(255,255,255,0.4);
+    border: 1px solid #00ffcc;
+}
+.btn-chave-sincronia:active { transform: scale(0.95); }
+.icone-chave-sync { font-size: 1.5rem; transition: transform 0.5s; }
+.btn-chave-sincronia.ativado .icone-chave-sync { transform: rotate(90deg); filter: drop-shadow(0 0 5px rgba(255,255,255,0.8)); }
+
+
+
+/* ==========================================
+   CORREIO ELEGANTE (TITAN TIER SUPREMO)
+========================================== */
+.btn-escrever-titan {
+    background: linear-gradient(145deg, #1e3a12, #14290c); color: #6ab04c;
+    border: 1px solid rgba(106, 176, 76, 0.4); padding: 8px 22px; border-radius: 4px;
+    font-weight: 900; font-family: monospace; letter-spacing: 2px;
+    cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: all 0.3s;
+}
+
+/* Radar de Telemetria */
+.painel-radar-correio {
+    background: rgba(0,0,0,0.6); border: 1px solid rgba(106, 176, 76, 0.2);
+    border-radius: 12px; padding: 20px; margin-bottom: 40px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,1); position: relative;
+}
+.titulo-radar {
+    font-family: monospace; font-size: 0.7rem; color: #6ab04c; 
+    letter-spacing: 3px; margin-bottom: 15px; text-align: center; opacity: 0.8;
+}
+.stats-radar-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;
+    border-top: 1px solid rgba(106, 176, 76, 0.1); padding-top: 10px;
+}
+.stat-item { font-family: monospace; font-size: 0.65rem; color: #888; letter-spacing: 1px; }
+.stat-item span { color: #6ab04c; font-weight: bold; }
+
+/* O Envelope com Lacre */
+.envelope-titan {
+    background: #e0d5b8; width: 100%; padding: 40px 20px; border-radius: 4px;
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid #c5b895;
+    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+}
+.envelope-titan::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+    pointer-events: none;
+}
+
+/* Lacre de Cera Animado */
+.lacre-cera-titan {
+    width: 70px; height: 70px; background: #8b0000; border-radius: 50%;
+    position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.3);
+    border: 4px solid #5d0000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.lacre-cera-titan:hover { transform: scale(1.1) rotate(5deg); }
+.lacre-cera-titan::after {
+    content: '❤'; color: #5d0000; font-size: 1.8rem; opacity: 0.6;
+}
+
+/* Lacre Quebrando */
+.lacre-quebrando {
+    animation: quebrarLacre 0.5s forwards; pointer-events: none;
+}
+@keyframes quebrarLacre {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* A Carta Revelada (Papel Nobre) */
+.papel-carta-titan {
+    background: #fdf6e3; color: #2c3e50; padding: 40px; border-radius: 2px;
+    font-family: 'Playfair Display', serif; font-size: 1.3rem; line-height: 1.8;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8); position: relative;
+    border-left: 1px solid #eee; border-top: 1px solid #eee;
+    background-image: linear-gradient(rgba(200,200,200,0.05) 1px, transparent 1px);
+    background-size: 100% 2.5rem;
+}
+
+/* Modal de Escrita (Mesa de Madeira) */
+.cartao-escrita-premium {
+    background: #fdf6e3; width: 95%; max-width: 500px; padding: 40px;
+    border-radius: 4px; box-shadow: 0 30px 70px rgba(0,0,0,1);
+    position: relative; animation: deslizarCima 0.5s ease-out;
+    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+}
+.cartao-escrita-premium textarea {
+    width: 100%; height: 250px; background: transparent; border: none;
+    border-bottom: 1px solid #dcd3b2; outline: none; font-size: 1.2rem;
+    font-family: 'Playfair Display', serif; color: #2c3e50; line-height: 1.6;
+    resize: none;
+}
+.btn-cancelar-carta { background: transparent; border: 1px solid #dcd3b2; color: #888; padding: 12px 20px; border-radius: 4px; cursor: pointer; }
+.btn-enviar-carta { background: #8b0000; color: #fff; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-weight: 900; }

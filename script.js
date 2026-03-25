@@ -291,6 +291,7 @@ function removerLetra() {
 }
 
 // O Grande Veredito com Revelação Ortográfica Automática
+// O Grande Veredito com Revelação Ortográfica Automática (CORRIGIDO)
 window.verificarPalavra = function() {
     if (letraAtual !== 5) {
         if(typeof mostrarToast === 'function') mostrarToast("A palavra precisa ter 5 letras!", "⚠️");
@@ -334,17 +335,30 @@ window.verificarPalavra = function() {
             if (quadrado) {
                 quadrado.classList.add("anim-flip");
                 
-                // No meio da animação, trocamos a cor E injetamos o acento!
                 setTimeout(() => {
                     quadrado.classList.add(statusClasses[i]);
-                    // 🚨 A MÁGICA: A letra no visor ganha o acento original
-                    quadrado.innerText = palavraOriginal[i]; 
+                    
+                    // 🚨 A MÁGICA CORRIGIDA: Usa a letra que o usuário digitou!
+                    let letraExibida = palpite[i];
+                    
+                    // Se for a letra correta, puxa o acento original daquela exata posição
+                    if (statusClasses[i] === "correta") {
+                        letraExibida = palavraOriginal[i];
+                    } 
+                    // Se estiver na palavra, mas no lugar errado, procura a versão acentuada
+                    else if (statusClasses[i] === "presente") {
+                        const idxOriginal = palavraNormalizada.indexOf(palpite[i]);
+                        if (idxOriginal !== -1) {
+                            letraExibida = palavraOriginal[idxOriginal];
+                        }
+                    }
+                    
+                    quadrado.innerText = letraExibida; 
                     quadrado.style.color = "#000"; 
                     if(window.Haptics) navigator.vibrate(30);
                 }, 300);
             }
 
-            // Teclado continua sem acento (pois os botões não mudam)
             setTimeout(() => {
                 const tecla = document.getElementById(`tecla-${palpite[i]}`);
                 if (tecla) {
@@ -518,6 +532,7 @@ window.usarDicaAmor = function() {
 // ==========================================
 // RESTAURAÇÃO DE MEMÓRIA (Com suporte ao Glassmorphism)
 // ==========================================
+// RESTAURAÇÃO DE MEMÓRIA (CORRIGIDA)
 function restaurarEstadoTermo() {
     const estadoSalvo = sessionStorage.getItem('termo_estado');
     if (estadoSalvo) {
@@ -538,24 +553,33 @@ function restaurarEstadoTermo() {
                         quadrado.classList.add("preenchido");
                         
                         if (i < tentativaAtual) { 
-                            // 🚨 A MÁGICA: Recupera o acento na restauração
-                            quadrado.innerText = palavraOriginal[j]; 
-                            
                             const letraPalpite = grade[i][j];
-                            if (letraPalpite === palavraNormalizada[j]) quadrado.classList.add("correta");
-                            else if (palavraNormalizada.includes(letraPalpite)) quadrado.classList.add("presente");
-                            else quadrado.classList.add("ausente");
                             
+                            let status = "ausente";
+                            if (letraPalpite === palavraNormalizada[j]) status = "correta";
+                            else if (palavraNormalizada.includes(letraPalpite)) status = "presente";
+                            
+                            quadrado.classList.add(status);
+                            
+                            // 🚨 A MÁGICA CORRIGIDA: Devolve o acento só para as letras certas
+                            let letraExibida = letraPalpite;
+                            if (status === "correta") {
+                                letraExibida = palavraOriginal[j];
+                            } else if (status === "presente") {
+                                const idxOriginal = palavraNormalizada.indexOf(letraPalpite);
+                                if (idxOriginal !== -1) letraExibida = palavraOriginal[idxOriginal];
+                            }
+                            
+                            quadrado.innerText = letraExibida; 
                             quadrado.style.color = "#000";
                             
                             const tecla = document.getElementById(`tecla-${letraPalpite}`);
                             if (tecla) {
-                                if (letraPalpite === palavraNormalizada[j]) tecla.className = "tecla correta";
-                                else if (palavraNormalizada.includes(letraPalpite) && !tecla.classList.contains("correta")) tecla.className = "tecla presente";
-                                else if (!tecla.classList.contains("correta") && !tecla.classList.contains("presente")) tecla.className = "tecla ausente";
+                                if (status === "correta") tecla.className = "tecla correta";
+                                else if (status === "presente" && !tecla.classList.contains("correta")) tecla.className = "tecla presente";
+                                else if (status === "ausente" && !tecla.classList.contains("correta") && !tecla.classList.contains("presente")) tecla.className = "tecla ausente";
                             }
                         } else {
-                            // Letras que ainda estão sendo digitadas na linha atual
                             quadrado.innerText = grade[i][j];
                         }
                     }

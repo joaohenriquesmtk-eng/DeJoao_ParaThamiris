@@ -405,6 +405,12 @@
         <p class="desc-jogo-grid">Palavras do coração</p>
     </div>
 
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('paradoxo')">
+        <img src="assets/icones-jogos/paradoxo.png" alt="Paradoxo" class="icone-jogo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3284/3284613.png'">
+        <h4 class="titulo-jogo-grid">O Prisma</h4>
+        <p class="desc-jogo-grid">Mensagem Inclinada</p>
+    </div>
+
     <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('estufa')">
         <img src="assets/icones-jogos/estufa.png" alt="Estufa" class="icone-jogo-img">
         <h4 class="titulo-jogo-grid">Estufa de Foco</h4>
@@ -621,6 +627,7 @@
         <div id="container-minifazenda" class="escondido"></div>
         <div id="container-jardim" class="escondido"></div>
         <div id="container-julgamento" class="escondido"></div>
+        <div id="container-paradoxo" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: radial-gradient(circle at center, #111 0%, #000 100%); z-index: 100; display: flex; flex-direction: column; overflow: hidden;"></div>
     </section>
 
             <section id="cofre" class="tela escondido">
@@ -1049,6 +1056,7 @@
     <script src="cinema.js"></script>
     <script src="correio.js"></script>
     <script src="pager.js"></script>
+    <script src="paradoxo.js"></script>
 
 
 

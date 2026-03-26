@@ -543,7 +543,7 @@ window.voltarMenuJogos = function() {
     window.julgamentoAtivo = false; // 🚨 MATA O LOOP FANTASMA DO MATCH-3 IMEDIATAMENTE
 
     // 🚨 ADICIONADO 'contratos' e 'defesa' NA LISTA DE JOGOS PARA ESCONDER
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'paradoxo'];
     
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);

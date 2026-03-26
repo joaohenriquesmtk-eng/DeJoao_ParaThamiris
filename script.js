@@ -1197,7 +1197,7 @@ window.abrirJogo = async function(tipo) {
     document.body.classList.add('modo-jogo-ativo');
 
     // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'paradoxo'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1329,6 +1329,10 @@ window.abrirJogo = async function(tipo) {
         else if (tipo === 'pager') {
             if (typeof window.inicializarPager === 'function') window.inicializarPager();
         }
+
+        else if (tipo === 'paradoxo') {
+            if (typeof window.inicializarParadoxo === 'function') window.inicializarParadoxo();
+        }
     }
 };
 
@@ -1337,7 +1341,7 @@ window.voltarMenuJogos = function() {
     window.defesaAtiva = false; // Trava do Tower Defense
 
     // 1. Esconde todos os jogos abertos
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'paradoxo'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');

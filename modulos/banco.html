@@ -1,0 +1,113 @@
+<div class="top-bar" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(212, 175, 55, 0.15); z-index: 10; position: sticky; top: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Retornar</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesBanco()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="badge-carteira-banco">
+                <span style="font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-right: 5px;">Liquidez:</span>
+                <span id="banco-carteira-atual" style="font-weight: 900; font-family: monospace; font-size: 1.2rem; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.5);">0</span>💰
+            </div>
+        </div>
+    </div>
+
+    <div class="conteudo-banco" style="padding: 25px 20px; width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 140px; position: relative;">
+        
+        <div id="instrucoes-banco" class="escondido cartao-instrucoes" style="border-left: 5px solid #D4AF37; margin-bottom: 25px; background: rgba(15,15,15,0.95); box-shadow: 0 15px 35px rgba(0,0,0,0.9);">
+            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.3rem;">🏦 Private Bank do Afeto</h4>
+            <ul style="font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                <li>Crie fundos reais para o futuro de vocês (Passagens, Jantares, Casamento).</li>
+                <li>Invista os lucros gerados no ecossistema (Fazenda, Tribunal, Contratos).</li>
+                <li><span style="color: #2ecc71; font-weight: bold;">Rendimento CDI do Amor:</span> Seu capital rende juros compostos diários. A taxa é definida pela sua <b>Ofensiva Diária (🔥)</b>. Se o ritual falhar, o rendimento zera.</li>
+            </ul>
+        </div>
+
+        <div class="cartao-black-patrimonio">
+            <div class="brilho-cartao"></div>
+            <div style="position: relative; z-index: 2;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <span style="font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 3px;">Patrimônio Acumulado</span>
+                    <span style="font-size: 1.5rem; filter: drop-shadow(0 0 5px rgba(212,175,55,0.5));">🏛️</span>
+                </div>
+                <div style="font-size: 3.5rem; color: #FFD700; font-family: monospace; font-weight: 900; letter-spacing: -1px; text-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); margin-bottom: 25px; line-height: 1;">
+                    <span style="font-size: 1.5rem; vertical-align: super; opacity: 0.7;">R$</span><span id="banco-patrimonio-total" class="odometro-financeiro">0</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <div>
+                        <span style="display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px;">Ofensiva Ativa</span>
+                        <span style="color: #ff6b6b; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,107,107,0.5);">🔥 <span id="banco-streak-atual">0</span></span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="display: block; font-size: 0.65rem; color: #2ecc71; text-transform: uppercase; letter-spacing: 1px;">Rendimento Atual</span>
+                        <span style="color: #2ecc71; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 10px rgba(46,204,113,0.5);">+<span id="banco-taxa-juros">0.0</span>% / dia</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px dashed rgba(212,175,55,0.2); padding-bottom: 10px;">
+            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0;">Portfólio de Sonhos</h4>
+            <button class="btn-nova-meta" onclick="window.abrirModalCriarMeta()">+ Novo Fundo</button>
+        </div>
+        
+        <div id="lista-metas-banco" style="display: flex; flex-direction: column; gap: 20px;">
+            </div>
+    </div>
+</div>
+
+<div id="modal-criar-meta-banco" class="modal-financeiro escondido">
+    <div class="cartao-modal-financeiro">
+        <h3 class="titulo-modal-fin">Abertura de Fundo</h3>
+        <p style="font-size: 0.85rem; color: #888; margin-bottom: 20px; text-align: center;">Dê um nome ao sonho e o valor necessário para realizá-lo.</p>
+        
+        <div class="input-grupo-fin">
+            <label>Nome do Fundo</label>
+            <input type="text" id="banco-input-nome-meta" placeholder="Ex: Passagens para Goiânia">
+        </div>
+        
+        <div class="input-grupo-fin">
+            <label>Alvo Financeiro (Custo Total)</label>
+            <div class="input-com-icone">
+                <span class="icone-input">💰</span>
+                <input type="number" id="banco-input-alvo-meta" placeholder="5000">
+            </div>
+        </div>
+
+        <div class="botoes-modal-fin">
+            <button class="btn-fin-cancelar" onclick="window.fecharModalCriarMeta()">Cancelar</button>
+            <button class="btn-fin-confirmar" onclick="window.criarNovaMeta()">Autorizar Criação</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-aporte-banco" class="modal-financeiro escondido">
+    <div class="cartao-modal-financeiro" style="border-color: #2ecc71;">
+        <div style="font-size: 3rem; text-align: center; margin-bottom: -10px; animation: flutuar 3s infinite ease-in-out;">💸</div>
+        <h3 class="titulo-modal-fin" style="color: #2ecc71;">Investir Capital</h3>
+        <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px; text-align: center;">Destino: <strong id="aporte-nome-fundo" style="color: #fff;">Fundo</strong></p>
+        
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px;">Sua Liquidez Disponível</span>
+            <div style="font-size: 1.5rem; color: #FFD700; font-family: monospace; font-weight: bold;" id="aporte-saldo-disponivel">0</div>
+        </div>
+
+        <div class="input-grupo-fin">
+            <div class="input-com-icone" style="border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);">
+                <span class="icone-input" style="color: #2ecc71;">R$</span>
+                <input type="number" id="banco-input-valor-aporte" placeholder="0" style="color: #2ecc71; font-size: 1.5rem; font-weight: bold;" oninput="window.validarInputAporte()">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 25px;">
+            <button class="btn-fin-rapido" onclick="window.aplicarAporteRapido(0.25)">25%</button>
+            <button class="btn-fin-rapido" onclick="window.aplicarAporteRapido(0.50)">50%</button>
+            <button class="btn-fin-rapido" onclick="window.aplicarAporteRapido(1.00)" style="border-color: #FFD700; color: #FFD700;">MAX</button>
+        </div>
+
+        <div class="botoes-modal-fin">
+            <button class="btn-fin-cancelar" onclick="window.fecharModalAporte()">Cancelar</button>
+            <button id="btn-confirmar-aporte" class="btn-fin-confirmar" style="background: linear-gradient(145deg, #2ecc71, #27ae60); color: #000;" onclick="window.confirmarAporte()">Transferir</button>
+        </div>
+    </div>
+</div>

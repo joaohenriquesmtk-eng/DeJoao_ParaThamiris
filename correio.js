@@ -1,15 +1,13 @@
 // ============================================================================
-// CORREIO ELEGANTE (LOGÍSTICA DO AFETO) - TITAN TIER SUPREMO
+// CORREIO ELEGANTE (LOGÍSTICA DO AFETO) - GOD TIER ENGINE
 // ============================================================================
 
-window.TEMPO_TRANSITO_MS = 12 * 60 * 60 * 1000; // 12 Horas Fixas
+window.TEMPO_TRANSITO_MS = 12 * 60 * 60 * 1000; // 12 Horas de Delay
 
 window.inicializarCorreio = function() {
-    console.log("Acionando Protocolo Postal Titan...");
+    console.log("Servidores Postais God Tier Online.");
     window.escutarCartasGlobais();
-    setInterval(() => {
-        window.renderizarListaDeCartas();
-    }, 60000); // Atualiza telemetria a cada minuto
+    setInterval(window.renderizarListaDeCartas, 30000); 
 };
 
 window.toggleInstrucoesCorreio = function() {
@@ -19,6 +17,8 @@ window.toggleInstrucoesCorreio = function() {
 
 window.abrirModalEscrita = function() {
     document.getElementById('modal-escrita-carta').classList.remove('escondido');
+    const nomeEl = document.getElementById('nome-assinatura-redacao');
+    if(nomeEl) nomeEl.innerText = window.MEU_NOME || "Eu";
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
@@ -34,14 +34,17 @@ window.enviarCartaCorreio = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, push } = window.SantuarioApp.modulos;
     
+    // Criptografa para ninguém ler do banco de dados direto
+    const textoSeguro = window.SantuarioCrypto ? window.SantuarioCrypto.codificar(texto) : texto;
+
     push(ref(db, 'utilitarios/correio'), {
         remetente: window.MEU_NOME,
         destinatario: window.NOME_PARCEIRO,
-        conteudo: texto,
+        conteudo: textoSeguro,
         timestampEnvio: Date.now(),
         lida: false
     }).then(() => {
-        if(typeof mostrarToast === 'function') mostrarToast("Documento entregue ao mensageiro.", "📜");
+        if(typeof mostrarToast === 'function') mostrarToast("Envelope lacrado. Mensageiro em rota.", "✉️");
         if(window.Haptics) window.Haptics.sucesso();
         window.fecharModalEscrita();
     });
@@ -57,32 +60,38 @@ window.escutarCartasGlobais = function() {
     });
 };
 
-window.abrirCartaTitan = function(idCarta, elementoLacre) {
-    elementoLacre.classList.add('lacre-quebrando');
-    
-    // SFX de lacre partindo
-    const crackSom = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-    crackSom.playbackRate = 2; crackSom.volume = 0.5; crackSom.play().catch(e=>{});
-    
-    if(window.Haptics) navigator.vibrate([30, 100]);
+// 🚨 A MÁGICA FÍSICA: Abre o envelope em 3 etapas
+window.quebrarSeloEAbrir = function(idCarta, elementoSelo) {
+    const envelopePai = document.getElementById(`env-${idCarta}`);
+    if(!envelopePai) return;
 
+    // 1. Som tátil forte de cera quebrando
+    if(window.Haptics) navigator.vibrate([100, 30, 50]);
+    const crackSom = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+    crackSom.volume = 0.4; crackSom.play().catch(e=>{});
+
+    // 2. Aciona o CSS que rotaciona a aba e sobe o papel
+    envelopePai.classList.add('envelope-aberto');
+    elementoSelo.style.pointerEvents = "none";
+
+    // 3. Atualiza no Firebase como LIDA silenciosamente
     setTimeout(() => {
         if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
         const { db, ref, update } = window.SantuarioApp.modulos;
         update(ref(db, `utilitarios/correio/${idCarta}`), { lida: true });
-    }, 600);
+    }, 1500); // Dá tempo da animação rolar
 };
 
 window.renderizarListaDeCartas = function() {
     const lista = document.getElementById('lista-cartas-correio');
     const rotaSvg = document.getElementById('rota-ativa-svg');
     if (!lista) return;
+    
     lista.innerHTML = "";
 
     const agora = Date.now();
     const cartas = Object.keys(window.bancoCartas).map(id => ({ id, ...window.bancoCartas[id] }));
     
-    // Ordenação Cronológica
     cartas.sort((a, b) => b.timestampEnvio - a.timestampEnvio);
 
     let maiorProgresso = 0;
@@ -95,56 +104,68 @@ window.renderizarListaDeCartas = function() {
         
         if (progresso < 100 && progresso > maiorProgresso) maiorProgresso = progresso;
 
+        // Descriptografa o texto
+        const textoLegivel = window.SantuarioCrypto ? window.SantuarioCrypto.decodificar(carta.conteudo) : carta.conteudo;
         const div = document.createElement('div');
         
         if (progresso < 100) {
-            // CARTA EM TRÂNSITO (ENVELOPE LACRADO COM INFOS DE ROTA)
+            // CARTA EM ROTA (Apenas um card tático de transporte)
             div.innerHTML = `
-                <div class="envelope-titan">
-                    <div style="font-family: monospace; font-size: 0.7rem; color: #5d0000; margin-bottom: 20px; opacity: 0.6;">EM TRÂNSITO GEOGRÁFICO</div>
-                    <div class="lacre-cera-titan" style="cursor: default; opacity: 0.8; filter: grayscale(0.5);"></div>
-                    <div style="margin-top: 20px; text-align: center;">
-                        <span style="display:block; color: #2c3e50; font-family: 'Playfair Display';">Para: ${carta.destinatario}</span>
-                        <div style="width: 150px; height: 2px; background: rgba(0,0,0,0.1); margin: 10px auto;">
-                            <div style="width: ${progresso}%; height: 100%; background: #6ab04c;"></div>
-                        </div>
-                        <span style="font-size: 0.7rem; color: #888; font-family: monospace;">ENTREGA ESTIMADA: ${Math.ceil((window.TEMPO_TRANSITO_MS - tempoPassado) / 3600000)} HORAS</span>
+                <div class="envelope-transito">
+                    <div style="font-family: monospace; font-size: 0.7rem; color: #6ab04c; display:flex; justify-content:space-between;">
+                        <span>De: ${carta.remetente.toUpperCase()}</span>
+                        <span>Carga Selada 🔒</span>
                     </div>
+                    <div class="barra-transito-bg">
+                        <div class="barra-transito-fill" style="width: ${progresso}%"></div>
+                    </div>
+                    <span style="font-size: 0.7rem; color: #888; font-family: monospace;">FALTAM: ${Math.ceil((window.TEMPO_TRANSITO_MS - tempoPassado) / 3600000)} HORAS</span>
                 </div>
             `;
         } else {
             // CARTA ENTREGUE
-            if (carta.destinatario === window.MEU_NOME && !carta.lida) {
-                div.innerHTML = `
-                    <div class="envelope-titan" style="border-color: #6ab04c; box-shadow: 0 0 30px rgba(106,176,76,0.2);">
-                        <div style="color: #6ab04c; font-family: monospace; font-size: 0.7rem; margin-bottom: 20px; font-weight: bold; letter-spacing: 2px;">MENSAGEIRO NO LOCAL</div>
-                        <div class="lacre-cera-titan" onclick="window.abrirCartaTitan('${carta.id}', this)"></div>
-                        <div style="margin-top: 20px; text-align: center;">
-                            <span style="color: #2c3e50; font-family: 'Playfair Display'; font-weight: bold;">Correspondência de ${carta.remetente}</span>
-                            <p style="font-size: 0.6rem; color: #888; text-transform: uppercase; margin-top: 10px;">Toque para quebrar o lacre</p>
+            const lida = carta.lida;
+            const foiPraMim = carta.destinatario === window.MEU_NOME;
+            
+            // Se for para mim e não lida, ela nasce FECHADA. Se já foi lida (ou fui eu que mandei), nasce ABERTA.
+            const classeEstado = (foiPraMim && !lida) ? "" : "envelope-aberto";
+            const seloOculto = (foiPraMim && !lida) ? "" : "style='opacity:0; pointer-events:none;'";
+            
+            const dataFormatada = new Date(carta.timestampEnvio + window.TEMPO_TRANSITO_MS).toLocaleDateString('pt-BR');
+
+            div.innerHTML = `
+                <div class="container-carta-3d" style="margin-bottom: ${lida || !foiPraMim ? '120px' : '0'};">
+                    <div id="env-${carta.id}" class="envelope-fisico ${classeEstado}">
+                        
+                        <div class="papel-timbrado-interno">
+                            <div style="font-family:monospace; font-size:0.6rem; color:#888; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:15px;">Entregue em: ${dataFormatada}</div>
+                            <div style="white-space: pre-wrap; font-size: 1.1rem;">${textoLegivel}</div>
+                            <div style="margin-top:20px; text-align:right; font-style:italic; color:#666;">— ${carta.remetente}</div>
                         </div>
+
+                        <div class="aba-esquerda"></div>
+                        <div class="aba-direita"></div>
+                        <div class="aba-inferior"></div>
+                        <div class="aba-superior"></div>
+                        
+                        <div class="selo-cera-real" ${seloOculto} onclick="window.quebrarSeloEAbrir('${carta.id}', this)"></div>
+                        
                     </div>
-                `;
-            } else {
-                // CARTA JÁ ABERTA
-                div.innerHTML = `
-                    <div class="papel-carta-titan">
-                        <div style="font-size: 0.7rem; color: #999; margin-bottom: 20px; font-family: monospace; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                            ARQUIVADO EM ${new Date(carta.timestampEnvio).toLocaleDateString()} • ORIGEM: ${carta.remetente}
-                        </div>
-                        <div style="min-height: 100px;">${carta.conteudo.replace(/\n/g, '<br>')}</div>
-                        <div style="margin-top: 30px; text-align: right; font-style: italic; opacity: 0.7;">— Assinado, ${carta.remetente}</div>
-                    </div>
-                `;
-            }
+                </div>
+            `;
         }
         lista.appendChild(div);
     });
 
-    // Atualiza o rastro de luz no mapa (stroke-dashoffset vai de 300 a 0)
+    // Atualiza HUD Principal do Radar
     if (rotaSvg) {
-        const offset = 300 - (300 * (maiorProgresso / 100));
+        // stroke-dashoffset vai de 350 (vazio) a 0 (cheio)
+        const offset = 350 - (350 * (maiorProgresso / 100));
         rotaSvg.style.strokeDashoffset = offset;
-        document.getElementById('status-envio').innerText = maiorProgresso > 0 ? "EM TRÂNSITO" : "AGUARDANDO";
+        const statusRadar = document.getElementById('status-envio');
+        if(statusRadar) {
+            statusRadar.innerText = maiorProgresso > 0 ? "MENSAGEIRO EM ROTA" : "SISTEMA OCIOSO";
+            statusRadar.style.color = maiorProgresso > 0 ? "#6ab04c" : "#888";
+        }
     }
 };

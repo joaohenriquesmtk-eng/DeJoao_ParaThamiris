@@ -1,3 +1,48 @@
+// ============================================================================
+// MOTOR DE INJEÇÃO SOB DEMANDA (BYPASS DE ANTIVÍRUS/EXTENSÕES)
+// ============================================================================
+
+window.modulosCarregadosHTML = {};
+
+window.injetarModuloHTML = function(jogoId) {
+    return new Promise((resolve) => {
+        const container = document.getElementById(`container-${jogoId}`);
+        if (!container) return resolve(false);
+
+        // Se já carregou, não gasta processamento
+        if (window.modulosCarregadosHTML[jogoId]) return resolve(true);
+
+        if(typeof mostrarToast === 'function') mostrarToast("Sintonizando módulo...", "⏳");
+
+        // 🚨 A MÁGICA FURTIVA: Substituímos o 'fetch' moderno pelo 'XMLHttpRequest'
+        // Isso passa invisível pelos bloqueios do 200.js (Kaspersky/AdBlocks)
+        const xhr = new XMLHttpRequest();
+        const urlFurtiva = `./modulos/${jogoId}.html?v=${Date.now()}`;
+        
+        xhr.open('GET', urlFurtiva, true);
+        
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                container.innerHTML = xhr.responseText;
+                window.modulosCarregadosHTML[jogoId] = true;
+                resolve(true);
+            } else {
+                console.error(`Falha do servidor ao buscar [${jogoId}]: Status ${xhr.status}`);
+                if(typeof mostrarToast === 'function') mostrarToast("Erro ao ler o arquivo HTML.", "❌");
+                resolve(false);
+            }
+        };
+
+        xhr.onerror = function() {
+            console.error(`Ataque bloqueado pela extensão no módulo [${jogoId}]`);
+            if(typeof mostrarToast === 'function') mostrarToast("Extensão cortou a conexão.", "❌");
+            resolve(false);
+        };
+
+        xhr.send();
+    });
+};
+
 // ==========================================
 // VARIÁVEIS GLOBAIS DE ESTADO
 // ==========================================
@@ -1135,7 +1180,7 @@ window.fecharModal = function(apenasLimpar = false) {
 // ==========================================
 // GERENCIADOR DE TELAS (MEMÓRIA INTELIGENTE E BLINDADA)
 // ==========================================
-window.abrirJogo = function(tipo) {
+window.abrirJogo = async function(tipo) {
     // 1. Esconde a interface principal de jogos, a navegação inferior e o áudio
     const menuLista = document.getElementById('menu-jogos-lista');
     const menuGrid = document.querySelector('.jogos-grid');
@@ -1152,7 +1197,7 @@ window.abrirJogo = function(tipo) {
     document.body.classList.add('modo-jogo-ativo');
 
     // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'hidratacao', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1161,6 +1206,19 @@ window.abrirJogo = function(tipo) {
     // 3. Mostra o container do jogo selecionado e DÁ O GATILHO DE INÍCIO
     const containerAtivo = document.getElementById(`container-${tipo}`);
     if (containerAtivo) {
+        
+        // 🚨 A TÁTICA DO CAVALO DE TROIA: Se for a Água, NÃO faz o download (fura o antivírus)
+        if (tipo !== 'agua') {
+            const htmlPronto = await window.injetarModuloHTML(tipo);
+            
+            // Se a internet cair ou o arquivo não existir, ele aborta e volta pro menu
+            if (!htmlPronto) {
+                window.voltarMenuJogos();
+                return;
+            }
+        }
+
+        // Se o HTML foi injetado (ou se era a água que já estava lá), ele mostra a tela
         containerAtivo.classList.remove('escondido');
         
         // --- INICIALIZAÇÃO INTELIGENTE ---
@@ -1205,11 +1263,19 @@ window.abrirJogo = function(tipo) {
             if(typeof iniciarMiniFazenda === 'function') iniciarMiniFazenda();
         }
         else if (tipo === 'jardim') {
-            if (typeof inicializarPrisma3D === 'function') inicializarPrisma3D(); // Acorda a Árvore
-            if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
             const capitalUI = document.getElementById('jardim-moedas');
             if (capitalUI) capitalUI.innerText = window.pontosDoCasal || 0;
-            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+            
+            // 🚨 A MÁGICA DO 3D: Damos 150ms para a tela existir fisicamente antes de pintar o 3D
+            setTimeout(() => {
+                if (typeof inicializarPrisma3D === 'function') inicializarPrisma3D();
+                if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
+                
+                // Força o recalculo da Placa de Vídeo 3 vezes em tempos diferentes para garantir o encaixe
+                window.dispatchEvent(new Event('resize')); 
+                setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+                setTimeout(() => window.dispatchEvent(new Event('resize')), 500);
+            }, 150); 
         }
         // 🚨 INTEGRAÇÕES FINAIS (CONTRATOS E DEFESA)
         else if (tipo === 'contratos') {
@@ -1236,7 +1302,7 @@ window.abrirJogo = function(tipo) {
             if (typeof window.inicializarLogistica === 'function') window.inicializarLogistica();
         }
 
-        else if (tipo === 'hidratacao') {
+        else if (tipo === 'agua') {
             if (typeof window.inicializarHidratacao === 'function') window.inicializarHidratacao();
         }
 
@@ -1259,6 +1325,10 @@ window.abrirJogo = function(tipo) {
         else if (tipo === 'correio') {
             if (typeof window.inicializarCorreio === 'function') window.inicializarCorreio();
         }
+
+        else if (tipo === 'pager') {
+            if (typeof window.inicializarPager === 'function') window.inicializarPager();
+        }
     }
 };
 
@@ -1267,7 +1337,7 @@ window.voltarMenuJogos = function() {
     window.defesaAtiva = false; // Trava do Tower Defense
 
     // 1. Esconde todos os jogos abertos
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'hidratacao', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');

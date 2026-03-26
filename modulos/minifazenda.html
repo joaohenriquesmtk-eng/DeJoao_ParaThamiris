@@ -1,0 +1,98 @@
+<div id="clima-overlay" class="camada-clima"></div>
+    <div id="vagalumes-overlay" class="escondido"></div>
+
+    <div id="alerta-rotacao" class="alerta-rotacao">
+        <div class="icone-celular-girando">📱</div>
+        <h3 style="color: #2ecc71; margin-bottom: 10px;">Modo Paisagem Exigido</h3>
+        <p>A Mini Fazenda Pro é um simulador avançado.</p>
+        <p><b>Por favor, deite o seu celular para iniciar o expediente.</b></p>
+    </div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(46, 204, 113, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesFazenda()">❓</button>
+            <button class="btn-info" onclick="abrirPainelBurocracia()" style="font-size: 1.2rem;">⚖️</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);">💰 <span id="fazenda-capital">0</span></span>
+            <span class="recurso">🌤️ <span id="fazenda-clima-texto">Sol</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-fazenda">
+        <div id="instrucoes-fazenda" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71;">
+            <h4 style="color: #2ecc71;">🚜 Simulador Agrícola</h4>
+            <ul style="font-size: 0.85rem;">
+                <li><b>Clima Vivo:</b> A chuva 🌧️ irriga as plantas grátis, mas dobra o risco de Fungos 🍄. Dias ensolarados secam o solo 2x mais rápido!</li>
+                <li><b>Bolsa de Valores:</b> Venda seus grãos no Mercado quando o preço estiver em alta!</li>
+                <li><b>Manejo de Solo:</b> Monitore o pH e NPK. Solo ácido (pH < 5.5) atrasa a colheita. Compre Calcário e Adubo.</li>
+                <li><b>Burocracia Ambiental ⚖️:</b> Vença casos no <b>Tribunal do Afeto</b> para conseguir Licenças de Expansão e Alvarás para Defensivos Pesados (Venenos)!</li>
+            </ul>
+        </div>
+
+        <div id="painel-burocracia" class="escondido cartao-instrucoes" style="border-left: 5px solid #D4AF37; background: rgba(20, 20, 20, 0.95);">
+            <h4 style="color: #D4AF37; text-align: center;">⚖️ Depto. Jurídico Ambiental</h4>
+            <div class="status-burocracia" style="font-size: 0.9rem; margin-top: 15px;">
+                <p style="margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <b>Licença de Expansão (Terreno 3):</b><br>
+                    <span id="status-licenca-expansao" style="color: #e74c3c;">Bloqueado (Requer 5 Vitórias no Tribunal)</span>
+                </p>
+                <p style="margin-bottom: 15px;">
+                    <b>Alvará de Defensivos (Herbicida/Fungicida):</b><br>
+                    <span id="status-alvara-defensivos" style="color: #e74c3c;">Bloqueado (Requer 10 Vitórias no Tribunal)</span>
+                </p>
+                
+                <div style="padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 8px; text-align: center; border: 1px solid rgba(212,175,55,0.3);">
+                    <span style="font-size: 1.5rem;">🏛️</span><br>
+                    <b>Histórico Oficial do Tribunal:</b><br>
+                    <span id="fazenda-vitorias-tribunal" style="color: #2ecc71; font-weight: bold; font-size: 1.4rem;">0</span> Casos Vencidos
+                </div>
+            </div>
+            <button class="btn-acao" onclick="fecharPainelBurocracia()" style="margin-top: 15px; width: 100%;">Arquivar Processos</button>
+        </div>
+
+        <div class="area-pastagem">
+            <div id="animal-vaca" class="animatronic-fazenda escondido" onclick="interagirAnimatronic('vaca')">
+                <span class="emoji-3d">🐄</span>
+                <div id="status-vaca" class="status-animal">Fome: 0%</div>
+            </div>
+            <div id="maquina-trator" class="animatronic-fazenda escondido" onclick="interagirAnimatronic('trator')">
+                <span class="emoji-3d">🚜</span>
+                <div class="status-animal" style="color: #f1c40f;">Operacional</div>
+            </div>
+        </div>
+
+        <div id="grade-fazenda" class="grade-plantacao">
+            </div>
+
+        <div class="painel-economia-agricola">
+            <div class="modulo-economia silo">
+                <h5>🏭 Meu Silo</h5>
+                <div class="item-estoque">🌾 Soja: <span id="estoque-soja">0</span> sc</div>
+                <div class="item-estoque">🌽 Milho: <span id="estoque-milho">0</span> sc</div>
+                <div class="item-estoque">☕ Café: <span id="estoque-cafe">0</span> sc</div>
+                <div class="item-estoque" style="color: #fffdf2; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px;">🥛 Leite: <span id="estoque-leite">0</span> L</div>
+            </div>
+            
+            <div class="modulo-economia mercado">
+                <h5>📈 Bolsa (R$)</h5>
+                <div class="item-mercado" onclick="venderProduto('soja')">🌾 Soja: <span id="preco-soja" class="preco-neutro">120</span> <button class="btn-vender">Vender</button></div>
+                <div class="item-mercado" onclick="venderProduto('milho')">🌽 Milho: <span id="preco-milho" class="preco-neutro">50</span> <button class="btn-vender">Vender</button></div>
+                <div class="item-mercado" onclick="venderProduto('cafe')">☕ Café: <span id="preco-cafe" class="preco-neutro">800</span> <button class="btn-vender">Vender</button></div>
+                <div class="item-mercado" onclick="venderProduto('leite')">🥛 Leite: <span id="preco-leite" class="preco-neutro">15</span> <button class="btn-vender">Vender</button></div>
+            </div>
+        </div>
+
+        <div id="loja-agricola" class="loja-agricola-container">
+            <div class="abas-loja" style="flex-wrap: wrap;">
+                <button class="aba-btn ativa" onclick="mudarAbaLoja('sementes')">Sementes</button>
+                <button class="aba-btn" onclick="mudarAbaLoja('insumos')">Manejo</button>
+                <button class="aba-btn" onclick="mudarAbaLoja('pecuaria')">Pecuária</button>
+                <button class="aba-btn" onclick="mudarAbaLoja('maquinas')">Máquinas</button>
+            </div>
+            <div id="conteudo-loja" class="conteudo-loja-scroll">
+                </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+<div id="flash-choque" class="escondido"></div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesJulgamento()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso">⚖️ Nível <span id="julgamento-nivel">1</span></span>
+            <span class="recurso" style="box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); color: #2ecc71;">🌳 <span id="julgamento-arvore-sync">Conectado</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-julgamento">
+        
+        <div id="instrucoes-julgamento" class="escondido cartao-instrucoes" style="border-left: 5px solid #9b59b6;">
+            <h4 style="color: #9b59b6;">💎 Julgamento Magnético</h4>
+            <ul style="font-size: 0.85rem;">
+                <li>Alinhe 3 ou mais joias (Agronômicas ou Jurídicas) para coletar evidências.</li>
+                <li><span style="color: #f1c40f;">Combos de 5 Joias:</span> Criam a <b>Semente Dourada</b>.</li>
+                <li>Toque na Semente Dourada para detonar uma <b>Onda de Choque</b> que limpa a tela inteira!</li>
+                <li><b>Integração Global:</b> A energia das joias alimenta diretamente o crescimento da <b>Árvore da Vida</b> no seu Jardim!</li>
+            </ul>
+        </div>
+
+        <div class="painel-score-choque">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px;">
+                <div style="text-align: left;">
+                    <div class="score-titulo">Poder Coletado</div>
+                    <div class="score-valor" id="julgamento-pontuacao">0</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="score-titulo" style="color: #e74c3c;">Movimentos</div>
+                    <div class="score-valor" id="julgamento-movimentos" style="color: #e74c3c; font-size: 2.2rem; animation: pulsarJoia 2s infinite alternate;">15</div>
+                </div>
+            </div>
+            <div class="score-meta">Meta: <span id="julgamento-meta">1000</span> (Nível <span id="julgamento-prox-nivel">1</span>)</div>
+            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.6); border-radius: 4px; margin-top: 8px; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);">
+                <div id="julgamento-barra-progresso" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9b59b6, #3498db, #2ecc71); border-radius: 4px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            </div>
+        </div>
+
+        <div id="julgamento-grade" class="tabuleiro-match3">
+            </div>
+        
+        <div id="texto-combo-flutuante" class="texto-combo escondido"></div>
+
+        <div style="margin-top: 20px; display: flex; gap: 15px;">
+            <button id="julgamento-btn-novo" class="btn-refresh" style="font-size: 1.5rem; border-radius: 50%; width: 60px; height: 60px; padding: 0;">↻</button>
+        </div>
+    </div>
+</div>

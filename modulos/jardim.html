@@ -1,0 +1,71 @@
+<div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(46, 204, 113, 0.4); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesJardim()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">💰 Capital: <span id="jardim-moedas">0</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-jardim">
+        <div id="instrucoes-jardim" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71;">
+            <h4 style="color: #2ecc71; text-align: center;">🌳 A Árvore da Vida</h4>
+            <ul style="font-size: 0.85rem;">
+                <li>Este é o coração do Santuário. Todo o esforço de vocês nos outros jogos converge para cá.</li>
+                <li>Usem o <b>Capital 💰</b> para nutrir a planta. Cada elemento dá um tipo de energia:</li>
+                <li>💧 <b>Orvalho (10💰):</b> Crescimento estável.</li>
+                <li>☀️ <b>Luz Solar (25💰):</b> Crescimento forte.</li>
+                <li>✨ <b>Pó de Estrela (50💰):</b> Magia pura, crescimento massivo!</li>
+                <li>O Prisma 3D protege a essência do amor de vocês. Girem-no para apreciar a energia fluindo!</li>
+            </ul>
+        </div>
+
+        <div class="area-estufa">
+            <div id="prisma-container" class="prisma-pedestal">
+                <div id="prisma-3d" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;"></div>
+                <div id="brilho-pedestal" class="brilho-base"></div>
+            </div>
+            
+            <div class="status-estufa" style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin-top: 20px;">
+                <div id="status-texto" class="texto-evolucao" style="text-align: center;">Sintonizando energia vital...</div>
+                <div id="aviso-regada" class="texto-ultima-acao" style="text-align: center;">Aguardando a primeira nutrição do dia.</div>
+                
+                <div class="badge-ciclos" style="margin-top: 5px;">
+                    <span class="icone-ciclo">♾️</span> 
+                    <span>Ciclos Completos: <span id="contador-ciclos-numero">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="painel-progresso-jardim">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
+                <span>Semente</span>
+                <span>Florescimento</span>
+            </div>
+            <div class="trilha-crescimento">
+                <div id="progresso-crescimento" class="seiva-vital"></div>
+            </div>
+            <div style="text-align: center; margin-top: 5px; font-weight: bold; color: #2ecc71;" id="porcentagem-jardim">0%</div>
+        </div>
+
+        <div class="painel-acoes-jardim">
+            <button class="btn-nutrir btn-agua" onclick="nutrirPlanta('agua')">
+                <span class="icone-btn">💧</span>
+                <span class="nome-btn">Orvalho</span>
+                <span class="custo-btn">10💰</span>
+            </button>
+            <button class="btn-nutrir btn-luz" onclick="nutrirPlanta('luz')">
+                <span class="icone-btn">☀️</span>
+                <span class="nome-btn">Luz Solar</span>
+                <span class="custo-btn">25💰</span>
+            </button>
+            <button class="btn-nutrir btn-magia" onclick="nutrirPlanta('magia')">
+                <span class="icone-btn">✨</span>
+                <span class="nome-btn">Pó de Estrela</span>
+                <span class="custo-btn">50💰</span>
+            </button>
+        </div>
+
+    </div>
+</div>

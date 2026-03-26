@@ -1,0 +1,79 @@
+<div class="top-bar" style="background: rgba(0,0,0,0.7); border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
+            <button class="btn-info" onclick="abrirDossieTribunal()" style="font-size: 1.2rem;">📊</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso">⚖️ Nível <span id="tribunal-nivel">1</span></span>
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">❤️ Vidas: <span id="tribunal-estrelas">3</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-tribunal">
+        <div id="instrucoes-tribunal" class="escondido cartao-instrucoes">
+            <h4>📜 Manual do Juizado Afetivo</h4>
+            <ul>
+                <li>Leia o "Caso Narrativo" e entenda a infração cometida.</li>
+                <li>Sua missão é selecionar as provas na mesa até que a <b>Soma</b> seja <b>EXATAMENTE IGUAL</b> à Meta.</li>
+                <li><span style="color: #f1c40f;">Dica de Ouro:</span> Os nomes das provas (Print Oculto, Áudio de 5 min) são divertidos, mas foque nos <b>números</b>!</li>
+                <li><span style="color: #e74c3c;">🚨 Testemunhas Surpresa:</span> Elas podem invadir o tribunal e proibir números ímpares, limitar cartas, etc.</li>
+                <li>Travou? Use a <b>Dica de Amor</b> (custa moedas da Fazenda) para revelar uma carta correta.</li>
+                <li>Bata o martelo! Acertar rende moedas, errar custa uma estrela.</li>
+            </ul>
+        </div>
+
+        <div id="dossie-tribunal" class="escondido cartao-instrucoes" style="border-left: 5px solid #3498db;">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h4 style="color: #3498db; font-size: 1.4rem; margin-bottom: 5px;">🏛️ Dossiê Confidencial</h4>
+                <p id="tribunal-patente" style="font-family: 'Playfair Display', serif; color: #FFD700; font-size: 1.1rem; letter-spacing: 1px;">Estagiários do Amor</p>
+            </div>
+            
+            <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 15px;">
+                <div>
+                    <div style="font-size: 2rem; color: #2ecc71;" id="stats-ganhos">0</div>
+                    <div style="font-size: 0.8rem; color: #ccc; text-transform: uppercase;">Casos Vencidos</div>
+                </div>
+                <div>
+                    <div style="font-size: 2rem; color: #e74c3c;" id="stats-perdidos">0</div>
+                    <div style="font-size: 0.8rem; color: #ccc; text-transform: uppercase;">Processos Perdidos</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; font-size: 0.9rem; color: #aaa;">
+                Taxa de Sucesso: <strong id="stats-taxa" style="color: #fff;">0%</strong>
+            </div>
+            
+            <button class="btn-acao" onclick="fecharDossieTribunal()" style="width: 100%; margin-top: 15px; padding: 10px; font-size: 1rem;">Fechar Dossiê</button>
+        </div>
+
+        <div class="cartao-caso-rpg">
+            <h3 id="tribunal-titulo-caso">⚖️ Carregando os autos do processo...</h3>
+            <p id="tribunal-descricao-caso" style="font-style: italic; margin-bottom: 10px; color: #ccc;">
+                Aguardando o escrivão...
+            </p>
+            <div class="meta-painel">
+                <div class="meta-item">🎯 Meta: <span id="tribunal-meta">0</span></div>
+                <div class="meta-item" style="color: #FFD700;">🏆 Sua Soma: <span id="tribunal-pontos">0</span></div>
+            </div>
+        </div>
+
+        <div id="area-testemunha" class="testemunha-card escondido">
+            <span id="icone-testemunha" class="testemunha-icone">👀</span>
+            <div class="testemunha-texto">
+                <strong id="nome-testemunha">Testemunha Surpresa</strong>
+                <p id="tribunal-regra-testemunha">"Nova regra aplicada à rodada!"</p>
+            </div>
+        </div>
+
+        <div id="tribunal-mao" class="mesa-cartas-rpg"></div>
+
+        <div class="area-martelo">
+            <div id="martelo-3d" class="martelo-icone escondido">🔨</div>
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button id="tribunal-btn-julgar" class="btn-acao btn-julgar-rpg" onclick="baterMarteloVisual()">Bater o Martelo</button>
+                <button id="tribunal-btn-reiniciar" class="btn-refresh" style="width: 60px; padding: 0; font-size: 1.5rem;" onclick="window.reiniciarTribunalManual()">↻</button>
+            </div>
+        </div>
+    </div>
+</div>

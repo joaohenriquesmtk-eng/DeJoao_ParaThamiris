@@ -1,0 +1,66 @@
+<div class="top-bar" style="background: rgba(0,0,0,0.8); border-bottom: 1px solid rgba(155, 89, 182, 0.4);">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesSincronia()">❓</button>
+            <button class="btn-info" onclick="abrirLinhaDoTempoSincronia()" style="font-size: 1.2rem;">📜</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);">💫 Conexões: <span id="sincronia-contador">0</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-sincronia">
+        <div id="instrucoes-sincronia" class="escondido cartao-instrucoes" style="border-left: 5px solid #9b59b6;">
+            <h4 style="color: #9b59b6;">🧠 Telepatia em Tempo Real</h4>
+            <ul>
+                <li>Entrem no jogo ao mesmo tempo. A Orbe avisará quando as mentes estiverem conectadas.</li>
+                <li>Leiam a reflexão do dia e digitem a resposta secreta.</li>
+                <li>Quando os dois travarem a resposta, a verdade será revelada!</li>
+                <li>Respostas iguais (ou com a mesma essência) geram uma Super Conexão e muitos pontos!</li>
+            </ul>
+        </div>
+
+        <div class="area-orbe">
+            <div id="status-conexao" class="status-texto">Aguardando a conexão de Goiânia...</div>
+            
+            <div class="orbe-container">
+                <div id="orbe-energia" class="orbe orbe-desconectada"></div>
+                <div class="anel-orbita anel-1"></div>
+                <div class="anel-orbita anel-2"></div>
+            </div>
+            
+            <div id="tema-sincronia" class="tema-pergunta">
+            Sintonizando frequências quânticas... 📡
+        </div>
+        </div>
+
+        <div class="area-telepatia">
+            <div class="inputs-telepatia">
+                <div class="campo-jogador">
+                    <label>Sua Mente:</label>
+                    <input type="text" id="input-minha-palavra" placeholder="Digite sua palavra..." autocomplete="off">
+                    <button id="btn-travar-mente" class="btn-acao btn-travar" onclick="travarPalavra()">Trancar Resposta 🔒</button>
+                </div>
+                
+                <div class="campo-parceiro">
+                    <label>A Mente Dela:</label>
+                    <div id="status-parceira-digitando" class="status-parceira">Aguardando conexão...</div>
+                    <div id="palavra-parceira-oculta" class="palavra-oculta escondido">Resposta Trancada! 🔒</div>
+                    <div id="palavra-parceira-revelada" class="palavra-revelada escondido">???</div>
+                </div>
+
+                <div id="area-nova-rodada" class="escondido" style="margin-top: 15px;">
+                    <button class="btn-acao" onclick="iniciarNovaInvestigacao()" style="width: 100%; background: linear-gradient(145deg, #2ecc71, #27ae60); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);">Próxima Investigação 🔍</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="linha-tempo-sincronia" class="escondido cartao-instrucoes" style="border-left: 5px solid #3498db; width: 90%; max-width: 400px; margin-top: 20px;">
+            <h4 style="text-align: center; color: #3498db;">📜 Nossas Conexões Eternas</h4>
+            <div id="lista-historico-sincronia" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.9rem;">
+                <p style="text-align: center; color: #aaa; font-style: italic;">Nenhuma conexão registrada ainda.</p>
+            </div>
+            <button class="btn-acao" onclick="fecharLinhaDoTempo()" style="width: 100%; margin-top: 15px;">Fechar Arquivos</button>
+        </div>
+    </div>
+</div>

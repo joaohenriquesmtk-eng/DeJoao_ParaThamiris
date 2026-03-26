@@ -1,0 +1,70 @@
+<div style="position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); font-size: 15rem; opacity: 0.03; pointer-events: none; z-index: 0;">⚖️</div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(212, 175, 55, 0.2); z-index: 10; position: sticky; top: 0;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Retornar</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesCartorio()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.5); color: #FFD700;">
+                Fundo: <span id="cartorio-moedas-hud" style="font-weight: bold; font-family: monospace; font-size: 1.1rem; margin-left: 5px;">0</span>💰
+            </span>
+        </div>
+    </div>
+
+    <div class="conteudo-cartorio" style="padding: 20px; width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 120px; position: relative; z-index: 2;">
+        
+        <div id="instrucoes-cartorio" class="escondido cartao-instrucoes" style="border-left: 5px solid #D4AF37; margin-bottom: 20px; background: rgba(20,20,20,0.95); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.2rem;">📜 Tabelionato do Afeto</h4>
+            <ul style="font-size: 0.85rem; color: #ccc;">
+                <li>Firme compromissos inquebráveis no mundo real.</li>
+                <li>Empenhe moedas do Santuário como <b>Garantia Legal</b>.</li>
+                <li>Cumprir a promessa e receber o Alvará do seu amor devolve a garantia com <b>300% de Juros!</b></li>
+                <li>A quebra do pacto resulta na execução da dívida e perda dos fundos.</li>
+            </ul>
+        </div>
+
+        <div class="cartao-vidro" style="text-align: center; margin-bottom: 30px; border: 1px solid rgba(212,175,55,0.3); background: linear-gradient(145deg, rgba(20,20,20,0.8), rgba(5,5,5,0.9)); box-shadow: inset 0 0 30px rgba(212,175,55,0.05), 0 15px 35px rgba(0,0,0,0.6);">
+            <div style="font-size: 2.5rem; margin-bottom: -15px; color: #D4AF37;">✍️</div>
+            <h3 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px;">Lavratura de Acordo</h3>
+            <p style="font-size: 0.85rem; color: #888; margin-bottom: 25px; font-style: italic;">Sob as leis soberanas do Santuário.</p>
+            
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="color: #D4AF37; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;">Eu, de livre e espontânea vontade, prometo:</label>
+                <textarea id="input-promessa-texto" placeholder="Ex: Te ligar diariamente às 20 horas..." rows="2" style="width: 100%; background: transparent; border: none; border-bottom: 1px dashed rgba(212, 175, 55, 0.5); color: #fff; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; padding: 10px 0; outline: none; resize: none;"></textarea>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px;">
+                <div style="text-align: left;">
+                    <span style="display: block; font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px;">Garantia a Reter</span>
+                    <span style="font-size: 0.7rem; color: #2ecc71;">Retorno de 300% se cumprido</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <input type="number" id="input-promessa-valor" placeholder="100" style="width: 70px; background: transparent; border: none; border-bottom: 2px solid #D4AF37; color: #FFD700; font-family: monospace; font-size: 1.8rem; text-align: right; outline: none; margin-right: 5px;">
+                    <span style="font-size: 1.5rem;">💰</span>
+                </div>
+            </div>
+
+            <button class="btn-acao btn-carimbo-cera" onclick="window.lavrarContrato()" style="width: 100%; font-family: 'Playfair Display', serif; font-size: 1.2rem; padding: 15px; background: linear-gradient(145deg, #8b0000, #510000); border: 1px solid #ff4d4d; color: #FFD700; box-shadow: 0 5px 20px rgba(139, 0, 0, 0.6); position: relative; overflow: hidden;">
+                Selar Pacto com Cera
+            </button>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
+            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.5));"></div>
+            <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Vigência Legal</h4>
+            <div style="flex: 1; height: 1px; background: linear-gradient(-90deg, transparent, rgba(212,175,55,0.5));"></div>
+        </div>
+        
+        <div id="lista-contratos-ativos" style="display: flex; flex-direction: column; gap: 20px;">
+            </div>
+    </div>
+</div>
+
+<div id="flash-carimbo-cera" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 99999; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);">
+    <div style="font-size: 8rem; filter: drop-shadow(0 10px 20px rgba(255,0,0,0.5)); animation: pancadaCarimbo 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">
+        <span style="position: relative; display: inline-block;">
+            <div style="width: 120px; height: 120px; background: #8b0000; border-radius: 50%; border: 4px solid #510000; display: flex; align-items: center; justify-content: center; color: #FFD700; font-family: 'Playfair Display', serif; font-size: 4rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 30px rgba(139,0,0,0.8);">§</div>
+        </span>
+    </div>
+</div>

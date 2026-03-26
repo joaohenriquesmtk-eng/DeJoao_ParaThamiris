@@ -492,7 +492,8 @@ function julgarCaso() {
     }
 }
 
-document.getElementById('tribunal-btn-reiniciar').addEventListener('click', function() {
+// Função global para reiniciar o caso (Blindada contra o Lazy Load)
+window.reiniciarTribunalManual = function() {
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-5, "Reset Tribunal");
     iniciarNovoCaso();
-});
+};

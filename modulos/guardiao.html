@@ -1,0 +1,115 @@
+<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(253,150,68,0.05) 2px, transparent 2px); background-size: 50px 50px; pointer-events: none; z-index: 0; opacity: 0.5;"></div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(30px); border-bottom: 1px solid rgba(253, 150, 68, 0.2); z-index: 10; position: sticky; top: 0;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Retornar</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesGuardiao()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span style="color: #fd9644; font-weight: 900; font-family: 'Playfair Display', serif; font-size: 1.2rem; letter-spacing: 2px; text-shadow: 0 0 15px rgba(253,150,68,0.6);">INCUBADORA 🧬</span>
+        </div>
+    </div>
+
+    <div class="conteudo-guardiao" style="padding: 20px; width: 100%; max-width: 550px; margin: 0 auto; padding-bottom: 140px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
+        
+        <div id="instrucoes-guardiao" class="escondido cartao-instrucoes" style="border-left: 5px solid var(--pet-cor-base, #fd9644); margin-bottom: 20px; background: rgba(10,5,0,0.95); box-shadow: 0 20px 50px rgba(0,0,0,1); width: 100%; transition: border-color 0.5s;">
+            <h4 style="color: var(--pet-cor-base, #fd9644); font-family: 'Playfair Display', serif; font-size: 1.3rem; transition: color 0.5s;">🧬 O Guardião Cibernético</h4>
+            <ul style="font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                <li>Este constructo de luz sobrevive do código de afeto de vocês.</li>
+                <li>Mantenham a bio-energia acima de 80% para habilitar a <b>Mineração de Ouro</b>.</li>
+                <li>O holograma reagirá visualmente à falta de cuidado. Não o deixem apagar.</li>
+            </ul>
+        </div>
+
+        <div class="camara-holografica-pet">
+            <div class="feixe-luz-holograma"></div>
+            
+            <div id="entidade-pet" class="pet-vivo-animacao" style="--pet-cor-base: #fd9644;">
+                <svg viewBox="0 0 200 200" width="180" height="180" class="svg-guardiao-holograma">
+                    <defs>
+                        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2" />
+                            <feMerge>
+                                <feMergeNode in="blur2" />
+                                <feMergeNode in="blur1" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    
+                    <g filter="url(#neon-glow)" class="poligonos-pet">
+                        <polygon points="50,30 80,80 30,90" class="poly-fundo"/>
+                        <polygon points="150,30 120,80 170,90" class="poly-fundo"/>
+                        <polygon points="80,80 120,80 100,120" class="poly-frente"/>
+                        <polygon points="30,90 80,80 100,120 50,150" class="poly-lateral"/>
+                        <polygon points="170,90 120,80 100,120 150,150" class="poly-lateral"/>
+                        <polygon points="50,150 100,120 100,180" class="poly-focinho"/>
+                        <polygon points="150,150 100,120 100,180" class="poly-focinho"/>
+                        <polygon points="90,170 110,170 100,185" fill="#fff" opacity="0.8"/>
+                        
+                        <path id="pet-olho-esq" d="M 60,110 Q 75,95 90,110" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                        <path id="pet-olho-dir" d="M 140,110 Q 125,95 110,110" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                    </g>
+                </svg>
+
+                <div id="pet-zzz" class="escondido">Zzz</div>
+            </div>
+
+            <div class="pedestal-holograma">
+                <div class="anel-rotativo-pedestal"></div>
+            </div>
+        </div>
+
+        <div class="painel-biometrico-pet">
+            
+            <div class="linha-status-pet">
+                <div class="icone-status-pet">🍖</div>
+                <div class="hud-barra-fundo">
+                    <div id="barra-fome-pet" class="hud-barra-segmentada" style="--cor-hud: #f39c12;"></div>
+                </div>
+                <div id="texto-fome-pet" class="texto-porcentagem-pet" style="color: #f39c12;">100%</div>
+            </div>
+
+            <div class="linha-status-pet">
+                <div class="icone-status-pet">💧</div>
+                <div class="hud-barra-fundo">
+                    <div id="barra-sede-pet" class="hud-barra-segmentada" style="--cor-hud: #3498db;"></div>
+                </div>
+                <div id="texto-sede-pet" class="texto-porcentagem-pet" style="color: #3498db;">100%</div>
+            </div>
+
+            <div class="linha-status-pet">
+                <div class="icone-status-pet">❤️</div>
+                <div class="hud-barra-fundo">
+                    <div id="barra-afeto-pet" class="hud-barra-segmentada" style="--cor-hud: #e74c3c;"></div>
+                </div>
+                <div id="texto-afeto-pet" class="texto-porcentagem-pet" style="color: #e74c3c;">100%</div>
+            </div>
+            
+        </div>
+
+        <div class="grade-acoes-pet">
+            <button class="btn-acao-pet" onclick="window.cuidarDoPet('fome')" style="--cor-btn: #f39c12;">
+                <span style="font-size: 1.8rem; margin-bottom: 8px;">🥩</span>
+                <span class="btn-pet-titulo">Sintetizar Ração</span>
+                <span class="btn-pet-custo">-10 💰</span>
+            </button>
+            
+            <button class="btn-acao-pet" onclick="window.cuidarDoPet('sede')" style="--cor-btn: #3498db;">
+                <span style="font-size: 1.8rem; margin-bottom: 8px;">🧊</span>
+                <span class="btn-pet-titulo">Injetar H₂O</span>
+                <span class="btn-pet-custo">0 💰</span>
+            </button>
+            
+            <button class="btn-acao-pet" onclick="window.cuidarDoPet('afeto')" style="--cor-btn: #e74c3c;">
+                <span style="font-size: 1.8rem; margin-bottom: 8px;">✨</span>
+                <span class="btn-pet-titulo">Transmitir Afeto</span>
+                <span class="btn-pet-custo">0 💰</span>
+            </button>
+        </div>
+
+        <div id="mensagem-status-pet" style="margin-top: 25px; font-family: monospace; font-size: 0.9rem; color: var(--pet-cor-base, #fd9644); text-align: center; text-transform: uppercase; letter-spacing: 2px; transition: color 0.5s;">SISTEMA OPERACIONAL ESTÁVEL</div>
+
+    </div>
+</div>

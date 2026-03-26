@@ -1,0 +1,63 @@
+<div class="top-bar" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(46, 204, 113, 0.2); z-index: 10;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Sair do Foco</button>
+            <button class="btn-info" onclick="toggleInstrucoesEstufa()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span class="recurso" style="box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); color: #D4AF37; border-color: #D4AF37;">✨ Húmus VIP: <span id="estufa-humus-qtd">0</span></span>
+        </div>
+    </div>
+
+    <div class="conteudo-estufa" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative;">
+        
+        <div id="instrucoes-estufa" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71; position: absolute; z-index: 50; top: 10px; width: calc(100% - 40px); max-width: 400px; background: rgba(5,15,5,0.95); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <h4 style="color: #2ecc71;">⏳ Estufa de Foco (Pomodoro)</h4>
+            <ul style="font-size: 0.85rem;">
+                <li>Defina um tempo para estudo ou trabalho profundo.</li>
+                <li>Ao iniciar, o Santuário silencia notificações e sincroniza os cronômetros de vocês.</li>
+                <li>Se ambos estiverem focados simultaneamente, a energia gerada é multiplicada!</li>
+                <li>Concluir ciclos gera <b>Húmus de Ouro (✨)</b>, um fertilizante lendário que acelera drasticamente a Árvore da Vida e a Mini Fazenda.</li>
+                <li>Seja honesto: sair da tela antes do tempo quebra a concentração (e a recompensa).</li>
+            </ul>
+            <button class="btn-acao" onclick="toggleInstrucoesEstufa()" style="background: #2ecc71; color: #000; margin-top: 10px;">Entendido</button>
+        </div>
+
+        <div id="estufa-status-parceiro" style="margin-bottom: 30px; padding: 10px 20px; border-radius: 30px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: #aaa; display: flex; align-items: center; gap: 10px; transition: all 0.5s;">
+            <span class="status-dot" style="width: 10px; height: 10px; background: #555; border-radius: 50%; box-shadow: 0 0 5px #555;"></span>
+            <span id="estufa-texto-parceiro">Aguardando conexão quântica...</span>
+        </div>
+
+        <div class="estufa-timer-wrapper">
+            <svg class="estufa-progresso-svg" viewBox="0 0 200 200">
+                <circle class="estufa-bg-ring" cx="100" cy="100" r="90"></circle>
+                <circle class="estufa-progress-ring" id="estufa-anel-progresso" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="estufa-timer-display">
+                <div id="estufa-tempo" style="font-family: monospace; font-size: 4rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(46, 204, 113, 0.5); letter-spacing: 2px;">25:00</div>
+                <div id="estufa-fase-texto" style="font-family: 'Playfair Display', serif; font-style: italic; color: #2ecc71; font-size: 1.2rem; margin-top: -5px;">Pronto para iniciar</div>
+            </div>
+        </div>
+
+        <div id="estufa-controles-tempo" style="display: flex; gap: 15px; margin-top: 30px; align-items: center;">
+            <button class="btn-estufa-ajuste" onclick="ajustarTempoEstufa(-5)">-5</button>
+            <div style="font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px;">Minutos</div>
+            <button class="btn-estufa-ajuste" onclick="ajustarTempoEstufa(5)">+5</button>
+        </div>
+
+        <div style="width: 100%; max-width: 300px; margin-top: 25px;">
+            <button id="btn-estufa-iniciar" class="btn-acao" onclick="iniciarCicloEstufa()" style="background: linear-gradient(145deg, #2ecc71, #27ae60); box-shadow: 0 6px 0 #1e8449, 0 10px 20px rgba(46,204,113,0.4); font-size: 1.3rem; padding: 15px; font-weight: 900; letter-spacing: 2px;">▶ FOCAR</button>
+            
+            <button id="btn-estufa-cancelar" class="btn-acao escondido" onclick="cancelarCicloEstufa()" style="background: transparent; border: 2px solid #e74c3c; color: #e74c3c; box-shadow: none; margin-top: 15px;">Parar (Perder Progresso)</button>
+        </div>
+
+        <div id="estufa-painel-som" style="margin-top: 40px; display: flex; gap: 15px;">
+            <button class="btn-som-ambiente" id="btn-som-chuva" onclick="alternarSomAmbiente('chuva')">🌧️ Chuva</button>
+            <button class="btn-som-ambiente" id="btn-som-lofi" onclick="alternarSomAmbiente('lofi')">☕ Lofi</button>
+        </div>
+
+        <audio id="audio-estufa-chuva" loop preload="auto" src="assets/sons/estufa/chuva.mp3"></audio>
+        <audio id="audio-estufa-lofi" loop preload="auto" src="assets/sons/estufa/lofi.mp3"></audio>
+        <audio id="audio-estufa-conclusao" preload="auto" src="assets/sons/estufa/estufa_conclusao.mp3"></audio>
+
+    </div>
+</div>

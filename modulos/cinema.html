@@ -1,0 +1,76 @@
+<div class="top-bar" style="background: rgba(0,0,0,0.9); backdrop-filter: blur(30px); border-bottom: 1px solid rgba(229, 9, 20, 0.2); z-index: 10; position: sticky; top: 0;">
+        <div class="top-bar-left">
+            <button class="btn-voltar" onclick="voltarMenuJogos()">← Sair da Sala</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesCinema()">❓</button>
+        </div>
+        <div class="top-bar-right">
+            <span style="color: #e50914; font-weight: 900; font-family: 'Playfair Display', serif; font-size: 1.2rem; letter-spacing: 3px; text-shadow: 0 0 20px rgba(229,9,20,0.8);">MULTIPLEX 🎥</span>
+        </div>
+    </div>
+
+    <div class="conteudo-cinema" style="width: 100%; max-width: 800px; margin: 0 auto; padding-bottom: 100px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
+        
+        <div id="instrucoes-cinema" class="escondido cartao-instrucoes" style="border-left: 5px solid #e50914; margin: 20px; background: rgba(15,5,5,0.95); box-shadow: 0 20px 50px rgba(0,0,0,1); width: calc(100% - 40px);">
+            <h4 style="color: #e50914; font-family: 'Playfair Display', serif; font-size: 1.3rem;">🍿 Protocolo de Tela Compartilhada</h4>
+            <ul style="font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                <li>Cole o link de qualquer vídeo do YouTube no painel. Ele aparecerá para ambos.</li>
+                <li>O sistema usa a <b>Chave Dupla</b>: o vídeo só começa quando os dois apertarem "Sincronizar".</li>
+                <li>Preparem a pipoca, deitem-se e assistam juntos, não importa a distância.</li>
+            </ul>
+        </div>
+
+        <div class="painel-controle-cinema">
+            <input type="text" id="input-link-video" placeholder="Cole o link do YouTube ou do Google Drive..." class="input-cinema-titan">
+            <button class="btn-injetar-video" onclick="window.processarLinkVideo()">CARREGAR SESSÃO</button>
+        </div>
+
+        <div class="palco-cinema-titan">
+            <div class="ambilight-glow" id="cinema-ambilight"></div>
+            <div class="tela-projetor">
+                
+                <div id="player-youtube" class="escondido"></div>
+                
+                <video id="player-nativo" class="escondido" controls preload="auto" style="width: 100%; height: 100%; object-fit: contain; background: #000; position: absolute; top: 0; left: 0; z-index: 2; border-radius: 12px;"></video>
+                
+                <div id="tela-estatica-cinema" class="tela-estatica-ruido">
+                    <span style="font-size: 3rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));">📡</span>
+                    <p style="font-family: monospace; font-size: 1rem; color: #fff; letter-spacing: 2px; margin-top: 10px;">AGUARDANDO TRANSMISSÃO</p>
+                </div>
+
+                <div id="overlay-contagem-cinema" class="escondido overlay-contagem-titan">
+                    <span id="numero-contagem-cinema">3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="painel-assentos-sincronia">
+            
+            <div class="assento-cinema" id="assento-eu">
+                <div class="luz-status-assento" id="luz-status-eu"></div>
+                <div style="display: flex; flex-direction: column;">
+                    <span class="nome-assento">João</span>
+                    <span class="status-texto-assento" id="texto-status-eu">Aguardando...</span>
+                </div>
+            </div>
+
+            <div class="divisor-sincronia">
+                <span id="icone-conexao-cinema" style="font-size: 1.5rem; filter: grayscale(1);">🔗</span>
+            </div>
+
+            <div class="assento-cinema" id="assento-parceiro">
+                <div class="luz-status-assento" id="luz-status-parceiro"></div>
+                <div style="display: flex; flex-direction: column;">
+                    <span class="nome-assento">Thamiris</span>
+                    <span class="status-texto-assento" id="texto-status-parceiro">Desconectada</span>
+                </div>
+            </div>
+
+        </div>
+
+        <button id="btn-chave-dupla" class="btn-chave-sincronia" onclick="window.alternarStatusProntoCinema()">
+            <span class="icone-chave-sync">🔑</span>
+            <span id="texto-btn-chave">ESTOU PRONTO (Sincronizar)</span>
+        </button>
+
+    </div>
+</div>

@@ -8685,89 +8685,622 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 
 
 /* ==========================================
-   CORREIO ELEGANTE (TITAN TIER SUPREMO)
+   CORREIO ELEGANTE ABSOLUTO (GOD TIER)
 ========================================== */
-.btn-escrever-titan {
-    background: linear-gradient(145deg, #1e3a12, #14290c); color: #6ab04c;
-    border: 1px solid rgba(106, 176, 76, 0.4); padding: 8px 22px; border-radius: 4px;
+.btn-god-tier-escrever {
+    background: linear-gradient(145deg, #11200b, #0a1406); color: #6ab04c;
+    border: 1px solid #6ab04c; padding: 10px 20px; border-radius: 6px;
     font-weight: 900; font-family: monospace; letter-spacing: 2px;
-    cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: all 0.3s;
+    cursor: pointer; box-shadow: 0 5px 20px rgba(106, 176, 76, 0.3), inset 0 0 10px rgba(106,176,76,0.1);
+    transition: all 0.3s;
+}
+.btn-god-tier-escrever:active { transform: scale(0.95); }
+
+/* HUD do Radar */
+.hud-radar-absoluto {
+    background: #020302; border: 1px solid rgba(106, 176, 76, 0.4);
+    border-radius: 8px; padding: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,1), 0 15px 30px rgba(0,0,0,0.8);
+    position: relative; overflow: hidden;
+}
+.hud-cabecalho { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(106,176,76,0.2); padding-bottom: 10px; margin-bottom: 15px; }
+.hud-titulo { font-family: monospace; font-size: 0.75rem; color: #6ab04c; font-weight: bold; letter-spacing: 2px; }
+.hud-status { font-family: monospace; font-size: 0.7rem; color: #888; }
+.piscar { animation: alertaPisca 2s infinite; }
+@keyframes alertaPisca { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.visor-radar-container {
+    width: 100%; height: 120px; background: rgba(10,20,10,0.5); border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;
+}
+.linha-varredura {
+    position: absolute; top: 0; left: -10%; width: 10%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(106, 176, 76, 0.5), transparent);
+    animation: varreduraRadar 3s infinite linear; pointer-events: none; z-index: 10;
+}
+@keyframes varreduraRadar { 0% { left: -10%; } 100% { left: 110%; } }
+.hud-rodape { margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 0.7rem; color: #888; text-align: center; }
+
+/* O ENVELOPE FÍSICO 3D */
+.container-carta-3d {
+    width: 100%; max-width: 450px; margin: 0 auto; perspective: 1000px;
+}
+.envelope-fisico {
+    position: relative; width: 100%; aspect-ratio: 1.6 / 1;
+    background: #d1bfae; border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+    transition: transform 0.5s;
 }
 
-/* Radar de Telemetria */
-.painel-radar-correio {
-    background: rgba(0,0,0,0.6); border: 1px solid rgba(106, 176, 76, 0.2);
-    border-radius: 12px; padding: 20px; margin-bottom: 40px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,1); position: relative;
+/* Corpo do Envelope e Abas */
+.aba-superior {
+    position: absolute; top: 0; left: 0; width: 100%; height: 60%;
+    background: #d1bfae; background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+    clip-path: polygon(0 0, 50% 100%, 100% 0);
+    z-index: 4; transform-origin: top; transition: transform 0.8s ease-in-out;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); border-top: 1px solid rgba(255,255,255,0.3);
 }
-.titulo-radar {
-    font-family: monospace; font-size: 0.7rem; color: #6ab04c; 
-    letter-spacing: 3px; margin-bottom: 15px; text-align: center; opacity: 0.8;
-}
-.stats-radar-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;
-    border-top: 1px solid rgba(106, 176, 76, 0.1); padding-top: 10px;
-}
-.stat-item { font-family: monospace; font-size: 0.65rem; color: #888; letter-spacing: 1px; }
-.stat-item span { color: #6ab04c; font-weight: bold; }
+.aba-esquerda { position: absolute; top: 0; left: 0; width: 50%; height: 100%; background: #c5b2a0; clip-path: polygon(0 0, 100% 50%, 0 100%); z-index: 2; }
+.aba-direita { position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: #c5b2a0; clip-path: polygon(100% 0, 0 50%, 100% 100%); z-index: 2; }
+.aba-inferior { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: #dac8b8; clip-path: polygon(0 100%, 50% 0, 100% 100%); z-index: 3; box-shadow: 0 -5px 10px rgba(0,0,0,0.1); }
 
-/* O Envelope com Lacre */
-.envelope-titan {
-    background: #e0d5b8; width: 100%; padding: 40px 20px; border-radius: 4px;
-    position: relative; display: flex; flex-direction: column; align-items: center;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid #c5b895;
+/* Lacre de Cera Profissional */
+.selo-cera-real {
+    position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%);
+    width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, #b30000, #660000);
+    border-radius: 50%; z-index: 5; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.4), inset 0 -2px 5px rgba(0,0,0,0.5);
+    border: 2px solid #4a0000; display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+}
+.selo-cera-real::after { content: 'S'; color: #4a0000; font-family: 'Playfair Display', serif; font-size: 2rem; text-shadow: 1px 1px 0px rgba(255,255,255,0.2); }
+.selo-cera-real:hover { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+
+/* A CARTA (Papel Timbrado) */
+.papel-timbrado-interno {
+    position: absolute; top: 10px; left: 5%; width: 90%; height: 90%;
+    background: #fdfaf6; border-radius: 2px; z-index: 1;
     background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+    padding: 20px; box-sizing: border-box; color: #2c3e50;
+    font-family: 'Playfair Display', serif; font-size: 1rem;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    transition: transform 1s ease-in-out, opacity 0.5s;
 }
-.envelope-titan::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+
+/* O ESTADO: ENVELOPE ABERTO */
+.envelope-aberto .aba-superior { transform: rotateX(180deg); z-index: 0; }
+.envelope-aberto .selo-cera-real { opacity: 0; pointer-events: none; transform: translate(-50%, -50%) scale(1.5); }
+.envelope-aberto .papel-timbrado-interno {
+    transform: translateY(-80px) scale(1.05); z-index: 6; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    height: auto; min-height: 150%; padding-bottom: 40px; border-bottom: 2px solid #eee;
+}
+
+/* Carta em Trânsito (Minimalista) */
+.envelope-transito {
+    background: rgba(10,10,10,0.8); border: 1px dashed rgba(106, 176, 76, 0.4);
+    border-radius: 8px; padding: 20px; text-align: center;
+}
+.barra-transito-bg { width: 100%; height: 4px; background: #222; border-radius: 2px; margin: 15px 0; overflow: hidden; }
+.barra-transito-fill { height: 100%; background: #6ab04c; box-shadow: 0 0 10px #6ab04c; }
+
+/* Mesa de Redação */
+.mesa-redacao-absoluta {
+    width: 95%; max-width: 500px; padding: 40px 30px; border-radius: 8px; position: relative;
+    background: radial-gradient(circle at top, #2a1610 0%, #0a0a0a 100%);
+    box-shadow: 0 30px 60px rgba(0,0,0,1); border: 1px solid #111;
+}
+.luz-abajur { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 200px; background: radial-gradient(ellipse at top, rgba(255, 215, 0, 0.15) 0%, transparent 70%); pointer-events: none; }
+.papel-redacao {
+    background: #fdfaf6; padding: 30px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png'); position: relative; z-index: 2;
+}
+.papel-redacao textarea { width: 100%; height: 200px; background: transparent; border: none; outline: none; font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #333; line-height: 1.6; resize: none; }
+.assinatura-redacao { text-align: right; font-style: italic; color: #888; margin-top: 10px; font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; }
+
+.btn-god-tier-enviar {
+    flex: 1; background: #8b0000; color: #fff; border: 1px solid #510000; padding: 12px; border-radius: 4px;
+    font-weight: 900; font-family: monospace; letter-spacing: 2px; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(139, 0, 0, 0.5); transition: all 0.2s;
+}
+.btn-god-tier-enviar:active { transform: scale(0.98); background: #660000; }
+
+
+/* ========================================== */
+/* CSS: COFRE DO SILÊNCIO (MODO AVIÃO)        */
+/* ========================================== */
+
+/* Overlay principal - Vidro fosco escuro */
+#cofre-silencio-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
+    font-family: 'Inter', sans-serif; /* Adapte para a fonte do seu projeto */
+}
+
+#cofre-silencio-overlay.cofre-escondido {
+    opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
-/* Lacre de Cera Animado */
-.lacre-cera-titan {
-    width: 70px; height: 70px; background: #8b0000; border-radius: 50%;
-    position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.3);
-    border: 4px solid #5d0000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.lacre-cera-titan:hover { transform: scale(1.1) rotate(5deg); }
-.lacre-cera-titan::after {
-    content: '❤'; color: #5d0000; font-size: 1.8rem; opacity: 0.6;
+/* Container interno */
+.cofre-glassmorphism {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    height: 80%;
+    max-height: 600px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
-/* Lacre Quebrando */
-.lacre-quebrando {
-    animation: quebrarLacre 0.5s forwards; pointer-events: none;
+/* Botão Fechar elegante */
+.btn-circular-blur {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
 }
-@keyframes quebrarLacre {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); opacity: 1; }
+
+.btn-circular-blur:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
+/* ================= ENVELOPE 3D ================= */
+.envelope-container {
+    position: relative;
+    width: 280px;
+    height: 200px;
+    perspective: 1000px;
+    margin-bottom: 40px;
+}
+
+.envelope-corpo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #e0d8c8;
+    border-radius: 10px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.envelope-frente {
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 100px 140px;
+    border-color: transparent transparent #cfc5b4 #cfc5b4;
+    border-radius: 0 0 10px 10px;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.envelope-aba {
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 100px 140px;
+    border-color: #f2eadb transparent transparent transparent;
+    transform-origin: top;
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 4;
+}
+
+/* A Carta em si */
+.carta-papel {
+    position: absolute;
+    bottom: 10px;
+    width: 90%;
+    height: 90%;
+    background: #fffdf8;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), height 1.5s ease;
+    z-index: 2;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.carta-titulo {
+    font-size: 1.2rem;
+    color: #8c2a3e;
+    margin-bottom: 10px;
+    font-family: 'Georgia', serif;
+}
+
+.carta-texto {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+    line-height: 1.6;
+    text-align: justify;
+}
+
+/* ================= CADEADO & STATUS ================= */
+#cadeado-digital {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 2px solid #ff4757;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    color: #ff4757;
+    box-shadow: 0 0 30px rgba(255, 71, 87, 0.4);
+    transition: all 0.8s ease;
+}
+
+.brilho-cadeado {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #ff4757;
+    animation: pulsar-perigo 2s infinite;
+}
+
+.status-conexao-container {
+    text-align: center;
+    color: white;
+    padding: 0 20px;
+}
+
+#titulo-status-rede {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    color: #ff4757;
+    transition: color 0.5s ease;
+}
+
+#texto-status-rede {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.5;
+}
+
+/* ================= ANIMAÇÕES DE ESTADO (OFFLINE) ================= */
+/* Quando o Modo Avião é ativado, o JS adiciona a classe 'offline-mode-active' */
+
+.offline-mode-active .envelope-aba {
+    transform: rotateX(180deg);
+    z-index: 1;
+}
+
+.offline-mode-active #cadeado-digital {
+    border-color: #2ed573;
+    color: #2ed573;
+    box-shadow: 0 0 30px rgba(46, 213, 115, 0.4);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+}
+
+.offline-mode-active .brilho-cadeado {
+    border-color: #2ed573;
+    animation: none;
+}
+
+.offline-mode-active .carta-papel {
+    transform: translateY(-130px);
+    height: 250px;
+    opacity: 1;
+    z-index: 4;
+    overflow-y: auto;
+}
+
+.offline-mode-active #titulo-status-rede {
+    color: #2ed573;
+}
+
+@keyframes pulsar-perigo {
+    0% { transform: scale(1); opacity: 1; }
     100% { transform: scale(1.5); opacity: 0; }
 }
 
-/* A Carta Revelada (Papel Nobre) */
-.papel-carta-titan {
-    background: #fdf6e3; color: #2c3e50; padding: 40px; border-radius: 2px;
-    font-family: 'Playfair Display', serif; font-size: 1.3rem; line-height: 1.8;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8); position: relative;
-    border-left: 1px solid #eee; border-top: 1px solid #eee;
-    background-image: linear-gradient(rgba(200,200,200,0.05) 1px, transparent 1px);
-    background-size: 100% 2.5rem;
+/* ========================================== */
+/* CSS: CARD ACIONADOR COFRE (PADRÃO OURO)    */
+/* ========================================== */
+
+/* O Card principal (Botão Glassmorphism) */
+.card-glass-premium.cofre-trigger {
+    position: relative;
+    width: 100%;
+    max-width: 350px; /* Ajuste conforme seu layout */
+    margin: 15px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03); /* Vidro super translúcido */
+    backdrop-filter: blur(15px); /* Blur de alta qualidade */
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Borda sutil de vidro */
+    border-radius: 24px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s ease, box-shadow 0.3s ease;
+    display: block;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    font-family: inherit; /* Mantém a fonte do seu app */
 }
 
-/* Modal de Escrita (Mesa de Madeira) */
-.cartao-escrita-premium {
-    background: #fdf6e3; width: 95%; max-width: 500px; padding: 40px;
-    border-radius: 4px; box-shadow: 0 30px 70px rgba(0,0,0,1);
-    position: relative; animation: deslizarCima 0.5s ease-out;
-    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+/* Efeito de Hover/Ativo (Feedback Tátil Visual) */
+.card-glass-premium.cofre-trigger:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
 }
-.cartao-escrita-premium textarea {
-    width: 100%; height: 250px; background: transparent; border: none;
-    border-bottom: 1px solid #dcd3b2; outline: none; font-size: 1.2rem;
-    font-family: 'Playfair Display', serif; color: #2c3e50; line-height: 1.6;
-    resize: none;
+
+.card-glass-premium.cofre-trigger:active {
+    transform: translateY(1px) scale(0.98); /* Feedback de clique pesado */
+    background: rgba(255, 255, 255, 0.02);
 }
-.btn-cancelar-carta { background: transparent; border: 1px solid #dcd3b2; color: #888; padding: 12px 20px; border-radius: 4px; cursor: pointer; }
-.btn-enviar-carta { background: #8b0000; color: #fff; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-weight: 900; }
+
+/* Efeito de brilho que passa pelo card */
+.card-glass-brilho {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    transition: left 0.7s ease;
+    z-index: 1;
+}
+
+.card-glass-premium.cofre-trigger:hover .card-glass-brilho {
+    left: 100%;
+}
+
+/* Layout Interno do Conteúdo */
+.cofre-card-content {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    z-index: 2; /* Garante que fica acima do brilho */
+}
+
+/* Container da Foto e Cadeado */
+.user-photo-container-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+}
+
+/* A Sua Foto (Colombo) */
+.avatar-circular-medium {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Brilho neon atrás da foto (pulsa) */
+.user-photo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 71, 87, 0.3); /* Cor de perigo (trancado) */
+    border-radius: 50%;
+    filter: blur(15px);
+    animation: pulsar-brilho-cadeado 3s infinite;
+    transition: background 0.5s ease;
+}
+
+/* Ícone de Cadeado Mini sobre a foto */
+.lock-icon-danger-small {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 26px;
+    height: 26px;
+    background: #1a1a1a;
+    border: 2px solid #ff4757; /* Cor de perigo */
+    border-radius: 50%;
+    color: #ff4757;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    transition: all 0.5s ease;
+}
+
+/* Container de Texto */
+.cofre-text-container {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.cofre-card-titulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 4px 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.cofre-card-subtitulo {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* ==========================================
+   MÓDULO 18: PAGER RETRÔ (GOD TIER UX)
+========================================== */
+
+/* O Plástico Grosso e Texturizado */
+.pager-chassi-god {
+    width: 100%; max-width: 360px;
+    background: #141414;
+    background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 4px 4px;
+    border-radius: 25px;
+    padding: 25px 20px 30px;
+    position: relative;
+    border: 1px solid #2a2a2a;
+    box-shadow: 
+        inset 5px 5px 15px rgba(255,255,255,0.05), /* Luz superior esquerda */
+        inset -5px -5px 20px rgba(0,0,0,0.9),      /* Sombra inferior direita */
+        0 30px 60px rgba(0,0,0,1),                 /* Sombra projetada massiva */
+        0 10px 20px rgba(0,0,0,0.8);
+}
+
+/* O LED de Sinal */
+.pager-led-status {
+    position: absolute; top: 15px; right: 25px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ff0000;
+    box-shadow: 0 0 5px #ff0000, inset 0 2px 4px rgba(255,255,255,0.5);
+    animation: blinkLed 3s infinite;
+}
+@keyframes blinkLed { 0%, 90% { background: #330000; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); } 95%, 100% { background: #ff3333; box-shadow: 0 0 10px #ff0000, inset 0 2px 4px rgba(255,255,255,0.8); } }
+
+/* Tipografia Impressa no Plástico */
+.pager-cabecalho-marca { margin-bottom: 20px; text-align: left; padding-left: 5px; }
+.pager-marca-logo { color: #555; font-family: 'Arial Black', sans-serif; font-size: 1.1rem; letter-spacing: 3px; text-shadow: 1px 1px 0px rgba(255,255,255,0.05); }
+.pager-modelo-texto { color: #444; font-family: monospace; font-size: 0.65rem; letter-spacing: 4px; font-weight: bold; }
+
+/* A TELA LCD PERFEITA */
+.pager-moldura-tela-god {
+    background: #050505; padding: 12px; border-radius: 12px; margin-bottom: 25px;
+    box-shadow: inset 0 8px 20px rgba(0,0,0,1), 0 2px 0 rgba(255,255,255,0.05);
+    border-top: 2px solid #000;
+}
+.pager-tela-lcd-god {
+    background: #7ca87c; /* O tom verde exato do LCD */
+    height: 110px; border-radius: 4px; padding: 10px 15px; position: relative; overflow: hidden;
+    box-shadow: inset 0 5px 15px rgba(0,0,0,0.6), inset 0 -2px 5px rgba(255,255,255,0.2);
+    display: flex; flex-direction: column;
+}
+.pager-matriz-pixels {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
+    background-image: radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 3px 3px;
+}
+.pager-scanlines {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%); background-size: 100% 4px;
+}
+/* O Reflexo Diagonal do Vidro */
+.pager-reflexo-vidro {
+    position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; pointer-events: none; z-index: 3;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 40%);
+    transform: rotate(10deg);
+}
+
+.pager-lcd-header-god { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(0,0,0,0.7); margin-bottom: auto; font-family: monospace; z-index: 5; font-weight: bold;}
+.pager-lcd-texto-god {
+    font-family: 'Courier New', Courier, monospace; font-weight: 900; font-size: 2.5rem; color: rgba(0,0,0,0.85);
+    text-align: center; text-shadow: 1px 1px 0px rgba(124, 168, 124, 0.8), -1px -1px 0px rgba(0,0,0,0.2); 
+    z-index: 5; letter-spacing: 6px; position: relative; top: -5px;
+}
+.pager-lcd-autor-god { font-family: monospace; font-size: 0.7rem; color: rgba(0,0,0,0.7); text-align: right; z-index: 5; margin-top: auto; font-weight: bold; }
+
+/* TECLADO DE BORRACHA */
+.pager-painel-teclado-god {
+    background: #0f0f0f; padding: 20px; border-radius: 15px;
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.9), 0 2px 0 rgba(255,255,255,0.05);
+    border-top: 2px solid #050505;
+}
+.pager-visor-input-god {
+    background: #000; color: #00ff00; font-family: monospace; font-size: 1.6rem; padding: 10px;
+    border-radius: 6px; margin-bottom: 20px; text-align: center; letter-spacing: 8px; 
+    border: 1px solid #222; text-shadow: 0 0 8px #00ff00; height: 30px; display: flex; 
+    align-items: center; justify-content: center; box-shadow: inset 0 2px 10px rgba(0,255,0,0.1);
+}
+.pager-grade-botoes-god { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+/* Física do Botão de Borracha */
+.btn-pager-god {
+    background: linear-gradient(180deg, #2a2a2a 0%, #111 100%);
+    color: #ccc; font-family: 'Arial', sans-serif; font-size: 1.3rem; font-weight: 900;
+    border: none; border-radius: 6px; padding: 15px 0; cursor: pointer;
+    box-shadow: 
+        0 6px 0 #000, 
+        0 8px 10px rgba(0,0,0,0.8),
+        inset 0 2px 3px rgba(255,255,255,0.1);
+    text-shadow: -1px -1px 0 #000;
+    transition: all 0.1s ease;
+    outline: none;
+}
+.btn-pager-god:active {
+    transform: translateY(6px);
+    box-shadow: 
+        0 0 0 #000, 
+        0 0 5px rgba(0,0,0,0.8),
+        inset 0 4px 6px rgba(0,0,0,0.6);
+    color: #fff;
+}
+.btn-pager-red { background: linear-gradient(180deg, #b32d22, #7a1c13); box-shadow: 0 6px 0 #4a0d08, 0 8px 10px rgba(0,0,0,0.8), inset 0 2px 3px rgba(255,255,255,0.2); }
+.btn-pager-red:active { box-shadow: 0 0 0 #4a0d08, inset 0 4px 6px rgba(0,0,0,0.8); }
+.btn-pager-green { background: linear-gradient(180deg, #27ae60, #177a3f); box-shadow: 0 6px 0 #0e4f28, 0 8px 10px rgba(0,0,0,0.8), inset 0 2px 3px rgba(255,255,255,0.2); }
+.btn-pager-green:active { box-shadow: 0 0 0 #0e4f28, inset 0 4px 6px rgba(0,0,0,0.8); }
+
+/* Furos do Alto Falante Inferior */
+.pager-furo-altofalante-god { display: flex; gap: 8px; justify-content: center; margin-top: 25px; }
+.pager-furo-altofalante-god div { 
+    width: 6px; height: 25px; background: #050505; border-radius: 3px; 
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,1), 1px 0px 0 rgba(255,255,255,0.05); 
+}
+
+/* Placa do Dicionário */
+.pager-dicionario-god { 
+    margin-top: 35px; background: linear-gradient(145deg, #1a1a1a, #0f0f0f); 
+    padding: 20px; border-radius: 8px; border: 1px solid #333; width: 100%; max-width: 360px; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+.dicionario-titulo-god { font-family: monospace; font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 15px; text-align: center; font-weight: bold; letter-spacing: 2px;}
+.dicionario-grid-god { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 15px; }
+.codigo-neon { color: #00ff00; font-family: monospace; font-weight: bold; font-size: 0.9rem; text-shadow: 0 0 5px rgba(0,255,0,0.3); }
+.significado-codigo { font-size: 0.8rem; color: #aaa; font-family: sans-serif; }
+
+.piscar-lento { animation: piscarCursor 2s infinite step-end; }

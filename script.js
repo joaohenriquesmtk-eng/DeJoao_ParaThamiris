@@ -80,7 +80,7 @@ const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
 // 🚨 A DATA E HORA EXATA DO REENCONTRO (O MOMENTO EM QUE A DISTÂNCIA ZERA)
 // Altere esta data para o dia e horário que o cronômetro deve congelar para sempre
-const dataCongelamento = new Date("2026-03-23T09:31:07").getTime(); 
+const dataCongelamento = new Date("2050-10-29T16:30:00").getTime(); 
 
 // 1. MOTOR DO TEMPO
 function atualizarMotorDoTempo() {
@@ -1136,6 +1136,7 @@ window.abrirReliquia = function(event, tipo) {
         if (tipo === 'ecos' && typeof inicializarEco3D === 'function') inicializarEco3D();
         if (tipo === 'carrossel' && typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
         if (tipo === 'epicentro' && typeof inicializarEpicentro === 'function') inicializarEpicentro();
+        if (tipo === 'paradoxo' && typeof inicializarParadoxo === 'function') inicializarParadoxo();
         
         // Desperta os motores 3D que já existiam
         setTimeout(() => window.dispatchEvent(new Event('resize')), 100); 
@@ -1205,7 +1206,7 @@ window.abrirJogo = async function(tipo) {
     document.body.classList.add('modo-jogo-ativo');
 
     // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'paradoxo'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1349,7 +1350,7 @@ window.voltarMenuJogos = function() {
     window.defesaAtiva = false; // Trava do Tower Defense
 
     // 1. Esconde todos os jogos abertos
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'paradoxo'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -3137,4 +3138,44 @@ window.inicializarEpicentro = function() {
             if (vid) vid.play().catch(e => console.log('Autoplay bloqueado', e));
         }
     }
+};
+
+
+// ==========================================
+// CONTROLE DE TELA CHEIA: O PRISMA (PARADOXO)
+// ==========================================
+window.abrirParadoxoTelaCheia = function() {
+    // A Trava do Dia (Desativada com "//" temporariamente para você conseguir testar na hora)
+    /*
+    if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
+        if(typeof mostrarToast === 'function') mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+    */
+
+    const container = document.getElementById('container-paradoxo');
+    const navInferior = document.querySelector('.menu-inferior');
+    
+    if (container) {
+        // 🚨 A MÁGICA BRUTA: Arranca o código da aba invisível e cola no fundo da tela à força!
+        document.body.appendChild(container);
+        container.classList.remove('escondido');
+    }
+    
+    if (navInferior) navInferior.classList.add('escondido'); 
+    document.body.classList.add('modo-jogo-ativo'); 
+
+    // Dá a Ignição no Motor do Paradoxo
+    if (typeof inicializarParadoxo === 'function') inicializarParadoxo();
+};
+
+window.fecharParadoxoTelaCheia = function() {
+    const container = document.getElementById('container-paradoxo');
+    const navInferior = document.querySelector('.menu-inferior');
+    
+    // Restaura a interface
+    if (container) container.classList.add('escondido');
+    if (navInferior) navInferior.classList.remove('escondido');
+    document.body.classList.remove('modo-jogo-ativo');
 };

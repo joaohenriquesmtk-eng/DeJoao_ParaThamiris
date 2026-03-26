@@ -1,13 +1,49 @@
 // ============================================================================
-// O PARADOXO DE SCHRÖDINGER (HACKEANDO O GIROSCÓPIO PARA VULNERABILIDADE)
+// O PARADOXO DE SCHRÖDINGER E CONTROLE DE TELA CHEIA
 // ============================================================================
 
+// 1. Abertura da Tela Cheia
+window.abrirParadoxoTelaCheia = function() {
+    // Verifica a Trava do Dia
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    if (localStorage.getItem('santuario_vitoria_dia') !== hoje) {
+        if(typeof mostrarToast === 'function') mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    const container = document.getElementById('container-paradoxo');
+    const navInferior = document.querySelector('.menu-inferior');
+    
+    if (container) {
+        // 🚨 A MÁGICA BRUTA: Arranca o Prisma de onde estiver e joga na tela!
+        document.body.appendChild(container); 
+        container.classList.remove('escondido');
+    }
+    
+    if (navInferior) navInferior.classList.add('escondido'); 
+    document.body.classList.add('modo-jogo-ativo'); 
+
+    if (typeof window.inicializarParadoxo === 'function') window.inicializarParadoxo();
+};
+
+// 2. Fechamento da Tela Cheia
+window.fecharParadoxoTelaCheia = function() {
+    const container = document.getElementById('container-paradoxo');
+    const navInferior = document.querySelector('.menu-inferior');
+    
+    if (container) container.classList.add('escondido');
+    if (navInferior) navInferior.classList.remove('escondido');
+    document.body.classList.remove('modo-jogo-ativo');
+};
+
+// 3. Controle das Instruções
 window.toggleInstrucoesParadoxo = function() {
     const inst = document.getElementById('instrucoes-paradoxo');
     if (inst) inst.classList.toggle('escondido');
 };
 
-// iPhones (iOS 13+) exigem permissão de botão para acessar o giroscópio
+// 4. Permissão da Apple/Giroscópio
 window.solicitarPermissaoGiroscopioParadoxo = function() {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
@@ -22,31 +58,30 @@ window.solicitarPermissaoGiroscopioParadoxo = function() {
             })
             .catch(console.error);
     } else {
-        // Celulares Android entram direto aqui
+        // Android entra direto
         window.toggleInstrucoesParadoxo();
         window.ativarSensorParadoxo();
         if(window.Haptics) window.Haptics.sucesso();
     }
 };
 
+// 5. Inicialização
 window.inicializarParadoxo = function() {
-    // Força as instruções a aparecerem primeiro para capturar o clique do usuário (Regra da Apple)
     const instrucoes = document.getElementById('instrucoes-paradoxo');
     if (instrucoes) instrucoes.classList.remove('escondido');
-    
     window.paradoxoRevelado = false;
 };
 
+// 6. O Motor Físico do Giroscópio
 window.ativarSensorParadoxo = function() {
     const txtSuperficie = document.getElementById('texto-superficie');
     const txtProfundo = document.getElementById('texto-profundo');
     const valZ = document.getElementById('valor-z');
-    // 🚨 MUDANÇA: Agora ele checa se o "cartao-paradoxo" está visível na tela
-    const cartao = document.getElementById('cartao-paradoxo');
+    const container = document.getElementById('container-paradoxo');
 
     const analisarInclinacao = (event) => {
-        // 🚨 MUDANÇA: Se o cartão não está no DOM (foi pra gaveta), para o cálculo
-        if (!cartao || !document.getElementById('corpo-modal').contains(cartao)) return;
+        // Se a tela foi fechada, para de calcular para poupar bateria
+        if (!container || container.classList.contains('escondido')) return;
 
         let beta = event.beta;   // Inclinação frente/trás (-180 a 180)
         let gamma = event.gamma; // Inclinação esquerda/direita (-90 a 90)

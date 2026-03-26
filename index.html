@@ -634,40 +634,35 @@
         <div id="container-julgamento" class="escondido"></div>
         <div id="container-paradoxo" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); z-index: 9999; display: flex; flex-direction: column; overflow: hidden;">
     
-    
-    <div class="top-bar" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); padding: 15px 20px; text-align: left; z-index: 10; border-bottom: 1px solid rgba(255,255,255,0.05);">
-        <button onclick="fecharParadoxoTelaCheia()" style="background: none; border: none; color: var(--cor-primaria); font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-            ← Retornar ao Cofre
-        </button>
-    </div>
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(30px); border-bottom: 1px solid rgba(212,175,55,0.15); z-index: 10; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px;">
+        <button onclick="fecharParadoxoTelaCheia()" style="background: none; border: none; color: var(--cor-primaria); font-size: 1rem; font-weight: bold; cursor: pointer; padding: 0;">← Retornar</button>
+        <span style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: bold;">O Prisma da Verdade</span>
+        <div style="width: 70px;"></div> </div>
 
-    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; width: 100%; box-sizing: border-box;">
+    <div style="flex: 1; width: 100%; position: relative; display: flex; flex-direction: column; overflow: hidden;">
         
-        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(212,175,55,0.4);">O Prisma da Verdade</h3>
-        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 30px;">A carta de duas naturezas.</p>
-
-        <div id="instrucoes-paradoxo" class="cartao-instrucoes" style="background: rgba(20,20,20,0.9); border-left: 5px solid #fff; padding: 20px; text-align: left; margin-bottom: 20px; border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            <h4 style="color: #fff; font-family: 'Playfair Display', serif; font-size: 1.2rem;">Como revelar a verdade:</h4>
-            <ul style="font-size: 0.9rem; color: #ccc; line-height: 1.6; margin-top: 15px; padding-left: 20px;">
+        <div id="instrucoes-paradoxo" class="cartao-instrucoes" style="background: rgba(20,20,20,0.95); border-left: 5px solid #fff; padding: 25px 20px; text-align: left; border-radius: 8px; width: 85%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 20;">
+            <h4 style="color: #fff; font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 10px;">Como revelar a verdade:</h4>
+            <ul style="font-size: 0.9rem; color: #ccc; line-height: 1.6; padding-left: 20px; margin-bottom: 20px;">
                 <li>Segure o celular <b>em pé</b> para ler a superfície.</li>
                 <li>Coloque o celular <b>totalmente deitado (horizontal)</b> para revelar a sombra.</li>
             </ul>
-            <button class="btn-acao" style="margin-top:25px; width: 100%; background: #fff; color: #000; font-weight: bold; font-size: 1.1rem; padding: 12px;" onclick="solicitarPermissaoGiroscopioParadoxo()">Calibrar Sensores</button>
+            <button class="btn-acao" style="width: 100%; background: #fff; color: #000; font-weight: bold; font-size: 1.1rem; padding: 12px;" onclick="solicitarPermissaoGiroscopioParadoxo()">Calibrar Sensores</button>
         </div>
 
-        <div class="conteudo-paradoxo" style="position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+        <div class="conteudo-paradoxo" style="flex: 1; width: 100%; display: grid; place-items: center; padding: 20px 20px 80px 20px; box-sizing: border-box; overflow-y: auto;">
             
-            <div id="texto-superficie" style="position: absolute; width: 90%; max-width: 400px; text-align: center; color: #aaa; font-family: 'Playfair Display', serif; font-size: clamp(1.1rem, 5vw, 1.4rem); line-height: 1.6; transition: opacity 0.3s, filter 0.3s; z-index: 2;">
+            <div id="texto-superficie" style="grid-area: 1 / 1; width: 100%; max-width: 400px; text-align: center; color: #aaa; font-family: 'Playfair Display', serif; font-size: clamp(1.1rem, 5vw, 1.4rem); line-height: 1.6; transition: opacity 0.3s, filter 0.3s; z-index: 2;">
                 "Bom dia, meu amor. Espero que o seu dia seja produtivo e leve. Lembre-se de beber água e não deixar o estresse da rotina te dominar. Cuide bem de você por mim. Estou daqui torcendo por cada passo seu."
             </div>
 
-            <div id="texto-profundo" style="position: absolute; width: 95%; max-width: 500px; text-align: center; color: #ff3366; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: clamp(0.85rem, 4vw, 1.15rem); line-height: 1.5; opacity: 0; filter: blur(20px); transition: opacity 0.3s ease, filter 0.3s ease; z-index: 1; text-shadow: 0 0 15px rgba(255,51,102,0.8);">
+            <div id="texto-profundo" style="grid-area: 1 / 1; width: 100%; max-width: 500px; text-align: center; color: #ff3366; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: clamp(0.85rem, 4vw, 1.1rem); line-height: 1.5; opacity: 0; filter: blur(20px); transition: opacity 0.3s ease, filter 0.3s ease; z-index: 1; text-shadow: 0 0 15px rgba(255,51,102,0.8);">
                 "A verdade, aquela que eu às vezes escondo atrás de sorrisos nas chamadas de vídeo, é que eu estou apavorado de tanta saudade. Tem noites em que o silêncio deste quarto é ensurdecedor, e tudo o que eu mais queria era o abrigo do seu abraço. Eu crio mundos digitais inteiros, construo esse aplicativo linha por linha, só para me sentir um milímetro mais perto de você. Mas a verdade é que eu trocaria tudo isso, cada código e cada tela, por um único segundo sentindo a sua respiração aqui no meu peito enquanto você pega no sono. A distância dói fisicamente. Eu desabaria o mundo, desafiaria qualquer regra e rasgaria todos os mapas só para te olhar nos olhos e te ter nos meus braços hoje. Thamiris, você não é apenas um plano para o meu futuro. Você é o meu porto seguro, a minha salvação no presente e a minha única certeza absoluta. Eu te amo com uma intensidade que quase me quebra, mas que me faz o homem mais vivo do mundo."
             </div>
-
+            
         </div>
         
-        <div style="font-size: 0.75rem; color: #555; letter-spacing: 2px; margin-bottom: 30px; font-family: monospace;">
+        <div style="position: absolute; bottom: 25px; width: 100%; text-align: center; font-size: 0.75rem; color: #555; letter-spacing: 2px; font-family: monospace; z-index: 5; pointer-events: none;">
             INCLINAÇÃO: <span id="valor-z">0.0°</span>
         </div>
     </div>

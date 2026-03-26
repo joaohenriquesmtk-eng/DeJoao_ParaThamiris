@@ -3144,30 +3144,60 @@ window.inicializarEpicentro = function() {
 // ==========================================
 // CONTROLE DE TELA CHEIA: O PRISMA (PARADOXO)
 // ==========================================
-window.abrirParadoxoTelaCheia = function() {
-    // A Trava do Dia (Desativada com "//" temporariamente para você conseguir testar na hora)
-    /*
-    if (localStorage.getItem('santuario_vitoria_dia') !== new Date().toLocaleDateString('pt-BR')) {
-        if(typeof mostrarToast === 'function') mostrarToast("🔒 Relíquia Selada. Vença o desafio do dia para colher este prêmio!");
-        if(window.Haptics) window.Haptics.erro();
-        return;
-    }
-    */
-
+window.ativarSensorParadoxo = function() {
+    const txtSuperficie = document.getElementById('texto-superficie');
+    const txtProfundo = document.getElementById('texto-profundo');
+    const valZ = document.getElementById('valor-z');
+    
+    // 🚨 A CORREÇÃO: Agora ele olha para a Tela Cheia (container-paradoxo)
     const container = document.getElementById('container-paradoxo');
-    const navInferior = document.querySelector('.menu-inferior');
-    
-    if (container) {
-        // 🚨 A MÁGICA BRUTA: Arranca o código da aba invisível e cola no fundo da tela à força!
-        document.body.appendChild(container);
-        container.classList.remove('escondido');
-    }
-    
-    if (navInferior) navInferior.classList.add('escondido'); 
-    document.body.classList.add('modo-jogo-ativo'); 
 
-    // Dá a Ignição no Motor do Paradoxo
-    if (typeof inicializarParadoxo === 'function') inicializarParadoxo();
+    const analisarInclinacao = (event) => {
+        // 🚨 A MÁGICA: Se a tela cheia estiver fechada (escondida), poupa a bateria. Se estiver aberta, o sensor trabalha livremente!
+        if (!container || container.classList.contains('escondido')) return;
+
+        let beta = event.beta;   // Inclinação frente/trás (-180 a 180)
+        let gamma = event.gamma; // Inclinação esquerda/direita (-90 a 90)
+        
+        if (beta === null || gamma === null) return;
+
+        let absBeta = Math.abs(beta);
+        let inclinacaoVertical = absBeta > 90 ? 180 - absBeta : absBeta;
+        let inclinacaoHorizontal = Math.abs(gamma);
+
+        let inclinacaoAbsoluta = Math.max(inclinacaoVertical, inclinacaoHorizontal);
+        let progresso = 0; 
+        
+        if (inclinacaoAbsoluta < 20) {
+            progresso = 1; 
+        } else if (inclinacaoAbsoluta > 45) {
+            progresso = 0; 
+        } else {
+            progresso = 1 - ((inclinacaoAbsoluta - 20) / 25);
+        }
+
+        if (txtSuperficie && txtProfundo) {
+            txtSuperficie.style.opacity = 1 - progresso;
+            txtSuperficie.style.filter = `blur(${progresso * 10}px)`;
+
+            txtProfundo.style.opacity = progresso;
+            txtProfundo.style.filter = `blur(${(1 - progresso) * 10}px)`;
+        }
+
+        if (valZ) {
+            valZ.innerText = inclinacaoAbsoluta.toFixed(1) + '°';
+            valZ.style.color = progresso > 0.8 ? '#ff3366' : '#555';
+        }
+        
+        if (progresso > 0.95 && !window.paradoxoRevelado) {
+            window.paradoxoRevelado = true;
+            if(window.Haptics) navigator.vibrate([40, 60, 40]);
+        } else if (progresso < 0.5) {
+            window.paradoxoRevelado = false;
+        }
+    };
+
+    window.addEventListener('deviceorientation', analisarInclinacao, true);
 };
 
 window.fecharParadoxoTelaCheia = function() {

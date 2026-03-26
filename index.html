@@ -128,15 +128,26 @@
                 </div>
 
 
-<div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px;">
-    <h4 style="color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-align: center;">Mural de Recados</h4>
-    <div id="area-postits" class="area-postits">
-        </div>
-    <div style="display: flex; gap: 10px; margin-top: 15px;">
+<div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px; padding: 20px;">
+    <h4 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-align: center;">Mural de Recados</h4>
+    
+    <div id="area-postits" class="area-postits" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    
+    <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
         <input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none;">
         <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 10px 15px;">📌 Fixar</button>
     </div>
-</div>                
+
+    <div class="arquivo-postits-container" style="border-top: 1px dashed rgba(212,175,55,0.3); padding-top: 15px;">
+        <div onclick="window.toggleArquivoPostits()" style="display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; color: #aaa; font-size: 0.9rem; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.3s;">
+            <span>🗂️ Histórico Antigo</span>
+            <span id="icone-arquivo-postits" style="transition: transform 0.3s; font-size: 0.8rem;">▼</span>
+        </div>
+        
+        <div id="conteudo-arquivo-postits" class="escondido" style="margin-top: 15px; display: flex; flex-direction: column; max-height: 350px; overflow-y: auto; padding-right: 5px;">
+            </div>
+    </div>
+</div>           
 
                 <div class="cartao-vidro" id="frase-do-dia">
                     <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
@@ -639,51 +650,67 @@
     </div>
 
     <div class="grade-cofre" id="grade-reliquias">
+        
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'musica')">
-            <span class="icone-reliquia">🎵</span>
-            <p class="titulo-reliquia">Nossa Trilha</p>
-            <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/nossa_trilha.png" alt="Nossa Trilha" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Nossa Trilha</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
+        
         <div class="cartao-vidro item-cofre" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'planetario'); setTimeout(() => { if(typeof inicializarPlanetario3D === 'function') inicializarPlanetario3D(); }, 200);">
-            <span class="icone-reliquia">🌠</span>
-            <p class="titulo-reliquia">Planetário</p>
-                        <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/planetario.png" alt="Planetário" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Planetário</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
+        
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'ceu')">
-            <span class="icone-reliquia">🌌</span>
-            <p class="titulo-reliquia">Mesmo Céu</p>
-            <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/mesmo_ceu.png" alt="Mesmo Céu" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Mesmo Céu</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
+        
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'cartas')">
-            <span class="icone-reliquia">✉️</span>
-            <p class="titulo-reliquia">Sementes</p>
-            <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/sementes.png" alt="Sementes" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Sementes</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
+        
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'encontro')">
-            <span class="icone-reliquia">🎟️</span>
-            <p class="titulo-reliquia">O Futuro</p>
-            <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/ofuturo.png" alt="O Futuro" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">O Futuro</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
+        
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'ecos')">
-            <span class="icone-reliquia">🎙️</span>
-            <p class="titulo-reliquia">Nossos Ecos</p>
-            <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/ecos.png" alt="Nossos Ecos" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Nossos Ecos</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
-        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'bussola')">
-            <span class="icone-reliquia">🧭</span>
-            <p class="titulo-reliquia">A Bússola</p>
-            <small class="status-reliquia">Trancado</small>
-        </div>
+
         <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'carrossel')">
-            <span class="icone-reliquia">📸</span>
-            <p class="titulo-reliquia">Horizontes</p>
-            <small class="status-reliquia">Trancado</small>
+            <img src="assets/icones-cofre/horizontes.png" alt="Horizontes" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Horizontes</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
+        </div>
+
+        <div class="cartao-vidro item-cofre bloqueado" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'bussola')">
+            <img src="assets/icones-cofre/bussola.png" alt="A Bússola" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">A Bússola</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
+        </div>
+
+        <div class="cartao-vidro item-cofre" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirReliquia(event, 'epicentro')">
+            <img src="assets/icones-cofre/ponto_zero.png" alt="Ponto Zero" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 8px #ff6b6b);">
+            <h4 class="titulo-jogo-grid">Ponto Zero</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
 
         <div class="cartao-vidro item-cofre capsula-livre" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirPainelFuturo()">
-            <span class="icone-reliquia">⏳</span>
-            <p class="titulo-reliquia">Cápsula do Tempo</p>
+            <img src="assets/icones-cofre/capsula.png" alt="Cápsula do Tempo" style="width: 45px; height: 45px; margin-bottom: 8px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <h4 class="titulo-jogo-grid">Cápsula do Tempo</h4>
+            <p class="desc-jogo-grid status-reliquia">Trancado</p>
         </div>
+        
     </div>
 
     <div id="modal-reliquia" class="modal escondido">
@@ -703,6 +730,47 @@
                 <button id="btn-ouvir-eco" class="btn-acao" style="width: 60px; height: 60px; border-radius: 50%; padding: 0; font-size: 1.5rem; display: none; background: rgba(0,0,0,0.5); border: 2px solid var(--cor-primaria); color: var(--cor-primaria);" onclick="tocarEco()">▶️</button>
             </div>
             <p id="status-eco" style="font-size: 0.7rem; color: var(--cor-primaria); margin-top: 10px; height: 15px;"></p>
+        </div>
+
+        <div id="cartao-epicentro" style="text-align: center; width: 100%;">
+            <style>
+                .epicentro-radar-box { width: 160px; height: 160px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.3); margin: 0 auto; position: relative; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); overflow: hidden; box-shadow: inset 0 0 20px rgba(212,175,55,0.2); }
+                .epicentro-varredura { position: absolute; top: 0; left: 0; width: 50%; height: 50%; background: linear-gradient(45deg, rgba(212,175,55,0) 0%, rgba(212,175,55,0.8) 100%); transform-origin: bottom right; animation: radar-spin 2s linear infinite; }
+                .epicentro-grade { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(212,175,55,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.2) 1px, transparent 1px); background-size: 20px 20px; border-radius: 50%; }
+                .epicentro-ponto { position: absolute; width: 8px; height: 8px; background: #ff3366; border-radius: 50%; box-shadow: 0 0 10px #ff3366; transition: all 1s ease; }
+                @keyframes radar-spin { 100% { transform: rotate(360deg); } }
+                .brilho-epicentro { animation: pulse-gold 2s infinite; }
+            </style>
+
+            <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px;">Ponto Zero</h3>
+            <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 20px;">A relíquia que colapsa o espaço-tempo.</p>
+
+            <div id="epicentro-bloqueado">
+                <div class="epicentro-radar-box">
+                    <div class="epicentro-grade"></div>
+                    <div class="epicentro-varredura"></div>
+                    <div id="ponto-alvo-radar" class="epicentro-ponto" style="top: 20%; left: 80%;"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #3498db; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #3498db;"></div>
+                </div>
+
+                <div style="margin-top: 25px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,51,102,0.4);">
+                    <p style="font-size: 0.85rem; color: #ff6b6b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">Anomalia Espacial</p>
+                    <p id="distancia-epicentro" style="font-size: 1.8rem; font-family: monospace; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5);">Buscando satélites...</p>
+                    <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">Aguardando colisão física de coordenadas.</p>
+                </div>
+            </div>
+
+            <div id="epicentro-desbloqueado" class="escondido" style="animation: fadeIn 2s ease forwards;">
+                <div style="font-size: 4rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px #D4AF37);">✨</div>
+                <h4 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0 0 10px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">A Espera Acabou.</h4>
+                <p style="color: #fff; font-style: italic; font-size: 0.95rem; line-height: 1.6; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border-left: 3px solid #D4AF37;">
+                    "Os satélites confirmam: a distância matemática entre nós dois agora é absolutamente zero.<br><br>Não olhe mais para a tela do celular.<br>Levante a cabeça. Eu estou bem na sua frente."
+                </p>
+                
+                <div style="margin-top: 20px; border-radius: 12px; overflow: hidden; border: 2px solid #D4AF37; box-shadow: 0 0 20px rgba(212,175,55,0.4);">
+                    <video id="video-reencontro" src="assets/reencontro.mp4" controls preload="metadata" style="width: 100%; display: block; background: #000;"></video>
+                </div>
+            </div>
         </div>
 
         <div id="cartao-planetario" style="text-align: center; width: 100%;">

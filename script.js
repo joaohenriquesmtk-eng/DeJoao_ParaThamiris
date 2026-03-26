@@ -1126,8 +1126,8 @@ window.abrirReliquia = function(event, tipo) {
         const v = BIBLIOTECA_RELIQUIAS.futuro[diaDoAno % BIBLIOTECA_RELIQUIAS.futuro.length];
         corpo.innerHTML = `<div class="bilhete-dourado"><div class="bilhete-dourado-inner"><div class="bilhete-header">Voucher Vitalício</div><div class="bilhete-corpo">Vale para:<div class="bilhete-destaque">${v.t}</div>${v.d}</div></div></div>`;
     } 
-// SE FOR UM ITEM DA GAVETA (Ecos, Bussola, Carrossel)
-    else if (['ecos', 'bussola', 'carrossel'].includes(tipo)) {
+// SE FOR UM ITEM DA GAVETA (Ecos, Bussola, Carrossel, Epicentro)
+    else if (['ecos', 'bussola', 'carrossel', 'epicentro'].includes(tipo)) {
         const template = document.getElementById(`cartao-${tipo}`);
         if(template) corpo.appendChild(template);
         
@@ -1135,6 +1135,7 @@ window.abrirReliquia = function(event, tipo) {
         if (tipo === 'bussola' && typeof inicializarBussola3D === 'function') inicializarBussola3D();
         if (tipo === 'ecos' && typeof inicializarEco3D === 'function') inicializarEco3D();
         if (tipo === 'carrossel' && typeof inicializarCarrossel3D === 'function') inicializarCarrossel3D();
+        if (tipo === 'epicentro' && typeof inicializarEpicentro === 'function') inicializarEpicentro();
         
         // Desperta os motores 3D que já existiam
         setTimeout(() => window.dispatchEvent(new Event('resize')), 100); 
@@ -1148,7 +1149,7 @@ window.fecharModal = function(apenasLimpar = false) {
     const corpo = document.getElementById('corpo-modal');
     const gaveta = document.getElementById('reliquias-templates');
     
-    // 🚨 1. EXTINTOR DE ÁUDIO: Para a música sincronizada e o áudio da cápsula
+    // 1. EXTINTOR DE ÁUDIO
     const audioSinc = document.getElementById('audio-sincronizado');
     if (audioSinc && !audioSinc.paused) {
         audioSinc.pause();
@@ -1159,17 +1160,24 @@ window.fecharModal = function(apenasLimpar = false) {
         audioReveladoFuturo = null;
     }
 
-    // 🚨 2. EXTINTOR DE CRONÔMETRO: Mata o timer da Cápsula do Futuro
+    // 2. EXTINTOR DE CRONÔMETRO
     if (typeof loopRelogioFuturo !== 'undefined' && loopRelogioFuturo) {
         clearInterval(loopRelogioFuturo);
         loopRelogioFuturo = null;
     }
     
-    if (gaveta && corpo) {
-        // Guarda os elementos 3D vivos na gaveta ANTES de limpar o modal!
-        ['ecos', 'bussola', 'carrossel'].forEach(id => {
-            const el = document.getElementById(`cartao-${id}`);
-            if (el && corpo.contains(el)) gaveta.appendChild(el);
+    // 3. EXTINTOR DE GPS
+    if (window.gpsWatcher !== undefined && window.gpsWatcher !== null) {
+        navigator.geolocation.clearWatch(window.gpsWatcher);
+        window.gpsWatcher = null;
+    }
+    
+    // 🚨 4. O SALVA-VIDAS ABSOLUTO (Impede a tela de sumir)
+    if (gaveta) {
+        const reliquiasParaSalvar = ['cartao-ecos', 'cartao-bussola', 'cartao-carrossel', 'cartao-planetario', 'cartao-epicentro'];
+        reliquiasParaSalvar.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) gaveta.appendChild(el); // Joga de volta pra gaveta à força!
         });
     }
     
@@ -3004,3 +3012,129 @@ window.comprarCombustivel = function() {
 window.addEventListener('load', () => {
     setTimeout(window.escutarRotaDestino, 1000);
 });
+
+
+// ==========================================
+// A NONA RELÍQUIA: O PONTO ZERO (GPS DETECTOR - VERSÃO DE LANÇAMENTO)
+// ==========================================
+window.gpsWatcher = null;
+
+window.inicializarEpicentro = function() {
+    const painelBloqueado = document.getElementById('epicentro-bloqueado');
+    const painelDesbloqueado = document.getElementById('epicentro-desbloqueado');
+    const txtDistancia = document.getElementById('distancia-epicentro');
+    const pontoRadar = document.getElementById('ponto-alvo-radar');
+
+    // Trava Eterna: Se a distância já zerou, o modal fica destrancado como um troféu!
+    if (localStorage.getItem('epicentro_destravado') === 'sim') {
+        if(painelBloqueado) painelBloqueado.classList.add('escondido');
+        if(painelDesbloqueado) painelDesbloqueado.classList.remove('escondido');
+        return;
+    }
+
+    if (!window.SantuarioApp || !window.MEU_NOME || !window.NOME_PARCEIRO) {
+        if(txtDistancia) txtDistancia.innerText = "Nuvem Offline";
+        return;
+    }
+
+    const { db, ref, set, onValue } = window.SantuarioApp.modulos;
+    const meuGpsRef = ref(db, `gps/${window.MEU_NOME.toLowerCase()}`);
+    const parceiroGpsRef = ref(db, `gps/${window.NOME_PARCEIRO.toLowerCase()}`);
+
+    let parceiroLat = null;
+    let parceiroLon = null;
+    let minhaLat = null;
+    let minhaLon = null;
+
+    // Fica ouvindo onde ela está na nuvem em tempo real
+    onValue(parceiroGpsRef, (snap) => {
+        const dados = snap.val();
+        if (dados) {
+            parceiroLat = dados.lat;
+            parceiroLon = dados.lon;
+            calcularColisao();
+        }
+    });
+
+    // Aciona o chip de GPS do celular
+    if (navigator.geolocation) {
+        window.gpsWatcher = navigator.geolocation.watchPosition((pos) => {
+            minhaLat = pos.coords.latitude;
+            minhaLon = pos.coords.longitude;
+            
+            // Grava a sua posição na nuvem para o celular dela ler
+            set(meuGpsRef, { lat: minhaLat, lon: minhaLon, timestamp: Date.now() });
+            calcularColisao();
+            
+        }, (err) => {
+            if(txtDistancia) txtDistancia.innerText = "GPS Recusado";
+        }, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+    } else {
+        if(txtDistancia) txtDistancia.innerText = "Satélite Indisponível";
+    }
+
+    function calcularColisao() {
+        // Se falta o GPS de um dos dois, aguarda educadamente
+        if (!parceiroLat || !minhaLat) {
+            if(txtDistancia && !txtDistancia.innerText.includes("KM") && !txtDistancia.innerText.includes("M")) {
+                txtDistancia.innerText = "Aguardando Alvo...";
+            }
+            return;
+        }
+
+        // Matemática Esférica de Haversine (Precisão Militar)
+        const R = 6371; 
+        const dLat = (parceiroLat - minhaLat) * (Math.PI/180);
+        const dLon = (parceiroLon - minhaLon) * (Math.PI/180);
+        
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(minhaLat * (Math.PI/180)) * Math.cos(parceiroLat * (Math.PI/180)) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distanciaMetros = (R * c) * 1000;
+
+        // Animação do Radar
+        if (pontoRadar) {
+            let raioVisual = Math.min(distanciaMetros / 100000, 1) * 45; 
+            let anguloRad = Date.now() / 1000; 
+            let posX = 50 + (Math.cos(anguloRad) * raioVisual);
+            let posY = 50 + (Math.sin(anguloRad) * raioVisual);
+            pontoRadar.style.left = `${posX}%`;
+            pontoRadar.style.top = `${posY}%`;
+        }
+
+        // 🚨 O GATILHO DA COLISÃO FÍSICA (15 METROS DE DISTÂNCIA)
+        if (distanciaMetros <= 15) {
+            if(txtDistancia) txtDistancia.innerText = "0.00 M";
+            // Desliga a antena GPS para economizar bateria instantaneamente
+            if (window.gpsWatcher !== null) navigator.geolocation.clearWatch(window.gpsWatcher);
+            desbloquearEpicentro();
+        } else {
+            // Exibe a distância real em tela
+            if (distanciaMetros > 1000) {
+                if(txtDistancia) txtDistancia.innerText = (distanciaMetros/1000).toFixed(1) + " KM";
+            } else {
+                if(txtDistancia) txtDistancia.innerText = distanciaMetros.toFixed(0) + " M";
+            }
+        }
+    }
+
+    function desbloquearEpicentro() {
+        // Grava na memória do celular que o encontro aconteceu
+        localStorage.setItem('epicentro_destravado', 'sim');
+        
+        if(painelBloqueado) painelBloqueado.classList.add('escondido');
+        if(painelDesbloqueado) {
+            painelDesbloqueado.classList.remove('escondido');
+            
+            // O celular treme e explode em ouro
+            if (window.Haptics) navigator.vibrate([300, 100, 300, 100, 500, 200, 800]);
+            if (typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 300, spread: 200, gravity: 1.5, zIndex: 10000});
+            
+            // Dá o Play no vídeo automaticamente
+            const vid = document.getElementById('video-reencontro');
+            if (vid) vid.play().catch(e => console.log('Autoplay bloqueado', e));
+        }
+    }
+};

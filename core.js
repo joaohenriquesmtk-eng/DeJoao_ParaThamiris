@@ -96,54 +96,8 @@ window.SantuarioApp.conectar = function() {
         }
     });
 
-    const refPostits = ref(db, 'postits');
-    onValue(refPostits, (snapshot) => {
-        const area = document.getElementById('area-postits');
-        if (!area) return;
-        area.innerHTML = '';
-        const postits = [];
-        
-        snapshot.forEach((filho) => {
-            postits.push({ key: filho.key, ...filho.val() });
-        });
-        
-        postits.sort((a, b) => {
-            if (a.fixado && !b.fixado) return -1;
-            if (!a.fixado && b.fixado) return 1;
-            return b.timestamp - a.timestamp;
-        });
-        
-        postits.forEach(p => {
-            const dataObjeto = new Date(p.timestamp);
-            const dataFormatada = `${String(dataObjeto.getDate()).padStart(2, '0')}/${String(dataObjeto.getMonth()+1).padStart(2, '0')} às ${String(dataObjeto.getHours()).padStart(2, '0')}:${String(dataObjeto.getMinutes()).padStart(2, '0')}`;
-            const classeAutor = (p.autor === 'João') ? 'postit-joao' : 'postit-thamiris';
-            const div = document.createElement('div');
-            div.className = `postit ${classeAutor}`;
-            div.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;">
-                    <span class="postit-autor">${p.autor}</span>
-                    <span style="font-size: 0.65rem; opacity: 0.6; font-weight: normal;">${dataFormatada}</span>
-                </div>
-                <div style="font-size: 0.95rem; margin-bottom: 8px;">${window.SantuarioCrypto.decodificar(p.mensagem)}</div>
-                <div style="display: flex; gap: 8px; justify-content: flex-end;"></div>
-            `;
-            if (p.autor === window.MEU_NOME) {
-                const btnFixar = document.createElement('button');
-                btnFixar.innerText = p.fixado ? '📌 Fixado' : '📍 Fixar';
-                btnFixar.className = 'btn-fixar';
-                btnFixar.onclick = (e) => { e.stopPropagation(); window.fixarPostit(p.key, !p.fixado); };
-                div.querySelector('div:last-child').appendChild(btnFixar);
-            }
-            const btnCurtir = document.createElement('button');
-            btnCurtir.innerText = `❤️ ${p.curtidas || 0}`;
-            btnCurtir.className = 'btn-curtir';
-            btnCurtir.onclick = (e) => { e.stopPropagation(); window.curtirPostit(p.key); };
-            div.querySelector('div:last-child').appendChild(btnCurtir);
-            area.appendChild(div);
-        });
-        if (postits.length > 0) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
-    });
-
+    // 11. Ignição do Mural de Recados (Post-its)
+    if (typeof window.escutarPostits === 'function') window.escutarPostits();
     
     // 6. Listener do Cofre (Ecos Recentes)
         // Invoca o motor de áudio multiplataforma (Samsung/iPhone) construído no script.js
@@ -398,4 +352,125 @@ function salvarProgressoPlantaFirebase() {
 window.toggleInstrucoesJardim = function() {
     const el = document.getElementById('instrucoes-jardim');
     if (el) el.classList.toggle('escondido');
+};
+
+// ==========================================
+// MURAL DE RECADOS: MOTOR DE ARQUIVAMENTO SEMANAL
+// ==========================================
+
+// Abre/Fecha a gaveta visualmente
+window.toggleArquivoPostits = function() {
+    const conteudo = document.getElementById('conteudo-arquivo-postits');
+    const icone = document.getElementById('icone-arquivo-postits');
+    if (conteudo && icone) {
+        conteudo.classList.toggle('escondido');
+        icone.style.transform = conteudo.classList.contains('escondido') ? 'rotate(0deg)' : 'rotate(180deg)';
+        if(window.Haptics) window.Haptics.toqueLeve();
+    }
+};
+
+// Calcula a semana exata de qualquer timestamp (ex: "Semana de 22/03 a 28/03")
+window.obterIdentificadorSemana = function(timestamp) {
+    const data = new Date(timestamp);
+    const diaSemana = data.getDay(); // 0 (Dom) a 6 (Sáb)
+    
+    // Volta para o Domingo desta semana
+    const domingo = new Date(data);
+    domingo.setDate(data.getDate() - diaSemana);
+    
+    // Avança para o Sábado desta semana
+    const sabado = new Date(domingo);
+    sabado.setDate(domingo.getDate() + 6);
+    
+    const formataData = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+    
+    return `Semana de ${formataData(domingo)} a ${formataData(sabado)} de ${domingo.getFullYear()}`;
+};
+
+// O Escutador do Firebase
+window.escutarPostits = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    onValue(ref(db, 'postits'), (snapshot) => {
+        const areaAtual = document.getElementById('area-postits');
+        const areaArquivo = document.getElementById('conteudo-arquivo-postits');
+        if (!areaAtual || !areaArquivo) return;
+
+        const dados = snapshot.val();
+        areaAtual.innerHTML = '';
+        areaArquivo.innerHTML = '';
+
+        if (!dados) {
+            areaAtual.innerHTML = '<p style="color: #888; font-style: italic; text-align: center; width: 100%;">O mural está vazio. Fixe o primeiro recado!</p>';
+            areaArquivo.innerHTML = '<p style="color: #666; font-style: italic; text-align: center; width: 100%; font-size: 0.85rem;">O arquivo está vazio.</p>';
+            return;
+        }
+
+        const postits = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
+        postits.sort((a, b) => b.timestamp - a.timestamp); // Mais recentes no topo
+
+        const semanaAtualString = window.obterIdentificadorSemana(Date.now());
+        const gruposArquivo = {}; 
+
+        postits.forEach(postit => {
+            const semanaPostit = window.obterIdentificadorSemana(postit.timestamp);
+            const txtDecodificado = window.SantuarioCrypto ? window.SantuarioCrypto.decodificar(postit.mensagem) : postit.mensagem;
+            const dataFormatada = new Date(postit.timestamp).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+            
+            // 🚨 A MÁGICA RESTAURADA: Puxando as cores clássicas do seu CSS
+            const classeAutor = (postit.autor === 'João') ? 'postit-joao' : 'postit-thamiris';
+            const iconeFixado = postit.fixado ? '📌 Fixado' : '📍 Fixar';
+            
+            // Monta o botão de fixar apenas se o recado for seu
+            let btnFixarHtml = '';
+            if (postit.autor === window.MEU_NOME) {
+                btnFixarHtml = `<button onclick="fixarPostit('${postit.id}', ${!postit.fixado})" class="btn-fixar">${iconeFixado}</button>`;
+            }
+
+            // O Chassi Clássico do Postit com as classes originais!
+            const htmlPostit = `
+                <div class="postit ${classeAutor}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;">
+                        <span class="postit-autor">${postit.autor}</span>
+                        <span style="font-size: 0.65rem; opacity: 0.6; font-weight: normal;">${dataFormatada}</span>
+                    </div>
+                    <div style="font-size: 0.95rem; margin-bottom: 8px; word-wrap: break-word;">${txtDecodificado}</div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        ${btnFixarHtml}
+                        <button onclick="curtirPostit('${postit.id}')" class="btn-curtir">❤️ ${postit.curtidas || 0}</button>
+                    </div>
+                </div>
+            `;
+            
+            // A MÁGICA DA TRIAGEM
+            if (postit.fixado || semanaPostit === semanaAtualString) {
+                areaAtual.insertAdjacentHTML('beforeend', htmlPostit);
+            } else {
+                if (!gruposArquivo[semanaPostit]) gruposArquivo[semanaPostit] = [];
+                gruposArquivo[semanaPostit].push(htmlPostit);
+            }
+        });
+
+        if (areaAtual.innerHTML === '') {
+            areaAtual.innerHTML = '<p style="color: #888; font-style: italic; text-align: center; width: 100%;">Nenhum recado na semana atual.</p>';
+        }
+
+        // Renderiza o Arquivo Histórico montando as pastas de semanas
+        let htmlArquivoFinal = '';
+        for (const [semanaStr, listaHtml] of Object.entries(gruposArquivo)) {
+            htmlArquivoFinal += `
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                    <h5 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 5px; margin-top: 0; margin-bottom: 15px; font-size: 1rem;">🗂️ ${semanaStr}</h5>
+                    ${listaHtml.join('')}
+                </div>
+            `;
+        }
+        
+        if (htmlArquivoFinal === '') {
+            areaArquivo.innerHTML = '<p style="color: #666; font-style: italic; text-align: center; width: 100%; font-size: 0.85rem;">Nenhum recado antigo arquivado.</p>';
+        } else {
+            areaArquivo.innerHTML = htmlArquivoFinal;
+        }
+    });
 };

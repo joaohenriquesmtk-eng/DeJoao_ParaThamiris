@@ -125,7 +125,7 @@ window.renderizarListaDeEventos = function() {
     eventos.forEach(evt => {
         const dataFormatada = new Date(evt.dataAlvo).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
         
-        // Injetamos a estrutura complexa do cartão
+        // Injetamos a estrutura complexa do cartão com Responsividade Flex embutida
         const cartao = document.createElement('div');
         cartao.className = `cartao-tempo-titan`;
         cartao.id = `cartao-evento-${evt.id}`;
@@ -134,41 +134,55 @@ window.renderizarListaDeEventos = function() {
         cartao.setAttribute('data-alvo', evt.dataAlvo); 
         cartao.setAttribute('data-criado', evt.criadoEm); 
         
+        // A MÁGICA DO CSS RESPONSIVO (Garante a perfeição em qualquer celular)
+        cartao.style.cssText = `
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 25px 15px; 
+            background: linear-gradient(145deg, rgba(15,15,15,0.9), rgba(5,5,5,0.95)); 
+            border: 1px solid rgba(212,175,55,0.3); 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
+            position: relative; 
+            width: 100%; 
+            box-sizing: border-box;
+            gap: 15px;
+            transition: all 0.5s ease;
+        `;
+        
         cartao.innerHTML = `
-            <div class="astrolabio-box">
-                <svg class="anel-tempo-svg" viewBox="0 0 100 100">
-                    <circle class="anel-tempo-bg" cx="50" cy="50" r="45"></circle>
-                    <circle class="anel-tempo-progresso" id="ring-${evt.id}" cx="50" cy="50" r="45"></circle>
+            <button onclick="window.excluirEventoAgenda('${evt.id}')" style="position: absolute; top: 12px; right: 12px; background: rgba(255, 51, 102, 0.1); border: 1px solid rgba(255, 51, 102, 0.3); color: #ff3366; font-size: 1rem; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10;">✖</button>
+
+            <div style="position: relative; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center;">
+                <svg viewBox="0 0 100 100" style="position: absolute; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible;">
+                    <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="6"></circle>
+                    <circle id="ring-${evt.id}" cx="50" cy="50" r="46" fill="none" stroke="#D4AF37" stroke-width="6" stroke-linecap="round" style="stroke-dasharray: 289; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 4px rgba(212,175,55,0.6));"></circle>
                 </svg>
-                <div class="icone-astrolabio">${evt.icone}</div>
+                <div style="font-size: 1.8rem; position: relative; z-index: 2; filter: drop-shadow(0 0 5px rgba(212,175,55,0.5));">${evt.icone}</div>
             </div>
 
-            <div class="dados-tempo-box">
-                <div class="cabecalho-tempo">
-                    <div>
-                        <h3 class="titulo-evento-titan">${evt.titulo}</h3>
-                        <span class="data-evento-titan">DATA ESTELAR: ${dataFormatada}</span>
-                    </div>
-                    <button class="btn-deletar-titan" onclick="window.excluirEventoAgenda('${evt.id}')">✖</button>
-                </div>
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <h3 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: clamp(1.1rem, 5vw, 1.4rem); margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; word-wrap: break-word;">${evt.titulo}</h3>
+                <span style="color: #888; font-size: 0.75rem; font-family: monospace; letter-spacing: 2px;">ALVO: ${dataFormatada}</span>
+            </div>
 
-                <div class="grid-nixie">
-                    <div class="bloco-nixie">
-                        <span class="numero-nixie" id="clock-dias-${evt.id}">00</span>
-                        <span class="label-nixie">Dias</span>
-                    </div>
-                    <div class="bloco-nixie">
-                        <span class="numero-nixie" id="clock-horas-${evt.id}">00</span>
-                        <span class="label-nixie">Horas</span>
-                    </div>
-                    <div class="bloco-nixie">
-                        <span class="numero-nixie" id="clock-mins-${evt.id}">00</span>
-                        <span class="label-nixie">Mins</span>
-                    </div>
-                    <div class="bloco-nixie">
-                        <span class="numero-nixie" id="clock-secs-${evt.id}">00</span>
-                        <span class="label-nixie">Segs</span>
-                    </div>
+            <div style="display: flex; justify-content: center; gap: 8px; width: 100%; max-width: 320px;">
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 12px 5px; flex: 1; display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                    <span id="clock-dias-${evt.id}" style="color: #fff; font-family: monospace; font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: bold; text-shadow: 0 0 8px rgba(212,175,55,0.5);">00</span>
+                    <span style="color: #D4AF37; font-size: 0.6rem; text-transform: uppercase; margin-top: 4px; letter-spacing: 1px;">Dias</span>
+                </div>
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 12px 5px; flex: 1; display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                    <span id="clock-horas-${evt.id}" style="color: #fff; font-family: monospace; font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: bold; text-shadow: 0 0 8px rgba(212,175,55,0.5);">00</span>
+                    <span style="color: #D4AF37; font-size: 0.6rem; text-transform: uppercase; margin-top: 4px; letter-spacing: 1px;">Horas</span>
+                </div>
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 12px 5px; flex: 1; display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                    <span id="clock-mins-${evt.id}" style="color: #fff; font-family: monospace; font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: bold; text-shadow: 0 0 8px rgba(212,175,55,0.5);">00</span>
+                    <span style="color: #D4AF37; font-size: 0.6rem; text-transform: uppercase; margin-top: 4px; letter-spacing: 1px;">Mins</span>
+                </div>
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 12px 5px; flex: 1; display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                    <span id="clock-secs-${evt.id}" style="color: #fff; font-family: monospace; font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: bold; text-shadow: 0 0 8px rgba(212,175,55,0.5);">00</span>
+                    <span style="color: #D4AF37; font-size: 0.6rem; text-transform: uppercase; margin-top: 4px; letter-spacing: 1px;">Segs</span>
                 </div>
             </div>
         `;
@@ -176,7 +190,7 @@ window.renderizarListaDeEventos = function() {
     });
 };
 
-// O MOTOR MATEMÁTICO DE ALTA PRECISÃO
+// O MOTOR MATEMÁTICO DE ALTA PRECISÃO E CÁLCULO
 window.processarTickDosRelogios = function() {
     const agora = Date.now();
     const cartoes = document.querySelectorAll('.cartao-tempo-titan');
@@ -193,19 +207,20 @@ window.processarTickDosRelogios = function() {
         if (anel) {
             const tempoTotal = alvo - criadoEm;
             const tempoPassado = agora - criadoEm;
-            // Circunferência = 2 * PI * 45 = 282.7 (arredondado para 283)
+            // O cálculo da Circunferência corrigido para o novo tamanho menor:
             let porcentagemProgresso = (tempoPassado / tempoTotal);
             if (porcentagemProgresso < 0) porcentagemProgresso = 0;
             if (porcentagemProgresso > 1) porcentagemProgresso = 1;
             
-            const offsetSvg = 283 - (283 * porcentagemProgresso);
+            const offsetSvg = 289 - (289 * porcentagemProgresso);
             anel.style.strokeDashoffset = offsetSvg;
         }
 
         // 2. ATUALIZAÇÃO DOS NIXIE TUBES E ESTADOS
         if (diferenca <= 0) {
-            cartao.classList.add('evento-passado');
-            cartao.classList.remove('evento-emergencia');
+            // Venceu o tempo! O anel vira verde e a contagem zera
+            cartao.style.borderColor = '#2ecc71';
+            cartao.style.boxShadow = '0 10px 30px rgba(46,204,113,0.3)';
             document.getElementById(`clock-dias-${idStr}`).innerText = "00";
             document.getElementById(`clock-horas-${idStr}`).innerText = "00";
             document.getElementById(`clock-mins-${idStr}`).innerText = "00";
@@ -225,9 +240,11 @@ window.processarTickDosRelogios = function() {
 
         // Modo Urgência Suprema (< 24h)
         if (dias === 0) {
-            cartao.classList.add('evento-emergencia');
+            cartao.style.borderColor = '#e74c3c';
+            cartao.style.boxShadow = '0 10px 30px rgba(231,76,60,0.3)';
         } else {
-            cartao.classList.remove('evento-emergencia');
+            cartao.style.borderColor = 'rgba(212,175,55,0.3)';
+            cartao.style.boxShadow = '0 10px 30px rgba(0,0,0,0.7)';
         }
     });
 };

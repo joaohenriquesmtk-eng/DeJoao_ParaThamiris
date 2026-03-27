@@ -16,17 +16,31 @@ firebase.initializeApp({
     appId: "1:381433603925:web:27d899e7fba589f2e231dc"
 });
 
-// Inicializa a escuta de background para o iOS e Android
 const messaging = firebase.messaging();
 
-// 🚨 O GATILHO DE CLIQUE: O que acontece quando ela clica na notificação com a tela bloqueada
+// 🚨 O MOTOR QUE FALTAVA: RECEBER QUANDO FECHADO
+messaging.onBackgroundMessage((payload) => {
+    console.log('[Santuário SW] Mensagem recebida em segundo plano.', payload);
+    
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: '/assets/icons/icon-192.png',
+        vibrate: [200, 100, 200, 100, 400],
+        data: { url: payload.fcmOptions?.link || '/' } 
+    };
+
+    return self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// 🚨 O GATILHO DE CLIQUE
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     const action = event.action;
+    const urlToOpen = event.notification.data?.url || '/';
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-            // Se clicou no botão de enviar pulso pela notificação
             if (action === 'enviar_pulso') {
                 for (let i = 0; i < windowClients.length; i++) {
                     if (windowClients[i].url && 'focus' in windowClients[i]) {
@@ -37,53 +51,28 @@ self.addEventListener('notificationclick', (event) => {
                 }
                 if (clients.openWindow) return clients.openWindow('/?acao=disparar_pulso_remoto');
             } 
-            // Se clicou no balão da notificação ou no botão "Abrir App"
             else {
                 for (let i = 0; i < windowClients.length; i++) {
                     if (windowClients[i].url && 'focus' in windowClients[i]) {
                         return windowClients[i].focus();
                     }
                 }
-                if (clients.openWindow) return clients.openWindow('/');
+                if (clients.openWindow) return clients.openWindow(urlToOpen);
             }
         })
     );
 });
 
 const CACHE_NAME = 'santuario-cache-v2';
-
-// A "Mochila de Sobrevivência"
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/core.js',
-    '/ui.js',
-    '/graficos3d.js',
-    '/app.js',
-    '/script.js',
-    '/tribunal.js',
-    '/julgamento.js',
-    '/minifazenda_novo.js',
-    '/manifest.json',
-    '/assets/icone.png',
-    '/assets/ambient.mp3',
-    '/assets/icones-jogos/termo.png',
-    '/assets/icones-jogos/tribunal.png',
-    '/assets/icones-jogos/sincronia.png',
-    '/assets/icones-jogos/minifazenda.png',
-    '/assets/icones-jogos/jardim.png',
-    '/assets/icones-jogos/julgamento.png'
+    '/', '/index.html', '/style.css', '/core.js', '/ui.js', '/graficos3d.js', 
+    '/app.js', '/script.js', '/tribunal.js', '/julgamento.js', '/minifazenda_novo.js', 
+    '/manifest.json', '/assets/icone.png', '/assets/ambient.mp3'
 ];
 
 self.addEventListener('install', (event) => {
     self.skipWaiting(); 
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('[Santuário SW] A carregar a mochila de sobrevivência...');
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
+    event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)));
 });
 
 self.addEventListener('activate', (event) => {
@@ -91,9 +80,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
+                    if (cacheName !== CACHE_NAME) return caches.delete(cacheName);
                 })
             );
         })
@@ -105,26 +92,21 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
     const url = new URL(event.request.url);
-    // Ignora conexões ao vivo do Firebase para as notificações chegarem em tempo real
-    if (url.hostname.includes('firestore.googleapis.com') || 
-        url.hostname.includes('identitytoolkit.googleapis.com') ||
-        url.hostname.includes('firebaseio.com')) {
+    
+    // 🚨 REGRA DE OURO DO FIREBASE: NUNCA intercepte as APIs do Google
+    if (url.hostname.includes('googleapis.com') || url.hostname.includes('firebase')) {
         return; 
     }
 
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            const fetchPromise = fetch(event.request).then((networkResponse) => {
+            return cachedResponse || fetch(event.request).then((networkResponse) => {
                 if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
                     const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
-                    });
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
                 }
                 return networkResponse;
             }).catch(() => {});
-
-            return cachedResponse || fetchPromise;
         })
     );
 });

@@ -1,4 +1,3 @@
-// 🚨 CORREÇÃO: Importar onValueWritten ao invés de onValueCreated
 const { onValueWritten, onValueUpdated } = require('firebase-functions/v2/database');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
@@ -6,28 +5,22 @@ const moment = require('moment-timezone');
 
 admin.initializeApp();
 
-// --- Função 1: enviarNotificacaoMood ---
+// --- Função 1: enviarNotificacaoMood (Alerta de S.O.S/Humor) ---
 exports.enviarNotificacaoMood = onValueWritten(
     '/moods/{userId}',
     async (event) => {
-        // Se a pessoa deletou o humor, não faz nada
         if (!event.data.after.exists()) return;
 
         const mood = event.data.after.val();
         const remetenteId = event.params.userId; 
 
-        // Define quem vai RECEBER a notificação
         const destinatarioId = (remetenteId === 'joao') ? 'thamiris' : 'joao';
         const nomeRemetente = (remetenteId === 'joao') ? 'João' : 'Thamiris';
 
-        // Busca o token de quem vai receber
         const snapshotToken = await admin.database().ref(`/fcmTokens/${destinatarioId}`).once('value');
         const tokenDestino = snapshotToken.val();
 
-        if (!tokenDestino) {
-            console.log(`Token de ${destinatarioId} não encontrado no banco.`);
-            return;
-        }
+        if (!tokenDestino) return;
 
         const estado = mood.estado;
         let titulo = `🌪️ Alerta de Cuidado: ${nomeRemetente}`;
@@ -40,19 +33,12 @@ exports.enviarNotificacaoMood = onValueWritten(
         }
 
         const message = {
-            notification: { 
-                title: titulo, 
-                body: corpo 
-            },
-            android: { 
-                priority: 'high' 
-            },
+            notification: { title: titulo, body: corpo },
+            android: { priority: 'high' },
             webpush: {
-                fcmOptions: {
-                    link: "/" 
-                },
+                fcmOptions: { link: "/" },
                 notification: {
-                    icon: "/assets/icons/icon-192.png", 
+                    icon: "https://joaohenriquesmtk-eng.github.io/DeJoao_ParaThamiris/assets/icons/icon-192.png", 
                     vibrate: [200, 100, 200],
                     actions: [
                         { action: "enviar_pulso", title: "💖 Enviar Pulso" },
@@ -67,12 +53,48 @@ exports.enviarNotificacaoMood = onValueWritten(
     }
 );
 
+// --- Função 1.5: enviarNotificacaoPulso (Aperto no Orbe) ---
+exports.enviarNotificacaoPulso = onValueWritten(
+    '/pulsos/{userId}',
+    async (event) => {
+        if (!event.data.after.exists()) return;
+
+        const remetenteId = event.params.userId;
+        const destinatarioId = (remetenteId === 'joao') ? 'thamiris' : 'joao';
+        const nomeRemetente = (remetenteId === 'joao') ? 'João' : 'Thamiris';
+
+        const snapshotToken = await admin.database().ref(`/fcmTokens/${destinatarioId}`).once('value');
+        const tokenDestino = snapshotToken.val();
+
+        if (!tokenDestino) return;
+
+        const message = {
+            notification: { 
+                title: `💓 Pulso de Vida`, 
+                body: `${nomeRemetente} apertou o orbe e está pensando em você agora.` 
+            },
+            android: { priority: 'high' },
+            webpush: {
+                fcmOptions: { link: "/" },
+                notification: { 
+                    icon: "https://joaohenriquesmtk-eng.github.io/DeJoao_ParaThamiris/assets/icons/icon-192.png", 
+                    vibrate: [100, 50, 400],
+                    actions: [
+                        { action: "enviar_pulso", title: "💖 Devolver Pulso" },
+                        { action: "abrir_app", title: "🌌 Entrar" }
+                    ]
+                }
+            },
+            token: tokenDestino
+        };
+
+        return admin.messaging().send(message);
+    }
+);
+
 // --- Função 2: gerarMetasDiarias ---
 exports.gerarMetasDiarias = onSchedule(
-    {
-        schedule: '0 3 * * *',
-        timeZone: 'America/Sao_Paulo',
-    },
+    { schedule: '0 3 * * *', timeZone: 'America/Sao_Paulo' },
     async (event) => {
         const db = admin.database();
         const hoje = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD');
@@ -115,10 +137,7 @@ exports.gerarMetasDiarias = onSchedule(
 
 // --- Função 3: verificarConquistas ---
 exports.verificarConquistas = onValueUpdated(
-    {
-        ref: '/jogadores/{userId}/estatisticas',
-        region: 'us-central1',
-    },
+    { ref: '/jogadores/{userId}/estatisticas', region: 'us-central1' },
     async (event) => {
         const before = event.data.before.val() || {};
         const after = event.data.after.val() || {};
@@ -147,10 +166,7 @@ exports.verificarConquistas = onValueUpdated(
 
 // --- Função 4: atualizarClima ---
 exports.atualizarClima = onSchedule(
-    {
-        schedule: '0 3 * * *',
-        timeZone: 'America/Sao_Paulo',
-    },
+    { schedule: '0 3 * * *', timeZone: 'America/Sao_Paulo' },
     async (event) => {
         const db = admin.database();
         const climas = ['ensolarado', 'nublado', 'chuvoso', 'seco'];
@@ -163,10 +179,7 @@ exports.atualizarClima = onSchedule(
 
 // --- Função 5: atualizarPrecosPorOferta ---
 exports.atualizarPrecosPorOferta = onSchedule(
-    {
-        schedule: '0 3 * * *',
-        timeZone: 'America/Sao_Paulo',
-    },
+    { schedule: '0 3 * * *', timeZone: 'America/Sao_Paulo' },
     async (event) => {
         const db = admin.database();
         const sementes = ['milho', 'cenoura', 'tomate', 'abóbora', 'morango', 'alface', 'girassol', 'batata'];

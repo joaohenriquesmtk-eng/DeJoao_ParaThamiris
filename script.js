@@ -49,31 +49,7 @@ window.injetarModuloHTML = function(jogoId) {
 window.statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
 
-// ==========================================
-// GERENTE MÁXIMO DE ÁUDIO (SISTEMA ANTI-DUPLICAÇÃO)
-// ==========================================
-window.musicaNossaTocando = false; // Trava de segurança
 
-window.tocarAmbiente = () => {
-    if (window.musicaNossaTocando) return; // Se a "Nossa Música" tá rolando, a ambiente fica calada.
-    
-    if (!audioJogos) {
-        // Só cria a música se ela NÃO existir na RAM
-        audioJogos = new Audio('ambient.mp3'); 
-        audioJogos.loop = true;
-        audioJogos.volume = 0.0;
-    }
-    
-    if (audioJogos.paused) {
-        audioJogos.play().catch(e => console.log("Navegador bloqueou áudio:", e));
-    }
-};
-
-window.pausarAmbiente = () => {
-    if (typeof audioJogos !== 'undefined' && audioJogos && !audioJogos.paused) {
-        audioJogos.pause();
-    }
-};
 
 let telaAtual = 'home';
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
@@ -1457,6 +1433,7 @@ function atualizarDinamicaHome() {
             const s = item.querySelector('.status-reliquia');
             if (s) s.innerText = "Disponível";
         });
+
     } else {
         if (msgCofre) msgCofre.innerText = "Vença o desafio diário para desbloquear";
         itensCofre.forEach(item => {
@@ -1465,25 +1442,16 @@ function atualizarDinamicaHome() {
             if (s) s.innerText = "Trancado";
         });
     }
-}
 
-
-function playAudioJogos() {
-    if (!audioJogos) {
-        audioJogos = document.getElementById('audio-jogos');
-        if (!audioJogos) return;
-        audioJogos.volume = 0.0;
-    }
-    if (audioJogos.paused) {
-        audioJogos.play().catch(e => console.log('Áudio bloqueado até interação:', e));
+    if ("Notification" in window && Notification.permission !== "granted") {
+        const btnNotif = document.getElementById('btn-ativar-notificacoes');
+        if(btnNotif) btnNotif.classList.remove('escondido');
+    } else {
+        const btnNotif = document.getElementById('btn-ativar-notificacoes');
+        if(btnNotif) btnNotif.classList.add('escondido');
     }
 }
 
-function pauseAudioJogos() {
-    if (audioJogos && !audioJogos.paused) {
-        audioJogos.pause();
-    }
-}
 
 // ==========================================
     // TERMÔMETRO DO CUIDADO SUPREMO & POST-ITS
@@ -1642,22 +1610,48 @@ window.enviarPostit = function() {
     input.value = ""; 
 };
 
+// SUBSTITUA A PARTIR DO EVENTO loginSucesso
 window.addEventListener('loginSucesso', async (e) => {
     console.log(`Bem-vindo, ${window.MEU_NOME}. Conectando satélite...`);
-    
-    // Inicializa o Pulso
     if (window.SantuarioApp && window.SantuarioApp.conectar) {
         window.SantuarioApp.conectar();
     }
-    
-    // Solicita permissão e só tenta obter o token se for concedida
+});
+
+// 🚨 A MÁGICA PARA O IPHONE APROVAR A NOTIFICAÇÃO
+window.ativarNotificacoesApple = async function() {
     const permitido = await solicitarPermissaoNotificacao();
     if (permitido) {
+        document.getElementById('btn-ativar-notificacoes').classList.add('escondido');
         salvarTokenFCM();
+        if(typeof mostrarToast === 'function') mostrarToast("Satélite sincronizado! Notificações ativas.", "✅");
+        if(window.Haptics) window.Haptics.sucesso();
     } else {
-        console.log('Permissão de notificação negada');
+        if(typeof mostrarToast === 'function') mostrarToast("Permissão negada. Vá nos Ajustes do iPhone.", "❌");
+        if(window.Haptics) window.Haptics.erro();
     }
-});
+};
+
+async function salvarTokenFCM() {
+    if (typeof window.SantuarioApp?.modulos?.messaging === 'undefined') return;
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const messaging = window.SantuarioApp.modulos.messaging;
+        const token = await window.SantuarioApp.modulos.getToken(messaging, {
+            vapidKey: 'BMfoiE5OUoxMK970zucUsdMO-X6zPX36rmOwlTKPEp8JTzDZzGbwqm097kQKd_508hZORw-B3AwKC6gRxm5iMjg',
+            serviceWorkerRegistration: registration 
+        });
+
+        if (token) {
+            console.log('Token FCM obtido:', token);
+            const { db, ref, set } = window.SantuarioApp.modulos;
+            await set(ref(db, `fcmTokens/${window.MEU_NOME.toLowerCase()}`), token);
+        }
+    } catch (err) {
+        console.error('Erro ao obter token FCM:', err);
+    }
+}
 
 // ==========================================
 // REGISTRAR LOGIN NO FIREBASE
@@ -3204,3 +3198,36 @@ window.fecharParadoxoTelaCheia = function() {
     if (navInferior) navInferior.classList.remove('escondido');
     document.body.classList.remove('modo-jogo-ativo');
 };
+
+// ==========================================
+// GERENTE MÁXIMO DE ÁUDIO (SISTEMA ANTI-MUDO E ANTI-DUPLICAÇÃO)
+// ==========================================
+window.musicaNossaTocando = false; // Trava de segurança para a música do Cofre
+
+window.playAudioJogos = function() {
+    if (window.musicaNossaTocando) return; // Se a "Nossa Trilha" do cofre estiver tocando, respeita o silêncio
+    
+    if (!audioJogos) {
+        audioJogos = document.getElementById('audio-jogos');
+        if (!audioJogos) return;
+    }
+    
+    // 🚨 A MÁGICA SALVADORA: Tiramos do 0.0 (Mudo) e colocamos em 40% (0.4) 
+    // Fica perfeito como música de fundo sem atrapalhar os toques!
+    audioJogos.volume = 0.3; 
+    
+    if (audioJogos.paused) {
+        // Tenta tocar. A Apple e o Google exigem que a pessoa toque na tela pelo menos uma vez antes do som sair.
+        audioJogos.play().catch(e => console.log('O navegador vai liberar o som assim que a tela for tocada.'));
+    }
+};
+
+window.pauseAudioJogos = function() {
+    if (audioJogos && !audioJogos.paused) {
+        audioJogos.pause();
+    }
+};
+
+// Redireciona os comandos antigos para o nosso novo motor perfeito
+window.tocarAmbiente = window.playAudioJogos;
+window.pausarAmbiente = window.pauseAudioJogos;

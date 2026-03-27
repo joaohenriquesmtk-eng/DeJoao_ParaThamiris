@@ -1,11 +1,58 @@
 // ==========================================
-// MOTOR OFFLINE SUPREMO (PWA SANTUÁRIO)
-// Versão: 1.0.0
+// MOTOR OFFLINE & NOTIFICAÇÕES (PWA SANTUÁRIO)
+// Versão: 2.0.0 (Compatibilidade Ouro iOS/Android)
 // ==========================================
 
-const CACHE_NAME = 'santuario-cache-v1';
+importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
-// A "Mochila de Sobrevivência": Tudo o que a app precisa para arrancar sem internet
+firebase.initializeApp({
+    apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
+    authDomain: "santuario-jt.firebaseapp.com",
+    databaseURL: "https://santuario-jt-default-rtdb.firebaseio.com",
+    projectId: "santuario-jt",
+    storageBucket: "santuario-jt.firebasestorage.app",
+    messagingSenderId: "381433603925",
+    appId: "1:381433603925:web:27d899e7fba589f2e231dc"
+});
+
+// Inicializa a escuta de background para o iOS e Android
+const messaging = firebase.messaging();
+
+// 🚨 O GATILHO DE CLIQUE: O que acontece quando ela clica na notificação com a tela bloqueada
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const action = event.action;
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            // Se clicou no botão de enviar pulso pela notificação
+            if (action === 'enviar_pulso') {
+                for (let i = 0; i < windowClients.length; i++) {
+                    if (windowClients[i].url && 'focus' in windowClients[i]) {
+                        windowClients[i].focus();
+                        windowClients[i].postMessage({ comando: 'disparar_pulso_remoto' });
+                        return;
+                    }
+                }
+                if (clients.openWindow) return clients.openWindow('/?acao=disparar_pulso_remoto');
+            } 
+            // Se clicou no balão da notificação ou no botão "Abrir App"
+            else {
+                for (let i = 0; i < windowClients.length; i++) {
+                    if (windowClients[i].url && 'focus' in windowClients[i]) {
+                        return windowClients[i].focus();
+                    }
+                }
+                if (clients.openWindow) return clients.openWindow('/');
+            }
+        })
+    );
+});
+
+const CACHE_NAME = 'santuario-cache-v2';
+
+// A "Mochila de Sobrevivência"
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -21,7 +68,6 @@ const ASSETS_TO_CACHE = [
     '/manifest.json',
     '/assets/icone.png',
     '/assets/ambient.mp3',
-    // Ícones dos Jogos
     '/assets/icones-jogos/termo.png',
     '/assets/icones-jogos/tribunal.png',
     '/assets/icones-jogos/sincronia.png',
@@ -30,56 +76,45 @@ const ASSETS_TO_CACHE = [
     '/assets/icones-jogos/julgamento.png'
 ];
 
-// INSTALAÇÃO: A app baixa tudo para o disco rígido do telemóvel
 self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Força a atualização imediata sem ter de fechar a app
+    self.skipWaiting(); 
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('[Santuário SW] A carregar a mochila de sobrevivência...');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-            .catch(err => console.error('[Santuário SW] Erro ao fazer cache:', err))
+        caches.open(CACHE_NAME).then((cache) => {
+            console.log('[Santuário SW] A carregar a mochila de sobrevivência...');
+            return cache.addAll(ASSETS_TO_CACHE);
+        })
     );
 });
 
-// ATIVAÇÃO: A app limpa lixo de versões antigas
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
-                        console.log('[Santuário SW] A apagar memórias antigas:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
         })
     );
-    self.clients.claim(); // Assume o controlo imediato de todas as abas
+    self.clients.claim(); 
 });
 
-// O INTERCETOR: O "Polícia de Trânsito" da sua Internet
 self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
-
-    // REGRA 1: Ignora tudo o que não for GET (como envio de mensagens ao Firebase)
     if (event.request.method !== 'GET') return;
 
-    // REGRA 2: Ignora o Firebase Database (Para as mensagens chegarem em tempo real)
+    const url = new URL(event.request.url);
+    // Ignora conexões ao vivo do Firebase para as notificações chegarem em tempo real
     if (url.hostname.includes('firestore.googleapis.com') || 
         url.hostname.includes('identitytoolkit.googleapis.com') ||
         url.hostname.includes('firebaseio.com')) {
         return; 
     }
 
-    // REGRA 3: Estratégia "Stale-While-Revalidate" (Mostra o cache RÁPIDO, atualiza no fundo)
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            // Vai à internet procurar uma versão mais nova
             const fetchPromise = fetch(event.request).then((networkResponse) => {
-                // Se encontrou algo novo na internet, guarda no cache silenciosamente
                 if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
                     const responseToCache = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => {
@@ -87,12 +122,8 @@ self.addEventListener('fetch', (event) => {
                     });
                 }
                 return networkResponse;
-            }).catch(() => {
-                // Se estiver offline e a rede falhar, simplesmente falha silenciosamente
-                // porque o `cachedResponse` será devolvido logo abaixo.
-            });
+            }).catch(() => {});
 
-            // MAGIA: Devolve o Cache IMEDIATAMENTE. Se não existir no cache, espera a rede.
             return cachedResponse || fetchPromise;
         })
     );

@@ -1692,22 +1692,82 @@ async function salvarTokenFCM() {
 }
 
 // ==========================================
-// REGISTRAR LOGIN NO FIREBASE
+// REGISTRAR LOGIN COM TRIANGULAÇÃO EXATA (GPS + IP)
 // ==========================================
-function registrarLogin(usuario) {
-    // Verifica se os módulos estão disponíveis
+async function registrarLogin(usuario) {
     if (!window.SantuarioApp?.modulos) return;
     const { db, ref, push } = window.SantuarioApp.modulos;
     
-    // Cria uma referência para a lista de logins
+    let ipUsuario = "Desconhecido";
+    let cidadePeloIP = "Base Desconhecida";
+    let coordenadasExatas = "N/A";
+    let enderecoDetalhado = "GPS bloqueado ou não autorizado";
+
+    // 1. Tenta o Radar Furtivo (IP) em paralelo para não perder tempo
+    const obterIP = async () => {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            if (res.ok) return await res.json();
+        } catch (e) {}
+        return null;
+    };
+
+    // 2. Tenta o Satélite Físico (GPS Exato)
+    const obterGPS = () => new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => resolve(pos.coords),
+            (err) => resolve(null), // Se ela negar, ele engole o erro e segue em frente
+            { enableHighAccuracy: true, timeout: 6000 } // Tenta forçar a melhor antena por 6 segundos
+        );
+    });
+
+    // Dispara as duas sondas ao mesmo tempo
+    const [dadosIP, coords] = await Promise.all([obterIP(), obterGPS()]);
+
+    // Processa os dados do IP
+    if (dadosIP) {
+        ipUsuario = dadosIP.ip || "Desconhecido";
+        if (dadosIP.city && dadosIP.region) {
+            cidadePeloIP = `${dadosIP.city}, ${dadosIP.region}`;
+        }
+    }
+
+    // 3. A MÁGICA: Se o GPS funcionou, traduzimos a coordenada para RUA E BAIRRO
+    if (coords) {
+        coordenadasExatas = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
+        
+        try {
+            // O satélite OpenStreetMap faz o "Reverse Geocoding" gratuitamente
+            const urlGeo = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&zoom=18&addressdetails=1`;
+            const resGeo = await fetch(urlGeo);
+            
+            if (resGeo.ok) {
+                const dadosEnd = await resGeo.json();
+                if (dadosEnd && dadosEnd.address) {
+                    const rua = dadosEnd.address.road || dadosEnd.address.pedestrian || "Rua não mapeada";
+                    const bairro = dadosEnd.address.suburb || dadosEnd.address.neighbourhood || "Bairro desconhecido";
+                    const cidade = dadosEnd.address.city || dadosEnd.address.town || "";
+                    
+                    enderecoDetalhado = `${rua}, ${bairro} - ${cidade}`.replace(/^, |, $/g, '').trim();
+                }
+            }
+        } catch (e) {
+            enderecoDetalhado = "Coordenadas capturadas, mas falha ao ler o mapa das ruas.";
+        }
+    }
+
+    // 4. Grava tudo no Diário de Bordo do Firebase
     const loginsRef = ref(db, 'logins');
-    
-    // Adiciona um novo registro com timestamp e usuário
     push(loginsRef, {
-        usuario: usuario,           // 'joao' ou 'thamiris'
+        usuario: usuario,
+        data_acesso: new Date().toLocaleString('pt-BR'),
         timestamp: Date.now(),
-        data: new Date().toLocaleString('pt-BR') // formato legível
-    }).catch(error => console.error('Erro ao registrar login:', error));
+        ip: ipUsuario,
+        cidade_rastreada: cidadePeloIP,
+        coordenadas_gps: coordenadasExatas,
+        endereco_exato: enderecoDetalhado
+    }).catch(error => console.error('Erro ao registrar login espacial:', error));
 }
 
 function atualizarInterfaceGlobal() {

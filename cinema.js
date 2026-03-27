@@ -1,339 +1,312 @@
 // ============================================================================
-// CINE QUÂNTICO (YOUTUBE + GOOGLE DRIVE) - TITAN TIER ENGINE (ANTI-CORS)
+// VERSÃO 2.0 - MOTOR DE CINE QUÂNTICO (YOUTUBE API + FIREBASE REALTIME)
+// Padrão Elite: Inicialização Inteligente, Bypass de Autoplay Mobile, Origin Fix.
 // ============================================================================
 
-window.estadoCinema = {
-    videoId: null,
-    tipoVideo: null,
-    ultimoTimestamp: null,
-    euPronto: false,
-    parceiroPronto: false,
-    contagemEmAndamento: false,
-    apiYTPronta: false
-};
+window.playerCinema = null;
+window.isCinemaSyncing = false; // A Trava Quântica Anti-Loop
+window.idVideoAtual = null;
+window.ytApiPronta = false; // Bandeira de segurança da API
+let dadosPendentesParaMontagem = null;
 
-window.youtubePlayer = null;
+// Função chamada pelo core.js quando o módulo é injetado
+window.inicializarCinema = function() {
+    console.log("🎬 Cine Quântico Ativado");
 
-function injetarAPIYouTube() {
-    if (!window.YT) {
-        console.log("Injetando API Quântica do YouTube...");
+    // Reseta o estado local ao entrar na sala
+    window.playerCinema = null;
+    window.isCinemaSyncing = false;
+    window.idVideoAtual = null;
+    dadosPendentesParaMontagem = null;
+
+    // 1. Carrega a API IFrame do YouTube dinamicamente (Padrão Ouro do Google)
+    if (!window.YT || !window.YT.Player) {
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
+        // A API do YouTube exige esta função global exata para avisar que carregou
+        window.onYouTubeIframeAPIReady = function() {
+            window.ytApiPronta = true;
+            console.log("✅ YouTube API Carregada e Pronta");
+            checarFilaDeMontagem();
+        };
+    } else {
+        window.ytApiPronta = true;
+        checarFilaDeMontagem();
+    }
+
+    escutarNuvemCinema();
+    escutarNuvemReacoes();
+};
+
+// 🚨 A MÁGICA: Só monta o player quando a API estiver pronta E houver um vídeo de verdade!
+function checarFilaDeMontagem() {
+    if (window.ytApiPronta && dadosPendentesParaMontagem && !window.playerCinema) {
+        montarPlayerYoutube(dadosPendentesParaMontagem);
     }
 }
 
-window.onYouTubeIframeAPIReady = function() {
-    console.log("Motor YouTube chancelado e aguardando ordens.");
-    window.estadoCinema.apiYTPronta = true;
-    
-    if (window.estadoCinema.videoId && window.estadoCinema.tipoVideo === 'youtube' && !window.youtubePlayer) {
-        window.carregarVideoNoPlayer(window.estadoCinema.videoId, 'youtube');
-    }
-};
+function montarPlayerYoutube(dados) {
+    if (window.playerCinema) return; 
 
-window.inicializarCinema = function() {
-    console.log("Multiplex Duplo Online.");
-    injetarAPIYouTube();
-    window.escutarCinemaGlobal();
-    
-    document.getElementById('texto-status-eu').innerText = "Aguardando Filme...";
-    const luzStatus = document.getElementById('luz-status-eu');
-    if (luzStatus) luzStatus.classList.remove('pronto');
-    
-    const btnChave = document.getElementById('btn-chave-dupla');
-    if (btnChave) btnChave.classList.remove('ativado');
-    
-    window.estadoCinema.euPronto = false;
-};
+    // Garante que o container existe
+    const containerBox = document.getElementById('youtube-player-container');
+    if(!containerBox) return;
 
-window.toggleInstrucoesCinema = function() {
-    const inst = document.getElementById('instrucoes-cinema');
-    if (inst) inst.classList.toggle('escondido');
-};
+    window.isCinemaSyncing = true; // Trava enquanto constrói
+    window.idVideoAtual = dados.videoId;
 
-window.processarLinkVideo = function() {
-    const input = document.getElementById('input-link-video');
-    const url = input.value.trim();
-    if (!url) return;
-
-    let videoIdExtraido = null;
-    let tipoIdentificado = null;
-
-    const regexYT = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
-    const matchYT = url.match(regexYT);
-
-    const regexDrive = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=))([a-zA-Z0-9_-]+)/i;
-    const matchDrive = url.match(regexDrive);
-
-    if (matchYT && matchYT[1]) {
-        videoIdExtraido = matchYT[1];
-        tipoIdentificado = 'youtube';
-    } else if (matchDrive && matchDrive[1]) {
-        videoIdExtraido = matchDrive[1];
-        tipoIdentificado = 'drive';
-    }
-
-    if (videoIdExtraido && tipoIdentificado) {
-        if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
-        const { db, ref, update } = window.SantuarioApp.modulos;
-        
-        update(ref(db, 'utilitarios/cinema'), {
-            videoId: videoIdExtraido,
-            tipo: tipoIdentificado,
-            timestamp: Date.now(),
-            [window.MEU_NOME]: false,
-            [window.NOME_PARCEIRO]: false
-        }).then(() => {
-            input.value = "";
-            if(window.Haptics) window.Haptics.sucesso();
-            if(typeof mostrarToast === 'function') mostrarToast(`Link ${tipoIdentificado.toUpperCase()} interceptado.`, "📡");
-        });
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast("URL corrompida.", "⚠️");
-        if(window.Haptics) window.Haptics.erro();
-    }
-};
-
-window.carregarVideoNoPlayer = function(videoId, tipo) {
-    const telaEstatica = document.getElementById('tela-estatica-cinema');
-    const playerNativo = document.getElementById('player-nativo');
-    const ambilight = document.getElementById('cinema-ambilight');
-
-    if (telaEstatica) {
-        telaEstatica.style.opacity = 0;
-        setTimeout(() => { telaEstatica.classList.add('escondido'); }, 1000);
-    }
-
-    if (tipo === 'youtube') {
-        if (playerNativo) {
-            playerNativo.classList.add('escondido');
-            playerNativo.pause(); 
-            playerNativo.removeAttribute('src'); 
-        }
-        
-        if (ambilight) {
-            ambilight.style.background = '#e50914';
-            ambilight.style.opacity = '0.3';
-        }
-
-        // Destrói o Iframe antigo para forçar uma recarga limpa
-        if (window.youtubePlayer) {
-            try { window.youtubePlayer.destroy(); } catch(e) {}
-            window.youtubePlayer = null;
-        }
-
-        let playerYT = document.getElementById('player-youtube');
-        if (!playerYT) {
-            playerYT = document.createElement('div');
-            playerYT.id = 'player-youtube';
-            const telaProjetor = document.querySelector('.tela-projetor');
-            if (telaProjetor) telaProjetor.prepend(playerYT);
-        }
-        playerYT.classList.remove('escondido');
-
-        if (window.YT && window.YT.Player) {
-            window.youtubePlayer = new YT.Player('player-youtube', {
-                videoId: videoId,
-                host: 'https://www.youtube.com', // Força a rota segura do Google
-                playerVars: { 
-                    'controls': 1, 
-                    'disablekb': 1, 
-                    'rel': 0,
-                    'enablejsapi': 1,
-                    'modestbranding': 1, // Remove logos pesadas do YT
-                    'origin': window.location.origin
-                },
-                events: {
-                    'onReady': (event) => {
-                        event.target.pauseVideo();
-                        console.log("Projetor YT ancorado em segurança máxima.");
-                    }
+    window.playerCinema = new YT.Player('youtube-player-container', {
+        height: '100%',
+        width: '100%',
+        videoId: dados.videoId, // Nunca inicia vazio, evitando o erro de Origin do postMessage
+        playerVars: {
+            'playsinline': 1, 
+            'controls': 1,
+            'disablekb': 1,
+            'rel': 0,
+            'modestbranding': 1,
+            'enablejsapi': 1, 
+            'origin': window.location.origin // Carimbo oficial de segurança
+        },
+        events: {
+            'onReady': (event) => {
+                console.log("🎥 Player Montado com Sucesso");
+                
+                if (dados.time > 0) {
+                    event.target.seekTo(dados.time, true);
                 }
-            });
-        }
-        
-    } else if (tipo === 'drive') {
-        if (window.youtubePlayer) {
-            try { window.youtubePlayer.destroy(); } catch(e) {}
-            window.youtubePlayer = null;
-        }
-        
-        let playerYT = document.getElementById('player-youtube');
-        if (playerYT) playerYT.classList.add('escondido');
-        
-        if (playerNativo) {
-            playerNativo.classList.remove('escondido');
-            const linkStreamingDireto = `https://drive.google.com/uc?export=download&id=${videoId}`;
-            playerNativo.src = linkStreamingDireto;
-            playerNativo.currentTime = 0;
-            playerNativo.pause();
-        }
-        
-        if (ambilight) {
-            ambilight.style.background = '#2ecc71';
-            ambilight.style.opacity = '0.3';
-        }
-    }
-};
+                
+                const precisaOverlay = dados.autor !== window.MEU_NOME;
+                
+                if (precisaOverlay) {
+                    const txtAutor = document.getElementById('cinema-autor-texto');
+                    if (txtAutor) txtAutor.innerText = dados.autor;
+                    const overlay = document.getElementById('cinema-overlay');
+                    if (overlay) overlay.classList.remove('escondido');
+                    event.target.pauseVideo();
+                } else if (dados.status === 'PLAYING') {
+                    event.target.playVideo();
+                } else {
+                    event.target.pauseVideo();
+                }
 
-window.alternarStatusProntoCinema = function() {
-    if (!window.estadoCinema.videoId) {
-        if(typeof mostrarToast === 'function') mostrarToast("O projetor está sem fita.", "🎬");
+                setTimeout(() => { window.isCinemaSyncing = false; }, 800);
+            },
+            'onStateChange': propagarMudancaDeEstado
+        }
+    });
+}
+
+function extrairIdDoYouTube(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+window.carregarNovoVideoCinema = function() {
+    const input = document.getElementById('cinema-url-input');
+    if (!input || !input.value.trim()) {
+        if(typeof mostrarToast === 'function') mostrarToast("Cole um link válido do YouTube primeiro.", "⚠️");
+        if(window.Haptics) window.Haptics.erro();
         return;
     }
 
-    const novoStatus = !window.estadoCinema.euPronto;
-    window.estadoCinema.euPronto = novoStatus;
-
-    const btn = document.getElementById('btn-chave-dupla');
-    if (novoStatus) {
-        if (btn) btn.classList.add('ativado');
-        document.getElementById('texto-btn-chave').innerText = "SISTEMA ARMADO";
-        if(window.Haptics) navigator.vibrate([50, 100, 50]);
-    } else {
-        if (btn) btn.classList.remove('ativado');
-        document.getElementById('texto-btn-chave').innerText = "ESTOU PRONTO (Sincronizar)";
-        if(window.Haptics) window.Haptics.toqueLeve();
+    const videoId = extrairIdDoYouTube(input.value.trim());
+    if (!videoId) {
+        if(typeof mostrarToast === 'function') mostrarToast("Link não reconhecido. Use um link padrão do YouTube.", "❌");
+        if(window.Haptics) window.Haptics.erro();
+        return;
     }
 
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
-    const { db, ref, update } = window.SantuarioApp.modulos;
-    update(ref(db, 'utilitarios/cinema'), {
-        [window.MEU_NOME]: novoStatus
+    input.value = ""; 
+    window.idVideoAtual = videoId;
+    
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    set(ref(db, 'cinema/estado'), {
+        videoId: videoId,
+        status: 'PAUSED',
+        time: 0,
+        timestamp: Date.now(),
+        autor: window.MEU_NOME
     });
+
+    if(window.Haptics) window.Haptics.sucesso();
 };
 
-window.escutarCinemaGlobal = function() {
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    const refCinema = ref(db, 'utilitarios/cinema');
+function propagarMudancaDeEstado(event) {
+    if (window.isCinemaSyncing) return;
+    if (!window.SantuarioApp || !window.idVideoAtual) return;
+
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const currentTime = window.playerCinema.getCurrentTime();
     
-    onValue(refCinema, (snapshot) => {
+    // YT.PlayerState.PLAYING == 1 | PAUSED == 2
+    if (event.data === YT.PlayerState.PLAYING) {
+        set(ref(db, 'cinema/estado'), {
+            videoId: window.idVideoAtual,
+            status: 'PLAYING',
+            time: currentTime,
+            timestamp: Date.now(),
+            autor: window.MEU_NOME
+        });
+    } else if (event.data === YT.PlayerState.PAUSED) {
+        set(ref(db, 'cinema/estado'), {
+            videoId: window.idVideoAtual,
+            status: 'PAUSED',
+            time: currentTime,
+            timestamp: Date.now(),
+            autor: window.MEU_NOME
+        });
+    }
+}
+
+function escutarNuvemCinema() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    onValue(ref(db, 'cinema/estado'), (snapshot) => {
+        const dados = snapshot.val();
+        if (!dados || !dados.videoId) return;
+
+        const indicador = document.getElementById('indicador-sync-cinema');
+        if (indicador) {
+            indicador.style.background = '#2ecc71';
+            indicador.style.boxShadow = '0 0 10px #2ecc71';
+            indicador.title = "Sincronia Quântica Ativa";
+        }
+
+        // Se o player AINDA NÃO EXISTE, guarda na fila e manda montar
+        if (!window.playerCinema || typeof window.playerCinema.loadVideoById !== 'function') {
+            dadosPendentesParaMontagem = dados;
+            checarFilaDeMontagem();
+            return;
+        }
+
+        // Se é um vídeo novo que alguém colocou
+        if (dados.videoId !== window.idVideoAtual) {
+            window.idVideoAtual = dados.videoId;
+            window.isCinemaSyncing = true; // Ativa a trava
+            
+            window.playerCinema.loadVideoById(dados.videoId, dados.time);
+            window.playerCinema.pauseVideo(); // Carrega pausado
+            
+            if (dados.autor !== window.MEU_NOME) {
+                const txtAutor = document.getElementById('cinema-autor-texto');
+                if (txtAutor) txtAutor.innerText = dados.autor;
+                const overlay = document.getElementById('cinema-overlay');
+                if (overlay) overlay.classList.remove('escondido');
+
+                if(typeof mostrarToast === 'function') mostrarToast(`Sessão criada por ${dados.autor}!`, "🍿");
+                if(window.Haptics) window.Haptics.toqueForte();
+            }
+            
+            setTimeout(() => { window.isCinemaSyncing = false; }, 800); 
+            return; 
+        }
+
+        // Se for o mesmo vídeo rolando, Sincroniza o Tempo e Play/Pause
+        window.isCinemaSyncing = true; // Trava anti-loop
+        
+        const tempoLocal = window.playerCinema.getCurrentTime() || 0;
+        // Margem de tolerância de 2.5s para conexões mais lentas não engasgarem o vídeo
+        if (Math.abs(tempoLocal - dados.time) > 2.5) {
+            window.playerCinema.seekTo(dados.time, true);
+        }
+
+        if (dados.status === 'PLAYING') {
+            window.playerCinema.playVideo();
+        } else if (dados.status === 'PAUSED') {
+            window.playerCinema.pauseVideo();
+        }
+
+        setTimeout(() => { window.isCinemaSyncing = false; }, 800); 
+    });
+}
+
+window.entrarNaSessaoCinema = function() {
+    const overlay = document.getElementById('cinema-overlay');
+    if (overlay) overlay.classList.add('escondido');
+    if (window.playerCinema && typeof window.playerCinema.playVideo === 'function') {
+        window.playerCinema.playVideo();
+    }
+};
+
+// 🚨 RECONSTRUÇÃO DO DOM: A cura para os Iframe Ghosts (Fantasmas do YouTube)
+window.sairDoCinema = function() {
+    if (window.playerCinema && typeof window.playerCinema.destroy === 'function') {
+        window.playerCinema.destroy(); // Remove o iframe do YouTube
+        window.playerCinema = null;
+    }
+    
+    // Como a API destruiu a nossa <div> original junto com o iframe, nós a criamos de volta!
+    const telaCinema = document.querySelector('#container-cinema > div > div:nth-child(2) > div:nth-child(2)');
+    if (telaCinema) {
+        if (!document.getElementById('youtube-player-container')) {
+            const novaDiv = document.createElement('div');
+            novaDiv.id = 'youtube-player-container';
+            novaDiv.style.width = '100%';
+            novaDiv.style.height = '100%';
+            telaCinema.insertBefore(novaDiv, telaCinema.firstChild);
+        }
+    }
+
+    window.voltarMenuJogos(); 
+};
+
+// ==========================================
+// O MOTOR DE EMOÇÕES FÍSICAS (CORAÇÕES VOADORES)
+// ==========================================
+window.enviarReacaoCinema = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    const idReacao = Date.now() + Math.floor(Math.random() * 1000);
+    set(ref(db, `cinema/reacoes/${idReacao}`), {
+        autor: window.MEU_NOME,
+        timestamp: Date.now()
+    });
+
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+window.escutarNuvemReacoes = function() {
+    if (!window.SantuarioApp) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    let horaDeAberturaDaTela = Date.now();
+
+    onValue(ref(db, 'cinema/reacoes'), (snapshot) => {
         const dados = snapshot.val();
         if (!dados) return;
 
-        const mudouVideo = dados.videoId !== window.estadoCinema.videoId;
-        const forcarReload = dados.timestamp !== window.estadoCinema.ultimoTimestamp;
+        const container = document.getElementById('reacoes-voadores-container');
+        if (!container) return;
 
-        if (dados.videoId && (mudouVideo || forcarReload || (!window.youtubePlayer && dados.tipo === 'youtube'))) {
-            
-            window.estadoCinema.videoId = dados.videoId;
-            window.estadoCinema.tipoVideo = dados.tipo || 'youtube';
-            window.estadoCinema.ultimoTimestamp = dados.timestamp;
-            window.estadoCinema.contagemEmAndamento = false;
-            
-            window.estadoCinema.euPronto = false;
-            const btnChave = document.getElementById('btn-chave-dupla');
-            if (btnChave) btnChave.classList.remove('ativado');
-            document.getElementById('texto-btn-chave').innerText = "ESTOU PRONTO (Sincronizar)";
-            
-            window.carregarVideoNoPlayer(dados.videoId, window.estadoCinema.tipoVideo);
-        }
-
-        const euProntoNuven = dados[window.MEU_NOME] || false;
-        const parceiroProntoNuvem = dados[window.NOME_PARCEIRO] || false;
+        const arrayReacoes = Object.keys(dados).map(k => dados[k]);
+        const reacoesNovas = arrayReacoes.filter(r => r.timestamp > horaDeAberturaDaTela);
         
-        window.estadoCinema.euPronto = euProntoNuven;
-        window.estadoCinema.parceiroPronto = parceiroProntoNuvem;
+        horaDeAberturaDaTela = Date.now();
 
-        if (euProntoNuven) {
-            document.getElementById('luz-status-eu').classList.add('pronto');
-            document.getElementById('texto-status-eu').innerText = "Sistema Armado";
-            document.getElementById('texto-status-eu').style.color = "#00ffcc";
-        } else {
-            document.getElementById('luz-status-eu').classList.remove('pronto');
-            document.getElementById('texto-status-eu').innerText = "Ajustando Poltrona...";
-            document.getElementById('texto-status-eu').style.color = "#888";
-        }
-
-        const iconeConexao = document.getElementById('icone-conexao-cinema');
-        if (parceiroProntoNuvem) {
-            document.getElementById('luz-status-parceiro').classList.add('pronto');
-            document.getElementById('texto-status-parceiro').innerText = "Pronta e Aguardando";
-            document.getElementById('texto-status-parceiro').style.color = "#00ffcc";
-            if (iconeConexao) {
-                iconeConexao.style.filter = "grayscale(0)";
-                iconeConexao.style.textShadow = "0 0 15px #00ffcc";
-            }
-        } else {
-            document.getElementById('luz-status-parceiro').classList.remove('pronto');
-            document.getElementById('texto-status-parceiro').innerText = "Ainda não está pronta";
-            document.getElementById('texto-status-parceiro').style.color = "#888";
-            if (iconeConexao) {
-                iconeConexao.style.filter = "grayscale(1)";
-                iconeConexao.style.textShadow = "none";
-            }
-        }
-
-        if (euProntoNuven && parceiroProntoNuvem && window.estadoCinema.videoId && !window.estadoCinema.contagemEmAndamento) {
-            window.iniciarContagemCinematografica();
-        }
-    });
-};
-
-window.iniciarContagemCinematografica = function() {
-    window.estadoCinema.contagemEmAndamento = true;
-    
-    if (window.estadoCinema.tipoVideo === 'youtube') {
-        if (window.youtubePlayer && typeof window.youtubePlayer.seekTo === 'function') {
-            window.youtubePlayer.seekTo(0);
-            window.youtubePlayer.pauseVideo();
-        }
-    } else if (window.estadoCinema.tipoVideo === 'drive') {
-        const playerNativo = document.getElementById('player-nativo');
-        if (playerNativo) {
-            playerNativo.currentTime = 0;
-            playerNativo.pause();
-        }
-    }
-
-    const overlay = document.getElementById('overlay-contagem-cinema');
-    const numeroEl = document.getElementById('numero-contagem-cinema');
-    const ambilight = document.getElementById('cinema-ambilight');
-    
-    if (overlay) overlay.classList.remove('escondido');
-    if (ambilight) {
-        ambilight.style.background = '#00d4ff';
-        ambilight.style.opacity = '0.5';
-    }
-
-    let contador = 3;
-    if (numeroEl) numeroEl.innerText = contador;
-
-    const beep = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-    beep.volume = 0.5; beep.play().catch(e=>{});
-
-    let intervalo = setInterval(() => {
-        contador--;
-        if (contador > 0) {
-            if (numeroEl) numeroEl.innerText = contador;
-            beep.currentTime = 0; beep.play().catch(e=>{});
-            if(window.Haptics) navigator.vibrate(50);
-        } else {
-            clearInterval(intervalo);
-            if (numeroEl) numeroEl.innerText = "PLAY";
-            if(window.Haptics) navigator.vibrate([100, 100, 400]);
+        reacoesNovas.forEach(reacao => {
+            const coracao = document.createElement('div');
+            coracao.className = 'coracao-cinema';
+            coracao.innerHTML = reacao.autor === 'Thamiris' ? '💖' : '💙';
+            
+            const espalhamentoHorizontal = (Math.random() * 60) - 30; 
+            coracao.style.left = `calc(50% + ${espalhamentoHorizontal}px)`;
+            
+            container.appendChild(coracao);
             
             setTimeout(() => {
-                if (overlay) overlay.classList.add('escondido');
-                if (ambilight) ambilight.style.opacity = '0.1';
-                
-                if (window.estadoCinema.tipoVideo === 'youtube') {
-                    if (window.youtubePlayer && typeof window.youtubePlayer.playVideo === 'function') {
-                        window.youtubePlayer.playVideo();
-                    }
-                } else if (window.estadoCinema.tipoVideo === 'drive') {
-                    const playerNativo = document.getElementById('player-nativo');
-                    if (playerNativo) {
-                        playerNativo.play().catch(err => {
-                            console.error("Autoplay bloqueado pelo navegador.", err);
-                            if(typeof mostrarToast === 'function') mostrarToast("Toque no player para dar o play.", "⚠️");
-                        });
-                    }
-                }
-            }, 800);
-        }
-    }, 1000);
+                if (container.contains(coracao)) container.removeChild(coracao);
+            }, 2500);
+
+            if(window.Haptics && reacao.autor !== window.MEU_NOME) {
+                navigator.vibrate(20);
+            }
+        });
+    });
 };

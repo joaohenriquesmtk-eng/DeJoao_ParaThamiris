@@ -1,0 +1,122 @@
+<div style="display: flex; flex-direction: column; width: 100vw; height: 100dvh; background: radial-gradient(circle at center, #05100a 0%, #000000 100%); color: white; box-sizing: border-box; position: absolute; top: 0; left: 0; z-index: 99; overflow: hidden;">
+    
+    <div class="tesouro-grid-animada"></div>
+
+    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(46,204,113,0.3); z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button onclick="window.sairDoTesouro()" class="btn-voltar" style="background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3); color: #2ecc71; border-radius: 20px; padding: 6px 15px;">← Abortar</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesTesouro()">❓</button>
+        </div>
+        <span style="color: #2ecc71; font-family: monospace; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px;">SATÉLITE GEO</span>
+    </div>
+
+    <div style="padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; z-index: 10;">
+
+        <div id="instrucoes-tesouro" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71; margin-bottom: 25px; background: rgba(5,15,10,0.95); box-shadow: 0 15px 35px rgba(0,0,0,0.9); width: 100%; border-radius: 12px; padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">
+            <h4 style="color: #2ecc71; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 12px;">🗺️ Manual de Geofencing</h4>
+            <ul style="font-size: 0.85rem; color: #ccc; line-height: 1.6; padding-left: 20px; margin: 0;">
+                <li><b>Enterrar:</b> Defina a coordenada geográfica do mundo real. Você pode digitar ou usar o seu GPS.</li>
+                <li><b>Mensagem e Mídia:</b> Digite um texto, anexe uma foto, vídeo ou <b>grave um áudio com a sua voz em tempo real</b>.</li>
+                <li><b>A Caçada:</b> A cápsula não aparecerá na tela dela. Ela será guiada por um radar que mede a distância em metros até o alvo. A relíquia só destranca a 40 metros do local exato.</li>
+            </ul>
+        </div>
+
+        <div id="tesouro-estado-criador" class="escondido" style="width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; padding-bottom: 50px;">
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <p style="font-size: 0.75rem; color: #2ecc71; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-family: monospace;">[1] Coordenadas de Colisão</p>
+                
+                <div class="tesouro-input-wrapper">
+                    <span>🌐</span>
+                    <input type="number" id="tesouro-lat" placeholder="Latitude (Ex: -16.6869)" step="any">
+                </div>
+                
+                <div class="tesouro-input-wrapper">
+                    <span>📍</span>
+                    <input type="number" id="tesouro-lon" placeholder="Longitude (Ex: -49.2648)" step="any">
+                </div>
+                
+                <button onclick="window.pegarMinhaCoordenada()" class="btn-acao" style="background: rgba(46,204,113,0.1); border: 1px dashed #2ecc71; color: #2ecc71; font-size: 0.9rem; padding: 12px; margin-top: 5px; border-radius: 12px;">
+                    🎯 Capturar Meu GPS Atual
+                </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <p style="font-size: 0.75rem; color: #D4AF37; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-family: monospace;">[2] O Criptograma</p>
+                <textarea id="tesouro-msg" placeholder="Escreva a mensagem que ficará oculta..." rows="4" style="width: 100%; background: rgba(0,0,0,0.7); border: 1px solid rgba(212,175,55,0.3); padding: 15px; border-radius: 12px; color: #fff; font-family: inherit; resize: none; box-sizing: border-box; outline: none; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); backdrop-filter: blur(10px);"></textarea>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <p style="font-size: 0.75rem; color: #ff3366; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-family: monospace;">[3] Carga Física</p>
+                
+                <div class="tesouro-media-grid">
+                    <label class="btn-media-upload" id="lbl-tesouro-foto">
+                        <span class="media-icon">📸</span>
+                        <span class="media-text">Foto</span>
+                        <input type="file" id="tesouro-foto" accept="image/*" class="escondido" onchange="window.processarMidiaTesouro(event, 'foto')">
+                    </label>
+                    
+                    <label class="btn-media-upload" id="lbl-tesouro-video">
+                        <span class="media-icon">🎥</span>
+                        <span class="media-text">Vídeo</span>
+                        <input type="file" id="tesouro-video" accept="video/mp4,video/webm,video/quicktime" class="escondido" onchange="window.processarMidiaTesouro(event, 'video')">
+                    </label>
+                    
+                    <button class="btn-media-mic" id="lbl-tesouro-audio" onclick="window.toggleGravarAudioTesouro()">
+                        <span class="media-icon" id="icone-mic-tesouro">🎙️</span>
+                        <span class="media-text" id="texto-mic-tesouro">Gravar</span>
+                    </button>
+                </div>
+                <p id="tesouro-midia-status" style="font-size: 0.75rem; color: #2ecc71; text-align: center; margin-top: 10px; height: 15px; font-style: italic;"></p>
+            </div>
+
+            <button id="btn-enterrar-mestre" onclick="window.enterrarTesouro()" class="btn-acao" style="background: linear-gradient(145deg, #D4AF37, #b5952f); color: #000; font-weight: 900; letter-spacing: 2px; padding: 18px; box-shadow: 0 8px 30px rgba(212,175,55,0.4); border-radius: 20px; font-size: 1.1rem; margin-top: 20px; border: 1px solid #ffdf70;">
+                ENTERRAR RELÍQUIA
+            </button>
+        </div>
+
+        <div id="tesouro-estado-cacador" class="escondido" style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
+            <h3 style="color: #2ecc71; font-family: monospace; font-size: 1.2rem; letter-spacing: 3px; text-shadow: 0 0 15px rgba(46,204,113,0.8); margin-bottom: 40px; text-align: center;">ANOMALIA ESPACIAL DETECTADA</h3>
+            
+            <div class="radar-tesouro-box">
+                <div class="radar-tesouro-grade"></div>
+                <div class="radar-tesouro-varredura"></div>
+                <div id="radar-alvo" class="radar-alvo-blip" style="top: 20%; left: 80%;"></div>
+                <div style="position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #fff;"></div>
+            </div>
+
+            <div style="margin-top: 50px; background: rgba(0,0,0,0.7); padding: 25px 30px; border-radius: 20px; border: 1px solid rgba(46,204,113,0.4); text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
+                <p style="color: #aaa; font-family: monospace; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Distância do Alvo</p>
+                <div id="tesouro-distancia-texto" style="font-size: 3rem; font-weight: bold; font-family: monospace; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.6); margin-bottom: 5px;">CALCULANDO...</div>
+                <p style="color: #2ecc71; font-size: 0.85rem; font-style: italic; margin-top: 15px;">Aproxime-se a menos de 40 metros para descriptografar a relíquia.</p>
+            </div>
+        </div>
+
+        <div id="tesouro-estado-revelado" class="escondido" style="width: 100%; max-width: 450px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; animation: fadeIn 2s ease; padding-bottom: 40px;">
+            <div style="text-align: center; padding-top: 20px;">
+                <span style="font-size: 4.5rem; filter: drop-shadow(0 0 25px #D4AF37);">✨</span>
+                <h2 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 2rem; margin-top: 10px; text-shadow: 0 0 20px rgba(212,175,55,0.6);">Tesouro Encontrado</h2>
+            </div>
+
+            <div class="cartao-vidro" style="padding: 25px; border-color: rgba(212,175,55,0.5); box-shadow: 0 15px 50px rgba(212,175,55,0.25); display: flex; flex-direction: column; gap: 15px; background: rgba(0,0,0,0.85);">
+                
+                <img id="tesouro-img-revelada" src="" class="escondido" style="width: 100%; border-radius: 12px; border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 8px 20px rgba(0,0,0,0.6);">
+                <video id="tesouro-vid-revelado" class="escondido" controls playsinline style="width: 100%; border-radius: 12px; border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 8px 20px rgba(0,0,0,0.6); background: #000;"></video>
+                
+                <div id="tesouro-aud-box" class="escondido" style="background: rgba(212,175,55,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); text-align: center;">
+                    <p style="font-size: 0.85rem; color: #D4AF37; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">🎙️ Mensagem de Voz</p>
+                    <audio id="tesouro-aud-revelado" controls style="width: 100%; height: 40px;"></audio>
+                </div>
+
+                <div id="tesouro-msg-box" style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border-left: 4px solid #D4AF37;">
+                    <p id="tesouro-msg-revelada" style="font-size: 1.1rem; font-style: italic; line-height: 1.6; color: #fff; white-space: pre-wrap; margin: 0;"></p>
+                </div>
+            </div>
+
+            <button onclick="window.destruirTesouroLido()" class="btn-acao" style="background: rgba(255, 51, 102, 0.1); border: 1px solid #ff3366; color: #ff3366; padding: 16px; border-radius: 20px; font-weight: bold; letter-spacing: 1px; transition: all 0.3s ease;">
+                Guardar na Memória e Esvaziar Radar
+            </button>
+        </div>
+
+    </div>
+</div>

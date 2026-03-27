@@ -662,39 +662,74 @@ function obterEmojiClima(condicao, eNoite) {
     return `<span class="${classe}">${emoji}</span>`;
 }
 
+// O Injetor Furtivo de Clima: Dribla o bloqueio do Kaspersky e AdBlocks
+function buscarClimaFurtivo(url) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    resolve(JSON.parse(xhr.responseText));
+                } catch(e) {
+                    reject(e);
+                }
+            } else {
+                reject(`Status de bloqueio: ${xhr.status}`);
+            }
+        };
+        
+        xhr.onerror = function() {
+            reject("Extensão de segurança cortou o cabo de rede.");
+        };
+        
+        xhr.send();
+    });
+}
+
 async function atualizarClima() {
     try {
-        // Coordenadas exatas injetadas direto na URL (sem chaves privadas)
         const urlJoao = "https://api.open-meteo.com/v1/forecast?latitude=-25.2917&longitude=-49.2242&current=temperature_2m,is_day,weather_code&timezone=America/Sao_Paulo";
         const urlThamiris = "https://api.open-meteo.com/v1/forecast?latitude=-16.6869&longitude=-49.2648&current=temperature_2m,is_day,weather_code&timezone=America/Sao_Paulo";
 
-        // Chama as duas cidades ao mesmo tempo em paralelo para não travar o app
-        const [resJ, resT] = await Promise.all([fetch(urlJoao), fetch(urlThamiris)]);
+        // Usamos allSettled em vez de all. Assim, se uma cidade falhar, a outra ainda carrega!
+        const [resJ, resT] = await Promise.allSettled([
+            buscarClimaFurtivo(urlJoao),
+            buscarClimaFurtivo(urlThamiris)
+        ]);
 
-        if (resJ.ok) {
-            const dataJ = await resJ.json();
+        if (resJ.status === 'fulfilled') {
+            const dataJ = resJ.value;
             window.dadosClima.joao = {
                 temp: Math.round(dataJ.current.temperature_2m),
                 condicao: mapearCodigoWMO(dataJ.current.weather_code),
-                eNoite: dataJ.current.is_day === 0 // 0 é noite, 1 é dia
+                eNoite: dataJ.current.is_day === 0
             };
-            document.getElementById("mini-temp-joao").innerText = `${window.dadosClima.joao.temp}°C`;
+            const tempJoaoUI = document.getElementById("mini-temp-joao");
+            if (tempJoaoUI) tempJoaoUI.innerText = `${window.dadosClima.joao.temp}°C`;
         }
         
-        if (resT.ok) {
-            const dataT = await resT.json();
+        if (resT.status === 'fulfilled') {
+            const dataT = resT.value;
             window.dadosClima.thamiris = {
                 temp: Math.round(dataT.current.temperature_2m),
                 condicao: mapearCodigoWMO(dataT.current.weather_code),
                 eNoite: dataT.current.is_day === 0
             };
-            document.getElementById("mini-temp-thamiris").innerText = `${window.dadosClima.thamiris.temp}°C`;
+            const tempThamirisUI = document.getElementById("mini-temp-thamiris");
+            if (tempThamirisUI) tempThamirisUI.innerText = `${window.dadosClima.thamiris.temp}°C`;
         }
 
         alternarVisaoClima(window.climaExibido);
+        
     } catch (e) {
-        console.error("Erro na API Open-Meteo", e);
-        document.getElementById("texto-mensagem-clima").innerText = "❌ Clima indisponível no momento";
+        console.error("Falha no satélite meteorológico:", e);
+        // O Plano B Poético: O design continua intacto mesmo offline!
+        const elMensagem = document.getElementById("texto-mensagem-clima");
+        if (elMensagem) {
+            elMensagem.innerText = "Nuvens densas cobriram o satélite, mas a nossa conexão permanece clara.";
+        }
     }
 }
 
@@ -1182,7 +1217,7 @@ window.abrirJogo = async function(tipo) {
     document.body.classList.add('modo-jogo-ativo');
 
     // 2. Esconde TODOS os containers de jogos por segurança (🚨 'contratos' e 'defesa' adicionados à lista)
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'tesouro'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -1314,19 +1349,22 @@ window.abrirJogo = async function(tipo) {
         else if (tipo === 'pager') {
             if (typeof window.inicializarPager === 'function') window.inicializarPager();
         }
-
         else if (tipo === 'paradoxo') {
             if (typeof window.inicializarParadoxo === 'function') window.inicializarParadoxo();
         }
-    }
-};
+        // 🚨 ADICIONE O FIO DE IGNIÇÃO DO SATÉLITE EXATAMENTE AQUI:
+        else if (tipo === 'tesouro') {
+            if (typeof window.inicializarTesouro === 'function') window.inicializarTesouro();
+        }
+    } // Fim da verificação do containerAtivo
+}; // Fim da função window.abrirJogo
 
 window.voltarMenuJogos = function() {
     window.julgamentoAtivo = false; // Trava do Julgamento
     window.defesaAtiva = false; // Trava do Tower Defense
 
     // 1. Esconde todos os jogos abertos
-    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager'];
+    const jogosContainers = ['termo', 'tribunal', 'sincronia', 'julgamento', 'minifazenda', 'jardim', 'contratos', 'defesa', 'estufa', 'cartorio', 'banco', 'pericia', 'logistica', 'agua', 'agenda', 'roleta', 'guardiao', 'cinema', 'correio', 'pager', 'tesouro'];
     jogosContainers.forEach(jogoId => {
         const el = document.getElementById(`container-${jogoId}`);
         if (el) el.classList.add('escondido');
@@ -3231,3 +3269,218 @@ window.pauseAudioJogos = function() {
 // Redireciona os comandos antigos para o nosso novo motor perfeito
 window.tocarAmbiente = window.playAudioJogos;
 window.pausarAmbiente = window.pauseAudioJogos;
+
+
+// ============================================================================
+// VERSÃO 2.0: MOTOR DE SINCRONIA DE SONO QUÂNTICO (WAKE LOCK + REALTIME DB)
+// Padrão Elite: Zero Erros.
+// ============================================================================
+
+window.estadoMeuSono = false;
+window.estadoSonoDela = false;
+let wakeLockSono = null;
+let loopRelogioSono = null;
+
+// Tenta manter a tela do celular acesa durante a noite (API moderna)
+async function travarTelaAcordada() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLockSono = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock ativado: A tela não vai apagar.');
+        }
+    } catch (err) {
+        console.log(`Wake Lock falhou ou não suportado: ${err.name}, ${err.message}`);
+    }
+}
+
+function liberarTela() {
+    if (wakeLockSono !== null) {
+        wakeLockSono.release().then(() => { wakeLockSono = null; });
+    }
+}
+
+window.escutarEstadoSono = function() {
+    if (!window.SantuarioApp || !window.NOME_PARCEIRO || !window.MEU_NOME) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    const refSonoDela = ref(db, `estado_sono/${window.NOME_PARCEIRO.toLowerCase()}`);
+    
+    // Escuta em tempo real o que acontece na cama dela
+    onValue(refSonoDela, (snapshot) => {
+        const dados = snapshot.val();
+        window.estadoSonoDela = dados && dados.dormindo ? true : false;
+        atualizarPainelSonoHome(dados);
+        atualizarCenaSono3D();
+    });
+};
+
+function atualizarPainelSonoHome(dadosParceiro) {
+    const dotMeu = document.getElementById('status-meu-sono');
+    const dotDela = document.getElementById('status-sono-dela');
+    const txtStatus = document.getElementById('texto-status-sono-parceiro');
+    const btn = document.getElementById('btn-toggle-sono');
+    
+    if (!dotMeu || !dotDela || !txtStatus || !btn) return;
+
+    // Atualiza a luz dos Dots na Home (Obedece ao Tema na fase individual)
+    if (window.estadoMeuSono) {
+        dotMeu.className = 'orbe-sono-ativo';
+        btn.innerText = "Despertar";
+        btn.style.background = "rgba(255,255,255,0.1)";
+        btn.style.color = "#fff";
+        btn.style.borderColor = "#aaa";
+    } else {
+        dotMeu.className = '';
+        dotMeu.style.background = '#444';
+        dotMeu.style.boxShadow = 'inset 0 0 5px #000';
+        btn.innerText = `Deitar ao lado de ${window.NOME_PARCEIRO}`;
+        btn.style.background = "transparent";
+        btn.style.color = "var(--cor-primaria)";
+        btn.style.borderColor = "var(--cor-primaria)";
+    }
+
+    if (window.estadoSonoDela) {
+        dotDela.className = 'orbe-sono-ativo';
+    } else {
+        dotDela.className = '';
+        dotDela.style.background = '#444';
+        dotDela.style.boxShadow = 'inset 0 0 5px #000';
+    }
+
+    // A Lógica Textual Emocional
+    if (window.estadoMeuSono && window.estadoSonoDela) {
+        // 🚨 O RETORNO DO ROXO NA HOME
+        txtStatus.innerHTML = `<span style="color: #cda8ff; font-weight: bold; text-shadow: 0 0 8px rgba(205,168,255,0.6);">Sincronia Neural Atingida.</span>`;
+    } else if (window.estadoSonoDela) {
+        const tempo = dadosParceiro && dadosParceiro.timestamp ? Math.floor((Date.now() - dadosParceiro.timestamp) / 60000) : 0;
+        let horas = Math.floor(tempo / 60);
+        let mins = tempo % 60;
+        let tempoStr = horas > 0 ? `${horas}h e ${mins}m` : `${mins} min`;
+        
+        // Fase individual continua respeitando o tema
+        txtStatus.innerHTML = `<span style="color: var(--cor-primaria);">${window.NOME_PARCEIRO} dorme há ${tempoStr}.</span>`;
+    } else {
+        txtStatus.innerText = `Aguardando a noite cair...`;
+    }
+}
+
+function atualizarCenaSono3D() {
+    const tela = document.getElementById('tela-modo-sono');
+    const orbeMeu = document.getElementById('orbe-sono-meu');
+    const orbeDela = document.getElementById('orbe-sono-dela');
+    const txtGuia = document.getElementById('texto-guia-sono');
+    
+    if (!tela || tela.classList.contains('escondido')) return;
+
+    if (window.estadoSonoDela) {
+        orbeDela.style.opacity = '1';
+        orbeDela.classList.add('anim-respirar');
+        
+        // Fusão perfeita no centro da tela
+        orbeMeu.style.transform = 'translateX(-15px)';
+        orbeDela.style.transform = 'translateX(15px)';
+        
+        // 🚨 A TELA ENTRA NO MODO ROXO
+        tela.classList.add('sincronia-perfeita-bg');
+        txtGuia.innerHTML = "Nossas mentes estão conectadas no espaço.<br><span style='font-size:1.2rem; color:#cda8ff; text-shadow:0 0 15px rgba(205,168,255,0.8); display:block; margin-top:8px;'>Durma bem, meu amor.</span>";
+        
+        if(window.Haptics) navigator.vibrate([30, 50, 30, 50, 100]); 
+    } else {
+        orbeDela.style.opacity = '0';
+        orbeDela.classList.remove('anim-respirar');
+        orbeMeu.style.transform = 'translateX(0)';
+        
+        // A TELA RESPEITA O TEMA INDIVIDUAL
+        tela.classList.remove('sincronia-perfeita-bg');
+        txtGuia.innerHTML = "Feche os olhos.<br>Eu estou aqui cuidando de você.";
+    }
+}
+
+window.alternarModoSono = function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const tela = document.getElementById('tela-modo-sono');
+    const audioLoFi = document.getElementById('audio-resgate-lofi'); 
+    const orbeMeu = document.getElementById('orbe-sono-meu');
+    
+    window.estadoMeuSono = !window.estadoMeuSono;
+    
+    set(ref(db, `estado_sono/${window.MEU_NOME.toLowerCase()}`), {
+        dormindo: window.estadoMeuSono,
+        timestamp: Date.now()
+    }).catch(err => console.error("Falha ao sincronizar sono:", err));
+
+    if (window.estadoMeuSono) {
+        if(window.Haptics) window.Haptics.toqueForte();
+        travarTelaAcordada();
+        
+        document.body.classList.add('modo-jogo-ativo'); 
+        tela.classList.remove('escondido');
+        orbeMeu.classList.add('anim-respirar');
+        
+        if(typeof window.pauseAudioJogos === 'function') window.pauseAudioJogos();
+        if(audioLoFi) {
+            audioLoFi.volume = 0.15; 
+            audioLoFi.play().catch(e => console.log(e));
+        }
+
+        const tempoStart = Date.now();
+        const txtTempo = document.getElementById('texto-tempo-sono');
+        loopRelogioSono = setInterval(() => {
+            const mins = Math.floor((Date.now() - tempoStart) / 60000);
+            const hrs = Math.floor(mins / 60);
+            const m = mins % 60;
+            if(txtTempo) txtTempo.innerText = `EM REPOUSO PROFUNDO: ${hrs}H ${m}M`;
+        }, 60000);
+        if(txtTempo) txtTempo.innerText = `EM REPOUSO PROFUNDO: 0H 0M`;
+
+        atualizarCenaSono3D();
+
+    } else {
+        if(window.Haptics) window.Haptics.sucesso();
+        liberarTela();
+        
+        document.body.classList.remove('modo-jogo-ativo');
+        tela.classList.add('escondido');
+        orbeMeu.classList.remove('anim-respirar');
+        if(audioLoFi) audioLoFi.pause();
+        if(loopRelogioSono) clearInterval(loopRelogioSono);
+        
+        if(typeof window.playAudioJogos === 'function') window.playAudioJogos();
+    }
+    
+    atualizarPainelSonoHome();
+};
+
+// GATILHO AUTOMÁTICO: Acorda o radar logo que o sistema der boot
+window.addEventListener('loginSucesso', () => {
+    setTimeout(window.escutarEstadoSono, 2000); 
+});
+
+// ============================================================================
+// MOTOR DE REALIDADE AUMENTADA (Holograma 3D)
+// ============================================================================
+
+window.abrirHolograma = function() {
+    const container = document.getElementById('ar-container');
+    if (!container) return;
+
+    // Pausa a música ambiente para a pessoa focar na câmera
+    if(typeof window.pauseAudioJogos === 'function') window.pauseAudioJogos();
+    
+    document.body.classList.add('modo-jogo-ativo'); // Esconde o menu inferior
+    container.classList.remove('escondido');
+    
+    if(window.Haptics) window.Haptics.sucesso();
+};
+
+window.fecharHolograma = function() {
+    const container = document.getElementById('ar-container');
+    if (container) container.classList.add('escondido');
+    
+    document.body.classList.remove('modo-jogo-ativo');
+    
+    // Retoma a música
+    if(typeof window.playAudioJogos === 'function') window.playAudioJogos();
+    
+    if(window.Haptics) window.Haptics.toqueLeve();
+};

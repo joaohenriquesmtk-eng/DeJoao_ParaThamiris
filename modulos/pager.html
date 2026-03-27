@@ -1,110 +1,51 @@
-<div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-image: radial-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; z-index: 0;"></div>
-
-<div class="top-bar" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 255, 0, 0.15); z-index: 10; position: sticky; top: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <div class="top-bar-left">
-        <button class="btn-voltar" onclick="voltarMenuJogos()">← Desconectar</button>
-        <button class="btn-info" onclick="window.toggleInstrucoesPager()">❓</button>
-    </div>
-    <div class="top-bar-right">
-        <div class="badge-carteira-banco" style="border-color: #00ff00; background: rgba(0,255,0,0.05); box-shadow: 0 0 10px rgba(0,255,0,0.1);">
-            <span style="font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-right: 5px;">Freq:</span>
-            <span style="font-weight: 900; font-family: monospace; font-size: 1rem; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.5);">900MHz 📡</span>
-        </div>
-    </div>
-</div>
-
-<div class="conteudo-pager" style="padding: 25px 20px; width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 140px; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+<div class="pager-fundo" style="display: flex; flex-direction: column; height: 100%; color: white; padding: 0; box-sizing: border-box; overflow: hidden;">
     
-    <div id="instrucoes-pager" class="escondido cartao-instrucoes" style="border-left: 5px solid #00ff00; margin-bottom: 25px; background: rgba(10,15,10,0.95); box-shadow: 0 15px 35px rgba(0,0,0,0.9); width: 100%;">
-        <h4 style="color: #00ff00; font-family: monospace; font-size: 1.3rem; letter-spacing: 2px; text-transform: uppercase;">📟 Protocolo de Emergência</h4>
-        <ul style="font-size: 0.85rem; color: #ccc; line-height: 1.6; font-family: sans-serif;">
-            <li>Este canal ignora limites do sistema e bloqueios de distância.</li>
-            <li>Utilize o teclado tátil para inserir o código numérico.</li>
-            <li>O botão verde <b style="color:#2ecc71; text-shadow: 0 0 5px #2ecc71;">▶</b> transmite o pulso. O Pager de destino irá apitar agressivamente.</li>
-            <li>Verifique a placa de criptografia abaixo para os códigos exatos.</li>
-        </ul>
+    <div class="pager-grade"></div>
+
+    <div class="top-bar" style="background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(138, 180, 248, 0.15); z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; position: relative;">
+        <button onclick="window.sairDoPager()" style="background: none; border: none; color: #8ab4f8; font-size: 0.95rem; font-weight: bold; cursor: pointer; padding: 5px 10px; border-radius: 20px; transition: all 0.3s; background: rgba(138, 180, 248, 0.05);">
+            <span style="margin-right: 5px;">←</span> Sair
+        </button>
+        
+        <span style="color: #8ab4f8; font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 15px rgba(138, 180, 248, 0.5); text-transform: uppercase;">Freq. 143.4 MHz</span>
+
+        <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+            <div id="indicador-satelite-pager" style="width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; box-shadow: 0 0 10px #2ecc71; animation: pulse-gold 2s infinite alternate;" title="Satélite Conectado"></div>
+        </div>
     </div>
 
-    <div class="pager-chassi-god" style="position: relative;">
-        <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; opacity: 0.3;">
-            <div style="width: 30px; height: 3px; background: #000; border-bottom: 1px solid #333; border-radius: 2px;"></div>
-            <div style="width: 30px; height: 3px; background: #000; border-bottom: 1px solid #333; border-radius: 2px;"></div>
-        </div>
-
-        <div class="pager-led-status"></div>
+    <div style="padding: 30px 20px; display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; z-index: 10;">
         
-        <div class="pager-cabecalho-marca">
-            <div class="pager-marca-logo">MOTOROLA <span style="font-size: 0.5rem; vertical-align: super;">TM</span></div>
-            <div class="pager-modelo-texto">ADVISOR PRO SG-X</div>
-        </div>
-        
-        <div class="pager-moldura-tela-god" style="position: relative;">
-            <div class="pager-tela-lcd-god" style="background: #7ca87c; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), inset 0 0 5px rgba(255,255,255,0.2);">
-                <div class="pager-reflexo-vidro" style="background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 50%);"></div>
-                <div class="pager-scanlines"></div>
-                <div class="pager-matriz-pixels" style="background-image: radial-gradient(rgba(0,0,0,0.25) 1px, transparent 1px);"></div>
-                
-                <div class="pager-lcd-header-god">
-                    <span id="pager-sinal" class="piscar-lento">📶 Yıll</span>
-                    <span id="pager-bateria">🔋 98%</span>
-                </div>
-                
-                <div id="pager-display-texto" class="pager-lcd-texto-god" style="white-space: nowrap; font-size: clamp(1.4rem, 7vw, 2.2rem); letter-spacing: 3px; height: 40px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    STANDBY
-                </div>
-                
-                <div id="pager-display-autor" class="pager-lcd-autor-god"></div>
-            </div>
-        </div>
-
-        <div class="pager-painel-teclado-god" style="background: linear-gradient(180deg, #111 0%, #050505 100%);">
-            <div class="pager-visor-input-god" style="box-shadow: inset 0 5px 15px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.05);">
-                <span id="pager-input-numeros" class="piscar-cursor">_</span>
-            </div>
+        <div class="pager-visor" style="width: 100%; max-width: 400px; margin-bottom: 50px;">
+            <p style="color: #666; font-family: monospace; font-size: 0.75rem; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase;">Status do Canal</p>
+            <h2 id="pager-status-texto" style="color: #8ab4f8; font-family: monospace; font-size: 1.4rem; font-weight: bold; margin: 0; text-shadow: 0 0 10px rgba(138, 180, 248, 0.8); letter-spacing: 1px; min-height: 35px; display: flex; align-items: center; justify-content: center;">
+                SINAL LIVRE
+            </h2>
             
-            <div class="pager-grade-botoes-god">
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('1')">1</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('2')">2</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('3')">3</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('4')">4</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('5')">5</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('6')">6</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('7')">7</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('8')">8</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('9')">9</button>
-                <button class="btn-pager-god btn-pager-red" onclick="if(window.Haptics) window.Haptics.erro(); window.limparPager()">C</button>
-                <button class="btn-pager-god" onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.digitarPager('0')">0</button>
-                <button class="btn-pager-god btn-pager-green" onclick="if(window.Haptics) window.Haptics.toqueForte(); window.enviarPager()">▶</button>
+            <div style="display: flex; justify-content: center; gap: 5px; margin-top: 20px; height: 30px; align-items: flex-end;" id="pager-ondas-visuais">
+                </div>
+        </div>
+
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;">
+            <div id="btn-ptt-mestre" class="pager-btn-ptt" 
+                 onpointerdown="window.iniciarGravacaoPTT(event)" 
+                 onpointerup="window.pararGravacaoPTT(event)" 
+                 onpointerleave="window.pararGravacaoPTT(event)"
+                 oncontextmenu="event.preventDefault(); return false;">
+                
+                <div class="onda-radio"></div>
+                <div class="onda-radio"></div>
+                <div class="onda-radio"></div>
+                
+                <div class="pager-btn-nucleo">
+                    <span id="icone-mic-ptt" style="font-size: 3rem; filter: drop-shadow(0 0 10px rgba(138, 180, 248, 0.5)); transition: all 0.3s;">🎙️</span>
+                    <span id="texto-btn-ptt" style="color: #8ab4f8; font-family: monospace; font-weight: bold; letter-spacing: 2px; margin-top: 10px; font-size: 0.85rem; transition: all 0.3s;">SEGURE</span>
+                </div>
             </div>
         </div>
-
-        <div class="pager-furo-altofalante-god">
-            <div style="box-shadow: inset 2px 2px 4px #000, 1px 1px 0 rgba(255,255,255,0.05);"></div>
-            <div style="box-shadow: inset 2px 2px 4px #000, 1px 1px 0 rgba(255,255,255,0.05);"></div>
-            <div style="box-shadow: inset 2px 2px 4px #000, 1px 1px 0 rgba(255,255,255,0.05);"></div>
-            <div style="box-shadow: inset 2px 2px 4px #000, 1px 1px 0 rgba(255,255,255,0.05);"></div>
-            <div style="box-shadow: inset 2px 2px 4px #000, 1px 1px 0 rgba(255,255,255,0.05);"></div>
-            <div style="box-shadow: inset 2px 2px 4px #000, 1px 1px 0 rgba(255,255,255,0.05);"></div>
-        </div>
-    </div>
-
-    <div class="pager-dicionario-god" style="position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.03) 50%, transparent 55%); pointer-events: none;"></div>
         
-        <div class="dicionario-titulo-god" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <div style="height: 1px; flex: 1; background: #333;"></div>
-            <span>CHAVE CRIPTOGRÁFICA</span>
-            <div style="height: 1px; flex: 1; background: #333;"></div>
-        </div>
-        
-        <div class="dicionario-grid-god">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;"><span class="codigo-neon">143</span> <span class="significado-codigo">Eu Te Amo</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;"><span class="codigo-neon">911</span> <span class="significado-codigo">Preciso de Você</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;"><span class="codigo-neon">777</span> <span class="significado-codigo">Sorte a Minha</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;"><span class="codigo-neon">600</span> <span class="significado-codigo">Manda Mensagem</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;"><span class="codigo-neon">000</span> <span class="significado-codigo">Pensando em Você</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;"><span class="codigo-neon">333</span> <span class="significado-codigo">Saudades de Você</span></div>
-        </div>
+        <p style="color: #555; font-family: monospace; font-size: 0.75rem; margin-top: 40px; letter-spacing: 1px; text-align: center;">
+            A transmissão corta o silêncio automaticamente no destino.
+        </p>
     </div>
-
 </div>

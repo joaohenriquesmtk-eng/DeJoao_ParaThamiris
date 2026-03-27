@@ -1,7 +1,6 @@
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
-// Inicialize o Firebase com as mesmas configurações do seu app
 firebase.initializeApp({
     apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
     authDomain: "santuario-jt.firebaseapp.com",
@@ -14,25 +13,45 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// 🚨 MÁGICA: Controla o que acontece quando a pessoa toca nos botões da notificação
 self.addEventListener('notificationclick', (event) => {
-    const notification = event.notification;
+    event.notification.close(); // Fecha o balão da notificação
+
     const action = event.action;
 
-    if (action === 'whatsapp') {
-        // Abre o WhatsApp com uma mensagem
-        const url = 'https://wa.me/5562994838837?text=Oi%20amor%2C%20vi%20que%20você%20não%20está%20bem.%20Quer%20conversar%3F';
-        event.waitUntil(clients.openWindow(url));
+    // Se clicou no botão "Enviar Pulso"
+    if (action === 'enviar_pulso') {
+        event.waitUntil(
+            clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+                // Se a pessoa já tiver o app aberto em alguma aba
+                for (let i = 0; i < windowClients.length; i++) {
+                    const client = windowClients[i];
+                    if (client.url && 'focus' in client) {
+                        client.focus(); // Traz o app pra frente
+                        // Manda uma ordem secreta pro app disparar o pulso na mesma hora!
+                        client.postMessage({ comando: 'disparar_pulso_remoto' });
+                        return;
+                    }
+                }
+                // Se o app tava fechado, abre ele já engatilhado para mandar o pulso
+                if (clients.openWindow) {
+                    return clients.openWindow('/?acao=disparar_pulso_remoto');
+                }
+            })
+        );
+    } 
+    // Se clicou no corpo da notificação ou no botão "Abrir App"
+    else {
+        event.waitUntil(
+            clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+                if (windowClients.length > 0) {
+                    return windowClients[0].focus();
+                } else {
+                    return clients.openWindow('/');
+                }
+            })
+        );
     }
-    notification.close();
 });
 
-// Notificação em background (quando o app está fechado)
-messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Notificação recebida em background:', payload);
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/assets/icons/icon-192.png'
-    };
-    self.registration.showNotification(notificationTitle, notificationOptions);
-});
+// Removemos a função onBackgroundMessage pois ela causa envio duplo quando o app tá fechado!

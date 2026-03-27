@@ -1,4 +1,5 @@
-const { onValueCreated, onValueUpdated } = require('firebase-functions/v2/database');
+// 🚨 CORREÇÃO: Importar onValueWritten ao invés de onValueCreated
+const { onValueWritten, onValueUpdated } = require('firebase-functions/v2/database');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
 const moment = require('moment-timezone');
@@ -6,12 +7,14 @@ const moment = require('moment-timezone');
 admin.initializeApp();
 
 // --- Função 1: enviarNotificacaoMood ---
-exports.enviarNotificacaoMood = onValueCreated(
+exports.enviarNotificacaoMood = onValueWritten(
     '/moods/{userId}',
     async (event) => {
-        const snapshot = event.data;
-        const mood = snapshot.val();
-        const remetenteId = event.params.userId; // Quem mudou o humor
+        // Se a pessoa deletou o humor, não faz nada
+        if (!event.data.after.exists()) return;
+
+        const mood = event.data.after.val();
+        const remetenteId = event.params.userId; 
 
         // Define quem vai RECEBER a notificação
         const destinatarioId = (remetenteId === 'joao') ? 'thamiris' : 'joao';
@@ -22,7 +25,7 @@ exports.enviarNotificacaoMood = onValueCreated(
         const tokenDestino = snapshotToken.val();
 
         if (!tokenDestino) {
-            console.log(`Token de ${destinatarioId} não encontrado.`);
+            console.log(`Token de ${destinatarioId} não encontrado no banco.`);
             return;
         }
 
@@ -30,14 +33,12 @@ exports.enviarNotificacaoMood = onValueCreated(
         let titulo = `🌪️ Alerta de Cuidado: ${nomeRemetente}`;
         let corpo = `${nomeRemetente} está se sentindo ${estado}.`;
 
-        // Personalização rápida das mensagens
         if (estado === 'ansiosa' || estado === 'ansioso') {
             corpo = `A mente de ${nomeRemetente} está acelerada. Mande um carinho.`;
         } else if (estado === 'triste') {
             corpo = `${nomeRemetente} não está bem. Que tal uma mensagem agora?`;
         }
 
-        // --- A NOVA MÁGICA: NOTIFICAÇÃO COM BOTÕES ---
         const message = {
             notification: { 
                 title: titulo, 
@@ -48,20 +49,14 @@ exports.enviarNotificacaoMood = onValueCreated(
             },
             webpush: {
                 fcmOptions: {
-                    link: "/" // Ao clicar, abre o Santuário
+                    link: "/" 
                 },
                 notification: {
-                    icon: "/assets/icons/icon-192.png", // Puxa o ícone dourado do seu app
+                    icon: "/assets/icons/icon-192.png", 
                     vibrate: [200, 100, 200],
                     actions: [
-                        {
-                            action: "enviar_pulso",
-                            title: "💖 Enviar Pulso"
-                        },
-                        {
-                            action: "abrir_app",
-                            title: "🌌 Abrir Santuário"
-                        }
+                        { action: "enviar_pulso", title: "💖 Enviar Pulso" },
+                        { action: "abrir_app", title: "🌌 Abrir Santuário" }
                     ]
                 }
             },

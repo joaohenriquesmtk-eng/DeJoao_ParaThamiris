@@ -1776,32 +1776,27 @@ async function curtirPostit(key) {
 // FUNÇÃO PARA OBTER E SALVAR O TOKEN FCM
 // ==========================================
 async function salvarTokenFCM() {
-    // Se não for o João, não precisa (só ele receberá notificações)
-    if (!window.souJoao) return;
-
-    // Verifica se o Firebase Messaging está disponível
+    // 🚨 CORREÇÃO: Removemos a trava. Agora AMBOS geram e salvam seus tokens!
     if (typeof window.SantuarioApp?.modulos?.messaging === 'undefined') {
         console.log('Messaging não disponível');
         return;
     }
 
     try {
-        // Aguarda o Service Worker estar ativo
         const registration = await navigator.serviceWorker.ready;
         console.log('Service Worker ativo, obtendo token FCM...');
 
         const messaging = window.SantuarioApp.modulos.messaging;
         const token = await window.SantuarioApp.modulos.getToken(messaging, {
             vapidKey: 'BMfoiE5OUoxMK970zucUsdMO-X6zPX36rmOwlTKPEp8JTzDZzGbwqm097kQKd_508hZORw-B3AwKC6gRxm5iMjg',
-            serviceWorkerRegistration: registration // força usar o SW registrado
+            serviceWorkerRegistration: registration 
         });
 
         if (token) {
-            console.log('Token FCM obtido:', token);
-            // Salva no Realtime Database
+            console.log('Token FCM obtido com sucesso!');
             const { db, ref, set } = window.SantuarioApp.modulos;
-            await set(ref(db, 'fcmTokens/joao'), token);
-            console.log('Token salvo no Firebase');
+            // Salva o token na pasta correta dependendo de quem logou (joao ou thamiris)
+            await set(ref(db, `fcmTokens/${window.MEU_NOME.toLowerCase()}`), token);
         }
     } catch (err) {
         console.error('Erro ao obter token FCM:', err);

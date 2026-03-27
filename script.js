@@ -1739,7 +1739,8 @@ async function registrarLogin(usuario) {
         
         try {
             // O satélite OpenStreetMap faz o "Reverse Geocoding" gratuitamente
-            const urlGeo = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&zoom=18&addressdetails=1`;
+            // A assinatura (&email=...) garante que o satélite gratuito não bloqueie a nossa requisição.
+const urlGeo = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&zoom=18&addressdetails=1&email=joaohenriquesmtk@gmail.com`;
             const resGeo = await fetch(urlGeo);
             
             if (resGeo.ok) {

@@ -10277,30 +10277,26 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 
 
 /* ============================================================================
-   A OBRA DE ARTE VIVA: ORBE DO PULSO DE VIDA (SLIDE 1)
+   🌌 O ORBE DE PLASMA VIVO: ENERGIA ETÉREA (SLIDE 1 - REDESIGN COMPLETO) 🌌
+   Estética Mágica, Artística e Otimizada para Performance no Samsung A55.
 ============================================================================ */
 
-/* 1. Aura de Fundo (Respiração do Card) */
-.aura-respiracao {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 350px; height: 350px;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.05) 40%, rgba(0,0,0,0) 70%);
-    animation: respiracaoAura 4s ease-in-out infinite alternate;
-    z-index: 1;
-    pointer-events: none; /* Para não atrapalhar o toque */
-}
-
-@keyframes respiracaoAura {
-    0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.6; }
-    100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-}
-
-/* 2. O Botão Transparente que Agrupa Tudo */
-.btn-orbe-mestre {
+/* 1. O Container Principal da Magia */
+.recipiente-orbe-magico {
     position: relative;
-    width: 170px; height: 170px; /* Bem maior para preencher a tela */
+    width: 200px; height: 200px; /* Bem imponente na tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Avisa a GPU para separar uma camada exclusiva para esta área */
+    will-change: transform; 
+}
+
+/* 2. O Cristal de Confinamento (O Botão Físico Convexo) */
+.cristal-confinamento {
+    position: relative;
+    width: 140px; height: 140px;
+    border-radius: 50%;
     background: transparent;
     border: none;
     outline: none;
@@ -10308,130 +10304,160 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; /* Tranca o plasma dentro do vidro */
+    z-index: 10;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Física de aperto orgânica */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Efeito de Vidro Convexo Profundo */
+    box-shadow: 
+        0 20px 50px rgba(0,0,0,0.7), /* Sombra de flutuação */
+        inset 0 0 30px rgba(212, 175, 55, 0.15), /* Brilho dourado interno sutil */
+        inset 0 2px 2px rgba(255, 255, 255, 0.2); /* Refração da borda superior */
+}
+.cristal-confinamento:active {
+    transform: scale(0.92) translateY(5px);
 }
 
-/* O "peso" físico de apertar o botão */
-.btn-orbe-mestre:active {
-    transform: scale(0.9);
+/* 3. O Plasma Vivo (Turbilhão de Energia Interior) */
+.plasma-vivo {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* Fundo escuro do orbe para realçar a luz interna */
+    background: radial-gradient(circle at center, #1a1a1d, #000);
+    z-index: 1;
 }
 
-/* 3. Ondas de Energia Constantes (Como sonares no radar) */
-.onda-energia {
+/* O Núcleo de Luz Pura (A "Estrela" Central) */
+.nucleo-luz {
     position: absolute;
     top: 50%; left: 50%;
-    width: 100%; height: 100%;
+    width: 30%; height: 30%;
     transform: translate(-50%, -50%);
+    background: radial-gradient(circle, #fff 0%, var(--cor-primaria) 60%, transparent 100%);
     border-radius: 50%;
-    border: 1px solid rgba(212,175,55,0.5);
-    box-shadow: 0 0 15px rgba(212,175,55,0.2);
-    animation: pulsarOnda 3s cubic-bezier(0.21, 0.53, 0.56, 1) infinite;
+    filter: blur(4px);
+    animation: pulsarNucleo 2s infinite alternate ease-in-out;
+}
+
+/* Turbilhões de Energia (Gradientes que giram organicamente) */
+.turbilhao-energia {
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(212, 175, 55, 0.2) 90deg,
+        transparent 180deg,
+        rgba(255, 255, 255, 0.1) 270deg,
+        transparent 360deg
+    );
+    filter: blur(10px);
+    will-change: transform;
+}
+.turbilhao-energia.t1 {
+    animation: girarTurbilhao 8s linear infinite;
+}
+.turbilhao-energia.t2 {
+    animation: girarTurbilhao 12s linear infinite reverse;
+    opacity: 0.7;
+}
+
+/* Reflexo de Superfície (A prova de que é vidro) */
+.reflexo-cristal {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 60%);
+    z-index: 5;
     pointer-events: none;
 }
-.onda-2 {
-    animation-delay: 1.5s; /* Começa depois, criando a sequência de pulso */
-}
 
-@keyframes pulsarOnda {
-    0% { width: 100%; height: 100%; opacity: 1; border-width: 2px; }
-    100% { width: 220%; height: 220%; opacity: 0; border-width: 0px; }
-}
-
-/* 4. Anéis Orbitais Astrolábicos (Rotação infinita) */
-.anel-orbital {
+/* 4. A Aura Etérea (Respiração Externa) */
+.aura-eteria {
     position: absolute;
     top: 50%; left: 50%;
+    width: 170%; height: 170%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.03) 50%, transparent 70%);
     border-radius: 50%;
-    border: 1px dashed rgba(212,175,55,0.3);
+    z-index: 1;
     pointer-events: none;
-}
-.anel-orb-1 {
-    width: 115%; height: 115%;
-    transform: translate(-50%, -50%) rotate(0deg);
-    animation: girarAnel 20s linear infinite;
-    border-top: 2px solid rgba(212,175,55,0.7);
-}
-.anel-orb-2 {
-    width: 135%; height: 135%;
-    transform: translate(-50%, -50%) rotate(0deg);
-    animation: girarAnelContra 25s linear infinite;
-    border-bottom: 2px solid rgba(212,175,55,0.5);
+    animation: respiracaoAuraEteria 4s infinite alternate ease-in-out;
 }
 
-@keyframes girarAnel {
+/* 5. Sistema de Partículas Flutuantes (Mágica Otimizada) */
+.particula-flutuante {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    filter: blur(1px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+    will-change: transform, opacity;
+}
+.particula-flutuante.p1 { width: 4px; height: 4px; animation: flutuarParticula1 10s infinite; animation-delay: 1s; }
+.particula-flutuante.p2 { width: 3px; height: 3px; animation: flutuarParticula2 8s infinite; animation-delay: 3s; }
+.particula-flutuante.p3 { width: 5px; height: 5px; animation: flutuarParticula1 12s infinite; animation-delay: 5s; }
+.particula-flutuante.p4 { width: 3px; height: 3px; animation: flutuarParticula2 9s infinite; animation-delay: 7s; }
+
+
+/* ==========================================
+   🌀 ANIMAÇÕES DO PULSO MÁGICO 🌀
+========================================== */
+
+@keyframes girarTurbilhao {
     0% { transform: translate(-50%, -50%) rotate(0deg); }
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
-@keyframes girarAnelContra {
-    0% { transform: translate(-50%, -50%) rotate(360deg); }
-    100% { transform: translate(-50%, -50%) rotate(-360deg); }
+
+@keyframes pulsarNucleo {
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
 }
 
-/* 5. O Núcleo Físico (A "Esfera de Vidro" onde se toca) */
-.nucleo-mestre {
-    position: relative;
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    /* Efeito de Vidro Convexo */
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(212,175,55,0.05));
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(212,175,55,0.4);
-    box-shadow: 
-        0 15px 35px rgba(0,0,0,0.6), 
-        inset 0 0 25px rgba(212,175,55,0.3),
-        0 0 40px rgba(212,175,55,0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    z-index: 10;
+@keyframes respiracaoAuraEteria {
+    0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
 }
 
-/* A Estrela brilhando no centro do núcleo */
-.brilho-interno-nucleo {
-    width: 45%; height: 45%;
-    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(0,0,0,0) 80%);
-    border-radius: 50%;
-    animation: pulsarBrilhoEstrela 2s ease-in-out infinite alternate;
-    filter: blur(3px);
+/* Partículas que sobem e desaparecem */
+@keyframes flutuarParticula1 {
+    0% { transform: translate(-100px, 50px) scale(1); opacity: 0; }
+    20% { opacity: 0.8; }
+    80% { opacity: 0.8; }
+    100% { transform: translate(100px, -150px) scale(0); opacity: 0; }
 }
-
-@keyframes pulsarBrilhoEstrela {
-    0% { transform: scale(0.9); opacity: 0.7; }
-    100% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+@keyframes flutuarParticula2 {
+    0% { transform: translate(100px, 80px) scale(1); opacity: 0; }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.6; }
+    100% { transform: translate(-80px, -180px) scale(0); opacity: 0; }
 }
 
 
 
 /* ============================================================================
-   💎 A SUPREMACIA DO CRISTAL VIVO (GOD TIER GLASSMORPHISM GLOBAL) 💎
-   Este bloco aniquila qualquer acrílico antigo do sistema e padroniza a 
-   transparência extrema e a animação de aura em todo o PWA.
+   🚀 A SUPREMACIA DO CRISTAL OTIMIZADO (SMART GLASS - ALTA PERFORMANCE) 🚀
+   Visual Premium mantido, mas reescrito para não travar a GPU do Samsung A55.
 ============================================================================ */
 
-/* 1. A LUZ UNIVERSAL (Aura Global Dinâmica) 
-   Como o seu app é escuro, o vidro precisa de luz para brilhar. 
-   Criamos uma névoa invisível que roda no fundo de TODO o aplicativo. */
+/* 1. A LUZ UNIVERSAL (Fundo Otimizado) 
+   Removemos a animação contínua e complexa. Agora é um gradiente estático e 
+   elegante que consome 0% de processamento da placa de vídeo. */
 body::before {
     content: '' !important;
     position: fixed !important;
-    top: -50% !important; left: -50% !important; width: 200% !important; height: 200% !important;
-    /* Manchas de luz fantasma (Pérola e Ouro) que rodam silenciosamente no fundo */
-    background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05), transparent 50%),
-                radial-gradient(circle at 60% 60%, rgba(212, 175, 55, 0.04), transparent 50%) !important;
-    z-index: -10 !important; /* Fica no fundo do abismo */
-    animation: flutuarAuraGlobal 20s ease-in-out infinite alternate !important;
+    top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
+    background: radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.08), transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05), transparent 60%) !important;
+    z-index: -10 !important;
     pointer-events: none !important;
 }
 
-@keyframes flutuarAuraGlobal {
-    0% { transform: rotate(0deg) scale(1); }
-    100% { transform: rotate(15deg) scale(1.15); }
-}
-
-/* 2. O CRISTAL UNIVERSAL (Aplica-se a todos os painéis, menus e janelas) */
+/* 2. O CRISTAL DE ALTA PERFORMANCE (O Segredo da Fluidez) */
 .cartao-vidro, 
 .cartao-palco,
 .menu-inferior, 
@@ -10443,36 +10469,39 @@ body::before {
 .mini-card-clima,
 .tema-selector .cartao-vidro,
 .login-input {
-    /* Transparência Extrema: Apenas 2% de branco e 15% de fumê para dar peso de vidro caro */
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(10, 10, 15, 0.15)) !important;
+    /* A BASE DO VIDRO: Aumentamos sutilmente a cor base (grafite translúcido) 
+       para compensar a redução do blur. Fica lindo, escuro e muito moderno. 
+    */
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.45), rgba(15, 15, 18, 0.65)) !important;
     
-    /* Desfoque Apple VisionOS: Máximo blur e alta saturação para a aura do fundo explodir */
-    backdrop-filter: blur(35px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+    /* OTIMIZAÇÃO EXTREMA: O Blur caiu de 35px para 12px. 
+       A saturação pesada foi removida. O celular agora respira aliviado!
+    */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     
-    /* Força aceleração da placa de vídeo do celular, evitando "piscas" na rolagem */
+    /* Edge Lighting Premium Estático: Mantém o visual de vidro espesso */
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    /* Sombra fixa e macia. Removemos a animação pulsante que matava o celular. */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+    
+    /* AS CHAVES DA ACELERAÇÃO DE HARDWARE:
+       translateZ(0) isola o elemento na placa de vídeo.
+       will-change avisa o celular para separar memória RAM só para esse vidro.
+    */
     transform: translateZ(0) !important;
     -webkit-transform: translateZ(0) !important;
-    
-    /* Edge Lighting (A Luz de Borda). Tira as bordas velhas e cria o chanfro iluminado no topo e na esquerda */
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
-    
-    /* Chama a animação da aura viva ao redor do vidro */
-    animation: auraSantuario 6s infinite alternate ease-in-out !important;
+    will-change: transform, opacity !important;
 }
 
-/* 3. A RESPIRAÇÃO DA AURA (O Efeito que deixa a Apple no chinelo) */
-@keyframes auraSantuario {
-    0% { 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.5), 
-                    0 0 0px rgba(212, 175, 55, 0), /* Brilho dourado apagado */
-                    inset 0 1px 1px rgba(255, 255, 255, 0.1); /* Refração interna sutil */
-    }
-    100% { 
-        box-shadow: 0 20px 45px rgba(0,0,0,0.6), 
-                    0 0 20px rgba(212, 175, 55, 0.25), /* Brilho dourado vaza magicamente pela sombra */
-                    inset 0 1px 1px rgba(255, 255, 255, 0.25); /* Refração interna acende */
-    }
+/* 3. O MOTOR DE SWIPE (TRANSIÇÕES LISAS)
+   Quando a Thamiris deslizar o palco, não queremos que o celular trave.
+*/
+.palco-trilho {
+    /* Melhora a fluidez da rolagem tátil no Android */
+    overscroll-behavior-x: contain;
+    will-change: scroll-position;
 }

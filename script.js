@@ -3787,3 +3787,474 @@ window.inicializarPalcoDimensional = function() {
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(window.inicializarPalcoDimensional, 300);
 });
+
+// ============================================================================
+// ⚖️ SISTEMA DE MANDADO DE APREENSÃO BILATERAL (TAKEOVER GLOBAL)
+// ============================================================================
+
+// 📱 CONFIGURAÇÃO DE TELEFONES (Coloque os números reais aqui, com DDD)
+const TELEFONE_JOAO = "+5541996419950";      // Ex: +55419...
+const TELEFONE_THAMIRIS = "+5562994838837";  // Ex: +55629...
+
+// 1. O Vigilante do Supremo Tribunal
+window.vigiarMandados = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos || !window.MEU_NOME) {
+        setTimeout(window.vigiarMandados, 1000);
+        return;
+    }
+
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    const takeover = document.getElementById('takeover-mandado');
+    if (!takeover) return;
+
+    // Escuta a porta do Tribunal
+    const refMandado = ref(db, 'tribunal/mandado_alvo');
+    
+    onValue(refMandado, (snapshot) => {
+        const alvo = snapshot.val(); // Agora o Firebase devolve um NOME
+        
+        // Se o nome no Firebase for exatamente o MEU nome... A casa caiu!
+        if (alvo === window.MEU_NOME.toLowerCase()) {
+            
+            // Preenche o documento com os nomes corretos antes de mostrar
+            document.getElementById('nome-reu-mandado').innerText = window.MEU_NOME;
+            document.getElementById('nome-autor-mandado').innerText = window.NOME_PARCEIRO;
+
+            // Derruba a tela
+            takeover.classList.remove('takeover-escondido');
+            
+            // Vibração de alerta máximo
+            if (window.Haptics && window.Haptics.erro) {
+                navigator.vibrate([100, 100, 100, 100, 400]); 
+            }
+            
+        } else {
+            // Se o alvo não for eu (ou for nulo), eu continuo navegando livremente.
+            takeover.classList.add('takeover-escondido');
+        }
+    });
+};
+
+// 2. A Rendição (O que a pessoa travada clica)
+window.cumprirMandado = function() {
+    if (window.Haptics) window.Haptics.sucesso();
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const refMandado = ref(db, 'tribunal/mandado_alvo');
+
+    // Revoga o mandado no Firebase limpando o alvo
+    set(refMandado, null).then(() => {
+        
+        // Lógica de roteamento: Se eu sou o João sendo preso, ligo para a Thamiris. E vice-versa.
+        const numeroDestino = window.souJoao ? TELEFONE_THAMIRIS : TELEFONE_JOAO;
+        window.location.href = `tel:${numeroDestino}`; 
+        
+    }).catch((erro) => {
+        console.error("Erro ao revogar mandado:", erro);
+    });
+};
+
+// 3. A Ordem Judicial (O que qualquer um clica para travar o outro)
+window.expedirMandadoApreensao = function() {
+    // Agora não há mais restrição. Se tiver um nome de parceiro, atira!
+    if (window.NOME_PARCEIRO) {
+        if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+        
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        const refMandado = ref(db, 'tribunal/mandado_alvo');
+
+        const alvo = window.NOME_PARCEIRO.toLowerCase();
+
+        // Registra no Firebase o nome de quem vai sofrer a apreensão
+        set(refMandado, alvo).then(() => {
+            if(typeof mostrarToast === 'function') mostrarToast(`Mandado expedido contra ${window.NOME_PARCEIRO}!`, "⚖️");
+        }).catch((erro) => {
+            if(typeof mostrarToast === 'function') mostrarToast("Falha na conexão com o Tribunal.", "❌");
+        });
+    } else {
+        if(typeof mostrarToast === 'function') mostrarToast("Identificação pendente.", "⚠️");
+    }
+};
+
+// Inicia a vigilância assim que a página é montada
+document.addEventListener("DOMContentLoaded", () => {
+    window.vigiarMandados();
+});
+
+
+// ============================================================================
+// 📜 MOTOR DE CRIPTOGRAFIA FÍSICA: SELO DE CERA EÓLICO (SOPRO E CALOR)
+// ============================================================================
+
+let timerCalor = null;
+let ceraDerretida = false;
+let audioContext = null;
+let analyser = null;
+let microphone = null;
+let frameSopro = null;
+
+// 1. Função para abrir o envelope mágico (Teste)
+window.abrirCartaMagica = function() {
+    const overlay = document.getElementById('overlay-carta-selada');
+    if(overlay) overlay.classList.remove('takeover-escondido');
+    iniciarFisicaSelo();
+};
+
+window.fecharCartaSelada = function() {
+    const overlay = document.getElementById('overlay-carta-selada');
+    if(overlay) overlay.classList.add('takeover-escondido');
+};
+
+// 2. Física do Calor Humano (Pressionar a tela)
+function iniciarFisicaSelo() {
+    const btnSelo = document.getElementById('selo-cera-btn');
+    const instrucao = document.getElementById('instrucao-selo');
+    ceraDerretida = false;
+
+    // Reseta o estado
+    btnSelo.className = '';
+    btnSelo.querySelector('.icone-selo').style.opacity = '1';
+    instrucao.innerText = "Pressione e segure para aquecer a cera...";
+    document.getElementById('conteudo-carta-secreta').classList.remove('texto-revelado');
+    document.getElementById('selo-cera-container').style.display = 'flex';
+    document.getElementById('selo-cera-container').style.opacity = '1';
+    document.getElementById('btn-fechar-carta').classList.add('escondido');
+
+    // Eventos de toque (Para celular) e Mouse (Para PC)
+    btnSelo.addEventListener('touchstart', iniciarAquecimento, {passive: false});
+    btnSelo.addEventListener('touchend', pararAquecimento);
+    btnSelo.addEventListener('mousedown', iniciarAquecimento);
+    btnSelo.addEventListener('mouseup', pararAquecimento);
+    btnSelo.addEventListener('mouseleave', pararAquecimento);
+}
+
+function iniciarAquecimento(e) {
+    e.preventDefault(); // Evita recarregar a tela
+    if (ceraDerretida) return;
+
+    if (window.Haptics) window.Haptics.toqueLeve();
+    const btnSelo = document.getElementById('selo-cera-btn');
+    const instrucao = document.getElementById('instrucao-selo');
+    
+    btnSelo.classList.add('aquecendo');
+    instrucao.innerText = "Aquecendo... mantenha o toque...";
+
+    // Vibração crescente simulando o calor
+    let vibracao = 10;
+    const intervaloVibracao = setInterval(() => {
+        if(navigator.vibrate) navigator.vibrate(vibracao);
+        vibracao += 10;
+    }, 500);
+
+    // Se segurar por 3 segundos ininterruptos, derrete!
+    timerCalor = setTimeout(() => {
+        clearInterval(intervaloVibracao);
+        derreterCera();
+    }, 3000);
+
+    // Salva o intervalo no botão para podermos limpar se ela soltar o dedo antes
+    btnSelo.dataset.vibTimer = intervaloVibracao;
+}
+
+function pararAquecimento(e) {
+    if (ceraDerretida) return;
+    const btnSelo = document.getElementById('selo-cera-btn');
+    const instrucao = document.getElementById('instrucao-selo');
+
+    clearTimeout(timerCalor);
+    clearInterval(parseInt(btnSelo.dataset.vibTimer));
+
+    btnSelo.classList.remove('aquecendo');
+    instrucao.innerText = "A cera esfriou. Tente novamente.";
+}
+
+// 3. A Cera Derrete e Ativa o Microfone (Web Audio API)
+function derreterCera() {
+    ceraDerretida = true;
+    if (window.Haptics) window.Haptics.sucesso();
+    
+    const btnSelo = document.getElementById('selo-cera-btn');
+    const instrucao = document.getElementById('instrucao-selo');
+    
+    btnSelo.classList.remove('aquecendo');
+    btnSelo.classList.add('derretido');
+    btnSelo.querySelector('.icone-selo').style.opacity = '0'; // O ícone some no derretimento
+    
+    instrucao.innerText = "Sopre o microfone do celular para espalhar a cera!";
+    instrucao.style.color = "#b31217";
+    instrucao.style.fontWeight = "bold";
+
+    // INICIA A LEITURA DO SOPRO (Vento)
+    iniciarRadarDeSopro();
+}
+
+async function iniciarRadarDeSopro() {
+    try {
+        // Pede permissão para o microfone de forma invisível
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        
+        // Cria o analisador de frequências
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        microphone = audioContext.createMediaStreamSource(stream);
+        
+        microphone.connect(analyser);
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        // Loop de monitoramento do som a 60FPS
+        const verificarSopro = () => {
+            if (!ceraDerretida) return;
+            
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calcula a média do volume (ruído branco do vento bate muito forte no mic)
+            let soma = 0;
+            for(let i = 0; i < bufferLength; i++) {
+                soma += dataArray[i];
+            }
+            let mediaVolume = soma / bufferLength;
+
+            // Se o volume passar de 100 (um sopro forte perto do microfone)
+            if (mediaVolume > 100) {
+                cancelAnimationFrame(frameSopro); // Para a leitura
+                revelarCartaSecreta(stream); // A MÁGICA ACONTECE
+                return;
+            }
+
+            frameSopro = requestAnimationFrame(verificarSopro);
+        };
+
+        verificarSopro();
+
+    } catch (err) {
+        console.error("Permissão de microfone negada ou erro:", err);
+        document.getElementById('instrucao-selo').innerText = "Microfone não autorizado. Clique no selo para abrir.";
+        document.getElementById('selo-cera-btn').onclick = () => revelarCartaSecreta(null);
+    }
+}
+
+// 4. O Êxtase: A Carta é Revelada!
+function revelarCartaSecreta(stream) {
+    if (window.Haptics) navigator.vibrate([200, 100, 300]); // Vibração de quebra mágica
+
+    // Desliga o microfone para não gastar bateria da Thamiris
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
+
+    // Some com o selo com um fade elegante
+    const containerSelo = document.getElementById('selo-cera-container');
+    containerSelo.style.opacity = '0';
+    setTimeout(() => containerSelo.style.display = 'none', 1000);
+
+    // Revela a carta tirando o Blur lentamente
+    const carta = document.getElementById('conteudo-carta-secreta');
+    carta.classList.add('texto-revelado');
+    
+    // Mostra o botão para guardar a carta depois de alguns segundos
+    setTimeout(() => {
+        document.getElementById('btn-fechar-carta').classList.remove('escondido');
+    }, 2000);
+}
+
+// ============================================================================
+// 🫀 MOTOR DE TELEMETRIA TÁTIL (O ECO DO CORAÇÃO)
+// ============================================================================
+
+let gravandoEco = false;
+let temposBatidas = [];
+let inicioGravacao = 0;
+let padraoVibracaoParaEnviar = [];
+
+// 1. Abre a sala para gravar
+window.abrirSalaDeEco = function() {
+    const overlay = document.getElementById('overlay-eco-coracao');
+    if(overlay) overlay.classList.remove('takeover-escondido');
+    
+    // Configura interface para gravação
+    document.getElementById('titulo-eco').innerText = "Gravar Eco";
+    document.getElementById('instrucao-eco').innerText = "Toque em 'Iniciar', feche os olhos e bata o ritmo na tela.";
+    document.getElementById('controles-gravacao-eco').classList.remove('escondido');
+    document.getElementById('controles-reproducao-eco').classList.add('escondido');
+    document.getElementById('btn-iniciar-eco').classList.remove('escondido');
+    document.getElementById('btn-parar-eco').classList.add('escondido');
+    document.getElementById('icone-radar-eco').innerText = "🫀";
+    
+    temposBatidas = [];
+    padraoVibracaoParaEnviar = [];
+    gravandoEco = false;
+};
+
+window.fecharSalaEco = function() {
+    const overlay = document.getElementById('overlay-eco-coracao');
+    if(overlay) overlay.classList.add('takeover-escondido');
+    gravandoEco = false;
+};
+
+// 2. Inicia o relógio
+window.iniciarGravacaoEco = function() {
+    gravandoEco = true;
+    temposBatidas = [];
+    inicioGravacao = Date.now();
+    
+    document.getElementById('btn-iniciar-eco').classList.add('escondido');
+    document.getElementById('btn-parar-eco').classList.remove('escondido');
+    document.getElementById('instrucao-eco').innerText = "Gravando... Bata na área central.";
+    
+    // Adiciona o escutador de toque rápido
+    const radar = document.getElementById('radar-tátil');
+    radar.addEventListener('touchstart', registrarBatida, {passive: false});
+    radar.addEventListener('mousedown', registrarBatida);
+};
+
+// 3. Captura o milissegundo de cada toque
+function registrarBatida(e) {
+    if (!gravandoEco) return;
+    e.preventDefault();
+    
+    const agora = Date.now();
+    temposBatidas.push(agora);
+    
+    // Efeito visual e físico de gravação
+    if (navigator.vibrate) navigator.vibrate(40); // Feedback que o toque foi gravado
+    
+    // Faz o núcleo pulsar
+    const nucleo = document.getElementById('nucleo-radar');
+    nucleo.style.transform = 'scale(0.8)';
+    setTimeout(() => nucleo.style.transform = 'scale(1)', 50);
+
+    // Cria a onda acústica visual
+    const onda = document.createElement('div');
+    onda.className = 'anel-radar-eco explosao-tatil';
+    document.getElementById('radar-tátil').appendChild(onda);
+    setTimeout(() => onda.remove(), 800);
+}
+
+// 4. Calcula a matemática e dispara para o Firebase
+window.pararEEnviarEco = function() {
+    gravandoEco = false;
+    const radar = document.getElementById('radar-tátil');
+    radar.removeEventListener('touchstart', registrarBatida);
+    radar.removeEventListener('mousedown', registrarBatida);
+
+    if (temposBatidas.length < 2) {
+        if(typeof mostrarToast === 'function') mostrarToast("Você precisa bater pelo menos 2 vezes.", "⚠️");
+        window.fecharSalaEco();
+        return;
+    }
+
+    // A MÁGICA: Converter os tempos absolutos em um Array de intervalos (Vibra, Pausa, Vibra, Pausa)
+    // O motor navigator.vibrate() funciona assim: [duracaoVibracao, pausa, duracaoVibracao, pausa...]
+    padraoVibracaoParaEnviar = [];
+    const duracaoToque = 50; // Cada batida dura 50ms de vibração
+    
+    for (let i = 0; i < temposBatidas.length; i++) {
+        padraoVibracaoParaEnviar.push(duracaoToque); // Adiciona a vibração
+        if (i < temposBatidas.length - 1) {
+            // Calcula o silêncio até o próximo toque
+            let pausa = temposBatidas[i+1] - temposBatidas[i] - duracaoToque;
+            if (pausa < 0) pausa = 0;
+            padraoVibracaoParaEnviar.push(pausa);
+        }
+    }
+
+    // Salva no Firebase
+    if (window.SantuarioApp && window.SantuarioApp.modulos && window.NOME_PARCEIRO) {
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        const caminho = `eco_santuario/${window.NOME_PARCEIRO.toLowerCase()}`;
+        
+        const payload = {
+            autor: window.MEU_NOME,
+            padrao: padraoVibracaoParaEnviar,
+            timestamp: Date.now()
+        };
+
+        set(ref(db, caminho), payload).then(() => {
+            if(typeof mostrarToast === 'function') mostrarToast("Sinfonia tátil enviada!", "✈️");
+            window.fecharSalaEco();
+        });
+    }
+};
+
+// ============================================================================
+// 📡 O RADAR DE RECEBIMENTO DO ECO
+// ============================================================================
+window.escutarEcosDoParceiro = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos || !window.MEU_NOME) return;
+
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    const caminho = `eco_santuario/${window.MEU_NOME.toLowerCase()}`;
+
+    onValue(ref(db, caminho), (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.padrao) {
+            // Um eco chegou para mim!
+            window.ecoRecebido = dados.padrao;
+            window.autorEco = dados.autor;
+            
+            // Abre a sala automaticamente para a pessoa receber
+            const overlay = document.getElementById('overlay-eco-coracao');
+            if(overlay) overlay.classList.remove('takeover-escondido');
+
+            document.getElementById('titulo-eco').innerText = `Sinfonia de ${dados.autor}`;
+            document.getElementById('instrucao-eco').innerText = "Ele enviou as batidas do coração. Sinta.";
+            document.getElementById('icone-radar-eco').innerText = "💓";
+            
+            document.getElementById('controles-gravacao-eco').classList.add('escondido');
+            document.getElementById('controles-reproducao-eco').classList.remove('escondido');
+            
+            // Vibra para chamar a atenção
+            if (navigator.vibrate) navigator.vibrate([100, 200, 100]);
+        }
+    });
+};
+
+// A pessoa clica e a física acontece
+window.reproduzirEcoRecebido = function() {
+    if (!window.ecoRecebido) return;
+    
+    document.getElementById('instrucao-eco').innerText = "Reproduzindo...";
+    
+    // Toca o padrão que foi gravado pelo parceiro!
+    if (navigator.vibrate) navigator.vibrate(window.ecoRecebido);
+    
+    // Animação visual acompanhando a vibração
+    const nucleo = document.getElementById('nucleo-radar');
+    let tempoDecorrido = 0;
+    
+    for (let i = 0; i < window.ecoRecebido.length; i++) {
+        if (i % 2 === 0) { // É uma vibração
+            setTimeout(() => {
+                nucleo.style.transform = 'scale(0.8)';
+                const onda = document.createElement('div');
+                onda.className = 'anel-radar-eco explosao-tatil';
+                document.getElementById('radar-tátil').appendChild(onda);
+                setTimeout(() => onda.remove(), 800);
+            }, tempoDecorrido);
+        } else { // É uma pausa
+            setTimeout(() => {
+                nucleo.style.transform = 'scale(1)';
+            }, tempoDecorrido);
+        }
+        tempoDecorrido += window.ecoRecebido[i];
+    }
+
+    setTimeout(() => {
+        document.getElementById('instrucao-eco').innerText = "Concluído.";
+    }, tempoDecorrido + 500);
+};
+
+// Depois de ouvir, apaga do Firebase para não ficar repetindo
+window.fecharSalaEcoEApagar = function() {
+    window.fecharSalaEco();
+    if (window.SantuarioApp && window.SantuarioApp.modulos && window.MEU_NOME) {
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        set(ref(db, `eco_santuario/${window.MEU_NOME.toLowerCase()}`), null);
+    }
+};

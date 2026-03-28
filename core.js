@@ -99,13 +99,6 @@ window.SantuarioApp.conectar = function() {
     // 11. Ignição do Mural de Recados (Post-its)
     if (typeof window.escutarPostits === 'function') window.escutarPostits();
     
-    // 6. Listener do Cofre (Ecos Recentes)
-        // Invoca o motor de áudio multiplataforma (Samsung/iPhone) construído no script.js
-        if (typeof window.escutarEcosDoParceiro === 'function') {
-            window.escutarEcosDoParceiro();
-        } else {
-            console.warn("Atenção: O motor de Ecos ainda não foi carregado.");
-        }
 
         // 6. Listener do Cofre (Ecos Recentes)
         if (typeof window.escutarEcosDoParceiro === 'function') {

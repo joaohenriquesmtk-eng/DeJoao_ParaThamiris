@@ -10277,26 +10277,37 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 
 
 /* ============================================================================
-   🌌 O ORBE DE PLASMA VIVO: ENERGIA ETÉREA (SLIDE 1 - REDESIGN COMPLETO) 🌌
-   Estética Mágica, Artística e Otimizada para Performance no Samsung A55.
+   🌌 O ASTROLÁBIO DO PULSO: RIQUEZA VISUAL COM PERFORMANCE 120Hz 🌌
+   Animações baseadas exclusivamente em GPU (Scale e Rotate).
 ============================================================================ */
 
-/* 1. O Container Principal da Magia */
-.recipiente-orbe-magico {
+/* 1. O Container Principal */
+.recipiente-astrolabio {
     position: relative;
-    width: 200px; height: 200px; /* Bem imponente na tela */
+    width: 200px; height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Avisa a GPU para separar uma camada exclusiva para esta área */
-    will-change: transform; 
+    transform: translateZ(0); /* Aceleração de hardware ligada */
 }
 
-/* 2. O Cristal de Confinamento (O Botão Físico Convexo) */
-.cristal-confinamento {
-    position: relative;
-    width: 140px; height: 140px;
+/* 2. A Aura de Fundo */
+.aura-astrolabio {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
     border-radius: 50%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    /* Anima apenas scale e opacity */
+    animation: respiracaoAuraGpu 4s infinite alternate ease-in-out;
+    will-change: transform, opacity;
+}
+
+/* 3. O Botão Estrutural (Fica transparente, agrupa tudo) */
+.orbe-astrolabio-btn {
+    position: relative;
+    width: 120px; height: 120px;
     background: transparent;
     border: none;
     outline: none;
@@ -10304,137 +10315,109 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Tranca o plasma dentro do vidro */
-    z-index: 10;
     -webkit-tap-highlight-color: transparent;
-    
-    /* Física de aperto orgânica */
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
-    /* Efeito de Vidro Convexo Profundo */
-    box-shadow: 
-        0 20px 50px rgba(0,0,0,0.7), /* Sombra de flutuação */
-        inset 0 0 30px rgba(212, 175, 55, 0.15), /* Brilho dourado interno sutil */
-        inset 0 2px 2px rgba(255, 255, 255, 0.2); /* Refração da borda superior */
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
 }
-.cristal-confinamento:active {
-    transform: scale(0.92) translateY(5px);
+.orbe-astrolabio-btn:active {
+    transform: scale(0.9);
 }
 
-/* 3. O Plasma Vivo (Turbilhão de Energia Interior) */
-.plasma-vivo {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    /* Fundo escuro do orbe para realçar a luz interna */
-    background: radial-gradient(circle at center, #1a1a1d, #000);
-    z-index: 1;
-}
-
-/* O Núcleo de Luz Pura (A "Estrela" Central) */
-.nucleo-luz {
+/* 4. Ondas de Energia (O sonar do radar) */
+.onda-energia-gpu {
     position: absolute;
     top: 50%; left: 50%;
-    width: 30%; height: 30%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, #fff 0%, var(--cor-primaria) 60%, transparent 100%);
+    width: 100%; height: 100%; /* Tamanho base fixo */
     border-radius: 50%;
-    filter: blur(4px);
-    animation: pulsarNucleo 2s infinite alternate ease-in-out;
-}
-
-/* Turbilhões de Energia (Gradientes que giram organicamente) */
-.turbilhao-energia {
-    position: absolute;
-    top: -50%; left: -50%; width: 200%; height: 200%;
-    background: conic-gradient(
-        from 0deg,
-        transparent 0deg,
-        rgba(212, 175, 55, 0.2) 90deg,
-        transparent 180deg,
-        rgba(255, 255, 255, 0.1) 270deg,
-        transparent 360deg
-    );
-    filter: blur(10px);
-    will-change: transform;
-}
-.turbilhao-energia.t1 {
-    animation: girarTurbilhao 8s linear infinite;
-}
-.turbilhao-energia.t2 {
-    animation: girarTurbilhao 12s linear infinite reverse;
-    opacity: 0.7;
-}
-
-/* Reflexo de Superfície (A prova de que é vidro) */
-.reflexo-cristal {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 60%);
-    z-index: 5;
+    border: 2px solid rgba(212, 175, 55, 0.5);
     pointer-events: none;
-}
-
-/* 4. A Aura Etérea (Respiração Externa) */
-.aura-eteria {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 170%; height: 170%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.03) 50%, transparent 70%);
-    border-radius: 50%;
-    z-index: 1;
-    pointer-events: none;
-    animation: respiracaoAuraEteria 4s infinite alternate ease-in-out;
-}
-
-/* 5. Sistema de Partículas Flutuantes (Mágica Otimizada) */
-.particula-flutuante {
-    position: absolute;
-    border-radius: 50%;
-    background: #fff;
-    filter: blur(1px);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 2;
+    /* A MÁGICA DA GPU: Animamos a ESCALA, não a LARGURA! */
+    animation: pulsarOndaGpu 3s cubic-bezier(0.21, 0.53, 0.56, 1) infinite;
     will-change: transform, opacity;
 }
-.particula-flutuante.p1 { width: 4px; height: 4px; animation: flutuarParticula1 10s infinite; animation-delay: 1s; }
-.particula-flutuante.p2 { width: 3px; height: 3px; animation: flutuarParticula2 8s infinite; animation-delay: 3s; }
-.particula-flutuante.p3 { width: 5px; height: 5px; animation: flutuarParticula1 12s infinite; animation-delay: 5s; }
-.particula-flutuante.p4 { width: 3px; height: 3px; animation: flutuarParticula2 9s infinite; animation-delay: 7s; }
+.onda-energia-gpu.o2 {
+    animation-delay: 1.5s;
+}
 
+/* 5. Anéis Orbitais Astrolábicos */
+.anel-orbital-gpu {
+    position: absolute;
+    top: 50%; left: 50%;
+    border-radius: 50%;
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    pointer-events: none;
+    will-change: transform;
+}
+.anel-orbital-gpu.a1 {
+    width: 150%; height: 150%;
+    border-top: 2px solid rgba(212, 175, 55, 0.8);
+    animation: girarAnelGpu 15s linear infinite;
+}
+.anel-orbital-gpu.a2 {
+    width: 180%; height: 180%;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.5);
+    animation: girarAnelContraGpu 20s linear infinite;
+}
+
+/* 6. O Núcleo Físico (A "Joia" central) */
+.nucleo-vidro-gpu {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    /* Truque: Parece vidro escuro, mas é um gradiente sólido. 0% de lag. */
+    background: radial-gradient(circle at 30% 30%, rgba(50, 50, 60, 0.9), rgba(10, 10, 15, 0.95));
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 
+        0 15px 35px rgba(0,0,0,0.8), 
+        inset 0 0 20px rgba(212, 175, 55, 0.3),
+        inset 0 2px 3px rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* A Estrela de Luz dentro da Joia */
+.brilho-estrela-gpu {
+    width: 40%; height: 40%;
+    background: #fff;
+    border-radius: 50%;
+    /* Brilho neon usando sombras puras */
+    box-shadow: 0 0 25px 15px rgba(212, 175, 55, 0.8), 0 0 40px 20px rgba(255, 255, 255, 0.4);
+    animation: pulsarEstrelaGpu 2s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
 
 /* ==========================================
-   🌀 ANIMAÇÕES DO PULSO MÁGICO 🌀
+   🌀 ANIMAÇÕES ACELERADAS POR HARDWARE 🌀
 ========================================== */
 
-@keyframes girarTurbilhao {
+@keyframes respiracaoAuraGpu {
+    /* Mantém o translate para o objeto não sair do centro durante o scale */
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+}
+
+@keyframes pulsarOndaGpu {
+    /* Scale cresce do tamanho original (1) para 2.5x maior */
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+@keyframes girarAnelGpu {
     0% { transform: translate(-50%, -50%) rotate(0deg); }
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-@keyframes pulsarNucleo {
-    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
-    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+@keyframes girarAnelContraGpu {
+    0% { transform: translate(-50%, -50%) rotate(360deg); }
+    100% { transform: translate(-50%, -50%) rotate(-360deg); }
 }
 
-@keyframes respiracaoAuraEteria {
-    0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.5; }
-    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-}
-
-/* Partículas que sobem e desaparecem */
-@keyframes flutuarParticula1 {
-    0% { transform: translate(-100px, 50px) scale(1); opacity: 0; }
-    20% { opacity: 0.8; }
-    80% { opacity: 0.8; }
-    100% { transform: translate(100px, -150px) scale(0); opacity: 0; }
-}
-@keyframes flutuarParticula2 {
-    0% { transform: translate(100px, 80px) scale(1); opacity: 0; }
-    20% { opacity: 0.6; }
-    80% { opacity: 0.6; }
-    100% { transform: translate(-80px, -180px) scale(0); opacity: 0; }
+@keyframes pulsarEstrelaGpu {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.2); opacity: 1; }
 }
 
 
@@ -10457,7 +10440,7 @@ body::before {
     pointer-events: none !important;
 }
 
-/* 2. O CRISTAL DE ALTA PERFORMANCE (O Segredo da Fluidez) */
+/* 2. O CRISTAL DE ALTA PERFORMANCE (Velocidade Máxima 120Hz) */
 .cartao-vidro, 
 .cartao-palco,
 .menu-inferior, 
@@ -10469,32 +10452,27 @@ body::before {
 .mini-card-clima,
 .tema-selector .cartao-vidro,
 .login-input {
-    /* A BASE DO VIDRO: Aumentamos sutilmente a cor base (grafite translúcido) 
-       para compensar a redução do blur. Fica lindo, escuro e muito moderno. 
-    */
-    background: linear-gradient(145deg, rgba(30, 30, 35, 0.45), rgba(15, 15, 18, 0.65)) !important;
+    /* BASE: Mais pigmento grafite para compensar o desfoque menor. 
+       Ainda revela lindamente as cores do fundo, mas sem forçar a tela. */
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.65), rgba(15, 15, 18, 0.85)) !important;
     
-    /* OTIMIZAÇÃO EXTREMA: O Blur caiu de 35px para 12px. 
-       A saturação pesada foi removida. O celular agora respira aliviado!
-    */
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+    /* DESFOQUE REDUZIDO: 8px é o limite perfeito onde o cérebro humano 
+       ainda enxerga vidro jateado, mas o processador trabalha folgado. */
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     
-    /* Edge Lighting Premium Estático: Mantém o visual de vidro espesso */
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+    /* Bordas e reflexos originais mantidos (o charme da Apple) */
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
     
-    /* Sombra fixa e macia. Removemos a animação pulsante que matava o celular. */
-    box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
-    
-    /* AS CHAVES DA ACELERAÇÃO DE HARDWARE:
-       translateZ(0) isola o elemento na placa de vídeo.
-       will-change avisa o celular para separar memória RAM só para esse vidro.
-    */
-    transform: translateZ(0) !important;
-    -webkit-transform: translateZ(0) !important;
-    will-change: transform, opacity !important;
+    /* ACELERAÇÃO MÁXIMA: translate3d força a placa de vídeo (GPU) a assumir o controle. 
+       backface-visibility limpa artefatos visuais no Android. */
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
 }
 
 /* 3. O MOTOR DE SWIPE (TRANSIÇÕES LISAS)

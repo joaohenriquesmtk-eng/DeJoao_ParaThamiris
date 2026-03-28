@@ -76,40 +76,36 @@
         <div class="palco-trilho" id="palco-trilho">
             
 <div class="palco-slide">
-                <div class="cartao-vidro cartao-palco" style="position: relative; overflow: hidden; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.1);">
+                <div class="cartao-vidro cartao-palco" style="position: relative; overflow: hidden; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.2);">
                     
-                    <div style="text-align: center; position: relative; z-index: 10; margin-bottom: 50px;">
-                        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);">Pulso de Vida</h3>
-                        <p style="color: #b0b0b0; font-style: italic; font-size: 0.95rem; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">Um toque. Um batimento. Duas almas conectadas.</p>
+                    <div style="text-align: center; position: relative; z-index: 10; margin-bottom: 40px;">
+                        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);">Pulso de Vida</h3>
+                        <p style="color: #a0a0a0; font-style: italic; font-size: 0.95rem; margin-bottom: 0; text-shadow: 0 2px 5px rgba(0,0,0,0.8);">Um toque. Um batimento. Duas almas.</p>
                     </div>
                     
                     <div class="area-pulso" style="position: relative; z-index: 10; width: 100%; display: flex; flex-direction: column; align-items: center;">
                         
-                        <div class="recipiente-orbe-magico">
+                        <div class="recipiente-astrolabio">
                             
-                            <div class="particula-flutuante p1"></div>
-                            <div class="particula-flutuante p2"></div>
-                            <div class="particula-flutuante p3"></div>
-                            <div class="particula-flutuante p4"></div>
+                            <div class="aura-astrolabio"></div>
 
-                            <button id="btn-pulso" class="cristal-confinamento" onclick="if(window.Haptics) window.Haptics.toqueForte(); enviarPulso()">
+                            <button id="btn-pulso" class="orbe-astrolabio-btn" onclick="if(window.Haptics) window.Haptics.toqueForte(); enviarPulso()">
                                 
-                                <div class="plasma-vivo">
-                                    <div class="nucleo-luz"></div>
-                                    <div class="turbilhao-energia t1"></div>
-                                    <div class="turbilhao-energia t2"></div>
+                                <div class="onda-energia-gpu o1"></div>
+                                <div class="onda-energia-gpu o2"></div>
+                                
+                                <div class="anel-orbital-gpu a1"></div>
+                                <div class="anel-orbital-gpu a2"></div>
+
+                                <div class="nucleo-vidro-gpu">
+                                    <div class="brilho-estrela-gpu"></div>
                                 </div>
-                                
-                                <div class="reflexo-cristal"></div>
                             </button>
-                            
-                            <div class="aura-eteria"></div>
                         </div>
 
-                        <div style="min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 55px; position: relative; z-index: 5; width: 100%; padding: 0 10px;">
+                        <div style="min-height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 55px; position: relative; z-index: 5; width: 100%;">
                             <span id="msg-feedback" class="feedback-pulso" style="font-weight: bold; letter-spacing: 1px; text-shadow: 0 0 10px var(--cor-primaria);"></span>
-                            
-                            <p id="contador-pulso" style="font-size: 0.95rem; color: #fff; font-family: 'Playfair Display', serif; text-shadow: 0 2px 5px rgba(0,0,0,0.8); margin: 0; padding: 12px 20px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.1); backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); white-space: nowrap; text-align: center; max-width: 95%;">
+                            <p id="contador-pulso" style="font-size: 0.95rem; color: #fff; font-family: 'Playfair Display', serif; text-shadow: 0 2px 5px rgba(0,0,0,0.8); margin: 0; padding: 12px 20px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.5); white-space: nowrap;">
                                 Você pensou nele hoje?
                             </p>
                         </div>

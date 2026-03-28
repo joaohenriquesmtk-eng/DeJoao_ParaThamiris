@@ -4933,7 +4933,7 @@ body.aura-ansiosa {
 .preambulo-container {
     font-family: 'Cormorant Garamond', serif; 
     font-size: 1.05rem; 
-    color: #333; /* Cinza chumbo/escuro para leitura fácil */
+    color: #a1a1a1; /* Cinza chumbo/escuro para leitura fácil */
     font-style: italic; 
     line-height: 1.6; 
     text-align: justify; 
@@ -4961,14 +4961,14 @@ body.aura-ansiosa {
 }
 
 .caput { 
-    color: #141414; /* Preto quase absoluto para máximo contraste e seriedade */
+    color: #c0c0c0; /* Preto quase absoluto para máximo contraste e seriedade */
     font-size: 0.95rem; 
     line-height: 1.5; 
     font-weight: 500;
 }
 
 .paragrafo {
-    color: #e0d8c8; /* Cinza escuro para diferenciar o parágrafo do Caput */
+    color: #998a8a; /* Cinza escuro para diferenciar o parágrafo do Caput */
     font-size: 0.85rem; 
     line-height: 1.4;
     margin-top: 8px; 
@@ -10174,25 +10174,25 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 /* 2. O Cristal Puro Glassmorphism (A verdadeira estética iOS Dark Mode) */
 .cartao-vidro.cartao-palco {
     /* A Base do Vidro: Um grafite muito translúcido para dar corpo e contraste */
-    background: rgba(20, 20, 25, 0.4) !important; 
+    background: rgba(20, 20, 25, 0.4); 
     
     /* O Desfoque Perfeito: Muito blur (24px) e saturação controlada (140% em vez de 220%) */
-    backdrop-filter: blur(24px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
     
     /* Força a renderização 3D na placa de vídeo do iPhone */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     
     /* Edge Lighting Sutil: Demarca as bordas com uma luz branca finíssima, sem exageros */
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
     
     /* Sombra macia para criar o efeito de flutuação e profundidade */
-    box-shadow: 0 15px 35px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     
-    border-radius: 32px !important;
+    border-radius: 32px;
     
     /* --- ESTRUTURA FÍSICA E HARMONIA BLINDADAS (!important) --- */
     width: 100% !important;
@@ -10425,24 +10425,21 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 
 
 /* ============================================================================
-   🚀 A SUPREMACIA DO CRISTAL OTIMIZADO (SMART GLASS - ALTA PERFORMANCE) 🚀
-   Visual Premium mantido, mas reescrito para não travar a GPU do Samsung A55.
+   ✨ O CRISTAL FUMÊ OTIMIZADO (O PONTO DE EQUILÍBRIO: iOS vs PERFORMANCE) ✨
+   Mais opaco, com desfoque real, mas matematicamente leve para a GPU.
 ============================================================================ */
 
-/* 1. A LUZ UNIVERSAL (Fundo Otimizado) 
-   Removemos a animação contínua e complexa. Agora é um gradiente estático e 
-   elegante que consome 0% de processamento da placa de vídeo. */
-body::before {
-    content: '' !important;
-    position: fixed !important;
-    top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
-    background: radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.08), transparent 60%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05), transparent 60%) !important;
-    z-index: -10 !important;
-    pointer-events: none !important;
+/* 1. O AMBIENTE (Luzes estáticas de fundo mantidas) */
+body {
+    background-color: #0d0d12 !important; 
+    background-image: 
+        radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.05), transparent 40%) !important;
+    background-attachment: fixed !important; 
 }
+body::before { display: none !important; }
 
-/* 2. O CRISTAL DE ALTA PERFORMANCE (Velocidade Máxima 120Hz) */
+/* 2. O CRISTAL FUMÊ (Vidro real, opaco e absurdamente leve) */
 .cartao-vidro, 
 .cartao-palco,
 .menu-inferior, 
@@ -10454,35 +10451,61 @@ body::before {
 .mini-card-clima,
 .tema-selector .cartao-vidro,
 .login-input {
-    /* BASE: Mais pigmento grafite para compensar o desfoque menor. 
-       Ainda revela lindamente as cores do fundo, mas sem forçar a tela. */
-    background: linear-gradient(145deg, rgba(30, 30, 35, 0.65), rgba(15, 15, 18, 0.85)) !important;
     
-    /* DESFOQUE REDUZIDO: 8px é o limite perfeito onde o cérebro humano 
-       ainda enxerga vidro jateado, mas o processador trabalha folgado. */
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    /* MAIS OPACO: Uma base sólida de grafite/fumê. Varia de 75% a 90% de opacidade.
+       Isso traz um peso de "aplicativo caro" e poupa a placa de vídeo. */
+    background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%) !important;
     
-    /* Bordas e reflexos originais mantidos (o charme da Apple) */
+    /* O DESFOQUE INTELIGENTE: Apenas 10px e SEM saturação extra.
+       O olho humano lê perfeitamente como vidro fosco, mas o processador trabalha folgado. */
+    backdrop-filter: blur(1px) !important;
+    -webkit-backdrop-filter: blur(1px) !important;
+    
+    /* Edge Lighting (O corte chanfrado na quina do vidro) */
     border: 1px solid rgba(255, 255, 255, 0.04) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
     
-    /* ACELERAÇÃO MÁXIMA: translate3d força a placa de vídeo (GPU) a assumir o controle. 
-       backface-visibility limpa artefatos visuais no Android. */
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-    backface-visibility: hidden !important;
-    -webkit-backface-visibility: hidden !important;
+    /* Sombra macia para elevação e reflexo interno */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+    
+    /* Aceleração Direta de Hardware */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
 }
 
-/* 3. O MOTOR DE SWIPE (TRANSIÇÕES LISAS)
-   Quando a Thamiris deslizar o palco, não queremos que o celular trave.
-*/
-.palco-trilho {
-    /* Melhora a fluidez da rolagem tátil no Android */
-    overscroll-behavior-x: contain;
-    will-change: scroll-position;
+/* ============================================================================
+   👑 A TOP BAR DE SEDA DOURADA (INTACTA E LUXUOSA) 👑
+============================================================================ */
+.cabecalho-fixo-home {
+    background-color: #D4AF37 !important;
+    background-image: linear-gradient(110deg, #D4AF37 10%, #FFDF00 25%, #FFF5C2 40%, #FFDF00 55%, #D4AF37 70%, #FFF5C2 85%) !important;
+    background-size: 600% 100% !important;
+    background-position: 0 0 !important;
+    animation: animaSedaOuroBarra 10s linear infinite !important;
+
+    /* Sem desfoque para focar 100% da performance no resto do app */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255, 255, 255, 0.3) !important;
+    border-radius: 0 0 28px 28px !important;
+    overflow: hidden !important;
 }
 
+.saudacao-mini {
+    color: #fff !important; 
+    text-shadow: 0 2px 5px rgba(0,0,0,0.6) !important;
+    font-size: 1.1rem !important;
+}
+.titulo-santuario-mini {
+    color: var(--cor-primaria) !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.3) !important; 
+}
+.timer-mini {
+    background: rgba(10, 10, 12, 0.7) !important; 
+    color: var(--cor-primaria) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,1) !important;
+}

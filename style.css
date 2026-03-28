@@ -2,6 +2,8 @@
    CONFIGURAÇÕES GLOBAIS
 ========================================== */
 :root {
+    color-scheme: dark; /* 🛡️ A TRAVA: Impede o celular de inverter as cores */
+    
     --cor-fundo: #090909;
     --cor-primaria: #D4AF37;
     --cor-agronomia: #2ecc71;
@@ -4959,14 +4961,14 @@ body.aura-ansiosa {
 }
 
 .caput { 
-    color: #111; /* Preto quase absoluto para máximo contraste e seriedade */
+    color: #141414; /* Preto quase absoluto para máximo contraste e seriedade */
     font-size: 0.95rem; 
     line-height: 1.5; 
     font-weight: 500;
 }
 
 .paragrafo {
-    color: #444; /* Cinza escuro para diferenciar o parágrafo do Caput */
+    color: #e0d8c8; /* Cinza escuro para diferenciar o parágrafo do Caput */
     font-size: 0.85rem; 
     line-height: 1.4;
     margin-top: 8px; 
@@ -10483,3 +10485,4 @@ body::before {
     overscroll-behavior-x: contain;
     will-change: scroll-position;
 }
+

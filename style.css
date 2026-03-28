@@ -10833,3 +10833,42 @@ body.modo-jogo-ativo .rastro-luz {
 .bottom-sheet {
     will-change: transform, opacity;
 }
+
+/* ============================================================================
+   🚀 OTIMIZAÇÃO DO PALCO DIMENSIONAL (ANTI-LAG SCROLL HORIZONTAL)
+   Impede que a GPU renderize animações e sombras de cartões fora da tela.
+============================================================================ */
+
+/* 1. O Contêiner que faz a rolagem (A Fita Horizontal) */
+.area-scroll-palco, /* Se o seu container tiver outro nome, o comando abaixo protege os filhos diretos */
+body > .container-palco {
+    /* Força o uso do processador gráfico apenas para a ação de rolar */
+    -webkit-overflow-scrolling: touch !important;
+    transform: translateZ(0) !important;
+    will-change: scroll-position !important;
+}
+
+/* 2. O Slide Individual (A Mágica do Isolamento) */
+.palco-slide {
+    /* O CADEADO DE PERFORMANCE (A regra mais importante):
+       'contain' proíbe o celular de recalcular o layout ou pintar as sombras
+       deste slide se ele estiver fisicamente fora do visor do aparelho. */
+    contain: layout paint style !important;
+    
+    /* Previne vazamento de pixels durante o deslize (Flickering) */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    
+    /* Avisa a placa de vídeo que isso vai deslizar para os lados */
+    will-change: transform !important;
+}
+
+/* 3. Pausa das Animações Off-Screen (Avançado)
+   Uma redundância de segurança. Se o cartão estiver fora de foco (sem opacidade), 
+   o CSS corta o motor das animações internas dele. */
+.palco-slide[style*="opacity: 0"] *,
+.palco-slide.escondido * {
+    animation-play-state: paused !important;
+}

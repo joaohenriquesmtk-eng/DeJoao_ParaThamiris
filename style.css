@@ -9911,3 +9911,568 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     0% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 15px rgba(212,175,55,0.6)); }
     100% { transform: translateY(-8px) scale(1.1); filter: drop-shadow(0 0 25px rgba(255,51,102,0.9)); }
 }
+
+/* =========================================================
+   PROJETO OMEGA: O TOQUE FANTASMA (SINGULARIDADE)
+========================================================= */
+#container-fantasma {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: #020202; z-index: 9999999;
+    overflow: hidden; touch-action: none; /* Bloqueia zoom e scroll */
+}
+
+/* O Vidro Fosco que separa as duas dimensões */
+.vidro-quantico {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    background: rgba(10, 5, 10, 0.4); z-index: 10; pointer-events: none;
+}
+
+/* O Canvas onde desenhamos o calor dos dedos na velocidade da luz */
+#canvas-calor {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 5;
+}
+
+/* A Interface Minimalista */
+.ui-fantasma {
+    position: absolute; top: 40px; width: 100%; text-align: center;
+    z-index: 20; pointer-events: none;
+}
+
+.texto-singularidade {
+    font-family: 'Playfair Display', serif; font-size: 1.2rem;
+    color: rgba(255,255,255,0.4); letter-spacing: 4px;
+    text-transform: uppercase; transition: color 0.5s ease;
+}
+
+.texto-singularidade.conectado {
+    color: #D4AF37; text-shadow: 0 0 20px #D4AF37;
+}
+
+/* A Onda de Choque da Colisão */
+.onda-choque {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(212,175,55,0) 70%);
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none; z-index: 15;
+    animation: detonar-choque 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+@keyframes detonar-choque {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(15); opacity: 0; }
+}
+
+/* ==========================================
+   PALCO DIMENSIONAL (SWIPE HORIZONTAL HIGH-END)
+========================================== */
+
+/* Trava a aba Home para não rolar verticalmente e forçar o foco */
+#home.palco-ativo {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    padding-bottom: calc(65px + env(safe-area-inset-bottom)); /* Proteção do menu inferior */
+    overflow: hidden !important; 
+}
+
+/* CABEÇALHO FIXO LUXUOSO (Aglutina Contador e Saudação) */
+/* ============================================================================
+   1. CABEÇALHO FIXO PREMIUM (Santuário e Saudação Dourada Animada)
+============================================================================ */
+.cabecalho-fixo-home {
+    /* O Fundo Dourado, Mágico e Vítreo */
+    background: linear-gradient(135deg, 
+        rgba(212, 175, 55, 0.35) 0%,   /* Ouro suave no início */
+        rgba(18, 18, 20, 0.95) 40%,    /* Escuro profundo para destacar o texto */
+        rgba(212, 175, 55, 0.15) 100%   /* Toque final de ouro */
+    );
+    background-size: 400% 400%; /* Essencial para a animação mover o gradiente */
+    
+    /* A Mágica do Vidro (Glassmorphism) */
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    
+    /* Bordas e Sombras de Luxo */
+    border-bottom: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 1px 1px rgba(212,175,55,0.2);
+    
+    /* Estrutura e Proteção de Tela (iOS/Samsung) */
+    padding: max(15px, env(safe-area-inset-top)) 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 50;
+    flex-shrink: 0;
+    border-radius: 0 0 28px 28px;
+    position: relative;
+    overflow: hidden;
+    
+    /* Liga a animação dourada */
+    animation: moverGradienteDouradoHeader 10s ease infinite;
+}
+
+/* Brilho extra sutil passando por cima */
+.cabecalho-fixo-home::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 70%);
+    animation: pulsarBrilhoOraculo 5s infinite alternate;
+    pointer-events: none;
+}
+
+/* Mantém o contador exatamente como está (cor original preservada) */
+#timer-principal {
+    /* Sem alterações aqui, confiamos no CSS já existente ou inline */
+}
+
+/* Ajuste fino na saudação para combinar com o fundo dourado */
+.saudacao-mini {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.08rem;
+    color: #fff; /* Branco puro para contraste máximo no fundo mágico */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(212,175,55,0.5);
+    margin: 0;
+    text-align: center;
+}
+
+/* A NOVA ANIMAÇÃO DO GRADIENTE DOURADO */
+@keyframes moverGradienteDouradoHeader {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.linha-superior-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-santuario-mini {
+    color: var(--cor-primaria);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin: 0;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.timer-mini {
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: monospace;
+    color: var(--cor-primaria);
+    background: rgba(0,0,0,0.6);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(212,175,55,0.4);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
+}
+
+.linha-inferior-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.estrela-header {
+    font-size: 0.9rem;
+    animation: pulsarBrilhoOraculo 2s infinite alternate;
+}
+
+.saudacao-mini {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #e0e0e0;
+    margin: 0;
+    text-align: center;
+}
+
+/* O CONTAINER DO PALCO */
+#palco-dimensional {
+    flex: 1;
+    min-height: 0; 
+    position: relative;
+    width: 100%;
+    /* A CORREÇÃO DE LUZ: 'isolation' e 'z-index' trancam as luzes de fundo aqui dentro. 
+       Elas não vão mais vazar e se esconder atrás do fundo preto do aplicativo! */
+    z-index: 1; 
+    isolation: isolate; 
+    overflow: hidden;
+}
+
+/* O TRILHO DE ROLAGEM MAGNÉTICO */
+.palco-trilho {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory; /* A mágica que faz estacionar no centro */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Esconde a barra feia no Firefox */
+}
+.palco-trilho::-webkit-scrollbar {
+    display: none; /* Esconde a barra feia no Chrome/Safari/iOS */
+}
+
+/* CADA SLIDE INDIVIDUAL */
+/* ============================================================================
+   2. HARMONIZAÇÃO DO PALCO DIMENSIONAL (SINGULARIDADE VISUAL)
+============================================================================ */
+
+/* CADA SLIDE INDIVIDUAL (O Container Invisível) */
+.palco-slide {
+    scroll-snap-align: center; /* Ponto de parada magnético */
+    flex: 0 0 100%; /* Cada slide ocupa exatamente 100% da largura útil */
+    width: 100%;
+    
+    /* MÁGICA DA ALTURA ÚNICA: O slide tenta ocupar todo o espaço vertical disponível */
+    height: 100%; 
+    
+    display: flex;
+    align-items: center; /* Centraliza o vidro verticalmente se a tela for gigante */
+    justify-content: center; /* Centraliza horizontalmente */
+    
+    /* Respiro sutil para o vidro não tocar as bordas da tela */
+    padding: 15px; 
+    box-sizing: border-box;
+}
+
+/* ============================================================================
+   A SUPREMACIA DO GLASSMORPHISM (O Fim do Acrílico)
+============================================================================ */
+
+/* 1. O Fundo do Palco (A luz elegante, sem cores neon) */
+#palco-dimensional::before {
+    content: '';
+    position: absolute;
+    top: -20%; left: -20%; width: 140%; height: 140%;
+    /* Substituímos o arco-íris por uma névoa sofisticada: branco fantasma e um toque de ouro */
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.04), transparent 50%);
+    z-index: -1;
+    animation: flutuarAuraFundo 20s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes flutuarAuraFundo {
+    0% { transform: rotate(0deg) scale(1); }
+    100% { transform: rotate(10deg) scale(1.15); }
+}
+
+/* 2. O Cristal Puro Glassmorphism (A verdadeira estética iOS Dark Mode) */
+.cartao-vidro.cartao-palco {
+    /* A Base do Vidro: Um grafite muito translúcido para dar corpo e contraste */
+    background: rgba(20, 20, 25, 0.4) !important; 
+    
+    /* O Desfoque Perfeito: Muito blur (24px) e saturação controlada (140% em vez de 220%) */
+    backdrop-filter: blur(24px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+    
+    /* Força a renderização 3D na placa de vídeo do iPhone */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    
+    /* Edge Lighting Sutil: Demarca as bordas com uma luz branca finíssima, sem exageros */
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    /* Sombra macia para criar o efeito de flutuação e profundidade */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5) !important;
+    
+    border-radius: 32px !important;
+    
+    /* --- ESTRUTURA FÍSICA E HARMONIA BLINDADAS (!important) --- */
+    width: 100% !important;
+    height: 100% !important; 
+    max-height: 100% !important; 
+    margin: 0 !important; 
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    padding: 25px 20px; 
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden; 
+}
+
+/* TRATAMENTO ESPECIAL PARA O CARTÃO DE POST-ITS (Ele precisa rolar internamente) */
+/* Isso garante que ele mantenha a mesma altura visual dos outros, mas permite rolagem útil */
+#cartao-postits {
+    justify-content: flex-start; /* Alinha o título no topo */
+}
+
+/* Garante que a área onde os recados aparecem ocupe o espaço e role suavemente */
+#area-postits {
+    flex: 1; /* Ocupa todo o espaço vertical livre dentro do vidro harmonizado */
+    width: 100%;
+    overflow-y: auto; /* Rolagem vertical suave e invisível liberada AQUI */
+    margin-bottom: 10px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#area-postits::-webkit-scrollbar { display: none; }
+
+/* Garante que o input e botão de fixar fiquem sempre visíveis no rodapé do vidro */
+.cartao-palco > div[style*="display: flex; gap: 10px;"] {
+    width: 100%;
+    margin-top: auto; /* Empurra para o rodapé do vidro */
+}
+
+/* TRATAMENTO ESPECIAL PARA O CLIMA (Centralização e visualização) */
+/* Garante que o Orbe 3D tenha espaço na centralização */
+#orbe-clima-3d {
+    flex-shrink: 0;
+    margin-bottom: -10px;
+}
+
+/* TRATAMENTO ESPECIAL PARA TEMAS E CONFIGS (Centralização) */
+/* Faz com que o conteúdo do slide de configurações não fique espremido no topo */
+.palco-slide > div[style*="display: flex; flex-direction: column; gap: 20px;"] {
+    height: 100%;
+    justify-content: center; /* Centraliza os dois sub-cartões verticalmente */
+}
+.cartao-palco::-webkit-scrollbar {
+    display: none;
+}
+
+/* AS BOLINHAS DE PAGINAÇÃO (ESTILO APPLE) */
+.palco-paginacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 0 15px 0;
+    flex-shrink: 0;
+}
+
+.palco-dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+}
+
+.palco-dot.ativo {
+    width: 22px; /* A bolinha ativa estica como uma pílula de neon */
+    background: var(--cor-primaria);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+
+/* ============================================================================
+   A OBRA DE ARTE VIVA: ORBE DO PULSO DE VIDA (SLIDE 1)
+============================================================================ */
+
+/* 1. Aura de Fundo (Respiração do Card) */
+.aura-respiracao {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 350px; height: 350px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.05) 40%, rgba(0,0,0,0) 70%);
+    animation: respiracaoAura 4s ease-in-out infinite alternate;
+    z-index: 1;
+    pointer-events: none; /* Para não atrapalhar o toque */
+}
+
+@keyframes respiracaoAura {
+    0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+}
+
+/* 2. O Botão Transparente que Agrupa Tudo */
+.btn-orbe-mestre {
+    position: relative;
+    width: 170px; height: 170px; /* Bem maior para preencher a tela */
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* O "peso" físico de apertar o botão */
+.btn-orbe-mestre:active {
+    transform: scale(0.9);
+}
+
+/* 3. Ondas de Energia Constantes (Como sonares no radar) */
+.onda-energia {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(212,175,55,0.5);
+    box-shadow: 0 0 15px rgba(212,175,55,0.2);
+    animation: pulsarOnda 3s cubic-bezier(0.21, 0.53, 0.56, 1) infinite;
+    pointer-events: none;
+}
+.onda-2 {
+    animation-delay: 1.5s; /* Começa depois, criando a sequência de pulso */
+}
+
+@keyframes pulsarOnda {
+    0% { width: 100%; height: 100%; opacity: 1; border-width: 2px; }
+    100% { width: 220%; height: 220%; opacity: 0; border-width: 0px; }
+}
+
+/* 4. Anéis Orbitais Astrolábicos (Rotação infinita) */
+.anel-orbital {
+    position: absolute;
+    top: 50%; left: 50%;
+    border-radius: 50%;
+    border: 1px dashed rgba(212,175,55,0.3);
+    pointer-events: none;
+}
+.anel-orb-1 {
+    width: 115%; height: 115%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: girarAnel 20s linear infinite;
+    border-top: 2px solid rgba(212,175,55,0.7);
+}
+.anel-orb-2 {
+    width: 135%; height: 135%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: girarAnelContra 25s linear infinite;
+    border-bottom: 2px solid rgba(212,175,55,0.5);
+}
+
+@keyframes girarAnel {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes girarAnelContra {
+    0% { transform: translate(-50%, -50%) rotate(360deg); }
+    100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+/* 5. O Núcleo Físico (A "Esfera de Vidro" onde se toca) */
+.nucleo-mestre {
+    position: relative;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    /* Efeito de Vidro Convexo */
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(212,175,55,0.05));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(212,175,55,0.4);
+    box-shadow: 
+        0 15px 35px rgba(0,0,0,0.6), 
+        inset 0 0 25px rgba(212,175,55,0.3),
+        0 0 40px rgba(212,175,55,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* A Estrela brilhando no centro do núcleo */
+.brilho-interno-nucleo {
+    width: 45%; height: 45%;
+    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(0,0,0,0) 80%);
+    border-radius: 50%;
+    animation: pulsarBrilhoEstrela 2s ease-in-out infinite alternate;
+    filter: blur(3px);
+}
+
+@keyframes pulsarBrilhoEstrela {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+}
+
+
+
+/* ============================================================================
+   💎 A SUPREMACIA DO CRISTAL VIVO (GOD TIER GLASSMORPHISM GLOBAL) 💎
+   Este bloco aniquila qualquer acrílico antigo do sistema e padroniza a 
+   transparência extrema e a animação de aura em todo o PWA.
+============================================================================ */
+
+/* 1. A LUZ UNIVERSAL (Aura Global Dinâmica) 
+   Como o seu app é escuro, o vidro precisa de luz para brilhar. 
+   Criamos uma névoa invisível que roda no fundo de TODO o aplicativo. */
+body::before {
+    content: '' !important;
+    position: fixed !important;
+    top: -50% !important; left: -50% !important; width: 200% !important; height: 200% !important;
+    /* Manchas de luz fantasma (Pérola e Ouro) que rodam silenciosamente no fundo */
+    background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05), transparent 50%),
+                radial-gradient(circle at 60% 60%, rgba(212, 175, 55, 0.04), transparent 50%) !important;
+    z-index: -10 !important; /* Fica no fundo do abismo */
+    animation: flutuarAuraGlobal 20s ease-in-out infinite alternate !important;
+    pointer-events: none !important;
+}
+
+@keyframes flutuarAuraGlobal {
+    0% { transform: rotate(0deg) scale(1); }
+    100% { transform: rotate(15deg) scale(1.15); }
+}
+
+/* 2. O CRISTAL UNIVERSAL (Aplica-se a todos os painéis, menus e janelas) */
+.cartao-vidro, 
+.cartao-palco,
+.menu-inferior, 
+.top-bar, 
+.painel-area, 
+.conteudo-modal, 
+.bottom-sheet, 
+.cartao-instrucoes,
+.mini-card-clima,
+.tema-selector .cartao-vidro,
+.login-input {
+    /* Transparência Extrema: Apenas 2% de branco e 15% de fumê para dar peso de vidro caro */
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(10, 10, 15, 0.15)) !important;
+    
+    /* Desfoque Apple VisionOS: Máximo blur e alta saturação para a aura do fundo explodir */
+    backdrop-filter: blur(35px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+    
+    /* Força aceleração da placa de vídeo do celular, evitando "piscas" na rolagem */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    
+    /* Edge Lighting (A Luz de Borda). Tira as bordas velhas e cria o chanfro iluminado no topo e na esquerda */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+    
+    /* Chama a animação da aura viva ao redor do vidro */
+    animation: auraSantuario 6s infinite alternate ease-in-out !important;
+}
+
+/* 3. A RESPIRAÇÃO DA AURA (O Efeito que deixa a Apple no chinelo) */
+@keyframes auraSantuario {
+    0% { 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5), 
+                    0 0 0px rgba(212, 175, 55, 0), /* Brilho dourado apagado */
+                    inset 0 1px 1px rgba(255, 255, 255, 0.1); /* Refração interna sutil */
+    }
+    100% { 
+        box-shadow: 0 20px 45px rgba(0,0,0,0.6), 
+                    0 0 20px rgba(212, 175, 55, 0.25), /* Brilho dourado vaza magicamente pela sombra */
+                    inset 0 1px 1px rgba(255, 255, 255, 0.25); /* Refração interna acende */
+    }
+}

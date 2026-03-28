@@ -56,242 +56,267 @@
     <div id="app-shell">
         <main id="conteudo-principal">
             
-            <section id="home" class="tela ativo">
-                <div class="cartao-vidro" style="text-align: center;">
-                    <h2 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 2rem;">Santuário</h2>
-                    <p style="opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">Conexão Vital Estabelecida há:</p>
-                    <div id="timer-principal" class="toque-secreto" style="font-size: 2rem; margin: 15px 0 5px; font-weight: bold; font-family: monospace; cursor: pointer; user-select: none;">
-                        00d 00h 00m 00s
-                    </div>
-                    
-                    <button id="btn-capsula" class="btn-acao escondido" style="margin-top: 15px; width: 100%; background: linear-gradient(45deg, #D4AF37, #ffb7c5); color: #000; font-weight: bold; border: none; font-size: 1.1rem; box-shadow: 0 0 20px rgba(212,175,55,0.4);" onclick="abrirCapsulaDoTempo()">✨ Abrir Livro de Ouro ✨</button>
-                </div>
-
-<div class="cartao-vidro cartao-saudacao" style="text-align: center; margin-top: 5px;">
-    <span class="estrela-canto">✨</span>
-    <p id="saudacao-personalizada" style="font-size: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; color: #ffffff;"></p>
-</div>
-
-<div class="cartao-vidro" style="margin-top: 20px; padding: 25px 10px; display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden;">
-    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 5px;">A Nossa Conexão</h3>
-    <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 25px; text-align: center; font-style: italic;">O amor não conhece distâncias, apenas laços infinitos.</p>
+            <section id="home" class="tela ativo palco-ativo">
     
-    <div id="infinito-dourado-container" style="width: 100%; height: 160px; position: relative; display: flex; justify-content: center; align-items: center;">
-        
-        <svg viewBox="0 0 240 100" style="width: 100%; height: 100%; overflow: visible;" preserveAspectRatio="xMidYMid meet">
-            <defs>
-                <linearGradient id="grad-infinito" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#3498db" /> <stop offset="50%" stop-color="#D4AF37" /> <stop offset="100%" stop-color="#ff6b6b" /> </linearGradient>
-                <filter id="brilho-infinito">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
-                    <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                </filter>
-            </defs>
-
-            <path id="trilha-base" d="M 120, 50 C 80, 100 20, 100 20, 50 C 20, 0 80, 0 120, 50 C 160, 100 220, 100 220, 50 C 220, 0 160, 0 120, 50 Z" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="2" stroke-dasharray="4 6" />
-            
-            <path class="cometa-infinito" d="M 120, 50 C 80, 100 20, 100 20, 50 C 20, 0 80, 0 120, 50 C 160, 100 220, 100 220, 50 C 220, 0 160, 0 120, 50 Z" fill="none" stroke="url(#grad-infinito)" stroke-width="3" filter="url(#brilho-infinito)" />
-            
-            <g transform="translate(20, 50)">
-                <circle class="pulso-estrela-azul" cx="0" cy="0" r="4" fill="none" stroke="#3498db" stroke-width="2" />
-                <circle cx="0" cy="0" r="5" fill="#fff" filter="url(#brilho-infinito)" />
-                <circle cx="0" cy="0" r="2" fill="#3498db" />
-                <text x="0" y="30" fill="#fff" font-size="9" font-family="'Playfair Display', serif" font-style="italic" text-anchor="middle" filter="url(#brilho-infinito)">Colombo</text>
-            </g>
-
-            <g transform="translate(220, 50)">
-                <circle class="pulso-estrela-rosa" cx="0" cy="0" r="4" fill="none" stroke="#ff6b6b" stroke-width="2" />
-                <circle cx="0" cy="0" r="5" fill="#fff" filter="url(#brilho-infinito)" />
-                <circle cx="0" cy="0" r="2" fill="#ff6b6b" />
-                <text x="0" y="30" fill="#fff" font-size="9" font-family="'Playfair Display', serif" font-style="italic" text-anchor="middle" filter="url(#brilho-infinito)">Goiânia</text>
-            </g>
-        </svg>
-    </div>
-</div>
-
-                <div class="cartao-vidro" style="text-align: center; margin-top: 20px; display: flex; flex-direction: column; align-items: center; padding: 25px 20px;">
-                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 20px;">Pulso de Vida</h3>
-                    
-                    <div class="area-pulso" style="position: relative; margin: 0; width: 100%; display: flex; flex-direction: column; align-items: center;">
-                        <button id="btn-pulso" onclick="if(window.Haptics) window.Haptics.toqueForte(); enviarPulso()">
-    <div class="orbe-nucleo"></div>
-    <div class="orbe-anel anel-interno"></div>
-    <div class="orbe-anel anel-externo"></div>
-</button>
-                        <p id="contador-pulso" style="margin-top: 15px;">Você pensou nele hoje?</p>
-                        <span id="msg-feedback" class="feedback-pulso">Pulso enviado!</span>
-                    </div>
-                </div>
-
-                <div class="cartao-vidro" id="cartao-sincronia-sono" style="text-align: center; margin-top: 20px; padding: 25px 20px; border-color: rgba(255,255,255,0.1); background: linear-gradient(145deg, rgba(10,15,30,0.85), rgba(0,0,0,0.95)); position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-    <div id="brilho-sono-bg" class="brilho-tema-dinamico"></div>
-    
-    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 10px; position: relative; z-index: 2; text-shadow: 0 0 10px var(--cor-primaria);">Sincronia de Repouso</h3>
-    
-    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; position: relative; z-index: 2; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
-        <div id="status-meu-sono" style="width: 12px; height: 12px; border-radius: 50%; background: #444; box-shadow: inset 0 0 5px #000; transition: all 1s ease;"></div>
-        <p id="texto-status-sono-parceiro" style="font-size: 0.85rem; color: #bbb; font-style: italic; margin: 0; font-family: monospace; letter-spacing: 0.5px;">Aguardando a noite cair...</p>
-        <div id="status-sono-dela" style="width: 12px; height: 12px; border-radius: 50%; background: #444; box-shadow: inset 0 0 5px #000; transition: all 1s ease;"></div>
-    </div>
-
-    <button id="btn-toggle-sono" class="btn-acao" onclick="window.alternarModoSono()" style="position: relative; z-index: 2; background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); width: 100%; font-weight: bold; letter-spacing: 1px; transition: all 0.5s ease; padding: 15px; font-size: 1.05rem;">
-        Deitar ao Lado Dela
-    </button>
-</div>
-
-
-<div class="cartao-vidro" id="cartao-postits" style="margin-top: 20px; padding: 20px;">
-    <h4 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-align: center;">Mural de Recados</h4>
-    
-    <div id="area-postits" class="area-postits" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    
-    <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
-        <input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none;">
-        <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 10px 15px;">📌 Fixar</button>
-    </div>
-
-    <div class="arquivo-postits-container" style="border-top: 1px dashed rgba(212,175,55,0.3); padding-top: 15px;">
-        <div onclick="window.toggleArquivoPostits()" style="display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; color: #aaa; font-size: 0.9rem; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.3s;">
-            <span>🗂️ Histórico Antigo</span>
-            <span id="icone-arquivo-postits" style="transition: transform 0.3s; font-size: 0.8rem;">▼</span>
+    <div class="cabecalho-fixo-home">
+        <div class="linha-superior-header">
+            <h2 class="titulo-santuario-mini">Santuário</h2>
+            <div id="timer-principal" class="timer-mini toque-secreto" onclick="if(typeof abrirCapsulaDoTempo === 'function') abrirCapsulaDoTempo()">
+                00d 00h 00m 00s
+            </div>
         </div>
-        
-        <div id="conteudo-arquivo-postits" class="escondido" style="margin-top: 15px; display: flex; flex-direction: column; max-height: 350px; overflow-y: auto; padding-right: 5px;">
-            </div>
-    </div>
-</div>           
-
-                <div class="cartao-vidro" id="frase-do-dia">
-                    <p style="font-style: italic;">"Carregando sua dose diária de admiração..."</p>
-                </div>
-
-
-
-<div class="cartao-vidro" id="cartao-termometro" style="text-align: center; margin-top: 5px;">
-    
-    <h4 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem">
-        Como está seu coração agora?
-    </h4>
-    
-    <div id="coracao-3d" style="width: 100%; height: 130px; margin-top: -30px; margin-bottom: 25px; position: relative; z-index: 1; pointer-events: none;"></div>
-    
-    <div class="botoes-mood">
-        <button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
-        <button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
-        <button class="btn-mood" onclick="enviarMood('triste')">🌧️ Triste</button>
-        <button class="btn-mood" onclick="enviarMood('cansada')">🔋 Cansada</button>
-        <button class="btn-mood" onclick="enviarMood('saudade')">🥺 Com saudade</button>
-        <button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
+        <div class="linha-inferior-header">
+            <span class="estrela-header">✨</span>
+            <p id="saudacao-personalizada" class="saudacao-mini"></p>
+        </div>
+        <button id="btn-capsula" class="btn-acao escondido" style="margin-top: 10px; padding: 8px; font-size: 0.9rem;" onclick="abrirCapsulaDoTempo()">✨ Abrir Livro de Ouro ✨</button>
     </div>
 
-    <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:10px; padding:8px; border-radius:10px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3);"></textarea>
-        
-        <button class="btn-acao" onclick="iniciarResgateEmocional()" style="grid-column: span 2; background: linear-gradient(145deg, #c0392b, #8e44ad); box-shadow: 0 0 20px rgba(192, 57, 43, 0.6); border: 1px solid #ff6b6b; font-weight: 900; letter-spacing: 1px; color: white; margin-top: 5px; height: 50px;">
-            🚨 Preciso de Você Agora (S.O.S)
-        </button>
-        
-    <div id="status-parceiro" style="margin-top: 10px; font-size: 0.95rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">
-        Aguardando a sintonia do outro lado...
-    </div>
-</div>
+    <div id="palco-dimensional">
+        <div class="palco-trilho" id="palco-trilho">
+            
+<div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" style="position: relative; overflow: hidden; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.2);">
+                    
+                    <div class="aura-respiracao"></div>
 
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; position: relative; z-index: 5; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);">Pulso de Vida</h3>
+                    <p style="color: #a0a0a0; font-style: italic; font-size: 0.95rem; margin-bottom: 40px; position: relative; z-index: 5; text-shadow: 0 2px 5px rgba(0,0,0,0.8);">Um toque. Um batimento. Duas almas.</p>
+                    
+                    <div class="area-pulso" style="position: relative; z-index: 10; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                        
+                        <button id="btn-pulso" class="btn-orbe-mestre" onclick="if(window.Haptics) window.Haptics.toqueForte(); enviarPulso()">
+                            
+                            <div class="onda-energia onda-1"></div>
+                            <div class="onda-energia onda-2"></div>
+                            
+                            <div class="anel-orbital anel-orb-1"></div>
+                            <div class="anel-orbital anel-orb-2"></div>
 
+                            <div class="nucleo-mestre">
+                                <div class="brilho-interno-nucleo"></div>
+                            </div>
+                        </button>
 
-<div class="cartao-vidro" id="cartao-espelho-alma" style="margin-top: 20px; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2);">
-                <div id="espelho-overlay" class="espelho-overlay"></div> <h3 class="titulo-cartao" style="text-align: center; color: var(--cor-primaria); margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 1.2rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);">🪞 O Espelho da Alma</h3>
-                <p id="pergunta-espelho" style="font-size: 1.05rem; font-style: italic; text-align: center; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.9); line-height: 1.5;"></p>
-
-                <div id="estado-espelho-responder" class="escondido">
-                    <textarea id="input-espelho" placeholder="Escreva a sua verdade aqui... (A sua resposta será selada)" style="width: 100%; height: 90px; background: rgba(0,0,0,0.6); border: 1px solid var(--cor-primaria); border-radius: 8px; color: white; padding: 12px; resize: none; margin-bottom: 12px; box-sizing: border-box; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);"></textarea>
-                    <button class="btn-acao" onclick="enviarRespostaEspelho()" style="width: 100%; background: var(--cor-primaria); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--cor-primaria);">Selar Resposta no Vidro</button>
-                </div>
-
-                <div id="estado-espelho-aguardando" class="escondido" style="text-align: center; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px dashed var(--cor-primaria); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
-                    <p style="color: #ddd; font-size: 0.95rem; line-height: 1.5;" id="texto-aguardando-espelho"></p>
-                </div>
-
-                <div id="estado-espelho-revelado" class="escondido" style="margin-top: 15px;">
-                    <div style="display: flex; flex-direction: column; gap: 15px;">
-                        <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--cor-primaria); padding: 15px; border-radius: 0 8px 8px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-                            <span style="font-size: 0.75rem; color: var(--cor-primaria); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">A Sua Alma</span>
-                            <p id="resposta-minha" style="color: #fff; font-size: 0.95rem; margin-top: 8px; white-space: pre-wrap; font-style: italic;"></p>
+                        <div style="min-height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 45px; position: relative; z-index: 5;">
+                            <span id="msg-feedback" class="feedback-pulso" style="font-weight: bold; letter-spacing: 1px; text-shadow: 0 0 10px var(--cor-primaria);"></span>
+                            <p id="contador-pulso" style="font-size: 1.1rem; color: #fff; font-family: 'Playfair Display', serif; text-shadow: 0 2px 5px rgba(0,0,0,0.8); margin: 0; padding: 12px 25px; background: rgba(0,0,0,0.5); border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.15); backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5);">Você pensou nele hoje?</p>
                         </div>
-                        <div style="background: rgba(255, 51, 102, 0.05); border-left: 4px solid #ff3366; padding: 15px; border-radius: 0 8px 8px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-                            <span id="nome-parceiro-espelho" style="font-size: 0.75rem; color: #ff9ff3; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">A Alma Dela</span>
-                            <p id="resposta-dela" style="color: #fff; font-size: 0.95rem; margin-top: 8px; white-space: pre-wrap; font-style: italic;"></p>
+
+                    </div>
+                </div>
+            </div>
+
+                        <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" id="cartao-postits" style="display: flex; flex-direction: column;">
+                    <h4 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 1.3rem; text-align: center;">Mural de Recados</h4>
+                    <div id="area-postits" class="area-postits" style="display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; padding-right: 5px;"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
+                        <input type="text" id="input-postit" placeholder="Escreva um recado rápido..." style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none; font-size: 1rem;">
+                        <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin-top: 0; padding: 12px 20px;">📌 Fixar</button>
+                    </div>
+                    <div class="arquivo-postits-container" style="border-top: 1px dashed rgba(212,175,55,0.3); padding-top: 15px;">
+                        <div onclick="window.toggleArquivoPostits()" style="display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; color: #aaa; font-size: 0.95rem; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; transition: background 0.3s;">
+                            <span>🗂️ Histórico Antigo</span>
+                            <span id="icone-arquivo-postits" style="transition: transform 0.3s; font-size: 0.8rem;">▼</span>
+                        </div>
+                        <div id="conteudo-arquivo-postits" class="escondido" style="margin-top: 15px; display: flex; flex-direction: column; max-height: 200px; overflow-y: auto; padding-right: 5px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" id="cartao-termometro" style="justify-content: center;">
+                    <h4 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; text-align: center; margin-bottom: 25px;">Como está seu coração agora?</h4>
+                    <div id="coracao-3d" style="width: 100%; height: 130px; margin-top: -30px; margin-bottom: 25px; position: relative; z-index: 1; pointer-events: none;"></div>
+                    <div class="botoes-mood">
+                        <button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
+                        <button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
+                        <button class="btn-mood" onclick="enviarMood('triste')">🌧️ Triste</button>
+                        <button class="btn-mood" onclick="enviarMood('cansada')">🔋 Cansada</button>
+                        <button class="btn-mood" onclick="enviarMood('saudade')">🥺 Saudade</button>
+                        <button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
+                    </div>
+                    <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:15px; padding:12px; border-radius:12px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3); font-size: 1rem;"></textarea>
+                    <button class="btn-acao" onclick="iniciarResgateEmocional()" style="width: 100%; background: linear-gradient(145deg, #c0392b, #8e44ad); box-shadow: 0 0 20px rgba(192, 57, 43, 0.6); border: 1px solid #ff6b6b; font-weight: 900; letter-spacing: 1px; color: white; margin-top: 15px; height: 50px; font-size: 1.05rem;">
+                        🚨 Preciso de Você (S.O.S)
+                    </button>
+                    <div id="status-parceiro" style="margin-top: 15px; font-size: 1rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">Aguardando a sintonia do outro lado...</div>
+                </div>
+            </div>
+
+            <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" id="cartao-singularidade" style="justify-content: center;">
+                    <h4 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 1.4rem; text-align: center;">Ponto de Singularidade</h4>
+                    <p style="text-align: center; color: #a0a0a0; font-size: 0.95rem; margin-bottom: 30px; line-height: 1.6;">O Toque Quântico. Encoste no vidro e sinta a presença do outro lado da tela em tempo real.</p>
+                    <div onclick="if(window.Haptics) window.Haptics.toqueForte(); window.iniciarToqueFantasma()" style="display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer; color: var(--cor-primaria); font-size: 1.1rem; font-weight: bold; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--cor-primaria); border-radius: 12px; transition: background 0.3s;">
+                        <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24">
+                            <path d="M12,2A10,10,0,1,0,22,12,10.01114,10.01114,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8.00917,8.00917,0,0,1,12,20Zm-2-7a2,2,0,1,1,2-2A2,2,0,0,1,10,13Zm4-2a2,2,0,1,1-2,2A2,2,0,0,1,14,11Zm0,4a2,2,0,1,1-2,2A2,2,0,0,1,14,15Zm-4,2a2,2,0,1,1,2-2A2,2,0,0,1,10,17Z"/>
+                        </svg>
+                        <span>Estabelecer Conexão</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" id="cartao-sincronia-sono" style="border-color: rgba(255,255,255,0.1); background: linear-gradient(145deg, rgba(10,15,30,0.85), rgba(0,0,0,0.95)); justify-content: center; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                    <div id="brilho-sono-bg" class="brilho-tema-dinamico"></div>
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 20px; position: relative; z-index: 2; text-shadow: 0 0 10px var(--cor-primaria); text-align: center;">Sincronia de Repouso</h3>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 30px; position: relative; z-index: 2; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div id="status-meu-sono" style="width: 14px; height: 14px; border-radius: 50%; background: #444; box-shadow: inset 0 0 5px #000; transition: all 1s ease;"></div>
+                        <p id="texto-status-sono-parceiro" style="font-size: 0.95rem; color: #bbb; font-style: italic; margin: 0; font-family: monospace; letter-spacing: 0.5px;">Aguardando a noite cair...</p>
+                        <div id="status-sono-dela" style="width: 14px; height: 14px; border-radius: 50%; background: #444; box-shadow: inset 0 0 5px #000; transition: all 1s ease;"></div>
+                    </div>
+                    <button id="btn-toggle-sono" class="btn-acao" onclick="window.alternarModoSono()" style="position: relative; z-index: 2; background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); width: 100%; font-weight: bold; letter-spacing: 1px; transition: all 0.5s ease; padding: 18px; font-size: 1.1rem;">
+                        Deitar ao Lado Dela
+                    </button>
+                </div>
+            </div>
+
+            <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" id="cartao-espelho-alma" style="position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); justify-content: center;">
+                    <div id="espelho-overlay" class="espelho-overlay"></div> 
+                    <h3 class="titulo-cartao" style="text-align: center; color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 1.4rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);">🪞 O Espelho da Alma</h3>
+                    <p id="pergunta-espelho" style="font-size: 1.05rem; font-style: italic; text-align: center; margin-bottom: 25px; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.9); line-height: 1.5;"></p>
+                    
+                    <div id="estado-espelho-responder" class="escondido" style="width: 100%;">
+                        <textarea id="input-espelho" placeholder="Escreva a sua verdade aqui... (Será selada)" style="width: 100%; height: 95px; background: rgba(0,0,0,0.6); border: 1px solid var(--cor-primaria); border-radius: 12px; color: white; padding: 15px; resize: none; margin-bottom: 15px; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); font-size: 1rem;"></textarea>
+                        <button class="btn-acao" onclick="enviarRespostaEspelho()" style="width: 100%; background: var(--cor-primaria); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--cor-primaria); padding: 15px; font-size: 1.05rem;">Selar Resposta</button>
+                    </div>
+
+                    <div id="estado-espelho-aguardando" class="escondido" style="text-align: center; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px dashed var(--cor-primaria); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
+                        <p style="color: #ddd; font-size: 1rem; line-height: 1.5;" id="texto-aguardando-espelho"></p>
+                    </div>
+
+                    <div id="estado-espelho-revelado" class="escondido" style="margin-top: 15px; width: 100%;">
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--cor-primaria); padding: 15px; border-radius: 0 12px 12px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                                <span style="font-size: 0.8rem; color: var(--cor-primaria); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">A Sua Alma</span>
+                                <p id="resposta-minha" style="color: #fff; font-size: 1rem; margin-top: 10px; white-space: pre-wrap; font-style: italic;"></p>
+                            </div>
+                            <div style="background: rgba(255, 51, 102, 0.05); border-left: 4px solid #ff3366; padding: 15px; border-radius: 0 12px 12px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                                <span id="nome-parceiro-espelho" style="font-size: 0.8rem; color: #ff9ff3; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">A Alma Dela</span>
+                                <p id="resposta-dela" style="color: #fff; font-size: 1rem; margin-top: 10px; white-space: pre-wrap; font-style: italic;"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-                <div class="cartao-vidro cartao-clima" id="cartao-clima-unificado" style="text-align: center; margin-top: 15px; position: relative; padding-bottom: 20px;">
-                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Sintonia Atmosférica</h3>
-                    <p style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Dois mundos, uma janela</p>
+
+            <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco" style="justify-content: center; position: relative; overflow: hidden;">
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px; text-align: center;">A Nossa Conexão</h3>
+                    <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 25px; text-align: center; font-style: italic;">O amor não conhece distâncias, apenas laços infinitos.</p>
+                    <div id="infinito-dourado-container" style="width: 100%; height: 180px; position: relative; display: flex; justify-content: center; align-items: center;">
+                        <svg viewBox="0 0 240 100" style="width: 100%; height: 100%; overflow: visible;" preserveAspectRatio="xMidYMid meet">
+                            <defs>
+                                <linearGradient id="grad-infinito" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#3498db" /> <stop offset="50%" stop-color="#D4AF37" /> <stop offset="100%" stop-color="#ff6b6b" /> </linearGradient>
+                                <filter id="brilho-infinito">
+                                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <path id="trilha-base" d="M 120, 50 C 80, 100 20, 100 20, 50 C 20, 0 80, 0 120, 50 C 160, 100 220, 100 220, 50 C 220, 0 160, 0 120, 50 Z" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="2" stroke-dasharray="4 6" />
+                            <path class="cometa-infinito" d="M 120, 50 C 80, 100 20, 100 20, 50 C 20, 0 80, 0 120, 50 C 160, 100 220, 100 220, 50 C 220, 0 160, 0 120, 50 Z" fill="none" stroke="url(#grad-infinito)" stroke-width="3" filter="url(#brilho-infinito)" />
+                            <g transform="translate(20, 50)">
+                                <circle class="pulso-estrela-azul" cx="0" cy="0" r="4" fill="none" stroke="#3498db" stroke-width="2" />
+                                <circle cx="0" cy="0" r="5" fill="#fff" filter="url(#brilho-infinito)" />
+                                <circle cx="0" cy="0" r="2" fill="#3498db" />
+                                <text x="0" y="30" fill="#fff" font-size="9" font-family="'Playfair Display', serif" font-style="italic" text-anchor="middle" filter="url(#brilho-infinito)">Colombo</text>
+                            </g>
+                            <g transform="translate(220, 50)">
+                                <circle class="pulso-estrela-rosa" cx="0" cy="0" r="4" fill="none" stroke="#ff6b6b" stroke-width="2" />
+                                <circle cx="0" cy="0" r="5" fill="#fff" filter="url(#brilho-infinito)" />
+                                <circle cx="0" cy="0" r="2" fill="#ff6b6b" />
+                                <text x="0" y="30" fill="#fff" font-size="9" font-family="'Playfair Display', serif" font-style="italic" text-anchor="middle" filter="url(#brilho-infinito)">Goiânia</text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palco-slide">
+                <div class="cartao-vidro cartao-palco cartao-clima" id="cartao-clima-unificado" style="justify-content: center; position: relative;">
+                    <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); text-align: center;">Sintonia Atmosférica</h3>
+                    <p style="font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; text-align: center;">Dois mundos, uma janela</p>
                     
                     <div id="orbe-clima-3d" style="width: 100%; height: 230px; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;"></div>
                     
-                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--cor-primaria); border-radius: 15px; padding: 15px 10px 10px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
-                        
-                        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
-                            <button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--cor-primaria); border-radius: 15px; padding: 20px 15px 15px; margin-top: -20px; position: relative; z-index: 3; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
+                        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                            <button id="btn-view-thamiris" class="btn-clima-toggle ativo" onclick="alternarVisaoClima('thamiris')" style="border-color: var(--cor-primaria); color: var(--cor-primaria); padding: 8px 15px; font-size: 1rem; border-radius: 20px;">
                                 Goiânia <span id="mini-temp-thamiris" style="color: #f1c40f;">--°C</span>
                             </button>
-                            <button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">
+                            <button id="btn-view-joao" class="btn-clima-toggle" onclick="alternarVisaoClima('joao')" style="border-color: var(--cor-primaria); color: var(--cor-primaria); padding: 8px 15px; font-size: 1rem; border-radius: 20px;">
                                 Colombo <span id="mini-temp-joao" style="color: #f1c40f;">--°C</span>
                             </button>
                         </div>
-
-                        <p id="texto-mensagem-clima" style="font-weight: bold; font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #fff; line-height: 1.4; min-height: 45px; display: flex; align-items: center; justify-content: center;">🌤️ Sincronizando satélites...</p>
+                        <p id="texto-mensagem-clima" style="font-weight: bold; font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #fff; line-height: 1.4; min-height: 50px; display: flex; align-items: center; justify-content: center; text-align: center;">🌤️ Sincronizando satélites...</p>
                     </div>
-                </div>
-
-                <div class="cartao-vidro" style="text-align: center; margin-top: 20px;">
-                        <button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 12px 20px;">✨ Mensagem Surpresa</button>
-                        <p id="texto-surpresa" style="font-style: italic; margin-top: 15px; font-size: 1rem; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
-                    </div>
-
-                    <div class="cartao-vidro" id="cartao-temas" style="margin-top: 20px; border-color: rgba(255,255,255,0.1);">
-                <div class="cabecalho-colapsavel" onclick="toggleTemas()" style="display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative;">
-                    <h3 class="titulo-cartao" style="margin-bottom: 0; color: var(--cor-primaria); text-align: center; font-family: 'Playfair Display', serif; font-size: 1.2rem;transition: color 0.4s ease;">Aura do Santuário</h3>
-                    <span id="icone-toggle-temas" style="transition: transform 0.3s; color: var(--cor-primaria); font-size: 1.2rem; position: absolute; right: 0;">▼</span>
-                </div>
-                
-                <div id="conteudo-temas" class="escondido" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px;">
-                    <button class="btn-tema ativo" data-tema="dourado">Ouro</button>
-                    <button class="btn-tema" data-tema="azul">Azul</button>
-                    <button class="btn-tema" data-tema="rosa">Rosa</button>
-                    
-                    <button class="btn-tema" data-tema="verde">Verde</button>
-                    <button class="btn-tema" data-tema="roxo">Roxo</button>
-                    <button class="btn-tema" data-tema="rubi">Rubi</button>
-                    
-                    <button class="btn-tema" data-tema="safira">Safira</button>
-                    <button class="btn-tema" data-tema="ambar">Âmbar</button>
-                    <button class="btn-tema" data-tema="turquesa">Turquesa</button>
-                    
-                    <button class="btn-tema" data-tema="coral">Coral</button>
-                    <button class="btn-tema" data-tema="lotus">Lótus</button>
-                    <button class="btn-tema" data-tema="onix">Ônix</button>
-
-                    <button class="btn-tema escondido" id="btn-tema-diamante" data-tema="diamante" style="width: 100%;">💎 Diamante</button>
                 </div>
             </div>
 
-<div style="display: flex; justify-content: center; width: 100%; margin-top: 15px;">
-    <button id="btn-ativar-notificacoes" class="btn-acao" onclick="ativarNotificacoesApple()" style="width: auto; padding: 12px 25px; background: rgba(0,0,0,0.4); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 25px; font-weight: bold; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); transition: all 0.3s ease;">
-        🔔 Sincronizar Alertas do iPhone
-    </button>
-</div>
+            <div class="palco-slide">
+                <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; height: 100%; justify-content: center;">
+                    <div class="cartao-vidro cartao-palco" id="frase-do-dia" style="min-height: auto; padding: 30px 20px;">
+                        <p style="font-style: italic; text-align: center; font-size: 1.1rem;">"Carregando sua dose diária de admiração..."</p>
+                    </div>
+                    <div class="cartao-vidro cartao-palco" style="text-align: center; justify-content: center; padding: 30px 20px;">
+                        <button id="btn-surpresa" class="btn-acao" style="width: auto; padding: 15px 30px; font-size: 1.1rem;">✨ Mensagem Surpresa</button>
+                        <p id="texto-surpresa" style="font-style: italic; margin-top: 20px; font-size: 1.1rem; min-height: 80px; display: flex; align-items: center; justify-content: center; padding: 10px;"></p>
+                    </div>
+                </div>
+            </div>
 
-                    <div style="text-align: center; margin-top: 10px;">
-    <button id="btn-verificar-atualizacao" style="background: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 8px 16px; border-radius: 20px; font-size: 12px;">🔄 Verificar atualização</button>
-</div>
+            <div class="palco-slide">
+                <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; height: 100%; justify-content: center;">
+                    
+                    <div class="cartao-vidro cartao-palco" id="cartao-temas" style="border-color: rgba(255,255,255,0.1); justify-content: center; padding: 30px 20px;">
+                        
+                        <h3 class="titulo-cartao" style="margin-bottom: 25px; color: var(--cor-primaria); text-align: center; font-family: 'Playfair Display', serif; font-size: 1.5rem; transition: color 0.4s ease; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                            Aura do Santuário
+                        </h3>
+                        
+                        <div id="conteudo-temas" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; width: 100%;">
+                            <button class="btn-tema ativo" data-tema="dourado">Ouro</button>
+                            <button class="btn-tema" data-tema="azul">Azul</button>
+                            <button class="btn-tema" data-tema="rosa">Rosa</button>
+                            <button class="btn-tema" data-tema="verde">Verde</button>
+                            <button class="btn-tema" data-tema="roxo">Roxo</button>
+                            <button class="btn-tema" data-tema="rubi">Rubi</button>
+                            <button class="btn-tema" data-tema="safira">Safira</button>
+                            <button class="btn-tema" data-tema="ambar">Âmbar</button>
+                            <button class="btn-tema" data-tema="turquesa">Turquesa</button>
+                            <button class="btn-tema" data-tema="coral">Coral</button>
+                            <button class="btn-tema" data-tema="lotus">Lótus</button>
+                            <button class="btn-tema" data-tema="onix">Ônix</button>
+                        </div>
+                    </div>
 
-            </section> 
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                        <button id="btn-ativar-notificacoes" class="btn-acao" onclick="ativarNotificacoesApple()" style="width: 100%; max-width: 300px; padding: 15px 25px; background: rgba(0,0,0,0.4); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 30px; font-weight: bold; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); transition: all 0.3s ease; font-size: 1rem;">
+                            🔔 Sincronizar Alertas
+                        </button>
+                        <button id="btn-verificar-atualizacao" style="background: transparent; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--cor-primaria); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; transition: background 0.3s;">
+                            🔄 Verificar atualização
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="palco-paginacao" class="palco-paginacao">
+        </div>
+
+</section>
 
             <div id="leis" class="tela escondido" style="padding: 15px; padding-bottom: 120px;">
         
@@ -1245,6 +1270,43 @@
 
 </div>
 
+<div id="container-fantasma" class="escondido">
+    <canvas id="canvas-calor"></canvas>
+    <div class="vidro-quantico"></div>
+    
+    <div class="ui-fantasma">
+        <p id="texto-fantasma" class="texto-singularidade">Aguardando contato...</p>
+    </div>
+
+    <button 
+        onmousedown="event.stopPropagation()" 
+        ontouchstart="event.stopPropagation()" 
+        onclick="if(window.Haptics) window.Haptics.toqueLeve(); window.fecharToqueFantasma()" 
+        style="
+            position: absolute; 
+            bottom: 50px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(0,0,0,0.6); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            color: #ddd; 
+            padding: 12px 30px; 
+            border-radius: 30px; 
+            z-index: 999999; 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px); 
+            font-family: system-ui, -apple-system, sans-serif; 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        ">
+        Romper Ligação
+    </button>
+</div>
+
     <div class="fio-de-ouro"></div>
     
 
@@ -1344,6 +1406,7 @@
 
 
 </body>
+
 <div id="tela-morte-falsa" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-color: #ffffff; color: #000000; z-index: 9999999999; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 0 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         
         <h1 style="font-size: 1.35rem; font-weight: 600; margin: 0 0 12px 0; color: #000; letter-spacing: -0.3px;">
@@ -1419,4 +1482,5 @@
             gatilho.addEventListener('mousedown', acionarGatilho);
         }
     </script>
+
 </html>

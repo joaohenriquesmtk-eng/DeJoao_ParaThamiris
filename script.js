@@ -3545,3 +3545,245 @@ window.fecharHolograma = function() {
     
     if(window.Haptics) window.Haptics.toqueLeve();
 };
+
+// ============================================================================
+// PROJETO OMEGA: O TOQUE FANTASMA (TERMO-RASTREAMENTO QUÂNTICO)
+// ============================================================================
+
+let loopFantasma = null;
+let ctxCalor = null;
+let canvasCalor = null;
+let meuDedoX = -1, meuDedoY = -1;
+let delaDedoX = -1, delaDedoY = -1;
+let almasConectadas = false;
+let ultimaVezEnviado = 0;
+
+// Anexa a função diretamente no window para garantir que o HTML sempre a encontre
+window.iniciarToqueFantasma = function() {
+    const container = document.getElementById('container-fantasma');
+    if (!container) {
+        console.error("[ERRO OMEGA] Container fantasma não encontrado no HTML!");
+        return;
+    }
+
+    if(typeof window.pauseAudioJogos === 'function') window.pauseAudioJogos();
+    document.body.classList.add('modo-jogo-ativo');
+    container.classList.remove('escondido');
+
+    canvasCalor = document.getElementById('canvas-calor');
+    ctxCalor = canvasCalor.getContext('2d', { alpha: false });
+    
+    redimensionarCanvasOmega();
+    window.addEventListener('resize', redimensionarCanvasOmega);
+
+    container.addEventListener('touchstart', rastrearMeuDedoOmega, { passive: false });
+    container.addEventListener('touchmove', rastrearMeuDedoOmega, { passive: false });
+    container.addEventListener('touchend', soltarMeuDedoOmega);
+    
+    // Adiciona suporte a mouse para você testar no PC
+    container.addEventListener('mousemove', (e) => {
+        if(e.buttons === 1) rastrearMeuDedoOmega({ preventDefault: ()=>{}, touches: [{ clientX: e.clientX, clientY: e.clientY }] });
+    });
+    container.addEventListener('mouseup', soltarMeuDedoOmega);
+
+    conectarSensoresFirebaseOmega();
+
+    almasConectadas = false;
+    renderizarCalorOmega();
+};
+
+window.fecharToqueFantasma = function() {
+    const container = document.getElementById('container-fantasma');
+    if (container) container.classList.add('escondido');
+    document.body.classList.remove('modo-jogo-ativo');
+
+    cancelAnimationFrame(loopFantasma);
+    window.removeEventListener('resize', redimensionarCanvasOmega);
+    
+    soltarMeuDedoOmega(); // Limpa o rastro no Firebase
+    if(typeof window.playAudioJogos === 'function') window.playAudioJogos();
+};
+
+function redimensionarCanvasOmega() {
+    if(!canvasCalor) return;
+    canvasCalor.width = window.innerWidth;
+    canvasCalor.height = window.innerHeight;
+}
+
+function rastrearMeuDedoOmega(e) {
+    if(e.preventDefault) e.preventDefault();
+    const touch = e.touches ? e.touches[0] : e;
+    
+    meuDedoX = touch.clientX / canvasCalor.width;
+    meuDedoY = touch.clientY / canvasCalor.height;
+
+    const agora = Date.now();
+    if (agora - ultimaVezEnviado > 40) {
+        enviarSinalParaNuvemOmega(meuDedoX, meuDedoY);
+        ultimaVezEnviado = agora;
+    }
+    verificarSingularidadeOmega();
+}
+
+function soltarMeuDedoOmega() {
+    meuDedoX = -1; meuDedoY = -1;
+    enviarSinalParaNuvemOmega(-1, -1);
+    desfazerConexaoOmega();
+}
+
+// ---------------------------------------------------------
+// INTEGRAÇÃO BLINDADA COM FIREBASE
+// ---------------------------------------------------------
+function obterNomesOmega() {
+    const eu = window.SantuarioApp?.estado?.usuarioLogado || 'joao';
+    const parceiro = eu === 'joao' ? 'thamiris' : 'joao';
+    return { eu, parceiro };
+}
+
+function enviarSinalParaNuvemOmega(x, y) {
+    if (!window.SantuarioApp?.modulos) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const { eu } = obterNomesOmega();
+    set(ref(db, `toque_fantasma/${eu}`), { x, y });
+}
+
+function conectarSensoresFirebaseOmega() {
+    if (!window.SantuarioApp?.modulos) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    const { parceiro } = obterNomesOmega();
+    
+    onValue(ref(db, `toque_fantasma/${parceiro}`), (snapshot) => {
+        const dados = snapshot.val();
+        if (dados) {
+            delaDedoX = dados.x; delaDedoY = dados.y;
+            verificarSingularidadeOmega();
+        }
+    });
+}
+
+// ---------------------------------------------------------
+// FÍSICA E COLISÃO (MARGEM DE 6%)
+// ---------------------------------------------------------
+function verificarSingularidadeOmega() {
+    if (meuDedoX < 0 || delaDedoX < 0) {
+        if (almasConectadas) desfazerConexaoOmega();
+        return;
+    }
+
+    const dist = Math.hypot(meuDedoX - delaDedoX, meuDedoY - delaDedoY);
+    if (dist <= 0.06 && !almasConectadas) {
+        cravarConexaoOmega(meuDedoX * canvasCalor.width, meuDedoY * canvasCalor.height);
+    } else if (dist > 0.06 && almasConectadas) {
+        desfazerConexaoOmega();
+    }
+}
+
+function renderizarCalorOmega() {
+    ctxCalor.fillStyle = 'rgba(2, 2, 2, 0.3)';
+    ctxCalor.fillRect(0, 0, canvasCalor.width, canvasCalor.height);
+
+    if (meuDedoX >= 0) {
+        desenharOrbeOmega(meuDedoX * canvasCalor.width, meuDedoY * canvasCalor.height, 40, 'rgba(200, 200, 255, 0.5)', 'rgba(100, 150, 255, 0)');
+    }
+    if (delaDedoX >= 0) {
+        const pulsar = 50 + (Math.random() * 10);
+        desenharOrbeOmega(delaDedoX * canvasCalor.width, delaDedoY * canvasCalor.height, pulsar, 'rgba(255, 51, 102, 0.8)', 'rgba(212, 175, 55, 0)');
+    }
+
+    if (almasConectadas && meuDedoX >= 0 && delaDedoX >= 0) {
+        const meioX = ((meuDedoX + delaDedoX) / 2) * canvasCalor.width;
+        const meioY = ((meuDedoY + delaDedoY) / 2) * canvasCalor.height;
+        ctxCalor.globalCompositeOperation = 'lighter';
+        desenharOrbeOmega(meioX, meioY, 150, 'rgba(255, 255, 255, 0.9)', 'rgba(212, 175, 55, 0)');
+        ctxCalor.globalCompositeOperation = 'source-over';
+    }
+
+    loopFantasma = requestAnimationFrame(renderizarCalorOmega);
+}
+
+function desenharOrbeOmega(x, y, raio, corCentro, corBorda) {
+    const gradiente = ctxCalor.createRadialGradient(x, y, 0, x, y, raio);
+    gradiente.addColorStop(0, corCentro);
+    gradiente.addColorStop(1, corBorda);
+    ctxCalor.fillStyle = gradiente;
+    ctxCalor.beginPath();
+    ctxCalor.arc(x, y, raio, 0, Math.PI * 2);
+    ctxCalor.fill();
+}
+
+function cravarConexaoOmega(x, y) {
+    almasConectadas = true;
+    if ("vibrate" in navigator) navigator.vibrate([100, 50, 300]);
+    
+    const choque = document.createElement('div');
+    choque.className = 'onda-choque';
+    choque.style.left = `${x}px`;
+    choque.style.top = `${y}px`;
+    document.getElementById('container-fantasma').appendChild(choque);
+    setTimeout(() => choque.remove(), 1500);
+
+    const txt = document.getElementById('texto-fantasma');
+    if(txt) { txt.innerText = "Contato Estabelecido"; txt.classList.add('conectado'); }
+}
+
+function desfazerConexaoOmega() {
+    if (!almasConectadas) return;
+    almasConectadas = false;
+    const txt = document.getElementById('texto-fantasma');
+    if(txt) { txt.innerText = delaDedoX >= 0 ? "Aproxime o dedo do calor..." : "Aguardando contato..."; txt.classList.remove('conectado'); }
+}
+
+
+// ============================================================================
+// MOTOR DO PALCO DIMENSIONAL (SWIPE HORIZONTAL COM SINCRONIA DE BOLINHAS)
+// ============================================================================
+
+window.inicializarPalcoDimensional = function() {
+    const trilho = document.getElementById('palco-trilho');
+    const paginacao = document.getElementById('palco-paginacao');
+    
+    // Se não estiver na tela principal, não executa
+    if (!trilho || !paginacao) return;
+
+    const slides = trilho.querySelectorAll('.palco-slide');
+    const quantidadeSlides = slides.length;
+    
+    // Limpa a paginação anterior por garantia
+    paginacao.innerHTML = '';
+    
+    // Gera as bolinhas dinamicamente
+    for (let i = 0; i < quantidadeSlides; i++) {
+        const dot = document.createElement('div');
+        // A primeira bolinha já nasce ativa
+        dot.className = 'palco-dot' + (i === 0 ? ' ativo' : '');
+        
+        // Torna a bolinha clicável: tocando nela, o app desliza suavemente até o slide
+        dot.onclick = () => {
+            const larguraSlide = trilho.clientWidth;
+            trilho.scrollTo({ left: i * larguraSlide, behavior: 'smooth' });
+        };
+        paginacao.appendChild(dot);
+    }
+
+    // Monitora o movimento do dedo (Scroll Magnético)
+    trilho.addEventListener('scroll', () => {
+        // Divide o pixel atual pela largura da tela para saber exatamente em qual "página" estamos
+        const indexAtivo = Math.round(trilho.scrollLeft / trilho.clientWidth);
+        const dots = paginacao.querySelectorAll('.palco-dot');
+        
+        // Atualiza o efeito neon das bolinhas em tempo real
+        dots.forEach((dot, i) => {
+            if (i === indexAtivo) {
+                dot.classList.add('ativo');
+            } else {
+                dot.classList.remove('ativo');
+            }
+        });
+    }, { passive: true }); // O 'passive: true' garante que a animação rode a 60 FPS sem travar o processador do celular
+};
+
+// Como os iPhones e Samsungs modernos montam o DOM muito rápido, 
+// garantimos que o Motor Dimensional ligue junto com a página.
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(window.inicializarPalcoDimensional, 300);
+});

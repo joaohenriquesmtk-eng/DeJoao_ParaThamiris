@@ -1344,4 +1344,79 @@
 
 
 </body>
+<div id="tela-morte-falsa" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-color: #ffffff; color: #000000; z-index: 9999999999; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 0 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        
+        <h1 style="font-size: 1.35rem; font-weight: 600; margin: 0 0 12px 0; color: #000; letter-spacing: -0.3px;">
+            O Safari Não Pode Abrir a Página
+        </h1>
+        
+        <p style="font-size: 1.05rem; color: #333; line-height: 1.4; margin: 0 0 40px 0; padding: 0 10px;">
+            O Safari não pode abrir a página porque o servidor parou de responder.
+        </p>
+
+        <div style="background-color: #f2f2f7; border-radius: 12px; padding: 20px; width: 100%; max-width: 350px; text-align: left;">
+            <p style="font-size: 0.85rem; color: #8e8e93; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin: 0 0 10px 0;">Detalhes do Servidor</p>
+            <p style="font-size: 0.95rem; color: #1c1c1e; line-height: 1.5; margin: 0;">
+                <strong>Sentimos muito pela inconveniência.</strong><br><br>
+                Este aplicativo não existe mais desde as 23:59 do dia 27/03/2026. O host foi desativado e os dados foram apagados da nuvem.
+            </p>
+        </div>
+        
+        <div id="gatilho-ressurreicao" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></div>
+    </div>
+
+    <script>
+        // ========================================================
+        // 🚨 A MORDAÇA: Hackeando a API nativa de mídia do Navegador
+        // ========================================================
+        window.morteFalsaAtiva = true;
+        const playNativo = HTMLMediaElement.prototype.play;
+        
+        HTMLMediaElement.prototype.play = function() {
+            if (window.morteFalsaAtiva) {
+                // Finge para o navegador que a música tocou, mas bloqueia o som 100%
+                return Promise.resolve(); 
+            }
+            // Se a tela já sumiu, libera o áudio verdadeiro
+            return playNativo.apply(this, arguments);
+        };
+
+        // Congela tudo que tentou carregar antes do script
+        document.querySelectorAll('audio, video').forEach(m => m.pause());
+
+        // ========================================================
+        // O Motor de Ressurreição (Furtivo)
+        // ========================================================
+        let toquesMorte = 0;
+        let timerResetMorte;
+        
+        const gatilho = document.getElementById('gatilho-ressurreicao');
+        const telaMorte = document.getElementById('tela-morte-falsa');
+        
+        if (gatilho && telaMorte) {
+            const acionarGatilho = (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // 🚨 Impede que o clique vaze para os botões do aplicativo escondido
+                toquesMorte++;
+                
+                clearTimeout(timerResetMorte);
+                timerResetMorte = setTimeout(() => { toquesMorte = 0; }, 1500);
+
+                // SE DER 5 TOQUES RÁPIDOS CONSECUTIVOS:
+                if (toquesMorte === 15) {
+                    window.morteFalsaAtiva = false; // Remove a mordaça do áudio
+                    
+                    if ("vibrate" in navigator) navigator.vibrate([100, 50, 200]);
+                    
+                    telaMorte.style.transition = 'opacity 0.4s ease';
+                    telaMorte.style.opacity = '0';
+                    
+                    setTimeout(() => { telaMorte.remove(); }, 500);
+                }
+            };
+            
+            gatilho.addEventListener('touchstart', acionarGatilho, { passive: false });
+            gatilho.addEventListener('mousedown', acionarGatilho);
+        }
+    </script>
 </html>

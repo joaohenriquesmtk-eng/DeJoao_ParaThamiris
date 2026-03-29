@@ -1,12 +1,22 @@
-<div class="top-bar" style="background: rgba(0,0,0,0.7); border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-        <div class="top-bar-left">
-            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-            <button class="btn-info" onclick="toggleInstrucoesTribunal()">❓</button>
-            <button class="btn-info" onclick="abrirDossieTribunal()" style="font-size: 1.2rem;">📊</button>
+<div class="top-bar" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 10px 8px;">
+        
+        <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+            <button class="btn-voltar" onclick="voltarMenuJogos()" style="padding: 6px 10px; font-size: 0.85rem;">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesTribunal()" style="padding: 6px 10px; font-size: 0.85rem;">❓</button>
+            <button class="btn-info" onclick="abrirDossieTribunal()" style="padding: 6px 10px; font-size: 0.85rem;">📊</button>
         </div>
-        <div class="top-bar-right">
-            <span class="recurso">⚖️ Nível <span id="tribunal-nivel">1</span></span>
-            <span class="recurso" style="box-shadow: 0 0 10px rgba(212,175,55,0.2);">❤️ Vidas: <span id="tribunal-estrelas">3</span></span>
+        
+        <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: nowrap;">
+            
+            <span class="recurso" style="padding: 4px 8px; font-size: 0.8rem; white-space: nowrap;">⚖️ Nv <span id="tribunal-nivel">1</span></span>
+            
+            <span class="recurso" style="padding: 4px 8px; font-size: 0.8rem; box-shadow: 0 0 10px rgba(212,175,55,0.2); white-space: nowrap;">❤️ <span id="tribunal-estrelas">3</span></span>
+
+            <div class="visor-moedas-global-container" style="padding: 4px 10px; font-size: 0.85rem;">
+                <span class="visor-moedas-global-texto">0</span>
+                <span style="font-size: 0.8rem;">💰</span>
+            </div>
+
         </div>
     </div>
 

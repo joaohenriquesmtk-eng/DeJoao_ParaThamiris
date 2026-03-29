@@ -200,7 +200,6 @@ window.atualizarContadorInterface = function(quantidade) {
 // ==========================================
 // BANCO CENTRAL DO SANTUÁRIO (SISTEMA FINANCEIRO)
 // ==========================================
-// Conserta o "Dinheiro Fantasma": Dá 100 moedas REAIS na primeira vez que o app for aberto
 let pontosSalvos = localStorage.getItem('santuario_pontos');
 if (pontosSalvos === null) {
     window.pontosDoCasal = 100;
@@ -214,14 +213,40 @@ window.atualizarPontosCasal = function(valor, motivo) {
     if (window.pontosDoCasal < 0) window.pontosDoCasal = 0;
     localStorage.setItem('santuario_pontos', window.pontosDoCasal);
 
-    // Atualiza TODOS os visores de dinheiro do app instantaneamente
+    // 1. Atualiza IDs legados (Fazenda e Termo)
     const visores = ['fazenda-capital', 'jardim-moedas', 'termo-moedas'];
     visores.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerText = window.pontosDoCasal;
     });
 
+    // 2. ATUALIZA A NOVA PÍLULA GLOBAL EM TODOS OS JOGOS
+    document.querySelectorAll('.visor-moedas-global-texto').forEach(el => {
+        el.innerText = window.pontosDoCasal;
+    });
+    
+    // 3. EFEITO DOPAMINA: Faz a pílula pular e brilhar em verde quando ganha dinheiro
+    if (valor > 0) {
+        document.querySelectorAll('.visor-moedas-global-container').forEach(el => {
+            el.style.transform = 'scale(1.15)';
+            el.style.borderColor = '#2ecc71';
+            el.style.boxShadow = '0 0 15px rgba(46, 204, 113, 0.6)';
+            setTimeout(() => {
+                el.style.transform = 'scale(1)';
+                el.style.borderColor = 'rgba(212, 175, 55, 0.5)';
+                el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(212, 175, 55, 0.2)';
+            }, 400);
+        });
+    }
+
     console.log(`Economia atualizada: ${motivo} | Saldo: ${window.pontosDoCasal}`);
+};
+
+// Função para injetar o valor assim que ela abrir a tela de um jogo
+window.sincronizarMoedasUI = function() {
+    document.querySelectorAll('.visor-moedas-global-texto').forEach(el => {
+        el.innerText = window.pontosDoCasal || 0;
+    });
 };
 
 // ==========================================
@@ -466,4 +491,36 @@ window.escutarPostits = function() {
             areaArquivo.innerHTML = htmlArquivoFinal;
         }
     });
+};
+
+// ============================================================================
+// 🎰 NAVEGAÇÃO DO CASSINO DO AFETO (O LOBBY VIP)
+// ============================================================================
+
+window.abrirLobbyCassino = function() {
+    console.log("Comando recebido: Abrindo Cassino..."); // Aviso no console F12
+    const overlayCassino = document.getElementById('overlay-cassino');
+    
+    if (overlayCassino) {
+        // Remove as classes de bloqueio
+        overlayCassino.classList.remove('escondido');
+        overlayCassino.classList.remove('takeover-escondido');
+        
+        // Força a tela a pular na frente de tudo
+        overlayCassino.style.display = 'flex';
+        overlayCassino.style.opacity = '1';
+        
+        // Atualiza a pílula de dinheiro
+        if (typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+    } else {
+        console.error("ERRO: O HTML do 'overlay-cassino' não foi encontrado!");
+    }
+};
+
+window.fecharCassino = function() {
+    const overlayCassino = document.getElementById('overlay-cassino');
+    if (overlayCassino) {
+        overlayCassino.classList.add('escondido');
+        overlayCassino.style.display = 'none';
+    }
 };

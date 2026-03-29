@@ -15,7 +15,9 @@ function pegarDataDeHoje() {
 }
 
 window.inicializarHidratacao = function() {
-    console.log("Inicializando Laboratório de Fluidos...");
+        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
+        
+        console.log("Inicializando Laboratório de Fluidos...");
     
     // Insere nomes ou "Amor" caso falte configuração global
     const nomeParc = document.getElementById('nome-parceiro-agua');
@@ -196,12 +198,13 @@ function checarMetaDiaria(dadosGlobais) {
         localStorage.setItem('santuario_gotas_orvalho', orvalhoTotal);
         window.atualizarOrvalhoUI();
 
-        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(100, "Corpo Purificado");
+        // 🚨 INFLAÇÃO DO BEM: Recompensa multiplicada de 100 para 250!
+        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(250, "Meta de Hidratação Atingida");
 
-        msgTela.innerText = "Corpo 100% Hidratado! +1 Gota de Orvalho e +100💰!";
+        msgTela.innerText = "Corpo 100% Hidratado! +1 Gota de Orvalho e +250💰!";
         msgTela.style.opacity = 1;
 
-        if(typeof mostrarToast === 'function') mostrarToast("Sintese Celular Completa!", "💧");
+        if(typeof mostrarToast === 'function') mostrarToast("Sintese Celular Completa! +250💰", "💧");
     } else if (euDado && euDado.ml >= window.estadoAgua.metaDiaria) {
         msgTela.innerText = "Manutenção Vital Estável.";
         msgTela.style.opacity = 1;

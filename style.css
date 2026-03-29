@@ -10911,3 +10911,479 @@ body > .container-palco {
     /* Desliga a escuta do navegador para toques verticais nessa área, focando 100% no deslize lateral */
     touch-action: pan-x !important;
 }
+
+
+/* ============================================================================
+   💰 PÍLULA DE OURO GLOBAL (HUD DE DINHEIRO DOS JOGOS)
+============================================================================ */
+.visor-moedas-global-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 20px;
+    padding: 6px 14px;
+    color: #D4AF37;
+    font-weight: 900;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(212, 175, 55, 0.2);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    gap: 6px;
+    z-index: 999;
+}
+
+
+/* ============================================================================
+   🏷️ MOLDURAS DE CATEGORIAS (O CRISTAL FUMÊ EXATO)
+   Trazendo a geometria, a performance e o luxo do seu vidro principal.
+============================================================================ */
+
+.moldura-vidro-separador {
+    /* 1. O SEU CRISTAL FUMÊ (Base sólida grafite com desfoque inteligente) */
+    background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%) !important;
+    backdrop-filter: blur(1px) !important;
+    -webkit-backdrop-filter: blur(1px) !important;
+    
+    /* 2. EDGE LIGHTING (O corte chanfrado na quina do vidro que você criou) */
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    
+    /* 3. SOMBRA MACIA (Para elevação e reflexo interno) */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+    
+    /* 4. ACELERAÇÃO DE HARDWARE */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    
+    /* 5. ALINHAMENTO E CENTRALIZAÇÃO DO TEXTO (Flexbox) */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
+    /* 6. ESPAÇAMENTO DO MENU (Respiro entre os jogos) */
+    width: 100% !important;
+    max-width: 400px !important; 
+    margin: 0 auto !important; 
+    margin-top: 35px !important; 
+    margin-bottom: 18px !important; 
+    padding: 15px 10px;
+    position: relative;
+    z-index: 5;
+}
+
+/* Remove a margem superior do primeiro separador para não ficar grudado no topo */
+.moldura-vidro-separador:first-child {
+    margin-top: 5px !important;
+}
+
+/* Tipografia Dourada Centralizada */
+.moldura-vidro-separador h3 {
+    color: var(--cor-primaria);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin: 0;
+    margin-bottom: 5px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    letter-spacing: 0.5px;
+}
+
+.moldura-vidro-separador p {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin: 0;
+    max-width: 90%;
+}
+
+/* ============================================================================
+   💣 ESTILOS DO CAMPO MINADO (MINES)
+============================================================================ */
+.bloco-mines {
+    background: linear-gradient(135deg, rgba(42, 42, 48, 0.8) 0%, rgba(20, 20, 24, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    box-shadow: inset 0 2px 5px rgba(255,255,255,0.05), 0 5px 15px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bloco-mines:active {
+    transform: scale(0.92);
+}
+
+.bloco-mines.revelado-diamante {
+    background: linear-gradient(145deg, rgba(46, 204, 113, 0.2), rgba(0,0,0,0.8));
+    border-color: #2ecc71;
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.4), inset 0 0 10px rgba(46, 204, 113, 0.2);
+    transform: scale(1.05);
+    pointer-events: none;
+}
+
+.bloco-mines.revelado-bomba {
+    background: linear-gradient(145deg, rgba(231, 76, 60, 0.4), rgba(0,0,0,0.9));
+    border-color: #e74c3c;
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.6), inset 0 0 15px rgba(231, 76, 60, 0.4);
+    animation: tremorTela 0.3s ease;
+    pointer-events: none;
+}
+
+/* Quadrados que sobram quando o jogo acaba e a gente revela o tabuleiro */
+.bloco-mines.opaco {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+
+/* ============================================================================
+   🎰 A NOITE DE NEON DO SANTUÁRIO (AMBIENTAÇÃO VEGAS VIP)
+   Injetando dopamina visual através de luz, brilho e pulso.
+============================================================================ */
+
+/* REGRA MESTRE: Trazendo a noite de Vegas para o app */
+#overlay-cassino, #mesa-mines {
+    position: fixed !important;
+    width: 100vw; height: 100vh;
+    /* Fundo cósmico + gradientes de neon sutis pulsando no fundo */
+    background-image: 
+        linear-gradient(rgba(10, 5, 5, 0.98), rgba(10, 5, 5, 0.98)),
+        radial-gradient(circle at 10% 10%, rgba(0, 212, 255, 0.1), transparent),
+        radial-gradient(circle at 90% 90%, rgba(231, 76, 60, 0.1), transparent) !important;
+    background-blend-mode: color-dodge, color-dodge, color-dodge !important;
+    animation: cassinoBackgroundPulse 10s ease-in-out infinite !important;
+}
+
+@keyframes cassinoBackgroundPulse {
+    0%, 100% { background-position: 0% 0%, 0% 0%, 100% 100%; }
+    50% { background-position: 100% 100%, 100% 100%, 0% 0%; }
+}
+
+/* 1. TIPOGRAFIA NEON: Títulos principais em Ouro Pulsante */
+#overlay-cassino h2, #mesa-mines h2, .titulo-mesa-ouro {
+    color: #D4AF37 !important;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.4), 0 0 30px rgba(212, 175, 55, 0.2) !important;
+    animation: neonPulseGold 2s ease-in-out infinite !important;
+}
+
+@keyframes neonPulseGold {
+    0%, 100% { text-shadow: 0 0 10px rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.4); }
+    50% { text-shadow: 0 0 15px rgba(212, 175, 55, 0.8), 0 0 30px rgba(212, 175, 55, 0.6), 0 0 45px rgba(212, 175, 55, 0.4); }
+}
+
+/* 2. LED ACCENTS: Top Bars com bordas e sombras piscantes */
+#overlay-cassino .top-bar, #mesa-mines .top-bar {
+    border-bottom: 2px solid rgba(212, 175, 55, 0.7) !important;
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3) !important;
+    animation: ledPulseGold 1.5s ease-in-out infinite !important;
+}
+
+@keyframes ledPulseGold {
+    0%, 100% { box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); border-color: rgba(212, 175, 55, 0.7); }
+    50% { box-shadow: 0 5px 25px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 1); }
+}
+
+/* 3. LOBBY: Cartões de Jogo com luzes de LED e brilho no mouse/toque */
+.cartao-vidro-mines {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    cursor: pointer;
+}
+.cartao-vidro-mines:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* Títulos dos jogos em tipografia Oásis centralizada */
+.cartao-vidro-mines h4 {
+    color: #fff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Cores de LED por Jogo (Usando box-shadow) */
+.cartao-mines-mines { border: 2px solid #00d4ff !important; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important; }
+.cartao-mines-slots { border: 2px solid #ff00ff !important; box-shadow: 0 0 20px rgba(255, 0, 255, 0.3) !important; }
+.cartao-mines-blackjack { border: 2px solid #00ff00 !important; box-shadow: 0 0 20px rgba(0, 255, 0, 0.3) !important; }
+.cartao-mines-crash { border: 2px solid #ffff00 !important; box-shadow: 0 0 20px rgba(255, 255, 0, 0.3) !important; }
+
+/* 4. VISORES DE MINES: Caixas de Vidro Ouro/Vermelho Piscante */
+#mines-aposta-input-wrapper {
+    background: rgba(0,0,0,0.8) !important;
+    border: 2px solid #D4AF37 !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+#mines-aposta-input { color: #D4AF37 !important; }
+
+#mines-bombas-input-wrapper {
+    background: rgba(0,0,0,0.8) !important;
+    border: 2px solid #e74c3c !important;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.4) !important;
+}
+#mines-bombas-input { color: #e74c3c !important; }
+
+/* Título secundário (Multiplicador) */
+#mines-multiplicador-texto {
+    color: #D4AF37 !important;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6) !important;
+}
+
+/* 5. A GRADE VIVA DO MINES: Blocos que respiram e brilham */
+.bloco-mines {
+    border-radius: 15px !important;
+    transition: all 0.3s ease-out !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6), inset 0 0 5px rgba(255,255,255,0.05) !important;
+    animation: blocoLedPulse 3s ease-in-out infinite !important; /* Brilho sutil */
+}
+
+@keyframes blocoLedPulse {
+    0%, 100% { box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
+    50% { box-shadow: 0 5px 20px rgba(255,255,255,0.05); }
+}
+
+/* Efeito de Mouse-over: Ciano Neon */
+.bloco-mines:hover {
+    transform: scale(1.08) !important;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0,0,0,0.8)) !important;
+    border: 2px solid #00d4ff !important;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.6), inset 0 0 10px rgba(0, 212, 255, 0.4) !important;
+}
+
+/* Efeito de Clique: Ciano Pulsante (Sucesso) */
+.bloco-mines.revelado-diamante {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0,0,0,0.8)) !important;
+    border: 3px solid #00d4ff !important;
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.8), inset 0 0 20px rgba(0, 212, 255, 0.6) !important;
+    animation: diamantedPulse 0.5s ease-out !important;
+}
+
+@keyframes diamantedPulse {
+    0% { transform: scale(1.1); box-shadow: 0 0 60px rgba(0, 212, 255, 1); }
+    100% { transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 212, 255, 0.8); }
+}
+
+/* Efeito de Bomba: Vermelho Explosivo (Derrota) */
+.bloco-mines.revelado-bomba {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.5), rgba(0,0,0,0.8)) !important;
+    border: 4px solid #e74c3c !important;
+    box-shadow: 0 0 50px rgba(231, 76, 60, 1), inset 0 0 25px rgba(231, 76, 60, 0.8) !important;
+    animation: bombaExplosion 0.5s ease-out !important;
+}
+
+@keyframes bombaExplosion {
+    0% { transform: scale(1.2); box-shadow: 0 0 70px rgba(231, 76, 60, 1); }
+    100% { transform: scale(1.1); box-shadow: 0 0 50px rgba(231, 76, 60, 1); }
+}
+
+/* Quadrados que sobram: Efeito Off-Air */
+.bloco-mines.opaco {
+    opacity: 0.2 !important;
+    pointer-events: none !important;
+}
+
+@keyframes btnNeonPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
+    50% { transform: scale(1.02); box-shadow: 0 5px 25px rgba(255,255,255,0.2); }
+}
+
+/* ============================================================================
+   🍒 FÍSICA E ESTILOS DO CAÇA-NÍQUEL (SLOTS)
+============================================================================ */
+.cilindro-slot {
+    flex: 1;
+    background: linear-gradient(180deg, #f0f0f0, #ffffff, #f0f0f0);
+    border-radius: 10px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem;
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.5), inset 0 -10px 20px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.8);
+    transition: filter 0.1s ease;
+    border: 1px solid #ccc;
+}
+
+/* O Segredo de Vegas: Motion Blur para simular velocidade */
+.slot-girando {
+    filter: blur(4px) drop-shadow(0 10px 0 rgba(0,0,0,0.2));
+    animation: slotTreme 0.1s infinite;
+}
+
+@keyframes slotTreme {
+    0% { transform: translateY(-3px); }
+    50% { transform: translateY(3px); }
+    100% { transform: translateY(-3px); }
+}
+
+@keyframes ledPulseMagenta {
+    0%, 100% { box-shadow: 0 5px 15px rgba(255, 0, 255, 0.3); border-color: rgba(255, 0, 255, 0.7); }
+    50% { box-shadow: 0 5px 25px rgba(255, 0, 255, 0.5); border-color: rgba(255, 0, 255, 1); }
+}
+
+@keyframes flashJackpot {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+#btn-girar-slots:active {
+    transform: scale(0.95) translateY(5px);
+    box-shadow: 0 2px 10px rgba(255,0,255,0.4);
+}
+
+
+/* ============================================================================
+   🚀 FÍSICA E ESTILOS DO FOGUETINHO (CRASH GAME)
+============================================================================ */
+@keyframes ledPulseYellow {
+    0%, 100% { box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); border-color: rgba(241, 196, 15, 0.7); }
+    50% { box-shadow: 0 5px 25px rgba(241, 196, 15, 0.5); border-color: rgba(241, 196, 15, 1); }
+}
+
+/* O Foguete Tremendo sob altíssima pressão */
+.foguete-voando {
+    animation: fogueteTreme 0.1s infinite !important;
+    transform: translateY(-20px) scale(1.1);
+}
+
+@keyframes fogueteTreme {
+    0% { transform: translateY(-20px) scale(1.1) translateX(-2px) rotate(-2deg); }
+    50% { transform: translateY(-20px) scale(1.1) translateX(2px) rotate(2deg); }
+    100% { transform: translateY(-20px) scale(1.1) translateX(-2px) rotate(-2deg); }
+}
+
+/* ============================================================================
+   🚀 ESTILOS DO AVIATOR / CRASH GAME (MOTOR CANVAS)
+============================================================================ */
+.tela-crash-explodiu {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 50px rgba(231, 76, 60, 0.8), inset 0 0 30px rgba(231, 76, 60, 0.5) !important;
+    animation: tremorTela 0.3s ease !important;
+}
+
+.foguete-voando-aviator {
+    /* Tremor suave enquanto decola, a rotação e a posição vêm do JS */
+    animation: tremorVoo 0.1s infinite alternate;
+}
+
+@keyframes tremorVoo {
+    0% { margin-top: -1px; margin-left: -1px; }
+    100% { margin-top: 1px; margin-left: 1px; }
+}
+
+.foguete-explodido {
+    filter: grayscale(100%) brightness(50%) sepia(100%) hue-rotate(-50deg) saturate(500%) drop-shadow(0 0 20px rgba(231, 76, 60, 0.9)) !important;
+    transform: scale(1.5) !important; /* Estoura de tamanho */
+}
+
+.texto-explodiu {
+    color: #e74c3c !important;
+    text-shadow: 0 0 30px rgba(231, 76, 60, 1) !important;
+}
+
+
+/* ============================================================================
+   🃏 ESTILOS E FÍSICA DAS CARTAS DE BLACKJACK (21)
+============================================================================ */
+
+@keyframes ledPulseGreen {
+    0%, 100% { box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); border-color: rgba(46, 204, 113, 0.7); }
+    50% { box-shadow: 0 5px 25px rgba(46, 204, 113, 0.5); border-color: rgba(46, 204, 113, 1); }
+}
+
+/* A estrutura base da carta CSS */
+.carta-bj {
+    width: 75px;
+    height: 110px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: -4px 4px 10px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    font-family: 'Arial', sans-serif;
+    
+    /* O truque do encavalamento de cartas da mesa real */
+    margin-left: -35px;
+    position: relative;
+    
+    /* A animação do Croupier jogando a carta */
+    animation: deslizaCarta 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* A primeira carta não pode ter margem negativa para não sumir da tela */
+.carta-bj:first-child {
+    margin-left: 0;
+}
+
+@keyframes deslizaCarta {
+    from { transform: translateY(-80px) rotate(20deg) scale(1.2); opacity: 0; }
+    to { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+
+/* Cores dos Naipes */
+.carta-bj.vermelha { color: #e74c3c; }
+.carta-bj.preta { color: #2c3e50; }
+
+/* Estrutura interna da carta (Número em cima e naipe grande no meio) */
+.carta-bj-topo { line-height: 1; align-self: flex-start; }
+.carta-bj-centro { align-self: center; font-size: 2rem; line-height: 1; }
+.carta-bj-base { line-height: 1; align-self: flex-end; transform: rotate(180deg); }
+
+/* A Carta Virada para baixo do Dealer */
+.carta-bj.oculta {
+    background: repeating-linear-gradient(45deg, #2c3e50, #2c3e50 5px, #1a252f 5px, #1a252f 10px);
+    border: 3px solid #ecf0f1;
+    color: transparent !important;
+}
+.carta-bj.oculta * { display: none; } /* Esconde o número */
+
+
+/* ============================================================================
+   🎡 FÍSICA E ESTILOS DA ROLETA DA SORTE
+============================================================================ */
+
+/* O Motor Gráfico da Roda (Alterna Vermelho e Preto em fatias perfeitas) */
+.roda-roleta-css {
+    background: repeating-conic-gradient(
+        #e74c3c 0deg 24deg,   /* Fatia Vermelha */
+        #2c3e50 24deg 48deg   /* Fatia Preta */
+    );
+    /* Força o hardware a renderizar os pixels de forma limpa durante o giro */
+    transform-origin: center center;
+    will-change: transform;
+}
+
+/* O Zero Verde (Injetado via CSS sobre o disco) */
+.roda-roleta-css::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 50%;
+    /* Desenha uma única fatia verde no topo exato */
+    background: conic-gradient(
+        transparent 0deg 348deg,
+        #2ecc71 348deg 360deg
+    );
+    z-index: 2;
+}
+
+/* Animação quando a roleta está esperando (girando bem devagar) */
+.roleta-respirando {
+    animation: roletaIdle 20s linear infinite;
+}
+
+@keyframes roletaIdle {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

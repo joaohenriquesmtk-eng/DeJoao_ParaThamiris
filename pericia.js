@@ -218,7 +218,9 @@ window.estadoPericia = {
 };
 
 window.inicializarPericia = function() {
-    console.log("Abrindo Arquivos da Perícia do Afeto...");
+        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
+        
+        console.log("Abrindo Arquivos da Perícia do Afeto...");
     window.estadoPericia.provaSelecionada = null;
     
     const historico = JSON.parse(localStorage.getItem('santuario_pericia_vitorias') || '[]');
@@ -410,13 +412,16 @@ window.dispararObjecao = function() {
                 iconeTestemunha.style.animation = "tremorTela 0.2s infinite";
             }
 
+            // 🚨 INFLAÇÃO DO BEM: +500 Moedas em Honorários Periciais!
+            if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(500, "Honorários Periciais (Caso Solucionado)");
+
             window.estadoPericia.historicoVitorias.push(caso.id);
             localStorage.setItem('santuario_pericia_vitorias', JSON.stringify(window.estadoPericia.historicoVitorias));
             
             if (btnObjecao) btnObjecao.classList.add('desativado');
 
             setTimeout(() => {
-                if(typeof mostrarToast === 'function') mostrarToast("Caso Encerrado. Precedente adquirido!", "⚖️");
+                if(typeof mostrarToast === 'function') mostrarToast("Caso Encerrado. +500💰 na conta!", "⚖️"); // 🚨 ATUALIZADO
                 window.inicializarPericia();
             }, 6000);
 

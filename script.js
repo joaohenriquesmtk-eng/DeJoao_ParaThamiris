@@ -193,6 +193,8 @@ const normalizarPalavra = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, 
 // CONSTRUÇÃO DO ORÁCULO DE CRISTAL (TERMO)
 // ==========================================
 function inicializarTermo() {
+    if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
+    
     const gradeElemento = document.getElementById("grade-termo");
     const tecladoElemento = document.getElementById("teclado-termo");
 
@@ -250,8 +252,6 @@ function inicializarTermo() {
     if (typeof restaurarEstadoTermo === 'function') {
         restaurarEstadoTermo();
     }
-
-    const moedasUI = document.getElementById('termo-moedas'); if (moedasUI) moedasUI.innerText = window.pontosDoCasal || 0;
 }
 
 function gerarTeclado() {
@@ -445,30 +445,36 @@ function verificarFimDeJogo(palpite, palavraFinal) {
 // ==========================================
 // A CHAVE DO COFRE E A MISERICÓRDIA DO ORÁCULO
 // ==========================================
-
-// Conecta a vitória do Oráculo com a porta do Cofre.
 function finalizarVitoria() {
     const hoje = new Date().toLocaleDateString('pt-BR');
     
-    // 1. Salva na memória profunda do celular que vocês ganharam hoje!
-    localStorage.setItem('santuario_vitoria_dia', hoje);
+    // 1. Salva na memória profunda e dá o dinheiro apenas 1 VEZ POR DIA
+    if (localStorage.getItem('santuario_vitoria_dia') !== hoje) {
+        localStorage.setItem('santuario_vitoria_dia', hoje);
+        
+        // 🚨 INFLAÇÃO DO BEM: +200 Moedas pela vitória diária
+        if (typeof atualizarPontosCasal === 'function') {
+            atualizarPontosCasal(200, "Vitória no Oráculo Diário");
+        }
+        if(typeof mostrarToast === 'function') mostrarToast("O Oráculo revelou a verdade! +200💰", "✨");
+    }
     
     // 2. A MÁGICA: Destranca o cofre visualmente e atualiza a tela Home
     if (typeof liberarCofreVisual === 'function') liberarCofreVisual();
     if (typeof atualizarDinamicaHome === 'function') atualizarDinamicaHome();
     
-    // 3. Atualiza a Ofensiva Diária (O "foguinho" dos rituais)
+    // 3. Atualiza a Ofensiva Diária
     if (typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
     
-    // 4. Limpa o teclado e esconde o botão para a tela ficar com cara de "Jogo Concluído"
+    // 4. Limpa o teclado e esconde o botão
     document.getElementById("teclado-termo").innerHTML = "";
     document.getElementById("btn-verificar").classList.add("escondido");
     
-    // 5. Atualiza o painel de instruções com a glória da vitória
+    // 5. Atualiza o painel de instruções com a glória e a fortuna
     const inst = document.getElementById('instrucoes-termo');
     if (inst) {
         inst.innerHTML = `<h4 style="text-align:center; color: #2ecc71;">Vitória Alcançada! ✨</h4>
-                          <p style="text-align:center;">O Oráculo revelou a verdade. O Cofre do Santuário foi destrancado para vocês hoje!</p>`;
+                          <p style="text-align:center;">O Oráculo foi destrancado e você garantiu seus 200💰 diários!</p>`;
         inst.classList.remove('escondido');
     }
 }
@@ -519,12 +525,14 @@ function resetarTermo() {
 }
 
 // ==========================================
-// A DICA DE AMOR SUPREMA (COM ATUALIZAÇÃO DE SALDO)
+// A DICA DE AMOR SUPREMA (INTEGRADA AO BANCO CENTRAL)
 // ==========================================
 window.usarDicaAmor = function() {
     const moedasAtuais = window.pontosDoCasal || 0;
+    
+    // Verifica se ela tem dinheiro suficiente na Poupança Global
     if (moedasAtuais < 10) {
-        if(typeof mostrarToast === 'function') mostrarToast("Vocês precisam de 10💰!", "🔒");
+        if(typeof mostrarToast === 'function') mostrarToast("Você precisa de 10💰 para a Dica!", "🔒");
         if(window.Haptics) window.Haptics.erro();
         return;
     }
@@ -533,26 +541,24 @@ window.usarDicaAmor = function() {
     const palavraNormalizada = normalizarPalavra(palavraOriginal);
     
     if (letraAtual < 5) {
+        // 1. O BANCO CENTRAL AGE: Desconta o valor e atualiza a Pílula no topo da tela instantaneamente
         if (typeof atualizarPontosCasal === 'function') {
             atualizarPontosCasal(-10, "Dica de Amor Oráculo");
         }
-        const visorMoedas = document.getElementById('termo-moedas');
-        if (visorMoedas) visorMoedas.innerText = window.pontosDoCasal;
 
-        // Entrega a letra sem acento para o teclado aceitar
+        // 2. Entrega a letra sem acento para o teclado aceitar
         const letraDica = palavraNormalizada[letraAtual];
         adicionarLetra(letraDica);
 
-        if(typeof mostrarToast === 'function') mostrarToast("Uma luz brilha no Oráculo...", "💖");
+        // 3. Feedback sensorial do gasto
+        if(typeof mostrarToast === 'function') mostrarToast("Uma luz brilha no Oráculo... -10💰", "💖");
         if(window.Haptics) window.Haptics.sucesso();
+        
     } else {
         if(typeof mostrarToast === 'function') mostrarToast("A linha já está cheia!", "⚠️");
     }
 };
 
-// ==========================================
-// RESTAURAÇÃO DE MEMÓRIA (Com suporte ao Glassmorphism)
-// ==========================================
 // RESTAURAÇÃO DE MEMÓRIA (CORRIGIDA)
 function restaurarEstadoTermo() {
     const estadoSalvo = sessionStorage.getItem('termo_estado');
@@ -1703,14 +1709,20 @@ async function registrarLogin(usuario) {
     let coordenadasExatas = "N/A";
     let enderecoDetalhado = "GPS bloqueado ou não autorizado";
 
-    // 1. Tenta o Radar Furtivo (IP) em paralelo para não perder tempo
-    const obterIP = async () => {
-        try {
-            const res = await fetch('https://ipapi.co/json/');
-            if (res.ok) return await res.json();
-        } catch (e) {}
-        return null;
-    };
+// Função blindada para obter IP sem travar o aplicativo
+async function obterIP() {
+    try {
+        // A API ipify não bloqueia por CORS e tem um limite muito maior
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (!response.ok) throw new Error("Falha na API");
+        
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        console.warn("⚠️ Não foi possível obter o IP (Bloqueio ou Offline). Usando fallback.");
+        return "IP_Desconhecido"; // Evita que o Firebase trave o login
+    }
+}
 
     // 2. Tenta o Satélite Físico (GPS Exato)
     const obterGPS = () => new Promise((resolve) => {
@@ -4258,3 +4270,1056 @@ window.fecharSalaEcoEApagar = function() {
         set(ref(db, `eco_santuario/${window.MEU_NOME.toLowerCase()}`), null);
     }
 };
+
+
+// ============================================================================
+// 💣 MOTOR MATEMÁTICO: CAMPO MINADO (MINES) - VERSÃO REESTRUTURADA
+// ============================================================================
+
+let motorMines = {
+    jogando: false,
+    apostaAtual: 0,
+    qtdBombas: 3,
+    multiplicador: 1.0,
+    diamantesAchados: 0,
+    lucroPotencial: 0,
+    gradeSecreta: [] // 0 = Diamante 💎, 1 = Bomba 💣
+};
+
+// --- FUNÇÕES DE AJUSTE (NOVIDADE PARA O NOVO DESIGN) ---
+
+window.ajustarApostaMines = function(valor) {
+    if (motorMines.jogando) return;
+    const visor = document.getElementById('mines-aposta-input');
+    if (!visor) return;
+    
+    let novaAposta = parseInt(visor.innerText) + valor;
+    
+    // Regras de negócio
+    if (novaAposta < 10) novaAposta = 10;
+    if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
+    
+    visor.innerText = novaAposta;
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+window.ajustarBombasMines = function(valor) {
+    if (motorMines.jogando) return;
+    const visor = document.getElementById('mines-bombas-input');
+    if (!visor) return;
+    
+    let qtd = parseInt(visor.innerText) + valor;
+    
+    // Limites de Segurança do Cassino
+    if (qtd < 1) qtd = 1;
+    if (qtd > 20) qtd = 20;
+    
+    visor.innerText = qtd;
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+// --- LÓGICA DO JOGO ---
+
+window.abrirMesaCassino = function(nomeDoJogo) {
+    if (nomeDoJogo === 'mines') {
+        const mesa = document.getElementById('mesa-mines');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            desenharGradeMines();
+        }
+    } else if (typeof window.abrirMesaCassinoOriginal === 'function') {
+        // Fallback para outros jogos se necessário
+        window.abrirMesaCassinoOriginal(nomeDoJogo);
+    }
+};
+
+window.fecharMesaMines = function() {
+    if (motorMines.jogando) {
+        if(typeof mostrarToast === 'function') mostrarToast("Você está em jogo! Retire o lucro ou continue.", "⚠️");
+        return;
+    }
+    const mesa = document.getElementById('mesa-mines');
+    if(mesa) {
+        mesa.classList.add('escondido');
+        mesa.style.display = 'none';
+    }
+};
+
+function desenharGradeMines() {
+    const gradeHTML = document.getElementById('grade-mines');
+    if (!gradeHTML) return;
+    gradeHTML.innerHTML = "";
+    
+    for (let i = 0; i < 25; i++) {
+        const bloco = document.createElement('div');
+        bloco.className = "bloco-mines";
+        bloco.id = `bloco-mines-${i}`;
+        bloco.onclick = () => {
+            if (!motorMines.jogando) {
+                if(typeof mostrarToast === 'function') mostrarToast("Aposte e clique em Iniciar!", "💸");
+            } else {
+                revelarBlocoMines(i);
+            }
+        };
+        gradeHTML.appendChild(bloco);
+    }
+}
+
+window.iniciarRodadaMines = function() {
+    // 🚨 CORREÇÃO AQUI: Lendo innerText (do span) em vez de .value (do input)
+    const aposta = parseInt(document.getElementById('mines-aposta-input').innerText);
+    const bombas = parseInt(document.getElementById('mines-bombas-input').innerText);
+    
+    if (aposta < 10) {
+        if(typeof mostrarToast === 'function') mostrarToast("Aposta mínima de 10💰", "⚠️");
+        return;
+    }
+    if ((window.pontosDoCasal || 0) < aposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
+        return;
+    }
+
+    if(typeof atualizarPontosCasal === 'function') {
+        atualizarPontosCasal(-aposta, "Aposta no Mines");
+    }
+
+    motorMines.jogando = true;
+    motorMines.apostaAtual = aposta;
+    motorMines.qtdBombas = bombas;
+    motorMines.multiplicador = 1.0;
+    motorMines.diamantesAchados = 0;
+    motorMines.lucroPotencial = aposta;
+
+    document.getElementById('btn-mines-iniciar').classList.add('escondido');
+    document.getElementById('mines-painel-saque').classList.remove('escondido');
+    atualizarPlacarMines();
+
+    motorMines.gradeSecreta = Array(25).fill(0); 
+    let bombasPlantadas = 0;
+    while (bombasPlantadas < motorMines.qtdBombas) {
+        let pos = Math.floor(Math.random() * 25);
+        if (motorMines.gradeSecreta[pos] === 0) {
+            motorMines.gradeSecreta[pos] = 1; 
+            bombasPlantadas++;
+        }
+    }
+
+    desenharGradeMines();
+    if(window.Haptics) navigator.vibrate([100, 100]);
+};
+
+window.revelarBlocoMines = function(index) {
+    if (!motorMines.jogando) return;
+    
+    const bloco = document.getElementById(`bloco-mines-${index}`);
+    if (!bloco || bloco.classList.contains('revelado-diamante')) return;
+
+    const ehBomba = motorMines.gradeSecreta[index] === 1;
+
+    if (ehBomba) {
+        if(window.Haptics) navigator.vibrate([200, 100, 400]);
+        bloco.classList.add('revelado-bomba');
+        bloco.innerHTML = "💣";
+        encerrarRodadaMines("derrota");
+    } else {
+        if(window.Haptics) navigator.vibrate(40);
+        bloco.classList.add('revelado-diamante');
+        bloco.innerHTML = "💎";
+        motorMines.diamantesAchados++;
+        
+        let fatorRisco = motorMines.qtdBombas / 25; 
+        motorMines.multiplicador += fatorRisco + (motorMines.diamantesAchados * 0.05);
+        
+        motorMines.lucroPotencial = Math.floor(motorMines.apostaAtual * motorMines.multiplicador);
+        atualizarPlacarMines();
+
+        if (motorMines.diamantesAchados === (25 - motorMines.qtdBombas)) {
+            sacarMines();
+        }
+    }
+};
+
+window.sacarMines = function() {
+    if (!motorMines.jogando) return;
+    
+    if(typeof atualizarPontosCasal === 'function') {
+        atualizarPontosCasal(motorMines.lucroPotencial, "Saque vitorioso no Mines");
+    }
+
+    if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 300]);
+    if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 150});
+    if(typeof mostrarToast === 'function') mostrarToast(`Saque brilhante! +${motorMines.lucroPotencial}💰`, "✨");
+
+    encerrarRodadaMines("vitoria");
+};
+
+function atualizarPlacarMines() {
+    const multVisor = document.getElementById('mines-multiplicador-texto');
+    const lucroVisor = document.getElementById('mines-lucro-texto');
+    if (multVisor) multVisor.innerText = motorMines.multiplicador.toFixed(2);
+    if (lucroVisor) lucroVisor.innerText = motorMines.lucroPotencial;
+}
+
+function encerrarRodadaMines(resultado) {
+    motorMines.jogando = false;
+    
+    for (let i = 0; i < 25; i++) {
+        const bloco = document.getElementById(`bloco-mines-${i}`);
+        if (bloco && !bloco.classList.contains('revelado-diamante') && !bloco.classList.contains('revelado-bomba')) {
+            bloco.classList.add('opaco');
+            bloco.innerHTML = (motorMines.gradeSecreta[i] === 1) ? "💣" : "💎";
+        }
+    }
+
+    document.getElementById('btn-mines-iniciar').classList.remove('escondido');
+    document.getElementById('mines-painel-saque').classList.add('escondido');
+    
+    if (resultado === "derrota") {
+        if(typeof mostrarToast === 'function') mostrarToast("BOOM! Você perdeu.", "🔥");
+    }
+}
+
+// ============================================================================
+// 🍒 MOTOR MATEMÁTICO: CAÇA-NÍQUEL (SLOTS)
+// ============================================================================
+
+// Atualizando o Roteador VIP para aceitar a nova máquina
+window.abrirMesaCassino = function(nomeDoJogo) {
+    if (nomeDoJogo === 'mines') {
+        const mesa = document.getElementById('mesa-mines');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            desenharGradeMines();
+        }
+    } else if (nomeDoJogo === 'slots') {
+        const mesa = document.getElementById('mesa-slots');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+        }
+    } else {
+        if(typeof mostrarToast === 'function') mostrarToast(`A máquina de ${nomeDoJogo} está sendo construída...`, "🚧");
+    }
+};
+
+window.fecharMesaSlots = function() {
+    if (motorSlots.girando) return; // Trava a saída durante o giro
+    const mesa = document.getElementById('mesa-slots');
+    if(mesa) {
+        mesa.classList.add('escondido');
+        mesa.style.display = 'none';
+    }
+};
+
+let motorSlots = {
+    girando: false,
+    simbolos: ['🍒', '🍋', '🍉', '🔔', '💎', '❤️'],
+    // Pesos: Coração é mais raro, Cereja é muito comum
+    pesos: [40, 30, 15, 8, 5, 2] 
+};
+
+// 🚨 CORREÇÃO 1: Ajusta a leitura para .innerText
+window.ajustarApostaSlots = function(valor) {
+    if (motorSlots.girando) return;
+    const input = document.getElementById('slots-aposta-input');
+    
+    let novaAposta = parseInt(input.innerText) + valor; // Mudou para innerText
+    
+    if (novaAposta < 10) novaAposta = 10;
+    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal; // Limita ao saldo
+    
+    input.innerText = novaAposta; // Mudou para innerText
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+function sortearSimbolo() {
+    let somaPesos = motorSlots.pesos.reduce((a, b) => a + b, 0);
+    let random = Math.random() * somaPesos;
+    for (let i = 0; i < motorSlots.pesos.length; i++) {
+        if (random < motorSlots.pesos[i]) return motorSlots.simbolos[i];
+        random -= motorSlots.pesos[i];
+    }
+    return motorSlots.simbolos[0];
+}
+
+// 🚨 CORREÇÃO 2: Ajusta a leitura para .innerText na hora de girar
+window.girarSlots = function() {
+    if (motorSlots.girando) return;
+    
+    const aposta = parseInt(document.getElementById('slots-aposta-input').innerText); // Mudou aqui
+    
+    if (aposta < 10 || window.pontosDoCasal < aposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    // 1. O Cassino cobra a aposta
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Giro no Caça-Níquel");
+    
+    motorSlots.girando = true;
+    const btn = document.getElementById('btn-girar-slots');
+    btn.style.opacity = '0.5';
+    document.getElementById('slots-led-vitoria').classList.add('escondido');
+    
+    const rolos = [document.getElementById('slot-1'), document.getElementById('slot-2'), document.getElementById('slot-3')];
+    
+    // 2. Aciona a Física de Velocidade (Efeito Blur)
+    rolos.forEach(r => r.classList.add('slot-girando'));
+    if(window.Haptics) navigator.vibrate([30, 30, 30, 30]);
+
+    // 3. O Loop visual (Motion Blur das frutas)
+    let tempoGiro = 0;
+    const motorVisual = setInterval(() => {
+        rolos.forEach(r => {
+            if (r.classList.contains('slot-girando')) {
+                r.innerText = motorSlots.simbolos[Math.floor(Math.random() * motorSlots.simbolos.length)];
+            }
+        });
+        tempoGiro += 50;
+    }, 50);
+
+    // 4. Parando os cilindros com suspense
+    const resultado = [sortearSimbolo(), sortearSimbolo(), sortearSimbolo()];
+    
+    setTimeout(() => {
+        rolos[0].classList.remove('slot-girando');
+        rolos[0].innerText = resultado[0];
+        if(window.Haptics) navigator.vibrate(50);
+    }, 1000);
+
+    setTimeout(() => {
+        rolos[1].classList.remove('slot-girando');
+        rolos[1].innerText = resultado[1];
+        if(window.Haptics) navigator.vibrate(50);
+    }, 1600);
+
+    setTimeout(() => {
+        clearInterval(motorVisual);
+        rolos[2].classList.remove('slot-girando');
+        rolos[2].innerText = resultado[2];
+        if(window.Haptics) navigator.vibrate([100, 50]);
+        
+        motorSlots.girando = false;
+        btn.style.opacity = '1';
+        verificarVitoriaSlots(resultado, aposta);
+    }, 2400);
+};
+
+function verificarVitoriaSlots(resultado, aposta) {
+    const [s1, s2, s3] = resultado;
+    let lucro = 0;
+    let msg = "";
+
+    // Tabela de Pagamentos do Cassino do Afeto
+    if (s1 === s2 && s2 === s3) {
+        // TRINCA (Jackpot)
+        if (s1 === '❤️') { lucro = aposta * 50; msg = "JACKPOT DO AMOR! 50x 💘"; }
+        else if (s1 === '💎') { lucro = aposta * 30; msg = "DIAMANTES! 30x 💎"; }
+        else if (s1 === '🔔') { lucro = aposta * 15; msg = "SINO DE OURO! 15x 🔔"; }
+        else if (s1 === '🍉') { lucro = aposta * 10; msg = "BINGO FRUTAL! 10x 🍉"; }
+        else if (s1 === '🍋') { lucro = aposta * 5; msg = "LIMONADA DE OURO! 5x 🍋"; }
+        else if (s1 === '🍒') { lucro = aposta * 3; msg = "CEREJAS! 3x 🍒"; }
+    } 
+    else if (s1 === s2 || s2 === s3 || s1 === s3) {
+        // DUPLA (Prêmio de Consolação)
+        lucro = aposta * 1.5;
+        msg = "PAGOU A DUPLA! 1.5x";
+    }
+
+    if (lucro > 0) {
+        // PAGA O JOGADOR!
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Jackpot no Slots!");
+        document.getElementById('slots-led-vitoria').classList.remove('escondido');
+        
+        if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
+        if(typeof confetti === 'function') confetti({colors: ['#ff00ff', '#D4AF37'], particleCount: 200});
+        if(typeof mostrarToast === 'function') mostrarToast(`${msg} (+${lucro}💰)`, "🎰");
+    }
+}
+
+
+// ============================================================================
+// 🚀 MOTOR GRÁFICO & MATEMÁTICO: CRASH (ESTILO AVIATOR)
+// ============================================================================
+
+const roteadorAntigo = window.abrirMesaCassino;
+window.abrirMesaCassino = function(nomeDoJogo) {
+    if (nomeDoJogo === 'crash') {
+        const mesa = document.getElementById('mesa-crash');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            resetarGraficoCrash();
+        }
+    } else {
+        roteadorAntigo(nomeDoJogo);
+    }
+};
+
+window.fecharMesaCrash = function() {
+    if (motorCrash.voando) {
+        if(typeof mostrarToast === 'function') mostrarToast("Você está no ar! Retire o lucro antes de sair.", "⚠️");
+        return;
+    }
+    const mesa = document.getElementById('mesa-crash');
+    if(mesa) mesa.style.display = 'none';
+};
+
+let motorCrash = {
+    voando: false,
+    aposta: 0,
+    multiplicadorAtual: 1.00,
+    pontoExplosao: 1.00,
+    motorLogica: null,
+    motorVisual: null
+};
+
+window.ajustarApostaCrash = function(valor) {
+    if (motorCrash.voando) return;
+    const input = document.getElementById('crash-aposta-input');
+    let novaAposta = parseInt(input.innerText) + valor;
+    if (novaAposta < 10) novaAposta = 10;
+    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal;
+    input.innerText = novaAposta;
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+window.acaoCrash = function() {
+    if (!motorCrash.voando) iniciarVooCrash();
+    else sacarLucroCrash();
+};
+
+function iniciarVooCrash() {
+    const aposta = parseInt(document.getElementById('crash-aposta-input').innerText);
+    
+    if (aposta < 10 || window.pontosDoCasal < aposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Lançamento Aviator");
+    
+    motorCrash.voando = true;
+    motorCrash.aposta = aposta;
+    motorCrash.multiplicadorAtual = 1.00;
+    
+    // RTP: Curva de probabilidade de Cassino
+    let sorte = Math.random();
+    if (sorte < 0.05) motorCrash.pontoExplosao = 1.00; 
+    else {
+        motorCrash.pontoExplosao = (1 / (1 - sorte)) * 0.95; 
+        if (motorCrash.pontoExplosao < 1.01) motorCrash.pontoExplosao = 1.01;
+    }
+
+    resetarGraficoCrash();
+    
+    const btn = document.getElementById('btn-acao-crash');
+    btn.innerHTML = `RETIRAR <span id="crash-btn-lucro">0</span>💰`;
+    btn.style.background = "linear-gradient(145deg, #f39c12, #d35400)";
+    btn.style.boxShadow = "0 10px 30px rgba(243, 156, 18, 0.6)";
+    
+    document.getElementById('crash-foguete-icone').classList.add('foguete-voando-aviator');
+    if(window.Haptics) navigator.vibrate([50, 50, 50, 50]);
+
+    // O CÉREBRO MATEMÁTICO (Roda independente do visual)
+    motorCrash.motorLogica = setInterval(() => {
+        let incremento = 0.001 + (motorCrash.multiplicadorAtual * 0.005);
+        motorCrash.multiplicadorAtual += incremento;
+
+        if (motorCrash.multiplicadorAtual >= motorCrash.pontoExplosao) {
+            motorCrash.multiplicadorAtual = motorCrash.pontoExplosao;
+            explodirFoguete();
+            return;
+        }
+
+        document.getElementById('crash-multiplicador-visor').innerText = motorCrash.multiplicadorAtual.toFixed(2) + "x";
+        document.getElementById('crash-btn-lucro').innerText = Math.floor(motorCrash.aposta * motorCrash.multiplicadorAtual);
+    }, 50);
+
+    // O MOTOR GRÁFICO CANVAS (60 FPS)
+    motorCrash.motorVisual = requestAnimationFrame(desenharGraficoAviator);
+}
+
+// 🎨 A MÁGICA DE LAS VEGAS: Renderização da Curva
+function desenharGraficoAviator() {
+    if (!motorCrash.voando) return; // Para de desenhar se explodiu ou sacou
+
+    const canvas = document.getElementById('crash-canvas');
+    if (!canvas) return;
+    
+    // Ajusta a resolução para evitar embaçamento no celular
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    // Lógica do visual (Vai de 1.00x até 2.00x como referência para preencher a tela)
+    // Se passar de 2.0x, o foguete estaciona no alto e o fundo dá a sensação de movimento contínuo
+    let progressoVisual = (motorCrash.multiplicadorAtual - 1.0) / 1.0; 
+    if (progressoVisual > 1) progressoVisual = 1; 
+
+    // Coordenadas
+    const startX = 20;
+    const startY = canvas.height - 20;
+    const alvoX = startX + progressoVisual * (canvas.width - 60);
+    const alvoY = startY - Math.pow(progressoVisual, 0.8) * (canvas.height - 80);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Desenha o preenchimento de energia sob a curva
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.quadraticCurveTo(alvoX, startY, alvoX, alvoY); // A curva do Aviator
+    ctx.lineTo(alvoX, startY);
+    ctx.lineTo(startX, startY);
+    
+    let gradienteFundo = ctx.createLinearGradient(0, alvoY, 0, startY);
+    gradienteFundo.addColorStop(0, "rgba(241, 196, 15, 0.4)"); // Amarelo no topo
+    gradienteFundo.addColorStop(1, "rgba(241, 196, 15, 0.0)"); // Transparente no chão
+    ctx.fillStyle = gradienteFundo;
+    ctx.fill();
+
+    // 2. Desenha a Linha Dourada
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.quadraticCurveTo(alvoX, startY, alvoX, alvoY);
+    ctx.strokeStyle = "#f1c40f";
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#f1c40f";
+    ctx.stroke();
+
+    // 3. Move o Foguete Físico (Emoji) para a ponta da linha
+    const foguete = document.getElementById('crash-foguete-icone');
+    foguete.style.left = `${alvoX - 25}px`; // Ajuste do centro do foguete
+    foguete.style.top = `${alvoY - 25}px`;
+    
+    // Inclina o foguete dependendo da curva
+    let inclinacao = progressoVisual * 45; // Sobe até 45 graus
+    foguete.style.transform = `rotate(${inclinacao}deg)`;
+
+    // Continua o loop de animação
+    motorCrash.motorVisual = requestAnimationFrame(desenharGraficoAviator);
+}
+
+function sacarLucroCrash() {
+    clearInterval(motorCrash.motorLogica);
+    cancelAnimationFrame(motorCrash.motorVisual);
+    motorCrash.voando = false;
+    
+    let lucroFinal = Math.floor(motorCrash.aposta * motorCrash.multiplicadorAtual);
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroFinal, "Voo Perfeito no Aviator!");
+    
+    document.getElementById('crash-multiplicador-visor').style.color = "#2ecc71"; 
+    document.getElementById('crash-foguete-icone').classList.remove('foguete-voando-aviator');
+    
+    if(window.Haptics) navigator.vibrate([100, 200, 100, 200]);
+    if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#f1c40f'], particleCount: 100});
+    if(typeof mostrarToast === 'function') mostrarToast(`Saque Perfeito! +${lucroFinal}💰`, "🚀");
+
+    voltarBotaoApostarCrash();
+}
+
+function explodirFoguete() {
+    clearInterval(motorCrash.motorLogica);
+    cancelAnimationFrame(motorCrash.motorVisual);
+    motorCrash.voando = false;
+    
+    document.getElementById('crash-multiplicador-visor').innerText = motorCrash.multiplicadorAtual.toFixed(2) + "x";
+    document.getElementById('crash-multiplicador-visor').classList.add('texto-explodiu');
+    document.getElementById('crash-tela-grafico').classList.add('tela-crash-explodiu');
+    
+    const foguete = document.getElementById('crash-foguete-icone');
+    foguete.classList.remove('foguete-voando-aviator');
+    foguete.classList.add('foguete-explodido');
+    foguete.innerText = "💥";
+    
+    // Tinta o Canvas de vermelho (Sangue)
+    const canvas = document.getElementById('crash-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "rgba(231, 76, 60, 0.3)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    if(window.Haptics) navigator.vibrate([300, 100, 500]); 
+    if(typeof mostrarToast === 'function') mostrarToast("CRASH! O foguete explodiu.", "💥");
+
+    voltarBotaoApostarCrash();
+}
+
+function voltarBotaoApostarCrash() {
+    const btn = document.getElementById('btn-acao-crash');
+    btn.innerHTML = "APOSTAR 🚀";
+    btn.style.background = "linear-gradient(145deg, #2ecc71, #27ae60)";
+    btn.style.boxShadow = "0 10px 30px rgba(46, 204, 113, 0.4)";
+}
+
+function resetarGraficoCrash() {
+    document.getElementById('crash-multiplicador-visor').innerText = "1.00x";
+    document.getElementById('crash-multiplicador-visor').style.color = "#fff";
+    document.getElementById('crash-multiplicador-visor').classList.remove('texto-explodiu');
+    document.getElementById('crash-tela-grafico').classList.remove('tela-crash-explodiu');
+    
+    const foguete = document.getElementById('crash-foguete-icone');
+    foguete.classList.remove('foguete-explodido');
+    foguete.innerText = "🚀";
+    foguete.style.left = "20px";
+    foguete.style.bottom = "20px";
+    foguete.style.top = "auto";
+    foguete.style.transform = "rotate(0deg)";
+
+    const canvas = document.getElementById('crash-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+
+// ============================================================================
+// 🃏 MOTOR MATEMÁTICO & IA: BLACKJACK (21)
+// ============================================================================
+
+// 🚨 Roteador Mestre Atualizado
+const roteadorMestre = window.abrirMesaCassino;
+window.abrirMesaCassino = function(nomeDoJogo) {
+    if (nomeDoJogo === 'blackjack') {
+        const mesa = document.getElementById('mesa-blackjack');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            resetarMesaBJ(true); // Prepara a mesa limpa
+        }
+    } else {
+        roteadorMestre(nomeDoJogo);
+    }
+};
+
+window.fecharMesaBlackjack = function() {
+    if (motorBJ.jogando) {
+        if(typeof mostrarToast === 'function') mostrarToast("A rodada está em andamento!", "⚠️");
+        return;
+    }
+    const mesa = document.getElementById('mesa-blackjack');
+    if(mesa) mesa.style.display = 'none';
+};
+
+// --- O CÉREBRO DO JOGO ---
+let motorBJ = {
+    jogando: false,
+    aposta: 0,
+    maoJogador: [],
+    maoDealer: [],
+    baralho: {
+        valores: ['2','3','4','5','6','7','8','9','10','J','Q','K','A'],
+        naipes: ['♠', '♥', '♦', '♣']
+    }
+};
+
+window.ajustarApostaBJ = function(valor) {
+    if (motorBJ.jogando) return;
+    const input = document.getElementById('bj-aposta-input');
+    let novaAposta = parseInt(input.innerText) + valor;
+    if (novaAposta < 10) novaAposta = 10;
+    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal;
+    input.innerText = novaAposta;
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+// Puxa uma carta aleatória infinita
+function sacarCartaAletoria() {
+    const valor = motorBJ.baralho.valores[Math.floor(Math.random() * motorBJ.baralho.valores.length)];
+    const naipe = motorBJ.baralho.naipes[Math.floor(Math.random() * motorBJ.baralho.naipes.length)];
+    return { valor, naipe };
+}
+
+// Matemática do 21 (Calcula o valor da mão, tratando os Ases inteligentemente)
+function calcularPontos(mao) {
+    let pontos = 0;
+    let ases = 0;
+
+    for (let carta of mao) {
+        if (['J', 'Q', 'K'].includes(carta.valor)) {
+            pontos += 10;
+        } else if (carta.valor === 'A') {
+            pontos += 11;
+            ases += 1;
+        } else {
+            pontos += parseInt(carta.valor);
+        }
+    }
+
+    // Se estourar 21 e tiver um Ás valendo 11, reduz o Ás para 1 ponto
+    while (pontos > 21 && ases > 0) {
+        pontos -= 10;
+        ases -= 1;
+    }
+    return pontos;
+}
+
+// Renderiza a Carta na Tela HTML usando CSS
+function renderizarCartaHTML(carta, oculta = false) {
+    const div = document.createElement('div');
+    div.className = `carta-bj ${oculta ? 'oculta' : ''}`;
+    
+    if (!oculta) {
+        const corCorreta = (carta.naipe === '♥' || carta.naipe === '♦') ? 'vermelha' : 'preta';
+        div.classList.add(corCorreta);
+        div.innerHTML = `
+            <div class="carta-bj-topo">${carta.valor}${carta.naipe}</div>
+            <div class="carta-bj-centro">${carta.naipe}</div>
+            <div class="carta-bj-base">${carta.valor}${carta.naipe}</div>
+        `;
+    }
+    return div;
+}
+
+function atualizarMesaVisual() {
+    // Atualiza o Jogador
+    const divJogador = document.getElementById('bj-jogador-cartas');
+    divJogador.innerHTML = "";
+    motorBJ.maoJogador.forEach(c => divJogador.appendChild(renderizarCartaHTML(c)));
+    document.getElementById('bj-jogador-pontos').innerText = calcularPontos(motorBJ.maoJogador);
+
+    // Atualiza o Dealer
+    const divDealer = document.getElementById('bj-dealer-cartas');
+    divDealer.innerHTML = "";
+    
+    if (motorBJ.jogando) {
+        // Se a rodada estiver rolando, a primeira carta do dealer é secreta!
+        divDealer.appendChild(renderizarCartaHTML(motorBJ.maoDealer[0], true));
+        if (motorBJ.maoDealer.length > 1) {
+            divDealer.appendChild(renderizarCartaHTML(motorBJ.maoDealer[1]));
+        }
+        document.getElementById('bj-dealer-pontos').innerText = "?";
+    } else {
+        // Rodada acabou, revela tudo do dealer
+        motorBJ.maoDealer.forEach(c => divDealer.appendChild(renderizarCartaHTML(c)));
+        document.getElementById('bj-dealer-pontos').innerText = calcularPontos(motorBJ.maoDealer);
+    }
+}
+
+// Inicia a Rodada (O Croupier distribui as cartas)
+window.iniciarRodadaBJ = function() {
+    const aposta = parseInt(document.getElementById('bj-aposta-input').innerText);
+    
+    if (aposta < 10 || window.pontosDoCasal < aposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Aposta no Blackjack");
+    
+    motorBJ.jogando = true;
+    motorBJ.aposta = aposta;
+    motorBJ.maoJogador = [];
+    motorBJ.maoDealer = [];
+
+    // Troca os painéis
+    document.getElementById('bj-painel-aposta').classList.add('escondido');
+    document.getElementById('bj-painel-resultado').classList.add('escondido');
+    document.getElementById('bj-painel-acao').classList.remove('escondido');
+
+    if(window.Haptics) navigator.vibrate([30, 50, 30]);
+
+    // O Croupier dá 2 cartas para cada um (com delay para charme visual)
+    setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); }, 200);
+    setTimeout(() => { motorBJ.maoDealer.push(sacarCartaAletoria()); atualizarMesaVisual(); }, 600);
+    setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); }, 1000);
+    setTimeout(() => { 
+        motorBJ.maoDealer.push(sacarCartaAletoria()); 
+        atualizarMesaVisual(); 
+        
+        // Verifica o Blackjack Natural (21 pontos de cara)
+        if (calcularPontos(motorBJ.maoJogador) === 21) {
+            if(window.Haptics) navigator.vibrate([100, 200, 300]);
+            finalizarRodadaBJ("BLACKJACK");
+        }
+    }, 1400);
+};
+
+// O Jogador pede mais uma carta
+window.comprarCartaBJ = function() {
+    if (!motorBJ.jogando) return;
+    
+    motorBJ.maoJogador.push(sacarCartaAletoria());
+    atualizarMesaVisual();
+    if(window.Haptics) navigator.vibrate(30);
+
+    // Se estourar 21, perde na hora
+    if (calcularPontos(motorBJ.maoJogador) > 21) {
+        if(window.Haptics) navigator.vibrate([300, 100, 300]);
+        finalizarRodadaBJ("ESTOUROU");
+    }
+};
+
+// O Jogador para, e a IA do Dealer assume
+window.pararBJ = function() {
+    if (!motorBJ.jogando) return;
+    
+    motorBJ.jogando = false; // Revela a carta do dealer
+    atualizarMesaVisual();
+    
+    // A regra sagrada do cassino: O Dealer é obrigado a comprar até ter 17 ou mais
+    let loopIA = setInterval(() => {
+        let pontosDealer = calcularPontos(motorBJ.maoDealer);
+        
+        if (pontosDealer < 17) {
+            motorBJ.maoDealer.push(sacarCartaAletoria());
+            atualizarMesaVisual();
+            if(window.Haptics) navigator.vibrate(30);
+        } else {
+            clearInterval(loopIA);
+            finalizarRodadaBJ("COMPARAÇÃO");
+        }
+    }, 800);
+};
+
+// Veredito e Pagamento
+function finalizarRodadaBJ(motivo) {
+    motorBJ.jogando = false;
+    atualizarMesaVisual(); // Força a revelação total
+
+    document.getElementById('bj-painel-acao').classList.add('escondido');
+    document.getElementById('bj-painel-resultado').classList.remove('escondido');
+
+    const pontosJ = calcularPontos(motorBJ.maoJogador);
+    const pontosD = calcularPontos(motorBJ.maoDealer);
+
+    let lucro = 0;
+    let msgToast = "";
+    let iconeToast = "";
+
+    if (motivo === "BLACKJACK") {
+        lucro = motorBJ.aposta * 2.5; // Paga 1.5x a aposta (Retorna a aposta + 1.5x lucro)
+        msgToast = `BLACKJACK! +${lucro}💰`;
+        iconeToast = "🃏✨";
+    } else if (motivo === "ESTOUROU") {
+        msgToast = "Você estourou 21! A casa vence.";
+        iconeToast = "💥";
+    } else {
+        // Comparação de pontos
+        if (pontosD > 21) {
+            lucro = motorBJ.aposta * 2; // Dealer estourou, ganha o dobro
+            msgToast = `Dealer estourou! Você venceu! +${lucro}💰`;
+            iconeToast = "💸";
+        } else if (pontosJ > pontosD) {
+            lucro = motorBJ.aposta * 2; // Maior pontuação
+            msgToast = `Sua mão é maior! Você venceu! +${lucro}💰`;
+            iconeToast = "🏆";
+        } else if (pontosJ < pontosD) {
+            msgToast = "O Dealer venceu esta mão.";
+            iconeToast = "🏦";
+        } else {
+            // Empate (Push)
+            lucro = motorBJ.aposta; // Devolve o dinheiro
+            msgToast = "Empate (Push). Aposta devolvida.";
+            iconeToast = "🤝";
+        }
+    }
+
+    // Paga a Thamiris
+    if (lucro > 0) {
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Vitória no Blackjack");
+        if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#ffffff'], particleCount: 150});
+        if(window.Haptics) navigator.vibrate([100, 100, 200, 200]);
+    } else if (lucro === 0 && pontosJ !== pontosD) {
+        if(window.Haptics) navigator.vibrate([200, 100, 200]); // Vibrar de perda
+    }
+
+    if(typeof mostrarToast === 'function') mostrarToast(msgToast, iconeToast);
+}
+
+// Limpa a mesa para a próxima rodada
+window.resetarMesaBJ = function(init = false) {
+    motorBJ.jogando = false;
+    document.getElementById('bj-painel-resultado').classList.add('escondido');
+    document.getElementById('bj-painel-acao').classList.add('escondido');
+    document.getElementById('bj-painel-aposta').classList.remove('escondido');
+    
+    document.getElementById('bj-jogador-cartas').innerHTML = "";
+    document.getElementById('bj-dealer-cartas').innerHTML = "";
+    document.getElementById('bj-jogador-pontos').innerText = "0";
+    document.getElementById('bj-dealer-pontos').innerText = "?";
+    
+    if(!init && window.Haptics) window.Haptics.toqueLeve();
+};
+
+
+// ============================================================================
+// 🎡 MOTOR MATEMÁTICO E FÍSICO: ROLETA DA SORTE (BLINDADO)
+// ============================================================================
+
+const roteadorAntesDaRoleta = window.abrirMesaCassino;
+window.abrirMesaCassino = function(nomeDoJogo) {
+    if (nomeDoJogo === 'roleta') {
+        const mesa = document.getElementById('mesa-roleta');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            
+            // Inicia o giro ocioso (esperando apostas)
+            const disco = document.getElementById('disco-roleta');
+            disco.style.transition = 'none';
+            disco.classList.add('roleta-respirando');
+        }
+    } else {
+        roteadorAntesDaRoleta(nomeDoJogo);
+    }
+};
+
+window.fecharMesaRoleta = function() {
+    if (motorRoleta.girando) {
+        if(typeof mostrarToast === 'function') mostrarToast("A bola está girando! Aguarde.", "⚠️");
+        return;
+    }
+    const mesa = document.getElementById('mesa-roleta');
+    if(mesa) mesa.style.display = 'none';
+};
+
+// --- O CÉREBRO DA MÁQUINA ---
+let motorRoleta = {
+    girando: false,
+    anguloAtual: 0
+};
+
+window.ajustarApostaRoleta = function(valor) {
+    if (motorRoleta.girando) return;
+    const input = document.getElementById('roleta-aposta-input');
+    let novaAposta = parseInt(input.innerText) + valor;
+    if (novaAposta < 10) novaAposta = 10;
+    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal;
+    input.innerText = novaAposta;
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+// 🚨 O LEITOR DE MATRIZ (Lê a posição do CSS em tempo real)
+function obterAnguloVisualReal(elemento) {
+    const style = window.getComputedStyle(elemento);
+    const matrix = style.getPropertyValue('transform');
+    if (matrix !== 'none') {
+        const values = matrix.split('(')[1].split(')')[0].split(',');
+        const a = values[0];
+        const b = values[1];
+        let angulo = Math.round(Math.atan2(b, a) * (180 / Math.PI));
+        return (angulo < 0) ? angulo + 360 : angulo;
+    }
+    return 0;
+}
+
+window.apostarRoleta = function(corApostada) {
+    if (motorRoleta.girando) return;
+    
+    const aposta = parseInt(document.getElementById('roleta-aposta-input').innerText);
+    
+    if (aposta < 10 || window.pontosDoCasal < aposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
+        if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    // O Cassino recolhe as fichas
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, `Aposta no ${corApostada.toUpperCase()}`);
+    
+    motorRoleta.girando = true;
+    const disco = document.getElementById('disco-roleta');
+    
+    // 🚨 A MÁGICA: Bate uma foto do ângulo exato no milissegundo do clique
+    let anguloVisualCongelado = obterAnguloVisualReal(disco);
+    
+    // Arranca a animação contínua e congela a roda onde o olho está vendo
+    disco.classList.remove('roleta-respirando');
+    disco.style.transition = 'none';
+    disco.style.transform = `rotate(${anguloVisualCongelado}deg)`;
+    
+    // Força o navegador a processar o congelamento (Reflow)
+    void disco.offsetWidth;
+
+    // 🚨 MATEMÁTICA PURA (100% Sorte e Imprevisibilidade)
+    let numeroSorteado = Math.floor(Math.random() * 15); 
+    let corCaiu = "";
+    let posicaoAlvoNaRoda = 0;
+
+    // As posições físicas de cada fatia na nossa geometria CSS
+    const posicoesVermelhas = [12, 60, 108, 156, 204, 252, 300];
+    const posicoesPretas = [36, 84, 132, 180, 228, 276, 324];
+
+    if (numeroSorteado === 0) {
+        corCaiu = "verde";
+        posicaoAlvoNaRoda = 354; // Eixo central da fatia verde
+    } else if (numeroSorteado >= 1 && numeroSorteado <= 7) {
+        corCaiu = "vermelho";
+        posicaoAlvoNaRoda = posicoesVermelhas[numeroSorteado - 1]; // Escolhe uma fatia vermelha aleatória
+    } else {
+        corCaiu = "preto";
+        posicaoAlvoNaRoda = posicoesPretas[numeroSorteado - 8]; // Escolhe uma fatia preta aleatória
+    }
+
+    // 🚨 FÍSICA DE GIRO: Calcula a distância exata da foto congelada até o alvo
+    let rotacaoParaOAlvo = (360 - posicaoAlvoNaRoda) % 360;
+    let distanciaFaltante = rotacaoParaOAlvo - (anguloVisualCongelado % 360);
+    if (distanciaFaltante <= 0) distanciaFaltante += 360; // Força a roleta a sempre girar para a direita
+
+    // Adiciona o Torque do Croupier: 10 voltas insanas completas (3600 graus) + a distância até o alvo
+    motorRoleta.anguloAtual = anguloVisualCongelado + 3600 + distanciaFaltante;
+    
+    // Liga os motores com uma curva de freio realista (arranca rápido e desliza no final)
+    disco.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
+    disco.style.transform = `rotate(${motorRoleta.anguloAtual}deg)`;
+    
+    if(window.Haptics) navigator.vibrate([20, 50, 20, 50, 20, 50]); 
+    if(typeof mostrarToast === 'function') mostrarToast("Rien ne va plus! (Apostas encerradas)", "🎲");
+
+    // Aguarda os 5 segundos da física terminarem
+    setTimeout(() => {
+        verificarVitoriaRoleta(corApostada, corCaiu, aposta);
+    }, 5000);
+};
+
+function verificarVitoriaRoleta(corApostada, corCaiu, aposta) {
+    motorRoleta.girando = false;
+    
+    // Devolve a roleta ao estado ocioso mantendo a posição final
+    const disco = document.getElementById('disco-roleta');
+    let anguloFinal = obterAnguloVisualReal(disco);
+    disco.style.transition = 'none';
+    disco.style.transform = `rotate(${anguloFinal}deg)`;
+    void disco.offsetWidth;
+    disco.classList.add('roleta-respirando');
+
+    let lucro = 0;
+    let msgToast = "";
+    let icone = "";
+
+    if (corApostada === corCaiu) {
+        if (corCaiu === "verde") {
+            lucro = aposta * 14;
+            msgToast = `JACKPOT VERDE! +${lucro}💰`;
+            icone = "🟢";
+        } else {
+            lucro = aposta * 2;
+            msgToast = `Caiu no ${corCaiu.toUpperCase()}! +${lucro}💰`;
+            icone = (corCaiu === "vermelho") ? "🔴" : "⚫";
+        }
+        
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Vitória na Roleta (${corCaiu})`);
+        if(typeof confetti === 'function') confetti({colors: ['#f1c40f', (corCaiu==='vermelho'?'#e74c3c':'#2c3e50')], particleCount: 150});
+        if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
+        
+    } else {
+        msgToast = `Caiu no ${corCaiu.toUpperCase()}. A casa venceu.`;
+        icone = "💸";
+        if(window.Haptics) navigator.vibrate([300, 100, 300]);
+    }
+
+    if(typeof mostrarToast === 'function') mostrarToast(msgToast, icone);
+}

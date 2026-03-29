@@ -49,6 +49,7 @@ const PLANTAS_NIVEIS = [
 ];
 
 window.inicializarLogistica = function() {
+    if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
     console.log("Abrindo Planta de Escoamento...");
     const hist = parseInt(localStorage.getItem('santuario_logistica_vitorias') || '0');
     window.estadoLogistica.historicoVitorias = hist;
@@ -233,18 +234,18 @@ window.finalizarPartidaComVitoria = function() {
     if(window.Haptics) navigator.vibrate([100, 100, 400]);
     if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#2ecc71'], particleCount: 200, spread: 100});
     
-    // Recompensa Econômica!
-    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(50, "Contrato Logístico Cumprido!");
+    // 🚨 INFLAÇÃO DO BEM: Recompensa aumentada de 50 para 300!
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(300, "Contrato Logístico Cumprido!");
     
     window.estadoLogistica.historicoVitorias++;
     localStorage.setItem('santuario_logistica_vitorias', window.estadoLogistica.historicoVitorias);
     document.getElementById('logistica-contratos-hud').innerText = window.estadoLogistica.historicoVitorias;
 
     setTimeout(() => {
-        if(typeof mostrarToast === 'function') mostrarToast("Rota Estabelecida! +50💰", "🚢");
+        if(typeof mostrarToast === 'function') mostrarToast("Rota Estabelecida! +300💰", "🚢"); // 🚨 ATUALIZADO
         document.getElementById('logistica-painel-inicio').classList.remove('escondido');
         document.querySelector('#logistica-painel-inicio h2').innerText = "Carga Entregue!";
-        document.querySelector('#logistica-painel-inicio p').innerText = "Pronto para o próximo contrato marítimo?";
+        document.querySelector('#logistica-painel-inicio p').innerText = "Você faturou R$ 300. Pronto para o próximo contrato?";
     }, 1500);
 };
 

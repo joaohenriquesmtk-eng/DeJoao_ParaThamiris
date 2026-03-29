@@ -8,15 +8,23 @@
         <p><b>Por favor, deite o seu celular para iniciar o expediente.</b></p>
     </div>
 
-    <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(46, 204, 113, 0.4); z-index: 10;">
-        <div class="top-bar-left">
-            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-            <button class="btn-info" onclick="toggleInstrucoesFazenda()">❓</button>
-            <button class="btn-info" onclick="abrirPainelBurocracia()" style="font-size: 1.2rem;">⚖️</button>
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(46, 204, 113, 0.4); z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 10px 8px;">
+        
+        <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+            <button class="btn-voltar" onclick="voltarMenuJogos()" style="padding: 6px 10px; font-size: 0.85rem;">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesFazenda()" style="padding: 6px 10px; font-size: 0.85rem;">❓</button>
+            <button class="btn-info" onclick="abrirPainelBurocracia()" style="padding: 6px 10px; font-size: 0.85rem;">⚖️</button>
         </div>
-        <div class="top-bar-right">
-            <span class="recurso" style="box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);">💰 <span id="fazenda-capital">0</span></span>
-            <span class="recurso">🌤️ <span id="fazenda-clima-texto">Sol</span></span>
+        
+        <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: nowrap;">
+            
+            <span class="recurso" style="padding: 4px 8px; font-size: 0.8rem; white-space: nowrap;">🌤️ <span id="fazenda-clima-texto">Sol</span></span>
+
+            <div class="visor-moedas-global-container" style="padding: 4px 10px; font-size: 0.85rem;">
+                <span class="visor-moedas-global-texto" id="fazenda-capital">0</span>
+                <span style="font-size: 0.8rem;">💰</span>
+            </div>
+
         </div>
     </div>
 

@@ -467,129 +467,150 @@
     <source src="assets/ambient.mp3" type="audio/mpeg">
 </audio>
 
-<div id="menu-jogos" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 5px 10px; margin-bottom: 20px;">
+<div id="menu-jogos-container" style="padding: 5px 10px; margin-bottom: 20px;">
     
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('termo')">
-        <img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Termo do Santuário</h4>
-        <p class="desc-jogo-grid">Palavras do coração</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('estufa')">
-        <img src="assets/icones-jogos/estufa.png" alt="Estufa" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Estufa de Foco</h4>
-        <p class="desc-jogo-grid">Produtividade unida</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('cinema')">
-        <img src="assets/icones-jogos/cinema.png" alt="Cinema" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Cine Quântico</h4>
-        <p class="desc-jogo-grid">Sincronia de Tela</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('tesouro')">
-        <img src="assets/icones-jogos/tesouro.png" alt="Tesouro" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Tesouro Oculto</h4>
-        <p class="desc-jogo-grid">Caça por GPS</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('correio')">
-        <img src="assets/icones-jogos/correio.png" alt="Correio" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Correio Elegante</h4>
-        <p class="desc-jogo-grid">Cartas em Trânsito</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('pager')">
-        <img src="assets/icones-jogos/pager.png" alt="Pager" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Pager Retrô</h4>
-        <p class="desc-jogo-grid">Frequência 90s</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('agua')">
-                <img src="assets/icones-jogos/hidratacao.png" alt="Hidratacao" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Nascente da Vida</h4>
-        <p class="desc-jogo-grid">Hidratação Mútua</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('agenda')">
-                <img src="assets/icones-jogos/agenda.png" alt="Agenda" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Pauta do Destino</h4>
-        <p class="desc-jogo-grid">Contagem Regressiva</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('roleta')">
-                <img src="assets/icones-jogos/roleta.png" alt="Roleta" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">O Veredito</h4>
-        <p class="desc-jogo-grid">Roleta Culinária</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('cartorio')">
-        <img src="assets/icones-jogos/tabelionato.png" alt="Tabelionato" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Tabelionato</h4>
-        <p class="desc-jogo-grid">Pactos de afeto</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('guardiao')">
-                <img src="assets/icones-jogos/guardiao.png" alt="Guardiao" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">O Guardião</h4>
-        <p class="desc-jogo-grid">Mascote Compartilhado</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('tribunal')">
-        <img src="assets/icones-jogos/tribunal.png" alt="Tribunal" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Tribunal do Afeto</h4>
-        <p class="desc-jogo-grid">Quem tem a razão?</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('sincronia')">
-        <img src="assets/icones-jogos/sincronia.png" alt="Sincronia" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Match de Sincronia</h4>
-        <p class="desc-jogo-grid">Conexão quântica</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('minifazenda')">
-        <img src="assets/icones-jogos/minifazenda.png" alt="Mini Fazenda" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Mini Fazenda</h4>
-        <p class="desc-jogo-grid">Cultive o amor</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('jardim')">
-        <img src="assets/icones-jogos/jardim.png" alt="Jardim" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Nosso Solo Fértil</h4>
-        <p class="desc-jogo-grid">A Árvore da Vida</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('julgamento')">
-        <img src="assets/icones-jogos/julgamento.png" alt="Julgamento" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Julgamento da Safra</h4>
-        <p class="desc-jogo-grid">Combine as provas</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('contratos')">
-        <img src="assets/icones-jogos/contratos.png" alt="Contratos" class="icone-jogo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2950/2950669.png'">
-        <h4 class="titulo-jogo-grid">Contratos da Terra</h4>
-        <p class="desc-jogo-grid">Exporte e lucre</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('banco')">
-                <img src="assets/icones-jogos/banco.png" alt="Banco" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Banco Central</h4>
-        <p class="desc-jogo-grid">Fundo de Investimento</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('pericia')">
-                <img src="assets/icones-jogos/pericia.png" alt="Pericia" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Perícia do Afeto</h4>
-        <p class="desc-jogo-grid">C.S.I. Agronômico</p>
-    </div>
-
-    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('logistica')">
-                <img src="assets/icones-jogos/escoamento.png" alt="Escomento" class="icone-jogo-img">
-        <h4 class="titulo-jogo-grid">Rota de Escoamento</h4>
-        <p class="desc-jogo-grid">Logística de Safra</p>
+    <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px; margin-top: 5px;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; margin-bottom: 5px;">🌱 Rituais de Cuidado 🌱</h3>
+        <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin: 0;">Cultive o amor, a saúde e a sintonia</p>
     </div>
     
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('estufa')">
+            <img src="assets/icones-jogos/estufa.png" alt="Estufa" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Estufa de Foco</h4>
+            <p class="desc-jogo-grid">Produtividade unida</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('agua')">
+            <img src="assets/icones-jogos/hidratacao.png" alt="Hidratacao" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Nascente da Vida</h4>
+            <p class="desc-jogo-grid">Hidratação Mútua</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('jardim')">
+            <img src="assets/icones-jogos/jardim.png" alt="Jardim" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Nosso Solo Fértil</h4>
+            <p class="desc-jogo-grid">A Árvore da Vida</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('cinema')">
+            <img src="assets/icones-jogos/cinema.png" alt="Cinema" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Cine Quântico</h4>
+            <p class="desc-jogo-grid">Sincronia de Tela</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('correio')">
+            <img src="assets/icones-jogos/correio.png" alt="Correio" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Correio Elegante</h4>
+            <p class="desc-jogo-grid">Cartas em Trânsito</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('pager')">
+            <img src="assets/icones-jogos/pager.png" alt="Pager" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Pager Retrô</h4>
+            <p class="desc-jogo-grid">Frequência 90s</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('agenda')">
+            <img src="assets/icones-jogos/agenda.png" alt="Agenda" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Pauta do Destino</h4>
+            <p class="desc-jogo-grid">Contagem Regressiva</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('roleta')">
+            <img src="assets/icones-jogos/roleta.png" alt="Roleta" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">O Veredito</h4>
+            <p class="desc-jogo-grid">Roleta Culinária</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('cartorio')">
+            <img src="assets/icones-jogos/tabelionato.png" alt="Tabelionato" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Tabelionato</h4>
+            <p class="desc-jogo-grid">Pactos de afeto</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('guardiao')">
+            <img src="assets/icones-jogos/guardiao.png" alt="Guardiao" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">O Guardião</h4>
+            <p class="desc-jogo-grid">Mascote Compartilhado</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('sincronia')">
+            <img src="assets/icones-jogos/sincronia.png" alt="Sincronia" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Match de Sincronia</h4>
+            <p class="desc-jogo-grid">Conexão quântica</p>
+        </div>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('tesouro')">
+            <img src="assets/icones-jogos/tesouro.png" alt="Tesouro" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Tesouro Oculto</h4>
+            <p class="desc-jogo-grid">Caça por GPS</p>
+        </div>
+    </div>
 
+    <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px; margin-top: 35px;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; margin-bottom: 5px;">🏛️ Império & Fortuna 🏛️</h3>
+        <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin: 0;">Estratégia, colheitas e riquezas</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('termo')">
+            <img src="assets/icones-jogos/termo.png" alt="Termo" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Termo do Santuário</h4>
+            <p class="desc-jogo-grid">Palavras do coração</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('julgamento')">
+            <img src="assets/icones-jogos/julgamento.png" alt="Julgamento" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Julgamento da Safra</h4>
+            <p class="desc-jogo-grid">Combine as provas</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('tribunal')">
+            <img src="assets/icones-jogos/tribunal.png" alt="Tribunal" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Tribunal do Afeto</h4>
+            <p class="desc-jogo-grid">Quem tem a razão?</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('pericia')">
+            <img src="assets/icones-jogos/pericia.png" alt="Pericia" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Perícia do Afeto</h4>
+            <p class="desc-jogo-grid">C.S.I. Agronômico</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('minifazenda')">
+            <img src="assets/icones-jogos/minifazenda.png" alt="Mini Fazenda" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Mini Fazenda</h4>
+            <p class="desc-jogo-grid">Cultive o amor</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('contratos')">
+            <img src="assets/icones-jogos/contratos.png" alt="Contratos" class="icone-jogo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2950/2950669.png'">
+            <h4 class="titulo-jogo-grid">Contratos da Terra</h4>
+            <p class="desc-jogo-grid">Exporte e lucre</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('logistica')">
+            <img src="assets/icones-jogos/escoamento.png" alt="Escomento" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Rota de Escoamento</h4>
+            <p class="desc-jogo-grid">Logística de Safra</p>
+        </div>
+
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('banco')">
+            <img src="assets/icones-jogos/banco.png" alt="Banco" class="icone-jogo-img">
+            <h4 class="titulo-jogo-grid">Banco Central</h4>
+            <p class="desc-jogo-grid">Fundo de Investimento</p>
+        </div>
+
+    </div>
+
+    <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px; margin-top: 35px;">
+        <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; margin-bottom: 5px;">🎰 O Distrito Noturno 🎰</h3>
+        <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin: 0;">Apostas, mimos e recompensas</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirLobbyCassino()" style="background: linear-gradient(145deg, rgba(212,175,55,0.1), rgba(0,0,0,0.8)); border: 1px solid rgba(212,175,55,0.6);">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">🎰</div>
+            <h4 class="titulo-jogo-grid" style="color: #D4AF37;">Cassino do Afeto</h4>
+            <p class="desc-jogo-grid">Arrisque sua fortuna</p>
+        </div>
+        
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('boutique')" style="background: linear-gradient(145deg, rgba(231,76,60,0.05), rgba(0,0,0,0.8)); border: 1px solid rgba(231,76,60,0.4);">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">🛍️</div>
+            <h4 class="titulo-jogo-grid" style="color: #e74c3c;">Boutique</h4>
+            <p class="desc-jogo-grid">Compre privilégios</p>
+        </div>
+    </div>
 
 </div>
 
@@ -602,15 +623,21 @@
         <div id="container-pager" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: radial-gradient(circle at center, #111411 0%, #000 100%); z-index: 100; display: flex; flex-direction: column; overflow-y: auto; scroll-behavior: smooth;"></div>
         <div id="container-tesouro" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: radial-gradient(circle at 50% 50%, #0a110a 0%, #000000 100%); z-index: 100; display: flex; flex-direction: column; overflow: hidden;"></div>
         <div id="container-agua" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: radial-gradient(circle at 50% 100%, #001a33 0%, #000000 100%); z-index: 100; display: flex; flex-direction: column; overflow-y: auto;">
-            <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(30px); border-bottom: 1px solid rgba(0, 212, 255, 0.15); z-index: 10; position: sticky; top: 0;">
-        <div class="top-bar-left">
-            <button class="btn-voltar" onclick="voltarMenuJogos()">← Retornar</button>
-            <button class="btn-info" onclick="window.toggleInstrucoesHidratacao()">❓</button>
+            <div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(30px); border-bottom: 1px solid rgba(0, 212, 255, 0.15); z-index: 10; position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 8px;">
+        
+        <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+            <button class="btn-voltar" onclick="voltarMenuJogos()" style="padding: 6px 10px; font-size: 0.85rem;">← Sair</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesHidratacao()" style="padding: 6px 10px; font-size: 0.85rem;">❓</button>
         </div>
-        <div class="top-bar-right">
-            <div style="background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.3); padding: 5px 12px; border-radius: 20px; box-shadow: 0 0 15px rgba(0,212,255,0.2);">
-                <span style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Orvalho Sagrado:</span>
-                <span id="hidratacao-orvalho-hud" style="color: #00d4ff; font-weight: 900; font-family: monospace; font-size: 1.1rem; margin-left: 5px;">0</span>💧
+        
+        <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: nowrap;">
+            <div style="background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.3); padding: 4px 8px; border-radius: 20px; box-shadow: 0 0 15px rgba(0,212,255,0.2); white-space: nowrap; font-size: 0.8rem; display: flex; align-items: center;">
+                <span id="hidratacao-orvalho-hud" style="color: #00d4ff; font-weight: bold; margin-right: 3px;">0</span>💧
+            </div>
+            
+            <div class="visor-moedas-global-container" style="padding: 4px 10px; font-size: 0.85rem;">
+                <span class="visor-moedas-global-texto">0</span>
+                <span style="font-size: 0.8rem;">💰</span>
             </div>
         </div>
     </div>
@@ -1441,6 +1468,320 @@
 
         </div>
     </div>
+
+<div id="overlay-cassino" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 99999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(212, 175, 55, 0.7); z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseGold 1.5s infinite;">
+            <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+                <button class="btn-voltar" onclick="fecharCassino()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 15px; color: #D4AF37;">← Sair do VIP</button>
+            </div>
+            
+            <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end;">
+                <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                    <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                    <span style="font-size: 0.9rem;">💰</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; padding: 30px 15px 10px 15px;">
+            <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);">🎰</div>
+            <h2 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6); animation: neonPulseGold 2s infinite;">Cassino do Afeto</h2>
+            <p style="color: rgba(255,255,255,0.6); font-style: italic; font-size: 1rem; margin-top: 5px;">A casa não tem piedade. Boa sorte, amor.</p>
+        </div>
+
+        <div style="padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px;">
+            
+            <div class="cartao-vidro-mines cartao-mines-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('mines')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+                <div style="font-size: 2.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 212, 255, 0.3);">💣</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Campo Minado (Mines)</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Multiplique a aposta. Desvie das bombas.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines cartao-mines-slots" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('slots')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+                <div style="font-size: 2.5rem; background: rgba(255, 0, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(255, 0, 255, 0.3);">🍒</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Caça-Níquel (Slots)</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Alinhe os símbolos e leve o Jackpot.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines cartao-mines-blackjack" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('blackjack')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+                <div style="font-size: 2.5rem; background: rgba(0, 255, 0, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 255, 0, 0.3);">🃏</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Blackjack (21)</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Derrote a mesa sem estourar 21 pontos.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('crash')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+                <div style="font-size: 2.5rem; background: rgba(255, 255, 0, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(255, 255, 0, 0.3);">🚀</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">O Foguetinho (Crash)</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Retire o lucro antes da explosão.</p>
+                </div>
+            </div>
+            
+            <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('roleta')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+                <div style="font-size: 2.5rem; background: rgba(46, 204, 113, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(46, 204, 113, 0.3);">🎡</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Roleta da Sorte</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Aposte suas cores e números.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id="mesa-mines" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 5, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(231, 76, 60, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseRed 1.5s infinite;">
+            <button onclick="fecharMesaMines()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(231, 76, 60, 0.4); border-radius: 15px; color: #e74c3c;">← Abandonar Mesa</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 20px; text-align: center; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+            
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 2.5rem; margin-bottom: 5px;">💣</div>
+                <h2 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6); animation: neonPulseGold 2s infinite;">Campo Minado</h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Multiplique sua fortuna</p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); 
+                        backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); 
+                        border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; 
+                        padding: 12px 8px; margin-bottom: 20px; display: flex; align-items: center; 
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);">
+                
+                <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 5px;">
+                    <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta 💰</label>
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <button onclick="ajustarApostaMines(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                        <span id="mines-aposta-input" style="color: #D4AF37; font-size: 1.4rem; font-weight: bold; font-family: 'monospace'; min-width: 40px; text-align: center;">50</span>
+                        <button onclick="ajustarApostaMines(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                    </div>
+                </div>
+
+                <div style="flex: 1; padding-left: 5px;">
+                    <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Bombas 💣</label>
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <button onclick="ajustarBombasMines(-1)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid #e74c3c; font-size: 1.2rem; font-weight: bold;">-</button>
+                        <span id="mines-bombas-input" style="color: #e74c3c; font-size: 1.4rem; font-weight: bold; font-family: 'monospace'; min-width: 30px; text-align: center;">3</span>
+                        <button onclick="ajustarBombasMines(1)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid #e74c3c; font-size: 1.2rem; font-weight: bold;">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="btn-mines-iniciar" onclick="iniciarRodadaMines()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4); animation: btnNeonPulse 1.5s infinite;">Apostar e Iniciar</button>
+            
+            <div id="mines-painel-saque" class="escondido" style="width: 100%;">
+                <div style="font-size: 1.5rem; color: #D4AF37; margin-bottom: 12px; font-weight: bold; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);">MULTIPLICADOR: <span id="mines-multiplicador-texto">1.00</span>x</div>
+                <button id="btn-mines-sacar" onclick="sacarMines()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #f1c40f, #f39c12); color: black; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(241, 196, 15, 0.5); animation: btnNeonPulse 1.5s infinite;">RETIRAR <span id="mines-lucro-texto">0</span>💰</button>
+            </div>
+
+            <div style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 15px 0;">
+                <div id="grade-mines" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 360px; aspect-ratio: 1/1;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mesa-slots" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 10, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(255, 0, 255, 0.5); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseMagenta 1.5s infinite;">
+            <button onclick="fecharMesaSlots()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(255, 0, 255, 0.4); border-radius: 15px; color: #ff00ff;">← Abandonar Máquina</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 20px; text-align: center; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+            
+            <h2 style="color: #ff00ff; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(255, 0, 255, 0.6); margin-bottom: 5px;">Caça-Níquel</h2>
+            <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px;">Alinhe os corações</p>
+
+            <div style="background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,15,1)); border: 4px solid #333; border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,1); position: relative; overflow: hidden; margin-bottom: 30px;">
+                
+                <div id="slots-led-vitoria" class="escondido" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%); z-index: 1; pointer-events: none; animation: flashJackpot 0.5s infinite;"></div>
+                
+                <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: rgba(231, 76, 60, 0.5); box-shadow: 0 0 10px rgba(231, 76, 60, 0.8); z-index: 2; transform: translateY(-50%);"></div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; position: relative; z-index: 3;">
+                    <div id="slot-1" class="cilindro-slot">🍒</div>
+                    <div id="slot-2" class="cilindro-slot">🍒</div>
+                    <div id="slot-3" class="cilindro-slot">🍒</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,0,255,0.2); margin-bottom: 20px;">
+                <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-bottom: 15px;">Valor da Aposta</label>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+                    <button onclick="ajustarApostaSlots(-10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(255, 0, 255, 0.1); color: #ff00ff; border: 2px solid #ff00ff; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); z-index: 5;">-</button>
+                    
+                    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                        <span id="slots-aposta-input" style="color: #ff00ff; font-size: 2.5rem; font-weight: bold; font-family: 'monospace'; text-shadow: 0 0 15px rgba(255,0,255,0.6);">50</span>
+                    </div>
+
+                    <button onclick="ajustarApostaSlots(10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(255, 0, 255, 0.1); color: #ff00ff; border: 2px solid #ff00ff; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); z-index: 5;">+</button>
+                </div>
+            </div>
+
+            <button id="btn-girar-slots" onclick="girarSlots()" style="width: 100%; padding: 20px; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #ff00ff, #8e44ad); color: white; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(255,0,255,0.4); transition: transform 0.1s;">Girar 🎰</button>
+        </div>
+    </div>
+
+
+    <div id="mesa-crash" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 15, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(241, 196, 15, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseYellow 1.5s infinite;">
+            <button onclick="fecharMesaCrash()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(241, 196, 15, 0.4); border-radius: 15px; color: #f1c40f;">← Abandonar Pista</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 20px; text-align: center; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+            
+            <h2 style="color: #f1c40f; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(241, 196, 15, 0.6); margin-bottom: 5px;">O Foguetinho</h2>
+            <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Retire antes da explosão</p>
+
+            <div id="crash-tela-grafico" style="background: linear-gradient(180deg, rgba(20,10,30,0.9), rgba(10,5,15,1)); border: 4px solid #333; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 30px rgba(155, 89, 182, 0.2); position: relative; overflow: hidden; margin-bottom: 30px; height: 280px; width: 100%;">
+                
+                <div id="crash-multiplicador-visor" style="position: absolute; top: 15px; left: 20px; font-size: 3.5rem; font-weight: 900; color: #fff; font-family: 'monospace'; text-shadow: 0 0 20px rgba(255, 255, 255, 0.4); z-index: 10; transition: color 0.3s;">1.00x</div>
+                
+                <canvas id="crash-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;"></canvas>
+                
+                <div id="crash-foguete-icone" style="position: absolute; bottom: 0; left: 0; font-size: 3rem; z-index: 5; transform-origin: center; transition: none; filter: drop-shadow(0 0 10px rgba(241,196,15,0.8));">🚀</div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(241, 196, 15, 0.2); margin-bottom: 20px;">
+                <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-bottom: 15px;">Valor da Aposta</label>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+                    <button onclick="ajustarApostaCrash(-10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 2px solid #f1c40f; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);"> - </button>
+                    
+                    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                        <span id="crash-aposta-input" style="color: #f1c40f; font-size: 2.5rem; font-weight: bold; font-family: 'monospace'; text-shadow: 0 0 15px rgba(241, 196, 15, 0.6);">50</span>
+                    </div>
+
+                    <button onclick="ajustarApostaCrash(10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 2px solid #f1c40f; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);"> + </button>
+                </div>
+            </div>
+
+            <button id="btn-acao-crash" onclick="acaoCrash()" style="width: 100%; padding: 20px; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4); transition: all 0.2s;">APOSTAR 🚀</button>
+        </div>
+    </div>
+
+    <div id="mesa-blackjack" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(20, 50, 30, 0.98), rgba(5, 15, 10, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(46, 204, 113, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseGreen 1.5s infinite;">
+            <button onclick="fecharMesaBlackjack()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 15px; color: #2ecc71;">← Sair da Mesa</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 20px; text-align: center; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+            
+            <div>
+                <h2 style="color: #2ecc71; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(46, 204, 113, 0.6); margin-bottom: 5px;">Blackjack 21</h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;">Vença o Dealer</p>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border-top: 2px solid rgba(255,255,255,0.1); margin-bottom: 10px; min-height: 160px; display: flex; flex-direction: column; align-items: center;">
+                <h4 style="color: rgba(255,255,255,0.8); margin: 0 0 10px 0; font-weight: normal;">Banca <span id="bj-dealer-pontos" style="color: #2ecc71; font-weight: bold; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; margin-left: 5px;">?</span></h4>
+                <div id="bj-dealer-cartas" style="display: flex; justify-content: center; height: 110px;">
+                    </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border-bottom: 2px solid #D4AF37; margin-bottom: 20px; min-height: 160px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div id="bj-jogador-cartas" style="display: flex; justify-content: center; height: 110px; margin-bottom: 10px;"></div>
+                <h4 style="color: #fff; margin: 0; font-weight: normal; font-size: 1.2rem;">Sua Mão: <span id="bj-jogador-pontos" style="color: #D4AF37; font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px rgba(212,175,55,0.5); margin-left: 5px;">0</span></h4>
+            </div>
+
+            <div id="bj-controles">
+                <div id="bj-painel-aposta" style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(46, 204, 113, 0.2);">
+                    <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-bottom: 15px;">Fazer Aposta</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 15px;">
+                        <button onclick="ajustarApostaBJ(-10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 2px solid #2ecc71; font-size: 2rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); z-index: 5;">-</button>
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <span id="bj-aposta-input" style="color: #2ecc71; font-size: 2.5rem; font-weight: bold; font-family: 'monospace'; text-shadow: 0 0 15px rgba(46, 204, 113, 0.6);">50</span>
+                        </div>
+                        <button onclick="ajustarApostaBJ(10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 2px solid #2ecc71; font-size: 2rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); z-index: 5;">+</button>
+                    </div>
+                    <button onclick="iniciarRodadaBJ()" style="width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; border-radius: 15px; background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 20px rgba(0,0,0,0.6); text-transform: uppercase;">Dar as Cartas 🃏</button>
+                </div>
+
+                <div id="bj-painel-acao" class="escondido" style="display: flex; gap: 10px;">
+                    <button id="btn-bj-comprar" onclick="comprarCartaBJ()" style="flex: 1; padding: 15px; font-size: 1.1rem; font-weight: bold; border-radius: 15px; background: linear-gradient(145deg, #3498db, #2980b9); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">+ Carta</button>
+                    <button id="btn-bj-parar" onclick="pararBJ()" style="flex: 1; padding: 15px; font-size: 1.1rem; font-weight: bold; border-radius: 15px; background: linear-gradient(145deg, #e74c3c, #c0392b); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);">Parar ✋</button>
+                </div>
+                
+                <div id="bj-painel-resultado" class="escondido">
+                    <button onclick="resetarMesaBJ()" style="width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; border-radius: 15px; background: linear-gradient(145deg, #f1c40f, #f39c12); color: black; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 20px rgba(241, 196, 15, 0.4); text-transform: uppercase; animation: ledPulseYellow 1.5s infinite;">Nova Rodada 🔄</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id="mesa-roleta" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 10, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(46, 204, 113, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseGreen 1.5s infinite;">
+            <button onclick="fecharMesaRoleta()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 15px; color: #2ecc71;">← Sair da Roleta</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 20px; text-align: center; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+            
+            <h2 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6); margin-bottom: 5px;">Roleta da Sorte</h2>
+            <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Faça a sua aposta</p>
+
+            <div style="background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,15,1)); border: 4px solid #333; border-radius: 20px; padding: 30px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 30px rgba(212, 175, 55, 0.1); position: relative; overflow: hidden; margin-bottom: 30px; display: flex; justify-content: center; align-items: center;">
+                
+                <div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #f1c40f; z-index: 10; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.8));"></div>
+
+                <div id="disco-roleta" class="roda-roleta-css" style="width: 220px; height: 220px; border-radius: 50%; border: 8px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8); position: relative; transition: transform 4s cubic-bezier(0.2, 0.8, 0.1, 1);">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #f1c40f, #d35400); border-radius: 50%; border: 4px solid #111; z-index: 5; box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);"></div>
+                </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.2); margin-bottom: 20px;">
+                <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-bottom: 15px;">Valor da Aposta</label>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 20px;">
+                    <button onclick="ajustarApostaRoleta(-10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 2px solid #D4AF37; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);"> - </button>
+                    
+                    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                        <span id="roleta-aposta-input" style="color: #D4AF37; font-size: 2.5rem; font-weight: bold; font-family: 'monospace'; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);">50</span>
+                    </div>
+
+                    <button onclick="ajustarApostaRoleta(10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 2px solid #D4AF37; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);"> + </button>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="apostarRoleta('vermelho')" style="flex: 1; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; background: linear-gradient(145deg, #e74c3c, #c0392b); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);">🔴 2x</button>
+                    <button onclick="apostarRoleta('verde')" style="flex: 0.6; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);">🟢 14x</button>
+                    <button onclick="apostarRoleta('preto')" style="flex: 1; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; background: linear-gradient(145deg, #34495e, #2c3e50); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);">⚫ 2x</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <div class="fio-de-ouro"></div>
     

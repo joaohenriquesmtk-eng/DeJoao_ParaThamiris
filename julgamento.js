@@ -44,8 +44,10 @@
     // 4. INICIALIZAÇÃO
     window.iniciarJulgamento = function() {
         console.log("Iniciando Match-3 Motor Definitivo...");
+        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO DO BANCO CENTRAL NA HORA
+        
         nivel = 1;
-        metaNivel = 1000;
+        metaNivel = 500; // 🚨 BALANCEAMENTO: 1000 era frustrante. 500 é perfeito para a fase 1.
         iniciarNovoNivel();
         
         const btnNovo = document.getElementById('julgamento-btn-novo');
@@ -53,9 +55,10 @@
     };
 
     function iniciarNovoNivel(resetarTudo = false) {
-        if(resetarTudo) { pontuacao = 0; nivel = 1; metaNivel = 1000; }
+        if(resetarTudo) { pontuacao = 0; nivel = 1; metaNivel = 500; }
         
-        movimentosRestantes = 20 + (nivel * 2); 
+        // 🚨 MAIS TRANQUILIDADE: Aumentamos a base de movimentos de 15 para 30!
+        movimentosRestantes = 30 + (nivel * 3); 
         processandoCascata = false;
         
         gerarGradeInicial();
@@ -303,6 +306,14 @@
         const recompensa = matchesUnicos.length * (isBombAttack ? 25 : 15);
         pontuacao += recompensa;
         
+        // 🚨 INFLAÇÃO DO BEM: Paga 1 Moeda por cada pecinha destruída no jogo!
+        if (typeof atualizarPontosCasal === 'function') {
+            atualizarPontosCasal(matchesUnicos.length, "Pedras Quebradas na Safra");
+            // Atualiza a interface da Fazenda (se aberta no fundo) para ela não perder a conta
+            const capitalUI = document.getElementById('fazenda-capital');
+            if (capitalUI) capitalUI.innerText = window.pontosDoCasal;
+        }
+        
         if (!isBombAttack) {
             AudioMatch.match3.currentTime = 0; AudioMatch.match3.play();
         }
@@ -508,11 +519,16 @@
         nivel++;
         pontuacao = 0;
         metaNivel = Math.floor(metaNivel * 1.5); 
-        movimentosRestantes = 15 + Math.floor(nivel * 2); 
+        
+        // 🚨 BUG CORRIGIDO: Mantendo a mesma generosidade matemática de 30 turnos + bônus do nível.
+        movimentosRestantes = 30 + (nivel * 3); 
         
         AudioMatch.subirNivel.play();
-        mostrarTextoFlutuante(`NÍVEL ${nivel}!`);
+        mostrarTextoFlutuante(`NÍVEL ${nivel}! +150💰`);
         if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#9b59b6'], spread: 90});
+        
+        // 🚨 INFLAÇÃO DO BEM: O prêmio gordo por passar de fase
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(150, `Subiu para o Nível ${nivel} na Safra`);
         
         let statsTribunal = JSON.parse(localStorage.getItem('estatisticasCasalTribunal')) || { ganhos: 0, perdidos: 0 };
         statsTribunal.ganhos++;

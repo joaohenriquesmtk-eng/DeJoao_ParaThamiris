@@ -1,10 +1,17 @@
-<div class="top-bar" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10;">
-        <div class="top-bar-left">
-            <button class="btn-voltar" onclick="voltarMenuJogos()">← Voltar</button>
-            <button class="btn-info" onclick="toggleInstrucoesTermo()">❓</button>
+<div class="top-bar" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.4); z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 10px 8px;">
+        
+        <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+            <button class="btn-voltar" onclick="voltarMenuJogos()" style="padding: 6px 10px; font-size: 0.85rem;">← Voltar</button>
+            <button class="btn-info" onclick="toggleInstrucoesTermo()" style="padding: 6px 10px; font-size: 0.85rem;">❓</button>
         </div>
-        <div class="top-bar-right">
-            <span class="recurso" style="box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); color: #D4AF37;">🔑 Guardião do Cofre</span>
+        
+        <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: nowrap;">
+            <span class="recurso" style="padding: 4px 8px; font-size: 0.8rem; box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); color: #D4AF37; white-space: nowrap;">🔑 Cofre</span>
+
+            <div class="visor-moedas-global-container" style="padding: 4px 10px; font-size: 0.85rem;">
+                <span class="visor-moedas-global-texto">0</span>
+                <span style="font-size: 0.8rem;">💰</span>
+            </div>
         </div>
     </div>
 
@@ -38,11 +45,10 @@
             <button class="btn-acao" onclick="resetarTermo()" style="background: linear-gradient(145deg, #e74c3c, #c0392b); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4); width: 100%;">↻ Tentar Novamente</button>
         </div>
         
-        <div style="margin-top: 15px; display: flex; gap: 10px; width: 100%; max-width: 400px; justify-content: center;">
-            <button class="btn-acao" onclick="usarDicaAmor()" style="flex: 1; background: linear-gradient(145deg, #9b59b6, #8e44ad); color: white; border: 1px solid #d35400; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4); padding: 10px;">💡 Dica do Coração (10💰)</button>
-            <div style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); padding: 0 20px; border-radius: 12px; border: 1px solid #D4AF37; color: #D4AF37; font-weight: bold; font-size: 1.2rem; backdrop-filter: blur(5px);">
-                <span id="termo-moedas">0</span>💰
-            </div>
+        <div style="margin-top: 15px; display: flex; width: 100%; max-width: 400px; justify-content: center;">
+            <button class="btn-acao" onclick="usarDicaAmor()" style="width: 100%; background: linear-gradient(145deg, #9b59b6, #8e44ad); color: white; border: 1px solid #d35400; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4); padding: 12px; font-weight: bold; font-size: 1rem; border-radius: 15px;">
+                💡 Comprar Dica do Coração (10💰)
+            </button>
         </div>
     </div>
 </div>

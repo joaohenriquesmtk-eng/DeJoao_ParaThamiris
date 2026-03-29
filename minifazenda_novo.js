@@ -38,7 +38,8 @@ const estacoesAno = [
 let fazenda = {
     silo: { soja: 0, milho: 0, cafe: 0, leite: 0 },
     mercado: { 
-        soja: 120, milho: 50, cafe: 800, leite: 15,
+        // 🚨 VALORES BASE MULTIPLICADOS POR 4x (A base da inflação)
+        soja: 480, milho: 200, cafe: 3200, leite: 60,
         tendencia: 'estavel', // estavel, alta, queda
         ciclosMercado: 0 
     },
@@ -185,6 +186,8 @@ function calcularProgressoOffline() {
 
 // 3. INICIALIZAÇÃO APRIMORADA (AGORA COM PROGRESSO OFFLINE)
 window.iniciarMiniFazenda = function() {
+    if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO NA HORA
+    
     carregarFazenda(); 
     
     // 🚨 INVOCAÇÃO DA MÁQUINA DO TEMPO AQUI
@@ -313,15 +316,16 @@ function motorAgronomico() {
         atualizarUIEstacao();
     }
 
-    // FLUTUAÇÃO DE PREÇOS
+    // FLUTUAÇÃO DE PREÇOS (SUPER VALORIZADOS)
     if (Math.random() < 0.15) {
         const velhaSoja = fazenda.mercado.soja;
         let multiplicador = fazenda.mercado.tendencia === 'alta' ? 1.2 : (fazenda.mercado.tendencia === 'queda' ? 0.8 : 1.0);
         
-        fazenda.mercado.soja = Math.floor((Math.random() * (150 - 90) + 90) * multiplicador);
-        fazenda.mercado.milho = Math.floor((Math.random() * (80 - 30) + 30) * multiplicador);
-        fazenda.mercado.cafe = Math.floor((Math.random() * (1000 - 600) + 600) * multiplicador);
-        fazenda.mercado.leite = Math.floor((Math.random() * (22 - 10) + 10) * multiplicador);
+        // 🚨 FAIXAS DE PREÇO MIN/MAX MULTIPLICADAS PARA GARANTIR RIQUEZA
+        fazenda.mercado.soja = Math.floor((Math.random() * (600 - 360) + 360) * multiplicador);
+        fazenda.mercado.milho = Math.floor((Math.random() * (320 - 120) + 120) * multiplicador);
+        fazenda.mercado.cafe = Math.floor((Math.random() * (4000 - 2400) + 2400) * multiplicador);
+        fazenda.mercado.leite = Math.floor((Math.random() * (88 - 40) + 40) * multiplicador);
         
         animarPreco('preco-soja', fazenda.mercado.soja, velhaSoja);
         animarPreco('preco-milho', fazenda.mercado.milho);

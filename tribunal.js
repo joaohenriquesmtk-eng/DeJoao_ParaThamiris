@@ -138,6 +138,8 @@ const bancoTestemunhas = [
 
 // INICIALIZAÇÃO
 window.iniciarTribunal = function() {
+    if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO DO BANCO CENTRAL NA HORA
+    
     tribunal.nivel = 1;
     tribunal.estrelas = 3;
     iniciarNovoCaso();
@@ -468,9 +470,12 @@ window.baterMarteloVisual = function() {
 
 function julgarCaso() {
     if (tribunal.somaAtual === tribunal.metaAtual) {
-        mostrarToast("Veredito Aceito! +25💰", "⚖️");
+        mostrarToast("Veredito Aceito! +200💰", "⚖️"); // 🚨 ATUALIZADO
         estatisticasTribunal.ganhos++; salvarEstatisticas();
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(25, "Caso Ganho");
+        
+        // 🚨 INFLAÇÃO DO BEM: +200 Moedas por causa ganha!
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(200, "Caso Ganho no Tribunal");
+        
         tribunal.nivel++;
         document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
         setTimeout(iniciarNovoCaso, 1500);

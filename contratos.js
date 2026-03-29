@@ -35,6 +35,8 @@
     };
 
     window.iniciarContratos = function() {
+        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
+        
         document.getElementById('contratos-tela-selecao').classList.remove('escondido');
         document.getElementById('contratos-tela-mesa').classList.add('escondido');
         document.getElementById('contratos-tela-resultado').classList.add('escondido');

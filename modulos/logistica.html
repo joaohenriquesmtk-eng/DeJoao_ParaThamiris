@@ -1,12 +1,19 @@
-<div class="top-bar" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(241, 196, 15, 0.3); z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.9);">
-        <div class="top-bar-left">
-            <button class="btn-voltar" onclick="voltarMenuJogos()">← Abortar Rota</button>
-            <button class="btn-info" onclick="window.toggleInstrucoesLogistica()">❓</button>
+<div class="top-bar" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(241, 196, 15, 0.3); z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.9); display: flex; justify-content: space-between; align-items: center; padding: 10px 8px;">
+        
+        <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+            <button class="btn-voltar" onclick="voltarMenuJogos()" style="padding: 6px 10px; font-size: 0.85rem;">← Sair</button>
+            <button class="btn-info" onclick="window.toggleInstrucoesLogistica()" style="padding: 6px 10px; font-size: 0.85rem;">❓</button>
         </div>
-        <div class="top-bar-right">
-            <span class="recurso" style="box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); color: #f1c40f; border-color: #f1c40f; font-weight: 900; background: rgba(241,196,15,0.05);">
-                Contratos: <span id="logistica-contratos-hud" style="font-family: monospace; font-size: 1.2rem; margin-left: 5px; color: #fff;">0</span>📑
+        
+        <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: nowrap;">
+            <span class="recurso" style="padding: 4px 8px; font-size: 0.8rem; box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); color: #f1c40f; border-color: #f1c40f; font-weight: bold; background: rgba(241,196,15,0.05); white-space: nowrap;">
+                Contr: <span id="logistica-contratos-hud" style="font-family: monospace; font-size: 1rem; margin-left: 3px; color: #fff;">0</span>📑
             </span>
+            
+            <div class="visor-moedas-global-container" style="padding: 4px 10px; font-size: 0.85rem;">
+                <span class="visor-moedas-global-texto">0</span>
+                <span style="font-size: 0.8rem;">💰</span>
+            </div>
         </div>
     </div>
 

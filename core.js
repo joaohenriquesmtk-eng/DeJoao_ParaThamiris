@@ -494,24 +494,34 @@ window.escutarPostits = function() {
 };
 
 // ============================================================================
-// 🎰 NAVEGAÇÃO DO CASSINO DO AFETO (O LOBBY VIP)
+// 🎰 NAVEGAÇÃO DO CASSINO DO AFETO (O LOBBY VIP E GESTÃO DE ÁUDIO)
 // ============================================================================
 
 window.abrirLobbyCassino = function() {
-    console.log("Comando recebido: Abrindo Cassino..."); // Aviso no console F12
+    console.log("Comando recebido: Abrindo Cassino..."); 
     const overlayCassino = document.getElementById('overlay-cassino');
     
     if (overlayCassino) {
-        // Remove as classes de bloqueio
         overlayCassino.classList.remove('escondido');
         overlayCassino.classList.remove('takeover-escondido');
-        
-        // Força a tela a pular na frente de tudo
         overlayCassino.style.display = 'flex';
         overlayCassino.style.opacity = '1';
         
-        // Atualiza a pílula de dinheiro
         if (typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+
+        // 🚨 1. O EXTINTOR DE ÁUDIO DO SANTUÁRIO
+        // Caba a boca da música romântica imediatamente ao entrar no Cassino
+        const musicaApp = document.getElementById('audio-ambiente');
+        const musicaJogos = document.getElementById('audio-jogos');
+        if (musicaApp) musicaApp.pause();
+        if (musicaJogos) musicaJogos.pause();
+
+        // 🚨 2. A IGNIÇÃO DO SOM DO CASSINO
+        // Inicia o barulho de cassino lotado automaticamente
+        if (window.CassinoAudio) {
+            window.CassinoAudio.ativo = true;
+            window.CassinoAudio.tocarBGM();
+        }
     } else {
         console.error("ERRO: O HTML do 'overlay-cassino' não foi encontrado!");
     }
@@ -522,5 +532,16 @@ window.fecharCassino = function() {
     if (overlayCassino) {
         overlayCassino.classList.add('escondido');
         overlayCassino.style.display = 'none';
+    }
+
+    // 🚨 3. DESLIGA O CASSINO E DEVOLVE A MÚSICA ROMÂNTICA
+    if (window.CassinoAudio) {
+        window.CassinoAudio.pausarBGM();
+        window.CassinoAudio.ativo = false; // Desliga os efeitos sonoros das máquinas
+    }
+    
+    const musicaApp = document.getElementById('audio-ambiente');
+    if (musicaApp) {
+        musicaApp.play().catch(e => console.log("Áudio bloqueado pelo navegador ao voltar pro app"));
     }
 };

@@ -605,9 +605,9 @@
             <p class="desc-jogo-grid">Arrisque sua fortuna</p>
         </div>
         
-        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirJogo('boutique')" style="background: linear-gradient(145deg, rgba(231,76,60,0.05), rgba(0,0,0,0.8)); border: 1px solid rgba(231,76,60,0.4);">
-            <div style="font-size: 2.5rem; margin-bottom: 8px;">🛍️</div>
-            <h4 class="titulo-jogo-grid" style="color: #e74c3c;">Boutique</h4>
+        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirBoutique()" style="background: linear-gradient(145deg, rgba(155, 89, 182, 0.1), rgba(0,0,0,0.8)); border: 1px solid rgba(155, 89, 182, 0.5);">
+            <div style="font-size: 2.5rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(155, 89, 182, 0.8));">🛍️</div>
+            <h4 class="titulo-jogo-grid" style="color: #e056fd; text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);">Boutique VIP</h4>
             <p class="desc-jogo-grid">Compre privilégios</p>
         </div>
     </div>
@@ -1532,6 +1532,46 @@
                 </div>
             </div>
 
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('plinko')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+                <div style="font-size: 2.5rem; background: rgba(155, 89, 182, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(155, 89, 182, 0.3);">☄️</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Plinko</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Solte a bolinha e busque o Jackpot.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('raspadinha')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #bdc3c7; box-shadow: 0 0 20px rgba(189, 195, 199, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+                <div style="font-size: 2.5rem; background: rgba(189, 195, 199, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(189, 195, 199, 0.3);">🎫</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Raspadinha VIP</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Raspe a tela e ache 3 símbolos iguais.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('towers')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+                <div style="font-size: 2.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 212, 255, 0.3);">🗼</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">A Torre VIP</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Escale os degraus e multiplique o ouro.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('hilo')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e67e22; box-shadow: 0 0 20px rgba(230, 126, 34, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+                <div style="font-size: 2.5rem; background: rgba(230, 126, 34, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(230, 126, 34, 0.3);">↕️</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Hi-Lo (Maior / Menor)</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Adivinhe a próxima carta e acumule lucros.</p>
+                </div>
+            </div>
+
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('dice')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+                <div style="font-size: 2.5rem; background: rgba(52, 152, 219, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(52, 152, 219, 0.3);">🎲</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Dado de Ouro</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Controle suas chances e multiplicadores.</p>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -1592,49 +1632,51 @@
         </div>
     </div>
 
-    <div id="mesa-slots" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 10, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
+    <div id="mesa-slots" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(30, 10, 10, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
         
-        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(255, 0, 255, 0.5); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseMagenta 1.5s infinite;">
-            <button onclick="fecharMesaSlots()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(255, 0, 255, 0.4); border-radius: 15px; color: #ff00ff;">← Abandonar Máquina</button>
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(231, 76, 60, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; z-index: 100; box-shadow: 0 5px 20px rgba(231, 76, 60, 0.2);">
+            <button onclick="fecharMesaSlots()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(231, 76, 60, 0.4); border-radius: 15px; color: #e74c3c;">← Sair das Máquinas</button>
             <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
                 <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
                 <span style="font-size: 0.9rem;">💰</span>
             </div>
         </div>
 
-        <div style="padding: 20px; text-align: center; display: flex; flex-direction: column; height: 100%; justify-content: center;">
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: space-between; max-width: 430px; margin: 0 auto; width: 100%; overflow-y: auto;">
             
-            <h2 style="color: #ff00ff; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(255, 0, 255, 0.6); margin-bottom: 5px;">Caça-Níquel</h2>
-            <p style="color: #888; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px;">Alinhe os corações</p>
-
-            <div style="background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,15,1)); border: 4px solid #333; border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,1); position: relative; overflow: hidden; margin-bottom: 30px;">
-                
-                <div id="slots-led-vitoria" class="escondido" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%); z-index: 1; pointer-events: none; animation: flashJackpot 0.5s infinite;"></div>
-                
-                <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: rgba(231, 76, 60, 0.5); box-shadow: 0 0 10px rgba(231, 76, 60, 0.8); z-index: 2; transform: translateY(-50%);"></div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; position: relative; z-index: 3;">
-                    <div id="slot-1" class="cilindro-slot">🍒</div>
-                    <div id="slot-2" class="cilindro-slot">🍒</div>
-                    <div id="slot-3" class="cilindro-slot">🍒</div>
-                </div>
+            <div style="text-align: center; margin-top: 5px;">
+                <h2 style="color: #e74c3c; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(231, 76, 60, 0.6);">Slots VIP</h2>
             </div>
 
-            <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,0,255,0.2); margin-bottom: 20px;">
-                <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-bottom: 15px;">Valor da Aposta</label>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-                    <button onclick="ajustarApostaSlots(-10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(255, 0, 255, 0.1); color: #ff00ff; border: 2px solid #ff00ff; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); z-index: 5;">-</button>
-                    
-                    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-                        <span id="slots-aposta-input" style="color: #ff00ff; font-size: 2.5rem; font-weight: bold; font-family: 'monospace'; text-shadow: 0 0 15px rgba(255,0,255,0.6);">50</span>
+            <div style="background: rgba(0,0,0,0.8); border: 3px solid #D4AF37; border-radius: 20px; padding: 20px 10px; width: 100%; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.9); margin: 20px 0; overflow: hidden; height: 120px;">
+                <div id="slot1" style="font-size: 4.5rem; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); transition: transform 0.1s;">🍒</div>
+                <div style="width: 2px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(212,175,55,0.5), transparent);"></div>
+                <div id="slot2" style="font-size: 4.5rem; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); transition: transform 0.1s;">🍒</div>
+                <div style="width: 2px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(212,175,55,0.5), transparent);"></div>
+                <div id="slot3" style="font-size: 4.5rem; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); transition: transform 0.1s;">🍒</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-around; width: 100%; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">7️⃣</span><br><span style="color: #D4AF37; font-size: 0.8rem; font-weight: bold;">100x</span></div>
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">💎</span><br><span style="color: #3498db; font-size: 0.8rem; font-weight: bold;">50x</span></div>
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">🔔</span><br><span style="color: #f1c40f; font-size: 0.8rem; font-weight: bold;">20x</span></div>
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">🍒</span><br><span style="color: #e74c3c; font-size: 0.8rem; font-weight: bold;">3x</span></div>
+            </div>
+
+            <div style="width: 100%;">
+                <div style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta Base 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 250px;">
+                            <button onclick="ajustarApostaSlots(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="slots-aposta-input" style="color: #D4AF37; font-size: 1.6rem; font-weight: bold; font-family: 'monospace'; min-width: 50px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaSlots(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
                     </div>
-
-                    <button onclick="ajustarApostaSlots(10)" style="width: 50px; height: 50px; min-width: 50px; border-radius: 50%; background: rgba(255, 0, 255, 0.1); color: #ff00ff; border: 2px solid #ff00ff; font-size: 2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); z-index: 5;">+</button>
                 </div>
-            </div>
 
-            <button id="btn-girar-slots" onclick="girarSlots()" style="width: 100%; padding: 20px; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #ff00ff, #8e44ad); color: white; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(255,0,255,0.4); transition: transform 0.1s;">Girar 🎰</button>
+                <button id="btn-slots-iniciar" onclick="girarSlots()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #e74c3c, #c0392b); color: white; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">GIRAR ROLETAS 🎰</button>
+            </div>
         </div>
     </div>
 
@@ -1778,6 +1820,326 @@
                     <button onclick="apostarRoleta('verde')" style="flex: 0.6; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);">🟢 14x</button>
                     <button onclick="apostarRoleta('preto')" style="flex: 1; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; background: linear-gradient(145deg, #34495e, #2c3e50); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);">⚫ 2x</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="mesa-plinko" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, rgba(30, 10, 40, 0.98), rgba(5, 5, 10, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none; padding-top: env(safe-area-inset-top);">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(155, 89, 182, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulsePurple 1.5s infinite; z-index: 100;">
+            <button onclick="fecharMesaPlinko()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(155, 89, 182, 0.4); border-radius: 15px; color: #9b59b6;">← Sair do Plinko</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: space-between; max-width: 430px; margin: 0 auto; width: 100%;">
+            
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h2 style="color: #9b59b6; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(155, 89, 182, 0.6);">Plinko</h2>
+            </div>
+
+            <div id="plinko-board" style="position: relative; width: 100%; aspect-ratio: 1/1.2; background: rgba(0,0,0,0.4); border-radius: 20px; border: 2px solid rgba(155, 89, 182, 0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); overflow: hidden; margin-bottom: 15px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 10px 0 10px;">
+                <div id="plinko-cacapas" style="display: flex; justify-content: space-between; width: 100%; height: 40px; margin-top: auto; margin-bottom: 10px; z-index: 10;">
+                    </div>
+            </div>
+
+            <div style="width: 100%;">
+                <div style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);">
+                    
+                    <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 5px;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center;">
+                            <button onclick="ajustarApostaPlinko(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="plinko-aposta-input" style="color: #D4AF37; font-size: 1.4rem; font-weight: bold; font-family: 'monospace'; min-width: 40px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaPlinko(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; padding-left: 5px;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Risco ⚡</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center;">
+                            <span style="color: #e74c3c; font-size: 1rem; font-weight: bold; text-shadow: 0 0 10px rgba(231,76,60,0.8);">ALTO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-plinko-jogar" onclick="soltarBolinhaPlinko()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #9b59b6, #8e44ad); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(155, 89, 182, 0.5); animation: btnNeonPulse 1.5s infinite; transition: transform 0.1s;">Soltar Bolinha ☄️</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="mesa-raspadinha" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(30, 35, 40, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none; padding-top: env(safe-area-inset-top);">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(189, 195, 199, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseSilver 1.5s infinite; z-index: 100;">
+            <button onclick="fecharMesaRaspadinha()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(189, 195, 199, 0.4); border-radius: 15px; color: #bdc3c7;">← Sair da Raspadinha</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: space-between; max-width: 430px; margin: 0 auto; width: 100%;">
+            
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h2 style="color: #bdc3c7; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(189, 195, 199, 0.6);">Bilhete VIP</h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;">Ache 3 símbolos iguais</p>
+            </div>
+
+            <div style="position: relative; width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 20px; border: 4px solid #D4AF37; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.3); margin-bottom: 15px; overflow: hidden;">
+                
+                <div id="raspadinha-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; padding: 10px; gap: 10px; position: absolute; top: 0; left: 0; z-index: 1;">
+                    </div>
+
+                <canvas id="raspadinha-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; opacity: 0; pointer-events: none; transition: opacity 0.3s;"></canvas>
+            </div>
+
+            <div style="display: flex; justify-content: space-around; width: 100%; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">💎</span><br><span style="color: #D4AF37; font-size: 0.8rem; font-weight: bold;">50x</span></div>
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">🍀</span><br><span style="color: #2ecc71; font-size: 0.8rem; font-weight: bold;">20x</span></div>
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">🍒</span><br><span style="color: #e74c3c; font-size: 0.8rem; font-weight: bold;">5x</span></div>
+                <div style="text-align: center;"><span style="font-size: 1.2rem;">🍋</span><br><span style="color: #f1c40f; font-size: 0.8rem; font-weight: bold;">2x</span></div>
+            </div>
+
+            <div style="width: 100%;">
+                <div style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta por Bilhete 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 250px;">
+                            <button onclick="ajustarApostaRaspadinha(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="raspadinha-aposta-input" style="color: #D4AF37; font-size: 1.6rem; font-weight: bold; font-family: 'monospace'; min-width: 50px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaRaspadinha(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-raspadinha-comprar" onclick="comprarRaspadinha()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #bdc3c7, #7f8c8d); color: #111; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(189, 195, 199, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">Comprar Bilhete 🎫</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="mesa-towers" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, rgba(10, 20, 30, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(0, 212, 255, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; z-index: 100; box-shadow: 0 5px 20px rgba(0, 212, 255, 0.2);">
+            <button onclick="fecharMesaTowers()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(0, 212, 255, 0.4); border-radius: 15px; color: #00d4ff;">← Abandonar Torre</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; max-width: 430px; margin: 0 auto; width: 100%; overflow-y: auto;">
+            
+            <div style="text-align: center; margin-bottom: 10px; margin-top: 10px;">
+                <h2 style="color: #00d4ff; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);">A Torre</h2>
+            </div>
+
+            <div id="towers-grid" style="display: flex; flex-direction: column-reverse; width: 100%; gap: 8px; flex: 1; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 20px; border: 1px solid rgba(0, 212, 255, 0.1); box-shadow: inset 0 0 30px rgba(0,0,0,0.8);">
+                </div>
+
+            <div style="width: 100%;">
+                <div style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta Base 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 250px;">
+                            <button onclick="ajustarApostaTowers(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="towers-aposta-input" style="color: #D4AF37; font-size: 1.6rem; font-weight: bold; font-family: 'monospace'; min-width: 50px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaTowers(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-towers-iniciar" onclick="iniciarRodadaTowers()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #00d4ff, #0097e6); color: white; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">INICIAR ESCALADA 🗼</button>
+                
+                <div id="towers-painel-saque" class="escondido" style="width: 100%;">
+                    <div style="font-size: 1.3rem; color: #00d4ff; margin-bottom: 12px; font-weight: bold; text-align: center; text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);">PRÓXIMO: <span id="towers-proximo-mult">1.42</span>x</div>
+                    <button id="btn-towers-sacar" onclick="sacarTowers()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #f1c40f, #f39c12); color: black; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(241, 196, 15, 0.5); animation: pulse-gold 1.5s infinite;">RETIRAR <span id="towers-lucro-texto">0</span>💰</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mesa-hilo" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(30, 15, 5, 0.98), rgba(10, 5, 5, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(230, 126, 34, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; z-index: 100; box-shadow: 0 5px 20px rgba(230, 126, 34, 0.2);">
+            <button onclick="fecharMesaHiLo()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(230, 126, 34, 0.4); border-radius: 15px; color: #e67e22;">← Abandonar Jogo</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: space-between; max-width: 430px; margin: 0 auto; width: 100%; overflow-y: auto;">
+            
+            <div style="text-align: center; margin-top: 5px;">
+                <h2 style="color: #e67e22; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(230, 126, 34, 0.6);">Hi-Lo</h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;">A próxima carta é...</p>
+            </div>
+
+            <div style="position: relative; width: 100%; height: 260px; display: flex; justify-content: center; align-items: center; perspective: 1000px; margin: 10px 0;">
+                <div id="hilo-carta-frente" class="carta-bj oculta" style="width: 140px !important; height: 200px !important; margin: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(230, 126, 34, 0.4); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                    <div class="carta-bj-topo" id="hilo-topo" style="align-self: flex-start; font-size: 2rem; line-height: 1;"></div>
+                    <div class="carta-bj-centro" id="hilo-centro" style="font-size: 4rem; line-height: 1;"></div>
+                    <div class="carta-bj-base" id="hilo-base" style="align-self: flex-end; transform: rotate(180deg); font-size: 2rem; line-height: 1;"></div>
+                </div>
+            </div>
+
+            <div style="width: 100%;">
+                
+                <div id="hilo-painel-lucro" class="escondido" style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 1.2rem; color: #D4AF37; font-weight: bold; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);">LUCRO ACUMULADO</div>
+                    <div style="font-size: 2.5rem; color: #fff; font-family: 'monospace'; font-weight: 900; text-shadow: 0 0 20px rgba(255,255,255,0.4);"><span id="hilo-lucro-texto">0</span>💰</div>
+                    <div style="color: #2ecc71; font-size: 1.1rem; font-weight: bold;">x<span id="hilo-multiplicador-texto">1.00</span></div>
+                </div>
+
+                <div id="hilo-painel-aposta" style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta Base 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 250px;">
+                            <button onclick="ajustarApostaHiLo(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="hilo-aposta-input" style="color: #D4AF37; font-size: 1.6rem; font-weight: bold; font-family: 'monospace'; min-width: 50px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaHiLo(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-hilo-iniciar" onclick="iniciarRodadaHiLo()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(230, 126, 34, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">APOSTAR E VIRAR</button>
+                
+                <div id="hilo-painel-decisao" class="escondido" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btn-hilo-maior" onclick="adivinharHiLo('maior')" style="flex: 1; padding: 12px; border-radius: 15px; background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="font-size: 1.2rem; font-weight: 900;">⬆️ MAIOR</span>
+                            <span id="hilo-mult-maior" style="font-size: 0.9rem; color: #D4AF37; font-weight: bold;">1.50x</span>
+                        </button>
+                        
+                        <button id="btn-hilo-menor" onclick="adivinharHiLo('menor')" style="flex: 1; padding: 12px; border-radius: 15px; background: linear-gradient(145deg, #e74c3c, #c0392b); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="font-size: 1.2rem; font-weight: 900;">⬇️ MENOR</span>
+                            <span id="hilo-mult-menor" style="font-size: 0.9rem; color: #D4AF37; font-weight: bold;">1.50x</span>
+                        </button>
+                    </div>
+                    
+                    <button id="btn-hilo-sacar" onclick="sacarHiLo()" style="width: 100%; padding: 15px; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 15px; background: linear-gradient(145deg, #f1c40f, #f39c12); color: black; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 20px rgba(241, 196, 15, 0.4); transition: transform 0.1s;">RETIRAR LUCRO 💰</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="mesa-dice" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, rgba(10, 15, 30, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(0, 242, 254, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; z-index: 100; box-shadow: 0 5px 20px rgba(0, 242, 254, 0.2);">
+            <button onclick="fecharMesaDice()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(0, 242, 254, 0.4); border-radius: 15px; color: #00f2fe;">← Abandonar Dado</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: space-between; max-width: 430px; margin: 0 auto; width: 100%; overflow-y: auto;">
+            
+            <div style="text-align: center; margin-top: 5px;">
+                <h2 style="color: #00f2fe; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);">Dado de Ouro</h2>
+            </div>
+
+            <div style="position: relative; width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; margin: 10px 0;">
+                <div id="dice-anel-energia" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 4px solid rgba(0, 242, 254, 0.2); box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.1), 0 0 30px rgba(0,0,0,0.8); transition: all 0.3s ease;"></div>
+                
+                <div style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
+                    <span style="color: rgba(255,255,255,0.4); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">Resultado</span>
+                    <div id="dice-resultado-visor" style="font-size: 4rem; font-weight: 900; font-family: 'monospace'; color: #fff; text-shadow: 0 0 20px rgba(0, 242, 254, 0.8); transition: color 0.3s, transform 0.1s; line-height: 1;">50.00</div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 15px; padding: 10px 5px; text-align: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+                    <div style="font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Paga</div>
+                    <div id="dice-mult-visor" style="font-size: 1.2rem; color: #D4AF37; font-weight: bold; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">1.98x</div>
+                </div>
+                <div style="flex: 1.2; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 15px; padding: 10px 5px; text-align: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 15px rgba(0, 242, 254, 0.1);">
+                    <div style="font-size: 0.65rem; color: #00f2fe; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Rolar Menor Que</div>
+                    <div id="dice-alvo-visor" style="font-size: 1.3rem; color: #fff; font-weight: bold; font-family: 'monospace';">50.00</div>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 15px; padding: 10px 5px; text-align: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+                    <div style="font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Chance</div>
+                    <div id="dice-chance-visor" style="font-size: 1.2rem; color: #2ecc71; font-weight: bold; text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);">50%</div>
+                </div>
+            </div>
+
+            <div style="width: 100%; padding: 10px 10px 25px 10px; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+                <div style="position: relative; width: 100%; height: 40px; display: flex; align-items: center;">
+                    
+                    <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 12px; background: #0f0f15; border-radius: 10px; transform: translateY(-50%); box-shadow: inset 0 3px 6px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.05);"></div>
+                    
+                    <div id="dice-track-visual" style="position: absolute; top: 50%; left: 0; width: 100%; height: 12px; transform: translateY(-50%); border-radius: 10px; background: linear-gradient(to right, #00b09b 0%, #96c93d 50%, #ff0844 50%, #ffb199 100%); z-index: 1;"></div>
+                    
+                    <input type="range" id="dice-slider" min="2" max="98" value="50" oninput="atualizarSliderDice()" style="position: absolute; top: 50%; left: 0; width: 100%; height: 40px; transform: translateY(-50%); opacity: 0; cursor: pointer; z-index: 10;">
+                    
+                    <div id="dice-thumb-visual" style="position: absolute; top: 50%; left: 50%; width: 32px; height: 32px; background: radial-gradient(circle, #fff 30%, #ddd 80%, #999 100%); border: 3px solid #00f2fe; border-radius: 50%; transform: translate(-50%, -50%); z-index: 2; box-shadow: 0 0 20px rgba(0, 242, 254, 0.8), 0 5px 10px rgba(0,0,0,0.6), inset 0 -3px 5px rgba(0,0,0,0.3); pointer-events: none; transition: box-shadow 0.2s;">
+                        <div style="position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #00f2fe; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #00f2fe;"></div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 5px; padding: 0 5px; color: rgba(255,255,255,0.3); font-size: 0.75rem; font-family: 'monospace'; font-weight: bold;">
+                    <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+                </div>
+            </div>
+
+            <div style="width: 100%;">
+                <div id="dice-painel-aposta" style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta Base 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 250px;">
+                            <button onclick="ajustarApostaDice(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="dice-aposta-input" style="color: #D4AF37; font-size: 1.6rem; font-weight: bold; font-family: 'monospace'; min-width: 50px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaDice(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-dice-iniciar" onclick="jogarDice()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #00f2fe, #4facfe); color: #000; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">ROLAR DADO 🎲</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay-boutique" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, #1a0f1a, #000000); z-index: 100000; display: none; flex-direction: column; overflow: hidden; font-family: 'Playfair Display', serif;">
+        
+        <div style="background: rgba(212, 175, 55, 0.1); border-bottom: 2px solid #D4AF37; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; backdrop-filter: blur(10px);">
+            <button onclick="fecharBoutique()" style="background: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 8px 15px; border-radius: 20px; font-weight: bold;">← Voltar ao Cassino</button>
+            <div style="color: #D4AF37; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
+                <span id="boutique-moedas-visor">0</span> 💰
+            </div>
+        </div>
+
+        <div style="padding: 20px; overflow-y: auto; flex: 1; padding-bottom: 100px;">
+            <h1 style="color: #D4AF37; text-align: center; font-size: 2.5rem; margin-top: 0; margin-bottom: 5px; text-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);">Boutique VIP</h1>
+            <p style="color: rgba(255,255,255,0.6); text-align: center; font-family: sans-serif; font-size: 0.9rem; margin-bottom: 30px;">Compre seus prêmios e cobre o João imediatamente no WhatsApp!</p>
+
+            <h2 style="color: #9b59b6; border-bottom: 1px solid #9b59b6; padding-bottom: 10px; text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);">Caixas Misteriosas (Lootboxes) 🎁</h2>
+            <div id="boutique-lootboxes" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 40px;">
+                </div>
+
+            <h2 style="color: #2ecc71; border-bottom: 1px solid #2ecc71; padding-bottom: 10px; text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);">Catálogo de Mimos 🍷</h2>
+            <div id="boutique-catalogo" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                </div>
+        </div>
+
+        <div id="tela-lootbox-abertura" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100001; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(20px);">
+            <div id="lootbox-brilho" style="position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(155, 89, 182, 0.8), transparent); filter: blur(40px); opacity: 0; transition: opacity 2s;"></div>
+            
+            <div id="lootbox-icone" style="font-size: 6rem; filter: drop-shadow(0 0 20px #9b59b6); z-index: 2; animation: pulsarLootbox 1s infinite alternate;">🎁</div>
+            
+            <h2 id="lootbox-texto-acao" style="color: white; margin-top: 30px; font-size: 1.5rem; text-shadow: 0 0 10px #fff; z-index: 2;">Desbloqueando a Caixa...</h2>
+            
+            <div id="lootbox-premio-revelado" class="escondido" style="text-align: center; z-index: 2; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; border: 2px solid #D4AF37; margin-top: 20px; max-width: 80%;">
+                <div id="lootbox-premio-emoji" style="font-size: 4rem; margin-bottom: 10px;"></div>
+                <h3 id="lootbox-premio-nome" style="color: #D4AF37; font-size: 1.8rem; margin: 0 0 10px 0;"></h3>
+                <p id="lootbox-premio-desc" style="color: white; font-family: sans-serif; font-size: 1rem; margin-bottom: 20px;"></p>
+                <button id="btn-resgatar-lootbox" style="background: linear-gradient(145deg, #2ecc71, #27ae60); color: white; border: none; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; box-shadow: 0 10px 20px rgba(46, 204, 113, 0.4); text-transform: uppercase;">Cobrar no WhatsApp 📲</button>
             </div>
         </div>
     </div>

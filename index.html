@@ -593,23 +593,46 @@
 
     </div>
 
-    <div class="cartao-vidro" style="text-align: center; margin-bottom: 20px; margin-top: 35px;">
+<div class="cartao-vidro" style="text-align: center; margin-bottom: 20px; margin-top: 35px;">
         <h3 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; margin-bottom: 5px;">🎰 O Distrito Noturno 🎰</h3>
         <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin: 0;">Apostas, mimos e recompensas</p>
     </div>
     
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
-        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirLobbyCassino()" style="background: linear-gradient(145deg, rgba(212,175,55,0.1), rgba(0,0,0,0.8)); border: 1px solid rgba(212,175,55,0.6);">
-            <div style="font-size: 2.5rem; margin-bottom: 8px;">🎰</div>
-            <h4 class="titulo-jogo-grid" style="color: #D4AF37;">Cassino do Afeto</h4>
-            <p class="desc-jogo-grid">Arrisque sua fortuna</p>
+    
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirLobbyCassino()" style="background: linear-gradient(145deg, rgba(212,175,55,0.1), rgba(0,0,0,0.8)); border: 1px solid rgba(212,175,55,0.6);">
+        <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+            <img src="assets/icones-cassino/cassino.png" alt="Cassino" style="width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.8));">
         </div>
-        
-        <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirBoutique()" style="background: linear-gradient(145deg, rgba(155, 89, 182, 0.1), rgba(0,0,0,0.8)); border: 1px solid rgba(155, 89, 182, 0.5);">
-            <div style="font-size: 2.5rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(155, 89, 182, 0.8));">🛍️</div>
-            <h4 class="titulo-jogo-grid" style="color: #e056fd; text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);">Boutique VIP</h4>
-            <p class="desc-jogo-grid">Compre privilégios</p>
+        <h4 class="titulo-jogo-grid" style="color: #D4AF37;">Cassino do Afeto</h4>
+        <p class="desc-jogo-grid">Máquinas Solo</p>
+    </div>
+
+    <div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirBoutique()" style="background: linear-gradient(145deg, rgba(155, 89, 182, 0.1), rgba(0,0,0,0.8)); border: 1px solid rgba(155, 89, 182, 0.5);">
+        <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+            <img src="assets/icones-cassino/boutique.png" alt="Boutique" style="width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(155, 89, 182, 0.9));">
         </div>
+        <h4 class="titulo-jogo-grid" style="color: #e056fd; text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);">Boutique VIP</h4>
+        <p class="desc-jogo-grid">Compre privilégios</p>
+    </div>
+
+<div class="cartao-vidro item-jogo-grid" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirCassinoDois()" style="grid-column: span 2; position: relative; background: linear-gradient(135deg, #021114 0%, #000000 50%, #021e24 100%); border: 2px solid #00f2fe; box-shadow: 0 15px 35px rgba(0, 242, 254, 0.3), inset 0 0 30px rgba(0, 242, 254, 0.15); display: flex; align-items: center; justify-content: space-between; padding: 30px 20px 20px 20px; text-align: left; border-radius: 15px; overflow: hidden; animation: neonPulseBlue 3s infinite alternate;">
+    
+    <div style="position: absolute; top: -30px; right: -30px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+
+    <div style="position: absolute; top: 0; left: 0; background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; font-size: 0.65rem; font-weight: 900; padding: 4px 20px; border-bottom-right-radius: 15px; text-transform: uppercase; letter-spacing: 3px; box-shadow: 2px 2px 15px rgba(0, 242, 254, 0.6);">
+        ★ Arena Global ★
+    </div>
+
+    <div style="z-index: 2; margin-top: 10px;">
+        <h4 class="titulo-jogo-grid" style="color: #ffffff; text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe, 0 0 40px #00f2fe; margin-bottom: 8px; font-size: 1.8rem; font-family: 'Playfair Display', serif; font-weight: 900; letter-spacing: 1px;">Cassino a Dois</h4>
+        <p class="desc-jogo-grid" style="margin: 0; color: #00f2fe; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 242, 254, 0.5);">Mesas PvP e Co-op Real-Time</p>
+    </div>
+
+    <div style="z-index: 2; display: flex; justify-content: center; align-items: center; width: 75px; height: 75px; background: rgba(0, 242, 254, 0.1); border-radius: 50%; border: 2px solid rgba(0, 242, 254, 0.5); box-shadow: 0 0 25px rgba(0, 242, 254, 0.6), inset 0 0 15px rgba(0, 242, 254, 0.3); flex-shrink: 0;">
+        <img src="assets/icones-cassino/cassino2.png" alt="Cassino a Dois" style="width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 15px #00f2fe) brightness(1.2);">
+    </div>
+</div>
     </div>
 
 </div>
@@ -1493,94 +1516,115 @@
         <div style="padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px;">
             
             <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('tigrinho')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e74c3c; box-shadow: 0 0 20px rgba(231, 76, 60, 0.4); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
-                <div style="font-size: 2.5rem; background: rgba(231, 76, 60, 0.15); border-radius: 15px; padding: 10px; border: 1px solid rgba(231, 76, 60, 0.5);">🐯</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Tigre da Sorte (Fortune)</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Ache a Carta da Sorte e leve o Mega Jackpot.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines cartao-mines-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('mines')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
-                <div style="font-size: 2.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 212, 255, 0.3);">💣</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Campo Minado (Mines)</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Multiplique a aposta. Desvie das bombas.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines cartao-mines-slots" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('slots')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
-                <div style="font-size: 2.5rem; background: rgba(255, 0, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(255, 0, 255, 0.3);">🍒</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Caça-Níquel (Slots)</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Alinhe os símbolos e leve o Jackpot.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines cartao-mines-blackjack" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('blackjack')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
-                <div style="font-size: 2.5rem; background: rgba(0, 255, 0, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 255, 0, 0.3);">🃏</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Blackjack (21)</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Derrote a mesa sem estourar 21 pontos.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('crash')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
-                <div style="font-size: 2.5rem; background: rgba(255, 255, 0, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(255, 255, 0, 0.3);">🚀</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">O Foguetinho (Crash)</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Retire o lucro antes da explosão.</p>
-                </div>
-            </div>
-            
-            <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('roleta')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
-                <div style="font-size: 2.5rem; background: rgba(46, 204, 113, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(46, 204, 113, 0.3);">🎡</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Roleta da Sorte</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Aposte suas cores e números.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('plinko')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
-                <div style="font-size: 2.5rem; background: rgba(155, 89, 182, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(155, 89, 182, 0.3);">☄️</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Plinko</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Solte a bolinha e busque o Jackpot.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('raspadinha')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #bdc3c7; box-shadow: 0 0 20px rgba(189, 195, 199, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
-                <div style="font-size: 2.5rem; background: rgba(189, 195, 199, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(189, 195, 199, 0.3);">🎫</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Raspadinha VIP</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Raspe a tela e ache 3 símbolos iguais.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('towers')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
-                <div style="font-size: 2.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 212, 255, 0.3);">🗼</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">A Torre VIP</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Escale os degraus e multiplique o ouro.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('hilo')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e67e22; box-shadow: 0 0 20px rgba(230, 126, 34, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
-                <div style="font-size: 2.5rem; background: rgba(230, 126, 34, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(230, 126, 34, 0.3);">↕️</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Hi-Lo (Maior / Menor)</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Adivinhe a próxima carta e acumule lucros.</p>
-                </div>
-            </div>
-
-            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('dice')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
-                <div style="font-size: 2.5rem; background: rgba(52, 152, 219, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(52, 152, 219, 0.3);">🎲</div>
-                <div>
-                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Dado de Ouro</h4>
-                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Controle suas chances e multiplicadores.</p>
-                </div>
-            </div>
-
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(231, 76, 60, 0.15); border-radius: 15px; border: 1px solid rgba(231, 76, 60, 0.5); flex-shrink: 0;">
+            <img src="assets/icones-cassino/tigre.png" alt="Tigre" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
         </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Tigre da Sorte (Fortune)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Ache a Carta da Sorte e leve o Mega Jackpot.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('mines')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(0, 212, 255, 0.1); border-radius: 15px; border: 1px solid rgba(0, 212, 255, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/mines.png" alt="Bomba" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Campo Minado (Mines)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Multiplique a aposta. Desvie das bombas.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-slots" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('slots')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(255, 0, 255, 0.1); border-radius: 15px; border: 1px solid rgba(255, 0, 255, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/slots.png" alt="Slots" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Caça-Níquel (Slots)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Alinhe os símbolos e leve o Jackpot.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-blackjack" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('blackjack')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(0, 255, 0, 0.1); border-radius: 15px; border: 1px solid rgba(0, 255, 0, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/21.png" alt="Cartas" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Blackjack (21)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Derrote a mesa sem estourar 21 pontos.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('crash')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(255, 255, 0, 0.1); border-radius: 15px; border: 1px solid rgba(255, 255, 0, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/crash.png" alt="Foguete" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">O Foguetinho (Crash)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Retire o lucro antes da explosão.</p>
+        </div>
+    </div>
+    
+    <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('roleta')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(46, 204, 113, 0.1); border-radius: 15px; border: 1px solid rgba(46, 204, 113, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/roleta_sorte.png" alt="Roleta" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Roleta da Sorte</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Aposte suas cores e números.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('plinko')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(155, 89, 182, 0.1); border-radius: 15px; border: 1px solid rgba(155, 89, 182, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/plinko.png" alt="Plinko" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Plinko</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Solte a bolinha e busque o Jackpot.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('raspadinha')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #bdc3c7; box-shadow: 0 0 20px rgba(189, 195, 199, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(189, 195, 199, 0.1); border-radius: 15px; border: 1px solid rgba(189, 195, 199, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/raspadinha.png" alt="Raspadinha" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Raspadinha VIP</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Raspe a tela e ache 3 símbolos iguais.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('towers')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(0, 212, 255, 0.1); border-radius: 15px; border: 1px solid rgba(0, 212, 255, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/torre.png" alt="Torre" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">A Torre VIP</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Escale os degraus e multiplique o ouro.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('hilo')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e67e22; box-shadow: 0 0 20px rgba(230, 126, 34, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(230, 126, 34, 0.1); border-radius: 15px; border: 1px solid rgba(230, 126, 34, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/hilo.png" alt="Hi-Lo" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Hi-Lo (Maior / Menor)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Adivinhe a próxima carta e acumule lucros.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('dice')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(52, 152, 219, 0.1); border-radius: 15px; border: 1px solid rgba(52, 152, 219, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/dados.png" alt="Dado" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Dado de Ouro</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Controle suas chances e multiplicadores.</p>
+        </div>
+    </div>
+</div>
     </div>
 
     <div id="mesa-mines" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 5, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
@@ -2153,6 +2197,1065 @@
             </div>
         </div>
     </div>
+
+    <div id="overlay-cassino-dois" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 10, 15, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 99999; flex-direction: column; overflow-y: auto; display: none;">
+        
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(0, 242, 254, 0.7); z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; box-shadow: 0 5px 20px rgba(0, 242, 254, 0.2);">
+        <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+            <button class="btn-voltar" onclick="fecharCassinoDois()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(0, 242, 254, 0.4); color: #00f2fe; border-radius: 0px !important;">← Voltar à Cidade</button>
+        </div>
+        <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end;">
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 30px 15px 20px 15px;">
+        <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 20px rgba(0, 242, 254, 0.8);">🤝</div>
+        <h2 style="color: #00f2fe; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);">Cassino a Dois</h2>
+        <p style="color: rgba(255,255,255,0.6); font-style: italic; font-size: 1rem; margin-top: 5px;">Apostas Reais. Conexão Real.</p>
+    </div>
+
+    <div style="padding: 0 15px 50px 15px; display: flex; flex-direction: column; gap: 15px;">
+        
+        <div class="cartao-pvp" onclick="abrirMesaCassino('uno')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #ff4757; background: rgba(255, 71, 87, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(255, 71, 87, 0.15); padding: 10px; border: 1px solid rgba(255, 71, 87, 0.3);">🎴</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">UNO Classic Royale <span style="color: #ff4757; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Cartas e vingança em tempo real.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('poker')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(212, 175, 55, 0.1); padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3);">♠️</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Texas Hold'em <span style="color: #D4AF37; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Duelo de Poker com cartas fechadas.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('roleta-multi')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #2ecc71; background: rgba(46, 204, 113, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(46, 204, 113, 0.1); padding: 10px; border: 1px solid rgba(46, 204, 113, 0.3);">🎡</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Roleta Compartilhada <span style="color: #2ecc71; font-size: 0.7rem; vertical-align: top;">[Co-op]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Apostas unidas no mesmo feltro.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('bj-coop')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #00f2fe; background: rgba(0, 242, 254, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(0, 242, 254, 0.1); padding: 10px; border: 1px solid rgba(0, 242, 254, 0.3);">🃏</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Blackjack Team <span style="color: #00f2fe; font-size: 0.7rem; vertical-align: top;">[Co-op]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Unam forças contra o Dealer da casa.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('craps')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #f39c12; background: rgba(243, 156, 18, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(243, 156, 18, 0.1); padding: 10px; border: 1px solid rgba(243, 156, 18, 0.3);">🎲</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Craps: Vegas Dice <span style="color: #f39c12; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Sacuda o celular e lance os dados.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('sicbo')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e84393; background: rgba(232, 67, 147, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(232, 67, 147, 0.1); padding: 10px; border: 1px solid rgba(232, 67, 147, 0.3);">🏮</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Sic Bo: Trindade <span style="color: #e84393; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Apostas milenares em 3 dados.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('baccarat')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #ffffff; background: rgba(255, 255, 255, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(255, 255, 255, 0.1); padding: 10px; border: 1px solid rgba(255, 255, 255, 0.3);">🤵</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Baccarat Royale <span style="color: #fff; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">O duelo veloz de Punto y Banca.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('caribbean')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #1dd1a1; background: rgba(29, 209, 161, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(29, 209, 161, 0.1); padding: 10px; border: 1px solid rgba(29, 209, 161, 0.3);">🌴</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Caribbean Poker <span style="color: #1dd1a1; font-size: 0.7rem; vertical-align: top;">[Co-op]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Cartas abertas entre parceiros.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('paigow')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #ffa502; background: rgba(255, 165, 2, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(255, 165, 2, 0.1); padding: 10px; border: 1px solid rgba(255, 165, 2, 0.3);">🧱</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Pai Gow: Tiles <span style="color: #ffa502; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">A estratégia do dominó de ouro.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('wheel')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #5352ed; background: rgba(83, 82, 237, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(83, 82, 237, 0.1); padding: 10px; border: 1px solid rgba(83, 82, 237, 0.3);">⚙️</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Wheel of Fortune <span style="color: #5352ed; font-size: 0.7rem; vertical-align: top;">[PvP]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">O clique da roda gigante.</p>
+            </div>
+        </div>
+
+        <div class="cartao-pvp" onclick="abrirMesaCassino('bridge')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #ff7f50; background: rgba(255, 127, 80, 0.05); cursor: pointer;">
+            <div style="font-size: 2.5rem; background: rgba(255, 127, 80, 0.1); padding: 10px; border: 1px solid rgba(255, 127, 80, 0.3);">🤝</div>
+            <div>
+                <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Casino Bridge <span style="color: #ff7f50; font-size: 0.7rem; vertical-align: top;">[Co-op]</span></h4>
+                <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">A parceria suprema nas cartas.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="mesa-uno" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2c0b0e 0%, #0a0000 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); border-bottom: 1px solid #eb4d4b; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(235, 77, 75, 0.2); z-index: 100;">
+        <button onclick="fecharMesaUno()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #eb4d4b; color: #eb4d4b; border-radius: 0px !important;">← Abandonar</button>
+        
+        <button id="btn-iniciar-uno" onclick="iniciarDueloUno()" style="background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; padding: 8px 20px; font-weight: 900; font-size: 0.9rem; border: none; cursor: pointer; border-radius: 0px !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.6); text-transform: uppercase;">NOVO DUELO 🎴</button>
+
+        <button onclick="document.getElementById('modal-regras-uno').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; position: relative; overflow: hidden;">
+        
+        <div style="text-align: center; height: 100px; width: 100%;">
+            <div id="uno-status-oponente" style="color: rgba(255,255,255,0.4); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;">Adversário</div>
+            <div id="uno-mao-oponente" style="display: flex; justify-content: center; margin-top: 10px; perspective: 500px;">
+                </div>
+        </div>
+
+        <div id="uno-indicador-turno" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; font-weight: 900; color: rgba(255,255,255,0.03); text-transform: uppercase; white-space: nowrap; pointer-events: none; z-index: 1;">AGUARDANDO</div>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 25px; z-index: 10; margin-bottom: 20px;">
+            <div id="uno-monte" onclick="comprarCartaUno()" class="uno-card-back" style="box-shadow: -3px 3px 0 #111, -6px 6px 0 #222, -9px 9px 15px rgba(0,0,0,0.8);">
+                <div class="uno-oval-back"><span style="transform: skewY(15deg); color: #D4AF37; font-size: 1.2rem; font-weight: 900;">UNO</span></div>
+            </div>
+            <div id="uno-descarte" class="uno-card uno-vazia" style="transform: rotate(5deg); box-shadow: 0 10px 30px rgba(0,0,0,0.8);"></div>
+        </div>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; position: relative;">
+            
+            <button id="btn-uno-gritar" onclick="gritarUnoAction()" class="escondido" style="position: absolute; top: -70px; left: 50%; transform: translateX(-50%); padding: 12px 35px; background: #e74c3c; color: #fff; font-weight: 900; font-size: 1.3rem; border: 4px solid #fff; border-radius: 50px !important; box-shadow: 0 0 40px rgba(231,76,60,1); z-index: 999; animation: pulsoUno 0.5s infinite alternate;">GRITAR UNO! 📢</button>
+
+            <div style="background: rgba(0,0,0,0.85); border: 1px solid #D4AF37; padding: 5px 25px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(212,175,55,0.2); margin-bottom: 10px; border-radius: 0px !important; z-index: 10;">
+                <div style="color: #D4AF37; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px;">Pote da Mesa</div>
+                <div style="color: #fff; font-weight: 900; font-size: 1.3rem; text-shadow: 0 0 10px rgba(255,255,255,0.4);"><span id="uno-pote-valor">0</span> 💰</div>
+            </div>
+            
+            <div id="uno-minha-mao" style="display: flex; justify-content: center; height: 140px; padding: 15px 20px; overflow-x: auto; overflow-y: hidden; width: 100%; box-sizing: border-box; scroll-behavior: smooth;">
+                </div>
+        </div>
+    </div>
+
+    <div id="uno-seletor-cor" class="escondido" style="position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h2 style="color: #fff; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 20px #fff;">Nova Cor 🎨</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <button onclick="escolherCorUno('vermelho')" style="width: 110px; height: 110px; background: #e74c3c; border: 4px solid #fff; box-shadow: 0 0 30px rgba(231, 76, 60, 0.8); border-radius: 20px !important;"></button>
+            <button onclick="escolherCorUno('azul')" style="width: 110px; height: 110px; background: #3498db; border: 4px solid #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); border-radius: 20px !important;"></button>
+            <button onclick="escolherCorUno('verde')" style="width: 110px; height: 110px; background: #2ecc71; border: 4px solid #fff; box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); border-radius: 20px !important;"></button>
+            <button onclick="escolherCorUno('amarelo')" style="width: 110px; height: 110px; background: #f1c40f; border: 4px solid #fff; box-shadow: 0 0 30px rgba(241, 196, 15, 0.8); border-radius: 20px !important;"></button>
+        </div>
+    </div>
+
+    <div id="modal-regras-uno" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #D4AF37; padding: 25px; width: 100%; max-width: 400px;">
+            <h2 style="color: #D4AF37; margin-top: 0;">📜 Regras do Royale</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Combinação:</strong> Jogue mesma COR ou SÍMBOLO.</li>
+                <li><strong>Bloqueio 🚫 / Inverte 🔄:</strong> No duelo 1v1, ambas pulam o adversário (você joga de novo!).</li>
+                <li><strong>Ataque (+2 / +4):</strong> O adversário compra e <strong>perde a vez</strong>.</li>
+                <li><strong>Grito:</strong> Com 1 carta, grite UNO! O primeiro a zerar a mão, leva o Pote!</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-uno').classList.add('escondido')" style="width: 100%; padding: 15px; background: #e74c3c; color: white; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Entendido</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-poker" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0e3b20 0%, #041209 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.8); border-bottom: 1px solid #D4AF37; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.1); z-index: 100;">
+        <button onclick="fecharMesaPoker()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #D4AF37; color: #D4AF37; border-radius: 0px !important;">← Abandonar</button>
+        
+        <button id="btn-iniciar-poker" onclick="iniciarMaoPoker()" style="background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; padding: 8px 20px; font-weight: 900; font-size: 0.9rem; border: none; cursor: pointer; border-radius: 0px !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.6); text-transform: uppercase;">NOVA MÃO ♠️</button>
+
+        <button onclick="document.getElementById('modal-regras-poker').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; position: relative; overflow: hidden;">
+        
+        <div style="text-align: center; width: 100%; position: relative;">
+            <div id="poker-status-oponente" style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">Adversário</div>
+            <div style="background: rgba(0,0,0,0.6); border: 1px solid #D4AF37; display: inline-block; padding: 3px 15px; border-radius: 20px !important; color: #D4AF37; font-weight: bold; font-family: monospace; font-size: 1.1rem; box-shadow: inset 0 0 10px rgba(212,175,55,0.2);">
+                🪙 <span id="poker-fichas-oponente">0</span>
+            </div>
+            <div id="poker-aposta-oponente" style="color: #2ecc71; font-size: 1rem; font-weight: bold; margin-top: 10px; min-height: 20px;"></div>
+            
+            <div id="poker-mao-oponente" style="display: flex; justify-content: center; gap: 5px; margin-top: 5px; perspective: 500px; height: 85px;">
+                </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; margin: 20px 0;">
+            <div style="background: rgba(0,0,0,0.85); border: 1px solid #D4AF37; padding: 5px 25px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(212,175,55,0.2); margin-bottom: 15px; border-radius: 0px !important;">
+                <div style="color: #D4AF37; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px;">Pote Total</div>
+                <div style="color: #fff; font-weight: 900; font-size: 1.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.4);">🪙 <span id="poker-pote-valor">0</span></div>
+            </div>
+
+            <div id="poker-mesa-cartas" style="display: flex; justify-content: center; gap: 8px; height: 100px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px !important; min-width: 300px;">
+                </div>
+            
+            <div id="poker-estado-aviso" style="color: #f1c40f; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 5px; margin-top: 15px; text-shadow: 0 0 15px rgba(241,196,15,0.8); min-height: 25px;"></div>
+        </div>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; position: relative;">
+            
+            <div id="poker-aposta-jogador" style="color: #2ecc71; font-size: 1rem; font-weight: bold; margin-bottom: 5px; min-height: 20px;"></div>
+            
+            <div id="poker-minha-mao" style="display: flex; justify-content: center; gap: 10px; height: 110px; margin-bottom: 15px;">
+                </div>
+
+            <div style="background: rgba(0,0,0,0.6); border: 1px solid #D4AF37; display: inline-block; padding: 3px 15px; border-radius: 20px !important; color: #D4AF37; font-weight: bold; font-family: monospace; font-size: 1.1rem; box-shadow: inset 0 0 10px rgba(212,175,55,0.2); margin-bottom: 15px;">
+                🪙 <span id="poker-fichas-jogador">0</span>
+            </div>
+
+            <div id="poker-painel-acao" class="escondido" style="display: flex; width: 90%; max-width: 400px; gap: 10px;">
+                <button onclick="acaoPoker('fold')" style="flex: 1; padding: 15px 0; background: linear-gradient(145deg, #e74c3c, #c0392b); color: #fff; font-weight: 900; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px !important; box-shadow: 0 5px 15px rgba(231,76,60,0.4);">FOLD</button>
+                <button id="btn-poker-check-call" onclick="acaoPoker('call')" style="flex: 1.5; padding: 15px 0; background: linear-gradient(145deg, #3498db, #2980b9); color: #fff; font-weight: 900; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px !important; box-shadow: 0 5px 15px rgba(52,152,219,0.4);">CHECK</button>
+                <button onclick="document.getElementById('poker-painel-raise').classList.remove('escondido')" style="flex: 1.5; padding: 15px 0; background: linear-gradient(145deg, #2ecc71, #27ae60); color: #fff; font-weight: 900; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px !important; box-shadow: 0 5px 15px rgba(46,204,113,0.4);">RAISE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="poker-painel-raise" class="escondido" style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.95); border-top: 2px solid #2ecc71; padding: 25px 20px; z-index: 1000; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(25px + env(safe-area-inset-bottom));">
+        <h3 style="color: #2ecc71; margin-top: 0; text-transform: uppercase; letter-spacing: 2px;">Aumentar Aposta</h3>
+        <div style="font-size: 2.5rem; color: #fff; font-weight: 900; font-family: monospace; margin-bottom: 20px;">🪙 <span id="poker-raise-visor">0</span></div>
+        <input type="range" id="poker-raise-slider" min="0" max="1000" step="10" oninput="document.getElementById('poker-raise-visor').innerText = this.value" style="width: 100%; margin-bottom: 20px; accent-color: #2ecc71;">
+        <div style="display: flex; gap: 10px; width: 100%;">
+            <button onclick="document.getElementById('poker-painel-raise').classList.add('escondido')" style="flex: 1; padding: 15px; background: #333; color: #fff; border: 1px solid #555; border-radius: 8px !important; font-weight: bold;">Cancelar</button>
+            <button onclick="acaoPoker('raise', document.getElementById('poker-raise-slider').value)" style="flex: 2; padding: 15px; background: #2ecc71; color: #000; border: none; border-radius: 8px !important; font-weight: 900; font-size: 1.1rem; box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);">CONFIRMAR RAISE</button>
+        </div>
+    </div>
+
+    <div id="modal-regras-poker" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #D4AF37; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #D4AF37; margin-top: 0;">📜 Texas Hold'em VIP</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Taxa da Casa:</strong> Iniciar cobra 20💰 reais do casal.</li>
+                <li><strong>Fichas Virtuais:</strong> Cada um recebe 1.000 🪙 para o duelo.</li>
+                <li><strong>Apostas:</strong> Check (Passar), Call (Pagar), Raise (Aumentar) ou Fold (Fugir).</li>
+                <li><strong>Showdown:</strong> O sistema revelará as cartas. O vencedor leva +100💰 de recompensa real para a conta conjunta!</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-poker').classList.add('escondido')" style="width: 100%; padding: 15px; background: #D4AF37; color: black; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Entendido</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-roleta-multi" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #051a15 0%, #000000 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #eb4d4b; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(235, 77, 75, 0.2); z-index: 100;">
+        <button onclick="fecharMesaRoletaMulti()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #eb4d4b; color: #eb4d4b; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre Conjunto:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-roleta-multi').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; padding-bottom: 30px;">
+        
+        <div style="display: flex; justify-content: center; align-items: center; padding: 30px 0; position: relative; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            
+            <div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #f1c40f; z-index: 20; filter: drop-shadow(0 5px 5px rgba(0,0,0,1));"></div>
+
+        <div id="roleta-multi-disco" style="width: 240px; height: 240px; border-radius: 50% !important; border: 10px solid #111; box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.8); position: relative; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); display: flex; justify-content: center; align-items: center; 
+background: conic-gradient(
+    #2ecc71 0deg 9.73deg, 
+    #111 9.73deg 19.46deg, #e74c3c 19.46deg 29.19deg, #111 29.19deg 38.92deg, #e74c3c 38.92deg 48.65deg, 
+    #111 48.65deg 58.38deg, #e74c3c 58.38deg 68.11deg, #111 68.11deg 77.84deg, #e74c3c 77.84deg 87.57deg, 
+    #111 87.57deg 97.30deg, #e74c3c 97.30deg 107.03deg, #111 107.03deg 116.76deg, #e74c3c 116.76deg 126.49deg, 
+    #111 126.49deg 136.22deg, #e74c3c 136.22deg 145.95deg, #111 145.95deg 155.68deg, #e74c3c 155.68deg 165.41deg, 
+    #111 165.41deg 175.14deg, #e74c3c 175.14deg 184.87deg, #111 184.87deg 194.60deg, #e74c3c 194.60deg 204.33deg, 
+    #111 204.33deg 214.06deg, #e74c3c 214.06deg 223.79deg, #111 223.79deg 233.52deg, #e74c3c 233.52deg 243.25deg, 
+    #111 243.25deg 252.98deg, #e74c3c 252.98deg 262.71deg, #111 262.71deg 272.44deg, #e74c3c 272.44deg 282.17deg, 
+    #111 282.17deg 291.90deg, #e74c3c 291.90deg 301.63deg, #111 301.63deg 311.36deg, #e74c3c 311.36deg 321.09deg, 
+    #111 321.09deg 330.82deg, #e74c3c 330.82deg 340.55deg, #111 340.55deg 350.28deg, #e74c3c 350.28deg 360deg
+);">
+                
+                <div style="position: absolute; width: 100%; height: 100%; background: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Ccircle cx=%22100%22 cy=%22100%22 r=%2298%22 fill=%22none%22 stroke=%22rgba(255,255,255,0.2)%22 stroke-width=%222%22 stroke-dasharray=%2215 15%22/%3E%3C/svg%3E') center center no-repeat; background-size: cover; border-radius: 50% !important;"></div>
+
+                <div style="width: 60px; height: 60px; background: radial-gradient(circle, #D4AF37, #b38b22); border-radius: 50% !important; border: 5px solid #000; z-index: 10; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);">
+                    <div style="width: 20px; height: 20px; background: #111; border-radius: 50% !important;"></div>
+                </div>
+            </div>
+
+            <div id="roleta-multi-resultado" class="escondido" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: rgba(0,0,0,0.9); border: 4px solid #f1c40f; border-radius: 50% !important; z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(241, 196, 15, 0.8);">
+                <span id="roleta-multi-res-num" style="font-size: 3.5rem; font-weight: 900; color: #fff; line-height: 1;">0</span>
+                <span id="roleta-multi-res-cor" style="font-size: 0.8rem; text-transform: uppercase; color: #f1c40f; font-weight: bold; letter-spacing: 2px;">VERDE</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; align-items: center;">
+            
+            <div id="roleta-multi-status-mesa" style="color: #2ecc71; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);">MESA ABERTA: FAÇAM SUAS APOSTAS</div>
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 400px;">
+                <button onclick="ajustarFichaRoleta(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">-</button>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="color: #888; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Valor da Ficha</span>
+                    <div style="color: #D4AF37; font-size: 2rem; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);"><span id="roleta-multi-ficha-valor">50</span></div>
+                </div>
+                <button onclick="ajustarFichaRoleta(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">+</button>
+            </div>
+
+            <div id="roleta-tabuleiro" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px;">
+                
+                <div onclick="apostarRoletaMulti('vermelho')" class="zona-aposta" style="background: linear-gradient(145deg, #c0392b, #e74c3c); border: 2px solid #ff7675;">
+                    🔴 VERMELHO <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-vermelho" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarRoletaMulti('preto')" class="zona-aposta" style="background: linear-gradient(145deg, #111, #2d3436); border: 2px solid #636e72;">
+                    ⚫ PRETO <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-preto" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarRoletaMulti('par')" class="zona-aposta" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
+                    🔢 PAR <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-par" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarRoletaMulti('impar')" class="zona-aposta" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
+                    🔢 ÍMPAR <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-impar" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarRoletaMulti('menor')" class="zona-aposta" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
+                    ⬇️ MENOR (1-18) <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-menor" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarRoletaMulti('maior')" class="zona-aposta" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
+                    ⬆️ MAIOR (19-36) <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-maior" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarRoletaMulti('verde')" class="zona-aposta" style="grid-column: span 2; background: linear-gradient(145deg, #27ae60, #2ecc71); border: 2px solid #55efc4;">
+                    🟢 ZERO (JACKPOT) <span class="multiplicador-txt" style="color: #fff;">Paga 14x</span>
+                    <div id="zona-verde" class="container-fichas"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 400px;">
+                <button id="btn-limpar-roleta" onclick="limparApostasRoleta()" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase;">Limpar</button>
+                
+                <button id="btn-girar-roleta" onclick="girarRoletaMulti()" style="flex: 2; padding: 15px; background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5);">GIRAR RODA 🎡</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modal-regras-roleta-multi" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #2ecc71; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #2ecc71; margin-top: 0;">📜 Roleta Co-op</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Conta Conjunta:</strong> Vocês dividem as perdas e os lucros! Cada ficha colocada desconta do cofre real de vocês.</li>
+                <li><strong>Estratégia Dupla:</strong> Cubram a mesa juntos contra o Cassino!</li>
+                <li><strong>Prêmios:</strong> Apostas simples pagam 2x. Acertar o Zero paga um Jackpot de 14x!</li>
+            }
+            </ul>
+            <button onclick="document.getElementById('modal-regras-roleta-multi').classList.add('escondido')" style="width: 100%; padding: 15px; background: #2ecc71; color: #000; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Vamos Lucrar</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-bj-coop" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #3498db; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(52, 152, 219, 0.2); z-index: 100;">
+        <button onclick="fecharMesaBjCoop()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #3498db; color: #3498db; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-bj-coop').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; overflow-y: auto;">
+        
+        <div style="text-align: center; width: 100%; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
+            <div style="color: #e74c3c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin-bottom: 5px;">Dealer (Cassino)</div>
+            <div id="bj-coop-pontuacao-dealer" style="color: #fff; font-size: 1.2rem; font-weight: 900; background: rgba(231,76,60,0.2); display: inline-block; padding: 2px 10px; border-radius: 5px; margin-bottom: 10px;">?</div>
+            <div id="bj-coop-mao-dealer" style="display: flex; justify-content: center; gap: 10px; height: 95px;"></div>
+        </div>
+
+        <div style="text-align: center; width: 100%; padding: 15px 0; opacity: 0.8;">
+            <div style="color: #3498db; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">Parceiro de Equipe</div>
+            <div id="bj-coop-pontuacao-oponente" style="color: #fff; font-size: 1.1rem; font-weight: bold; background: rgba(52,152,219,0.2); display: inline-block; padding: 2px 10px; border-radius: 5px; margin-bottom: 5px;">0</div>
+            <div id="bj-coop-resultado-oponente" style="color: #f1c40f; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 15px;"></div>
+            <div id="bj-coop-mao-oponente" style="display: flex; justify-content: center; gap: 5px; height: 80px; transform: scale(0.85);"></div>
+        </div>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1);">
+            
+            <div id="bj-coop-resultado-jogador" style="color: #f1c40f; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 20px;"></div>
+            
+            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
+                <div style="color: #2ecc71; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Sua Mão</div>
+                <div id="bj-coop-pontuacao-jogador" style="color: #fff; font-size: 1.5rem; font-weight: 900; background: rgba(46,204,113,0.3); padding: 2px 15px; border: 1px solid #2ecc71; border-radius: 5px;">0</div>
+            </div>
+
+            <div id="bj-coop-mao-jogador" style="display: flex; justify-content: center; gap: 10px; height: 100px; margin-bottom: 20px;"></div>
+
+            <div id="bj-coop-painel-aposta" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 350px;">
+                <div style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Aposta por Jogador (Total = 2x)</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; margin-bottom: 15px;">
+                    <button onclick="ajustarApostaBjCoop(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">-</button>
+                    <div style="color: #D4AF37; font-size: 2rem; font-weight: 900; font-family: monospace;"><span id="bj-coop-valor-aposta">50</span></div>
+                    <button onclick="ajustarApostaBjCoop(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">+</button>
+                </div>
+                <button onclick="iniciarRodadaBjCoop()" style="width: 100%; padding: 15px; background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5);">DAR AS CARTAS ♠️</button>
+            </div>
+
+            <div id="bj-coop-painel-acao" class="escondido" style="display: flex; width: 100%; max-width: 350px; gap: 10px;">
+                <button onclick="acaoBjCoop('comprar')" style="flex: 1; padding: 15px 0; background: linear-gradient(145deg, #2ecc71, #27ae60); color: #fff; font-weight: 900; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(46,204,113,0.4);">COMPRAR (HIT)</button>
+                <button onclick="acaoBjCoop('parar')" style="flex: 1; padding: 15px 0; background: linear-gradient(145deg, #e74c3c, #c0392b); color: #fff; font-weight: 900; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(231,76,60,0.4);">PARAR (STAND)</button>
+            </div>
+            
+            <div id="bj-coop-aviso-turno" class="escondido" style="color: #f1c40f; font-weight: bold; font-size: 1.2rem; margin-top: 15px; text-transform: uppercase; animation: pulse 1s infinite alternate;">Aguardando Turno...</div>
+
+            <button id="btn-bj-coop-novamao" class="escondido" onclick="resetarMesaBjCoop()" style="width: 100%; max-width: 350px; padding: 15px; background: #3498db; color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; margin-top: 15px; box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);">NOVA RODADA 🔄</button>
+        </div>
+    </div>
+
+    <div id="modal-regras-bj-coop" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #3498db; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #3498db; margin-top: 0;">📜 21 Blackjack Team</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Objetivo:</strong> Chegar perto de 21.</li>
+                <li><strong>Equipe:</strong> O valor é cobrado 2x do cofre.</li>
+                <li><strong>Dealer:</strong> Compra até 17.</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-bj-coop').classList.add('escondido')" style="width: 100%; padding: 15px; background: #3498db; color: #fff; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Entendi</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-craps" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #5b1a0e 0%, #1a0502 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #e67e22; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(230, 126, 34, 0.2); z-index: 100;">
+        <button onclick="fecharMesaCraps()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #e67e22; color: #e67e22; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-craps').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; padding-bottom: 30px;">
+        
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 30px 0; min-height: 180px; border-bottom: 1px solid rgba(255,255,255,0.05); background: radial-gradient(circle, rgba(230, 126, 34, 0.1) 0%, transparent 70%);">
+            
+            <div id="craps-dado1" class="dado-craps">⚅</div>
+            <div id="craps-dado2" class="dado-craps">⚅</div>
+            
+            <div id="craps-resultado-texto" class="escondido" style="position: absolute; top: 120px; font-size: 3rem; font-weight: 900; color: #f1c40f; text-shadow: 0 5px 20px rgba(0,0,0,0.8); z-index: 10; animation: zoomInResultado 0.5s;">12</div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; align-items: center;">
+            
+            <div id="craps-status-mesa" style="color: #e67e22; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(230, 126, 34, 0.5);">A MESA ESTÁ QUENTE</div>
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 400px;">
+                <button onclick="ajustarFichaCraps(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">-</button>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="color: #888; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Valor da Ficha</span>
+                    <div style="color: #D4AF37; font-size: 2rem; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);"><span id="craps-ficha-valor">50</span></div>
+                </div>
+                <button onclick="ajustarFichaCraps(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">+</button>
+            </div>
+
+            <div id="craps-tabuleiro" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px;">
+                
+                <div onclick="apostarCraps('pass_line')" class="zona-aposta" style="grid-column: span 2; background: linear-gradient(145deg, #2c3e50, #34495e); border: 2px solid #3498db;">
+                    ✅ PASS LINE (7 ou 11) <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-pass_line" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarCraps('craps')" class="zona-aposta" style="background: linear-gradient(145deg, #8e44ad, #9b59b6); border: 2px solid #cd84f1;">
+                    🎲 ANY CRAPS (2, 3, 12) <span class="multiplicador-txt">Paga 8x</span>
+                    <div id="zona-craps" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarCraps('field')" class="zona-aposta" style="background: linear-gradient(145deg, #d35400, #e67e22); border: 2px solid #ffb8b8;">
+                    🌾 FIELD (2,3,4,9,10,11,12) <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-field" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarCraps('sete')" class="zona-aposta" style="background: linear-gradient(145deg, #c0392b, #e74c3c); border: 2px solid #ff7675;">
+                    🔥 CRAZY 7 (Exatos 7) <span class="multiplicador-txt">Paga 5x</span>
+                    <div id="zona-sete" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarCraps('hardways')" class="zona-aposta" style="background: linear-gradient(145deg, #111, #222); border: 2px solid #f1c40f;">
+                    👯 HARDWAYS (Pares) <span class="multiplicador-txt">Paga 8x</span>
+                    <div id="zona-hardways" class="container-fichas"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 400px;">
+                <button id="btn-limpar-craps" onclick="limparApostasCraps()" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase;">Limpar</button>
+                
+                <button id="btn-lancar-craps" onclick="lancarDadosCraps()" style="flex: 2; padding: 15px; background: linear-gradient(145deg, #e67e22, #d35400); color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(230, 126, 34, 0.5); animation: btnNeonPulse 1.5s infinite;">LANÇAR DADOS 🎲</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-regras-craps" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #e67e22; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #e67e22; margin-top: 0;">📜 Vegas Craps Co-op</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Conta Conjunta:</strong> As fichas saem do cofre da equipe.</li>
+                <li><strong>Pass Line:</strong> Ganha se a soma der 7 ou 11.</li>
+                <li><strong>Any Craps:</strong> Ganha se a soma der 2, 3 ou 12.</li>
+                <li><strong>Field:</strong> Ganha se cair nos números das pontas (2,3,4,9,10,11,12).</li>
+                <li><strong>Hardways:</strong> Ganha se der dados idênticos (2-2, 3-3, 4-4, 5-5).</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-craps').classList.add('escondido')" style="width: 100%; padding: 15px; background: #e67e22; color: #fff; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Entendido</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-sicbo" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #4a0e0e 0%, #110000 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #f1c40f; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.2); z-index: 100;">
+        <button onclick="fecharMesaSicBo()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #f1c40f; color: #f1c40f; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-sicbo').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; padding-bottom: 30px;">
+        
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; padding: 30px 0; min-height: 180px; border-bottom: 1px solid rgba(255,215,0,0.1); background: radial-gradient(circle, rgba(241, 196, 15, 0.1) 0%, transparent 70%);">
+            
+            <div id="sicbo-dado1" class="dado-craps" style="color: #111;">⚅</div>
+            <div id="sicbo-dado2" class="dado-craps" style="color: #c0392b;">⚅</div>
+            <div id="sicbo-dado3" class="dado-craps" style="color: #111;">⚅</div>
+            
+            <div id="sicbo-resultado-texto" class="escondido" style="position: absolute; top: 120px; font-size: 3.5rem; font-weight: 900; color: #f1c40f; text-shadow: 0 5px 20px rgba(0,0,0,0.9); z-index: 10; animation: zoomInResultado 0.5s;">18</div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; align-items: center;">
+            
+            <div id="sicbo-status-mesa" style="color: #f1c40f; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);">A TRINDADE AGUARDA</div>
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(241, 196, 15, 0.2); width: 100%; max-width: 400px;">
+                <button onclick="ajustarFichaSicBo(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #f1c40f; color: #f1c40f; font-size: 1.5rem; font-weight: bold;">-</button>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="color: #aaa; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Valor da Ficha</span>
+                    <div style="color: #f1c40f; font-size: 2rem; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(241, 196, 15, 0.6);"><span id="sicbo-ficha-valor">50</span></div>
+                </div>
+                <button onclick="ajustarFichaSicBo(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #f1c40f; color: #f1c40f; font-size: 1.5rem; font-weight: bold;">+</button>
+            </div>
+
+            <div id="sicbo-tabuleiro" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px;">
+                
+                <div onclick="apostarSicBo('pequeno')" class="zona-aposta" style="background: linear-gradient(145deg, #2c3e50, #1a252f); border: 2px solid #3498db;">
+                    📉 PEQUENO (4 a 10) <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-pequeno" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarSicBo('grande')" class="zona-aposta" style="background: linear-gradient(145deg, #c0392b, #8e44ad); border: 2px solid #e74c3c;">
+                    📈 GRANDE (11 a 17) <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-grande" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarSicBo('duplo')" class="zona-aposta" style="background: rgba(255,255,255,0.05); border: 1px solid #f39c12;">
+                    👯 QUALQUER DUPLO <span class="multiplicador-txt">Paga 10x</span>
+                    <div id="zona-duplo" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarSicBo('soma_mistica')" class="zona-aposta" style="background: rgba(255,255,255,0.05); border: 1px solid #2ecc71;">
+                    ✨ SOMA 10 ou 11 <span class="multiplicador-txt">Paga 6x</span>
+                    <div id="zona-soma_mistica" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarSicBo('triplo')" class="zona-aposta" style="grid-column: span 2; background: linear-gradient(145deg, #f1c40f, #d35400); border: 2px solid #ffeaa7;">
+                    🐉 QUALQUER TRIPLO (JACKPOT) <span class="multiplicador-txt" style="color: #000;">Paga 30x</span>
+                    <div id="zona-triplo" class="container-fichas"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 400px;">
+                <button id="btn-limpar-sicbo" onclick="limparApostasSicBo()" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase;">Limpar</button>
+                
+                <button id="btn-lancar-sicbo" onclick="lancarDadosSicBo()" style="flex: 2; padding: 15px; background: linear-gradient(145deg, #f1c40f, #e67e22); color: #000; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5); animation: btnNeonPulse 1.5s infinite;">AGITAR CÚPULA 🥢</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-regras-sicbo" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #f1c40f; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #f1c40f; margin-top: 0;">📜 Sic Bo: Trindade</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Conta Conjunta:</strong> Vocês atuam em equipe contra o Cassino!</li>
+                <li><strong>Pequeno / Grande:</strong> O clássico. Pequeno (4 a 10) e Grande (11 a 17). <em>Atenção: Se der Triplo, a casa vence apostas de Pequeno/Grande!</em></li>
+                <li><strong>Duplo / Triplo:</strong> O jackpot do jogo. Triplos pagam absurdos 30x o valor apostado.</li>
+                <li><strong>Sincronia:</strong> Coloquem as apostas e cliquem em Agitar. A cúpula só treme quando os dois confirmam!</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-sicbo').classList.add('escondido')" style="width: 100%; padding: 15px; background: #f1c40f; color: #000; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Entendido</button>
+        </div>
+    </div>
+</div>
+
+<div id="mesa-baccarat" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2c0e3a 0%, #0a0211 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #D4AF37; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2); z-index: 100;">
+        <button onclick="fecharMesaBaccarat()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #D4AF37; color: #D4AF37; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-baccarat').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; overflow-y: auto;">
+        
+        <div style="text-align: center; width: 100%; border-bottom: 1px dashed rgba(212,175,55,0.2); padding-bottom: 15px;">
+            <div style="color: #e74c3c; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; margin-bottom: 5px;">👑 Banca (Banker)</div>
+            <div id="bac-pontuacao-banca" style="color: #fff; font-size: 1.5rem; font-weight: 900; background: rgba(231,76,60,0.2); border: 1px solid #e74c3c; display: inline-block; padding: 2px 15px; border-radius: 5px; margin-bottom: 10px;">0</div>
+            <div id="bac-mao-banca" style="display: flex; justify-content: center; gap: 10px; height: 95px;"></div>
+        </div>
+
+        <div style="text-align: center; width: 100%; padding: 15px 0;">
+            <div style="color: #3498db; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; margin-bottom: 5px;">👤 Jogador (Player)</div>
+            <div id="bac-pontuacao-jogador" style="color: #fff; font-size: 1.5rem; font-weight: 900; background: rgba(52,152,219,0.2); border: 1px solid #3498db; display: inline-block; padding: 2px 15px; border-radius: 5px; margin-bottom: 10px;">0</div>
+            <div id="bac-mao-jogador" style="display: flex; justify-content: center; gap: 10px; height: 95px;"></div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; align-items: center; border-top: 1px dashed rgba(212,175,55,0.2);">
+            
+            <div id="bac-status-mesa" style="color: #D4AF37; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(212,175,55,0.5);">FAÇAM SUAS APOSTAS</div>
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(212,175,55,0.3); width: 100%; max-width: 400px;">
+                <button onclick="ajustarFichaBaccarat(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #D4AF37; color: #D4AF37; font-size: 1.5rem; font-weight: bold;">-</button>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="color: #aaa; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Valor da Ficha</span>
+                    <div style="color: #D4AF37; font-size: 2rem; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);"><span id="bac-ficha-valor">50</span></div>
+                </div>
+                <button onclick="ajustarFichaBaccarat(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #D4AF37; color: #D4AF37; font-size: 1.5rem; font-weight: bold;">+</button>
+            </div>
+
+            <div id="bac-tabuleiro" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px;">
+                
+                <div onclick="apostarBaccarat('jogador')" class="zona-aposta" style="background: linear-gradient(145deg, #2980b9, #3498db); border: 2px solid #74b9ff; min-height: 90px;">
+                    👤 JOGADOR <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-bac-jogador" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarBaccarat('empate')" class="zona-aposta" style="background: linear-gradient(145deg, #27ae60, #2ecc71); border: 2px solid #55efc4; min-height: 90px;">
+                    🤝 EMPATE <span class="multiplicador-txt">Paga 8x</span>
+                    <div id="zona-bac-empate" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarBaccarat('banca')" class="zona-aposta" style="background: linear-gradient(145deg, #c0392b, #e74c3c); border: 2px solid #ff7675; min-height: 90px;">
+                    👑 BANCA <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-bac-banca" class="container-fichas"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 400px;">
+                <button id="btn-limpar-bac" onclick="limparApostasBaccarat()" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase;">Limpar</button>
+                
+                <button id="btn-lancar-bac" onclick="distribuirBaccarat()" style="flex: 2; padding: 15px; background: linear-gradient(145deg, #D4AF37, #b38b22); color: #000; font-weight: 900; font-size: 1.1rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5); animation: btnNeonPulse 1.5s infinite;">DISTRIBUIR 🃏</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-regras-baccarat" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #D4AF37; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #D4AF37; margin-top: 0;">📜 Baccarat Royale</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Objetivo:</strong> Aposte em qual mão (Jogador ou Banca) chegará mais perto de 9.</li>
+                <li><strong>Pontos:</strong> Ases valem 1. Cartas de 2 a 9 valem seu número. 10, J, Q, K valem ZERO. Se a soma for 15, vale 5.</li>
+                <li><strong>Retornos:</strong> Vitória do Jogador ou da Banca paga 2x. O Empate paga 8x!</li>
+                <li><strong>Seguro de Empate:</strong> Se der Empate e você tiver apostado no Jogador ou na Banca, sua aposta é devolvida (Push).</li>
+                <li><strong>Sincronia:</strong> Cliquem em Distribuir. O jogo só roda quando a equipe toda estiver pronta!</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-baccarat').classList.add('escondido')" style="width: 100%; padding: 15px; background: #D4AF37; color: #000; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Apostar Alto</button>
+        </div>
+    </div>
+</div>
+
+<div id="mesa-carib" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0b3b24 0%, #03140b 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #1abc9c; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(26, 188, 156, 0.2); z-index: 100;">
+        <button onclick="fecharMesaCarib()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #1abc9c; color: #1abc9c; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-carib').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; overflow-y: auto;">
+        
+        <div style="text-align: center; width: 100%; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
+            <div style="color: #e74c3c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin-bottom: 5px;">Dealer (A Casa)</div>
+            <div id="carib-info-dealer" style="color: #f1c40f; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 15px;"></div>
+            <div id="carib-mao-dealer" style="display: flex; justify-content: center; gap: -15px; height: 90px; transform: scale(0.9);">
+                </div>
+        </div>
+
+        <div style="text-align: center; width: 100%; padding: 15px 0; opacity: 0.8;">
+            <div style="color: #3498db; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">Mão do Parceiro</div>
+            <div id="carib-resultado-oponente" style="color: #2ecc71; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 15px;"></div>
+            <div id="carib-mao-oponente" style="display: flex; justify-content: center; gap: -15px; height: 80px; transform: scale(0.8);">
+                </div>
+        </div>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1);">
+            
+            <div id="carib-resultado-jogador" style="color: #2ecc71; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 20px;"></div>
+            
+            <div style="color: #1abc9c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Sua Mão</div>
+
+            <div id="carib-mao-jogador" style="display: flex; justify-content: center; gap: -15px; height: 95px; margin-bottom: 20px;">
+                </div>
+
+            <div id="carib-painel-aposta" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 350px;">
+                <div style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Aposta Ante (Inicial)</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; margin-bottom: 15px;">
+                    <button onclick="ajustarApostaCarib(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">-</button>
+                    <div style="color: #D4AF37; font-size: 2rem; font-weight: 900; font-family: monospace;"><span id="carib-valor-aposta">50</span></div>
+                    <button onclick="ajustarApostaCarib(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">+</button>
+                </div>
+                <button id="btn-iniciar-carib" onclick="iniciarRodadaCarib()" style="width: 100%; padding: 15px; background: linear-gradient(145deg, #1abc9c, #16a085); color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(26, 188, 156, 0.4);">PAGAR ANTE ♠️</button>
+            </div>
+
+            <div id="carib-painel-acao" class="escondido" style="display: flex; width: 100%; max-width: 350px; gap: 10px;">
+                <button id="btn-carib-fold" onclick="acaoCarib('fold')" style="flex: 1; padding: 15px 0; background: linear-gradient(145deg, #e74c3c, #c0392b); color: #fff; font-weight: 900; font-size: 1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(231,76,60,0.4);">FUGIR (FOLD)</button>
+                <button id="btn-carib-call" onclick="acaoCarib('call')" style="flex: 1.5; padding: 15px 0; background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; font-weight: 900; font-size: 1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);">APOSTAR 2x (CALL)</button>
+            </div>
+
+            <button id="btn-carib-novamao" class="escondido" onclick="resetarMesaCarib()" style="width: 100%; max-width: 350px; padding: 15px; background: #3498db; color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; margin-top: 15px; box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);">NOVA RODADA 🔄</button>
+        </div>
+    </div>
+
+    <div id="modal-regras-carib" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #1abc9c; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #1abc9c; margin-top: 0;">📜 Caribbean Poker Co-op</h2>
+            <ul style="color: #ccc; font-size: 0.85rem; padding-left: 20px; line-height: 1.5;">
+                <li><strong>Ante:</strong> O valor inicial que vocês pagam juntos para receber as 5 cartas.</li>
+                <li><strong>Decisão:</strong> Olhou as cartas? Você pode Fugir (Perde a Ante) ou dar CALL (Paga +2x o valor da Ante) para ver as cartas da Casa.</li>
+                <li><strong>Qualificação:</strong> O Cassino só joga se tiver no mínimo <strong>Ás e Rei</strong>. Se ele não qualificar, a sua Ante dobra e o Call volta intacto!</li>
+                <li><strong>Vitória Absoluta:</strong> Se você vencer a Casa Qualificada, o Call paga multiplicadores insanos (Ex: Flush paga 5x, Royal Flush 100x).</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-carib').classList.add('escondido')" style="width: 100%; padding: 15px; background: #1abc9c; color: #000; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Vamos lá</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-paigow" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2e150f 0%, #0a0302 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #e74c3c; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(231, 76, 60, 0.2); z-index: 100;">
+        <button onclick="fecharMesaPaiGow()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #f1c40f; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #f1c40f; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-paigow').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; overflow-y: auto;">
+        
+        <div style="text-align: center; width: 100%; border-bottom: 1px dashed rgba(231,76,60,0.3); padding-bottom: 15px;">
+            <div style="color: #e74c3c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin-bottom: 5px;">O Imperador (Dealer)</div>
+            <div id="paigow-info-dealer" style="color: #f1c40f; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 15px;"></div>
+            
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 0.6rem; color: #aaa; margin-bottom: 3px;">Mão Baixa</span>
+                    <div id="paigow-dealer-low" style="display: flex; gap: 5px; height: 75px;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 0.6rem; color: #aaa; margin-bottom: 3px;">Mão Alta</span>
+                    <div id="paigow-dealer-high" style="display: flex; gap: 5px; height: 75px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; width: 100%; padding: 15px 0; opacity: 0.85;">
+            <div style="color: #3498db; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">Aliado</div>
+            <div id="paigow-resultado-oponente" style="color: #2ecc71; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 15px;"></div>
+            
+            <div style="display: flex; justify-content: center; gap: 20px; transform: scale(0.85);">
+                <div id="paigow-oponente-low" style="display: flex; gap: 5px; height: 75px;"></div>
+                <div id="paigow-oponente-high" style="display: flex; gap: 5px; height: 75px;"></div>
+            </div>
+        </div>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 15px; border-top: 1px dashed rgba(231,76,60,0.3);">
+            
+            <div id="paigow-resultado-jogador" style="color: #2ecc71; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; min-height: 20px;"></div>
+            <div style="color: #1abc9c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Suas Peças</div>
+
+            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 0.7rem; color: #fff; margin-bottom: 5px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px;">Mão Baixa <span id="paigow-pts-low" style="color:#f1c40f;"></span></span>
+                    <div id="paigow-jogador-low" style="display: flex; gap: 5px; height: 75px;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 0.7rem; color: #fff; margin-bottom: 5px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px;">Mão Alta <span id="paigow-pts-high" style="color:#f1c40f;"></span></span>
+                    <div id="paigow-jogador-high" style="display: flex; gap: 5px; height: 75px;"></div>
+                </div>
+            </div>
+
+            <div id="paigow-painel-aposta" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 350px;">
+                <div style="color: #f1c40f; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Aposta da Equipe (Valor x2)</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(241,196,15,0.2); width: 100%; margin-bottom: 15px;">
+                    <button onclick="ajustarApostaPaiGow(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #f1c40f; color: #f1c40f; font-size: 1.5rem; font-weight: bold;">-</button>
+                    <div style="color: #f1c40f; font-size: 2rem; font-weight: 900; font-family: monospace;"><span id="paigow-valor-aposta">50</span></div>
+                    <button onclick="ajustarApostaPaiGow(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #f1c40f; color: #f1c40f; font-size: 1.5rem; font-weight: bold;">+</button>
+                </div>
+                <button id="btn-iniciar-paigow" onclick="iniciarRodadaPaiGow()" style="width: 100%; padding: 15px; background: linear-gradient(145deg, #c0392b, #8e44ad); color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(192, 57, 43, 0.4);">REVELAR O DESTINO 🀄</button>
+            </div>
+
+            <button id="btn-paigow-novamao" class="escondido" onclick="resetarMesaPaiGow()" style="width: 100%; max-width: 350px; padding: 15px; background: #3498db; color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; margin-top: 15px; box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);">NOVA RODADA 🔄</button>
+        </div>
+    </div>
+
+    <div id="modal-regras-paigow" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #e74c3c; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #e74c3c; margin-top: 0;">📜 Pai Gow: Tiles</h2>
+            <ul style="color: #ccc; font-size: 0.85rem; padding-left: 20px; line-height: 1.5;">
+                <li><strong>O Jogo:</strong> Cada jogador recebe 4 peças que são auto-divididas na melhor combinação de Mão Alta e Mão Baixa.</li>
+                <li><strong>Pontuação:</strong> A soma das duas peças, módulo 10 (ex: 8 + 7 = 15, vale 5). Qualquer PAR vence pontos normais!</li>
+                <li><strong>Condição de Vitória:</strong> Sua Mão Alta E Mão Baixa precisam vencer as do Dealer. Se vencer uma e perder outra, dá Empate (Recebe a aposta de volta). O Dealer sempre vence em caso de empate na pontuação.</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-paigow').classList.add('escondido')" style="width: 100%; padding: 15px; background: #e74c3c; color: #fff; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Mestre do Dominó</button>
+        </div>
+    </div>
+</div>
+
+<div id="mesa-wheel" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2c0e3a 0%, #000000 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #9b59b6; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(155, 89, 182, 0.2); z-index: 100;">
+        <button onclick="fecharMesaWheel()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #9b59b6; color: #9b59b6; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-wheel').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; padding-bottom: 30px;">
+        
+        <div style="display: flex; justify-content: center; align-items: center; padding: 40px 0 20px 0; position: relative; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            
+            <div style="position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #f1c40f; z-index: 20; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.9));"></div>
+
+            <div id="wheel-disco" style="width: 250px; height: 250px; border-radius: 50% !important; border: 8px solid #ecf0f1; box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8), 0 0 0 12px #111; position: relative; display: flex; justify-content: center; align-items: center; 
+            background: conic-gradient(
+                #bdc3c7 0deg 30deg,     /* 1x */
+                #3498db 30deg 60deg,    /* 2x */
+                #bdc3c7 60deg 90deg,    /* 1x */
+                #2ecc71 90deg 120deg,   /* 5x */
+                #bdc3c7 120deg 150deg,  /* 1x */
+                #3498db 150deg 180deg,  /* 2x */
+                #9b59b6 180deg 210deg,  /* 10x */
+                #bdc3c7 210deg 240deg,  /* 1x */
+                #3498db 240deg 270deg,  /* 2x */
+                #2ecc71 270deg 300deg,  /* 5x */
+                #e67e22 300deg 330deg,  /* 20x */
+                #f1c40f 330deg 360deg   /* JACKPOT */
+            );">
+                
+                <div style="position: absolute; width: 100%; height: 100%; background: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Ccircle cx=%22100%22 cy=%22100%22 r=%2298%22 fill=%22none%22 stroke=%22rgba(0,0,0,0.3)%22 stroke-width=%221%22 stroke-dasharray=%2226 26%22/%3E%3C/svg%3E') center center no-repeat; background-size: cover; border-radius: 50% !important;"></div>
+
+                <div style="width: 50px; height: 50px; background: radial-gradient(circle, #fff, #bdc3c7); border-radius: 50% !important; border: 4px solid #333; z-index: 10; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+                    <div style="width: 15px; height: 15px; background: #111; border-radius: 50% !important;"></div>
+                </div>
+            </div>
+
+            <div id="wheel-resultado-visor" class="escondido" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 110px; height: 110px; background: rgba(0,0,0,0.95); border: 3px solid #9b59b6; border-radius: 50% !important; z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 0 40px rgba(155, 89, 182, 0.8);">
+                <span style="font-size: 0.7rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px;">Pagou</span>
+                <span id="wheel-res-texto" style="font-size: 2.5rem; font-weight: 900; color: #fff; line-height: 1.1;">0x</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; align-items: center;">
+            
+            <div id="wheel-status-mesa" style="color: #9b59b6; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);">FAÇAM SUAS APOSTAS</div>
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 400px;">
+                <button onclick="ajustarFichaWheel(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">-</button>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="color: #888; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Valor da Ficha</span>
+                    <div style="color: #D4AF37; font-size: 2rem; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);"><span id="wheel-ficha-valor">50</span></div>
+                </div>
+                <button onclick="ajustarFichaWheel(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; font-size: 1.5rem; font-weight: bold;">+</button>
+            </div>
+
+            <div id="wheel-tabuleiro" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px;">
+                
+                <div onclick="apostarWheel('1')" class="zona-aposta" style="background: linear-gradient(145deg, #7f8c8d, #95a5a6); border: 2px solid #bdc3c7;">
+                    🪙 NOTA 1 <span class="multiplicador-txt">Paga 2x</span>
+                    <div id="zona-wheel-1" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarWheel('2')" class="zona-aposta" style="background: linear-gradient(145deg, #2980b9, #3498db); border: 2px solid #74b9ff;">
+                    📘 NOTA 2 <span class="multiplicador-txt">Paga 3x</span>
+                    <div id="zona-wheel-2" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarWheel('5')" class="zona-aposta" style="background: linear-gradient(145deg, #27ae60, #2ecc71); border: 2px solid #55efc4;">
+                    💵 NOTA 5 <span class="multiplicador-txt">Paga 6x</span>
+                    <div id="zona-wheel-5" class="container-fichas"></div>
+                </div>
+                
+                <div onclick="apostarWheel('10')" class="zona-aposta" style="background: linear-gradient(145deg, #8e44ad, #9b59b6); border: 2px solid #cd84f1;">
+                    💷 NOTA 10 <span class="multiplicador-txt">Paga 11x</span>
+                    <div id="zona-wheel-10" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarWheel('20')" class="zona-aposta" style="background: linear-gradient(145deg, #d35400, #e67e22); border: 2px solid #ffb8b8;">
+                    💶 NOTA 20 <span class="multiplicador-txt">Paga 21x</span>
+                    <div id="zona-wheel-20" class="container-fichas"></div>
+                </div>
+
+                <div onclick="apostarWheel('jackpot')" class="zona-aposta" style="background: linear-gradient(145deg, #f39c12, #f1c40f); border: 2px solid #ffeaa7;">
+                    🌟 JACKPOT <span class="multiplicador-txt" style="color: #000;">Paga 41x</span>
+                    <div id="zona-wheel-jackpot" class="container-fichas"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 400px;">
+                <button id="btn-limpar-wheel" onclick="limparApostasWheel()" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase;">Limpar</button>
+                
+                <button id="btn-girar-wheel" onclick="girarWheelCoop()" style="flex: 2; padding: 15px; background: linear-gradient(145deg, #9b59b6, #8e44ad); color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(155, 89, 182, 0.5); animation: btnNeonPulse 1.5s infinite;">GIRAR RODA 🎡</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modal-regras-wheel" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #9b59b6; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #9b59b6; margin-top: 0;">📜 Wheel of Fortune</h2>
+            <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
+                <li><strong>A Roda:</strong> Possui 12 fatias. As Notas menores (1 e 2) têm mais fatias e saem com frequência. O Jackpot tem apenas 1 fatia!</li>
+                <li><strong>Os Prêmios:</strong> O pagamento é "Para Um". Se apostar 50 na Nota 5, o prêmio é: Os seus 50 de volta + 250 de lucro (Total 300 = 6x).</li>
+                <li><strong>Sincronia:</strong> Cliquem em Girar Roda. A roleta só inicia quando a equipe estiver pronta!</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-wheel').classList.add('escondido')" style="width: 100%; padding: 15px; background: #9b59b6; color: #fff; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Vamos Lucrar</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="mesa-bridge" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #062b33 0%, #010a0c 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;">
+    
+    <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid #00d2d3; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; box-shadow: 0 5px 20px rgba(0, 210, 211, 0.2); z-index: 100;">
+        <button onclick="fecharMesaBridge()" style="padding: 6px 12px; font-size: 0.85rem; background: transparent; border: 1px solid #00d2d3; color: #00d2d3; border-radius: 0px !important;">← Abandonar</button>
+        
+        <div style="background: rgba(0,0,0,0.8); border: 1px solid #D4AF37; padding: 5px 15px; display: flex; align-items: center; gap: 5px;">
+            <span style="color: #D4AF37; font-size: 0.7rem; text-transform: uppercase;">Cofre:</span>
+            <span class="visor-moedas-global-texto" style="color: #fff; font-weight: 900; font-size: 1rem;">0</span> 💰
+        </div>
+
+        <button onclick="document.getElementById('modal-regras-bridge').classList.remove('escondido')" style="background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50% !important; font-weight: bold;">?</button>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; overflow-y: auto;">
+        
+        <div style="text-align: center; width: 100%; border-bottom: 1px dashed rgba(0,210,211,0.2); padding-bottom: 15px;">
+            <div style="color: #00d2d3; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; margin-bottom: 5px; text-shadow: 0 0 10px rgba(0,210,211,0.5);">A Ponte</div>
+            <div id="bridge-info-spread" style="color: #fff; font-size: 1rem; font-weight: 900; background: rgba(0,210,211,0.1); border: 1px solid #00d2d3; display: inline-block; padding: 5px 15px; border-radius: 5px; margin-bottom: 10px;">Distância: ?</div>
+        </div>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; padding: 30px 0; min-height: 200px; position: relative;">
+            
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <span style="color: #aaa; font-size: 0.6rem; text-transform: uppercase; margin-bottom: 5px;">Pilar Esquerdo</span>
+                <div id="bridge-pilar1" style="width: 70px; height: 100px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px;"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; margin: 0 10px;">
+                <span style="color: #f1c40f; font-size: 0.6rem; text-transform: uppercase; margin-bottom: 5px; font-weight: bold;">A Travessia</span>
+                <div id="bridge-passo" style="width: 70px; height: 100px; border: 2px solid #f1c40f; border-radius: 8px; box-shadow: 0 0 20px rgba(241,196,15,0.3);"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <span style="color: #aaa; font-size: 0.6rem; text-transform: uppercase; margin-bottom: 5px;">Pilar Direito</span>
+                <div id="bridge-pilar2" style="width: 70px; height: 100px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px;"></div>
+            </div>
+
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; align-items: center; border-top: 1px dashed rgba(0,210,211,0.2);">
+            
+            <div id="bridge-resultado-jogador" style="color: #f1c40f; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; min-height: 20px; text-shadow: 0 0 10px rgba(241,196,15,0.5);">AGUARDANDO PEDÁGIO</div>
+
+            <div id="bridge-painel-aposta" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 350px;">
+                <div style="color: #00d2d3; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Pedágio por Jogador</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid rgba(0,210,211,0.3); width: 100%; margin-bottom: 15px;">
+                    <button onclick="ajustarApostaBridge(-10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #00d2d3; color: #00d2d3; font-size: 1.5rem; font-weight: bold;">-</button>
+                    <div style="color: #00d2d3; font-size: 2rem; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(0, 210, 211, 0.6);"><span id="bridge-valor-aposta">50</span></div>
+                    <button onclick="ajustarApostaBridge(10)" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid #00d2d3; color: #00d2d3; font-size: 1.5rem; font-weight: bold;">+</button>
+                </div>
+                <button id="btn-iniciar-bridge" onclick="iniciarRodadaBridge()" style="width: 100%; padding: 15px; background: linear-gradient(145deg, #00d2d3, #01a3a4); color: #000; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; box-shadow: 0 5px 20px rgba(0, 210, 211, 0.4);">ERGUER PILARES 🏛️</button>
+            </div>
+
+            <div id="bridge-painel-acao" class="escondido" style="display: flex; width: 100%; max-width: 350px; gap: 10px;">
+                <button id="btn-bridge-recuar" onclick="acaoBridge('recuar')" style="flex: 1; padding: 15px 0; background: linear-gradient(145deg, #e74c3c, #c0392b); color: #fff; font-weight: 900; font-size: 1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(231,76,60,0.4);">RECUAR</button>
+                <button id="btn-bridge-cruzar" onclick="acaoBridge('atravessar')" style="flex: 1.5; padding: 15px 0; background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; font-weight: 900; font-size: 1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);">ATRAVESSAR (+2x)</button>
+            </div>
+
+            <button id="btn-bridge-novamao" class="escondido" onclick="resetarMesaBridge()" style="width: 100%; max-width: 350px; padding: 15px; background: #3498db; color: #fff; font-weight: 900; font-size: 1.2rem; border: none; text-transform: uppercase; margin-top: 15px; box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);">NOVA PONTE 🔄</button>
+        </div>
+    </div>
+
+    <div id="modal-regras-bridge" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #111; border: 2px solid #00d2d3; padding: 25px; width: 100%; max-width: 400px; border-radius: 0px !important;">
+            <h2 style="color: #00d2d3; margin-top: 0;">📜 Casino Bridge</h2>
+            <ul style="color: #ccc; font-size: 0.85rem; padding-left: 20px; line-height: 1.5;">
+                <li><strong>O Básico:</strong> Pagam o pedágio (Ante). Duas cartas (Pilares) são abertas. O objetivo é que a terceira carta caia no espaço entre elas.</li>
+                <li><strong>Eventos Automáticos:</strong> Se os pilares forem iguais (Um Par), uma terceira carta é puxada grátis. Se for Trinca paga 11:1! Se forem consecutivos (Ex: 5 e 6), a ponte quebra e o pedágio é devolvido na hora.</li>
+                <li><strong>A Ação:</strong> Se houver espaço (Spread), vocês escolhem <strong>Recuar</strong> (perde pedágio) ou <strong>Atravessar</strong> (Dobra a aposta para ver a 3ª carta).</li>
+                <li><strong>Multiplicadores:</strong> Spread de 1 carta paga 5x! Spread de 2 paga 4x! Spread de 3 paga 2x! Outros pagam 1x.</li>
+            </ul>
+            <button onclick="document.getElementById('modal-regras-bridge').classList.add('escondido')" style="width: 100%; padding: 15px; background: #00d2d3; color: #000; border: none; margin-top: 15px; font-weight: bold; text-transform: uppercase;">Entendido</button>
+        </div>
+    </div>
+</div>
+
 
     <div id="overlay-boutique" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, #1a0f1a, #000000); z-index: 100000; display: none; flex-direction: column; overflow: hidden; font-family: 'Playfair Display', serif;">
         

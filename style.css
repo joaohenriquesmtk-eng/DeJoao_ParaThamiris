@@ -11801,3 +11801,506 @@ body > .container-palco {
     0% { transform: scale(1.2) rotate(-2deg); }
     100% { transform: scale(1.2) rotate(2deg); }
 }
+
+
+/* ============================================================================ */
+/* 🎴 UNO CLASSIC ROYALE - ESTILOS DAS CARTAS E ANIMAÇÕES                       */
+/* ============================================================================ */
+
+.uno-card {
+    width: 70px;
+    height: 105px;
+    border-radius: 6px !important; /* Cartas reais precisam desse mínimo para parecerem cartas */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.4);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2);
+    border: 3px solid #fff;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-left: -20px; /* Sobreposição estilo leque */
+    position: relative;
+}
+
+.uno-card:hover {
+    transform: translateY(-15px) scale(1.05);
+    z-index: 50;
+}
+
+.uno-card-back {
+    width: 70px;
+    height: 105px;
+    border-radius: 6px !important;
+    background: repeating-linear-gradient(45deg, #111, #111 5px, #222 5px, #222 10px);
+    border: 3px solid #D4AF37;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+}
+
+.uno-card-oponente {
+    width: 50px;
+    height: 75px;
+    border-radius: 4px !important;
+    background: repeating-linear-gradient(45deg, #111, #111 5px, #222 5px, #222 10px);
+    border: 2px solid #D4AF37;
+    margin-left: -25px; /* Bem espremidas */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    transition: all 0.3s;
+}
+
+/* As Cores do Jogo */
+.uno-vermelho { background: linear-gradient(135deg, #ff4757, #c0392b); }
+.uno-azul { background: linear-gradient(135deg, #1e90ff, #0984e3); }
+.uno-verde { background: linear-gradient(135deg, #2ed573, #27ae60); }
+.uno-amarelo { background: linear-gradient(135deg, #ffa502, #f39c12); }
+.uno-preto { background: linear-gradient(135deg, #2f3542, #1e272e); color: #D4AF37;} /* Cartas Especiais */
+.uno-vazia { background: rgba(0,0,0,0.4); border: 2px dashed rgba(255,255,255,0.2); box-shadow: none; }
+
+/* Brilho da carta que PODE ser jogada */
+.uno-jogavel {
+    box-shadow: 0 0 20px rgba(255,255,255,0.8), inset 0 0 10px rgba(255,255,255,0.5) !important;
+    animation: cartaPulsando 1.5s infinite alternate;
+}
+
+@keyframes cartaPulsando {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-5px); }
+}
+
+
+/* ============================================================================ */
+/* 🎴 UNO CLASSIC ROYALE - GEOMETRIA DE CARTAS E JUICE                          */
+/* ============================================================================ */
+
+/* A Carta em si */
+.uno-card {
+    width: 75px;
+    height: 115px;
+    border-radius: 8px !important;
+    border: 4px solid #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    cursor: pointer;
+    position: relative;
+    /* Efeito Leque de Sobreposição */
+    margin-left: -35px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), margin 0.3s;
+}
+
+/* O primeiro do leque não tem margem negativa */
+#uno-minha-mao .uno-card:first-child { margin-left: 0; }
+
+/* Ao passar o dedo, a carta levanta e "empurra" as vizinhas */
+#uno-minha-mao .uno-card:hover, #uno-minha-mao .uno-card:active {
+    transform: translateY(-25px) scale(1.15) rotate(-2deg);
+    margin-right: 15px; 
+    z-index: 50;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+}
+
+/* A Elipse Clássica Branca no Centro da Carta */
+.uno-oval {
+    width: 85%;
+    height: 85%;
+    background: #fff;
+    border-radius: 50% !important; /* Elipse */
+    transform: skewY(-15deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+}
+
+/* O Valor/Símbolo (Desfazendo a inclinação para o texto ficar reto) */
+.uno-val {
+    transform: skewY(15deg);
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+/* Cores Oficiais Vibrantes */
+.uno-vermelho { background: linear-gradient(135deg, #ff4757, #c0392b); }
+.uno-vermelho .uno-val { color: #c0392b; }
+
+.uno-azul { background: linear-gradient(135deg, #1e90ff, #0984e3); }
+.uno-azul .uno-val { color: #0984e3; }
+
+.uno-verde { background: linear-gradient(135deg, #2ed573, #27ae60); }
+.uno-verde .uno-val { color: #27ae60; }
+
+.uno-amarelo { background: linear-gradient(135deg, #ffa502, #f39c12); }
+.uno-amarelo .uno-val { color: #f39c12; }
+
+/* Cartas de Ação Negras */
+.uno-preto { background: linear-gradient(135deg, #2f3542, #1e272e); }
+.uno-preto .uno-oval { background: #222; border: 2px solid #fff;}
+.uno-preto .uno-val { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.8); font-size: 1.8rem; }
+
+/* Carta Vazia e Costas */
+.uno-vazia { background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.2); box-shadow: none; }
+.uno-card-back {
+    width: 75px; height: 115px; border-radius: 8px !important; border: 4px solid #fff;
+    background: #000; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+}
+.uno-card-back:active { transform: scale(0.95); }
+.uno-oval-back {
+    width: 85%; height: 85%; background: #c0392b; border-radius: 50% !important; transform: skewY(-15deg);
+    display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 10px #000;
+}
+
+/* Cartas do Oponente (Pequenas no topo) */
+.uno-card-op {
+    width: 40px; height: 65px; border-radius: 4px !important; border: 2px solid #fff;
+    background: #111; margin-left: -20px; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+    display: flex; justify-content: center; align-items: center;
+}
+.uno-card-op:first-child { margin-left: 0; }
+.uno-oval-op { width: 70%; height: 70%; background: #c0392b; border-radius: 50% !important; transform: skewY(-15deg); }
+
+/* Animações (Juice) */
+.uno-jogavel {
+    box-shadow: 0 0 20px rgba(255,255,255,0.6), inset 0 0 10px rgba(255,255,255,0.3);
+    animation: pulsarJogavel 1.5s infinite alternate;
+}
+@keyframes pulsarJogavel {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+}
+
+@keyframes pulsoUno {
+    0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 20px #e74c3c; }
+    100% { transform: translateX(-50%) scale(1.1); box-shadow: 0 0 50px #ff4757; }
+}
+
+.animacao-descarte {
+    animation: baterMesa 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes baterMesa {
+    0% { transform: scale(1.5) rotate(15deg); opacity: 0; }
+    100% { transform: scale(1) rotate(5deg); opacity: 1; }
+}
+
+/* ============================================================================ */
+/* 🎴 UNO CLASSIC ROYALE - GEOMETRIA DE CARTAS E JUICE                          */
+/* ============================================================================ */
+
+/* Barra de rolagem invisível elegante para a mão de cartas */
+#uno-minha-mao::-webkit-scrollbar { height: 5px; }
+#uno-minha-mao::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 5px; }
+
+.uno-card {
+    flex-shrink: 0; /* 🚨 ISSO IMPEDE O ESMAGAMENTO DAS CARTAS */
+    width: 75px;
+    height: 115px;
+    border-radius: 8px !important;
+    border: 4px solid #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    cursor: pointer;
+    position: relative;
+    margin-left: -35px; /* O Efeito Leque */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), margin 0.2s;
+}
+
+#uno-minha-mao .uno-card:first-child { margin-left: 0; }
+
+/* Ao passar o dedo, a carta levanta e afasta a vizinha para ser vista completa */
+#uno-minha-mao .uno-card:hover, #uno-minha-mao .uno-card:active {
+    transform: translateY(-20px) scale(1.1);
+    margin-right: 25px; 
+    z-index: 50;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+}
+
+.uno-oval {
+    width: 85%; height: 85%; background: #fff; border-radius: 50% !important;
+    transform: skewY(-15deg); display: flex; justify-content: center; align-items: center;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+}
+
+/* O Valor perfeitamente centralizado */
+.uno-val {
+    transform: skewY(15deg);
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+/* Cores Oficiais */
+.uno-vermelho { background: linear-gradient(135deg, #ff4757, #c0392b); }
+.uno-vermelho .uno-val { color: #c0392b; }
+.uno-azul { background: linear-gradient(135deg, #1e90ff, #0984e3); }
+.uno-azul .uno-val { color: #0984e3; }
+.uno-verde { background: linear-gradient(135deg, #2ed573, #27ae60); }
+.uno-verde .uno-val { color: #27ae60; }
+.uno-amarelo { background: linear-gradient(135deg, #ffa502, #f39c12); }
+.uno-amarelo .uno-val { color: #f39c12; }
+
+/* Especiais */
+.uno-preto { background: linear-gradient(135deg, #2f3542, #1e272e); }
+.uno-preto .uno-oval { background: #222; border: 2px solid #fff;}
+.uno-preto .uno-val { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.8); font-size: 1.8rem; }
+.uno-vazia { background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.2); box-shadow: none; }
+
+/* Monte e Oponente */
+.uno-card-back {
+    width: 75px; height: 115px; border-radius: 8px !important; border: 4px solid #fff;
+    background: #000; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+}
+.uno-card-back:active { transform: scale(0.95); }
+.uno-oval-back {
+    width: 85%; height: 85%; background: #c0392b; border-radius: 50% !important; transform: skewY(-15deg);
+    display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 10px #000;
+}
+.uno-card-op {
+    width: 40px; height: 65px; border-radius: 4px !important; border: 2px solid #fff;
+    background: #111; margin-left: -20px; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+}
+.uno-card-op:first-child { margin-left: 0; }
+
+/* Juice (Animações de Jogo) */
+.uno-jogavel {
+    box-shadow: 0 0 20px rgba(255,255,255,0.8), inset 0 0 10px rgba(255,255,255,0.5) !important;
+    animation: pulsarJogavel 1s infinite alternate;
+}
+@keyframes pulsarJogavel { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
+
+@keyframes pulsoUno {
+    0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 20px #e74c3c; }
+    100% { transform: translateX(-50%) scale(1.1); box-shadow: 0 0 50px #ff4757; }
+}
+
+.animacao-descarte { animation: baterMesa 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes baterMesa {
+    0% { transform: scale(1.5) rotate(15deg); opacity: 0; }
+    100% { transform: scale(1) rotate(5deg); opacity: 1; }
+}
+
+
+/* ============================================================================ */
+/* ♠️ TEXAS HOLD'EM POKER - ESTÉTICA E FÍSICA DAS CARTAS                        */
+/* ============================================================================ */
+
+.poker-card {
+    width: 65px;
+    height: 95px;
+    background: #fff;
+    border-radius: 6px !important;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 0 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4px;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.poker-card:hover { transform: translateY(-10px); }
+
+/* Cartas Comunitárias (Mesa) */
+#poker-mesa-cartas .poker-card { width: 55px; height: 80px; }
+
+/* Animação de Distribuição (Flop, Turn, River) */
+.animacao-distribuir { animation: darCartaPoker 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
+@keyframes darCartaPoker {
+    0% { transform: translateY(-200px) scale(0.5) rotate(-180deg); opacity: 0; }
+    100% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+}
+
+.poker-val-topo { font-size: 1.2rem; font-weight: 900; line-height: 1; text-align: left; }
+.poker-naipe-centro { font-size: 2.2rem; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.poker-val-base { font-size: 1.2rem; font-weight: 900; line-height: 1; text-align: right; transform: rotate(180deg); }
+
+/* Cores dos Naipes */
+.poker-red { color: #e74c3c; }
+.poker-black { color: #111; }
+
+/* Costas da Carta */
+.poker-card-back {
+    width: 65px; height: 95px;
+    background: repeating-linear-gradient(45deg, #600 0, #600 5px, #800 5px, #800 10px);
+    border: 3px solid #fff;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+}
+#poker-mao-oponente .poker-card-back { width: 55px; height: 80px; }
+
+
+/* ============================================================================ */
+/* 🎡 ROLETA CO-OP - TABULEIRO E FÍSICA DAS FICHAS                              */
+/* ============================================================================ */
+
+/* O Botão/Área de aposta do Tabuleiro */
+.zona-aposta {
+    position: relative;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.1rem;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.1s, box-shadow 0.1s;
+    /* 🚨 Garantindo o Corte Seco 90° e ignorando flexbox bugs */
+    border-radius: 0px !important;
+    min-height: 80px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.zona-aposta:active {
+    transform: scale(0.97);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+.multiplicador-txt {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* A Ficha Física que cai no tabuleiro */
+.ficha-cassino {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #D4AF37, #b38b22);
+    border: 3px dashed #000;
+    border-radius: 50% !important; /* A ficha precisa ser redonda */
+    color: #000;
+    font-weight: 900;
+    font-size: 0.6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+    animation: cairFicha 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+}
+
+@keyframes cairFicha {
+    0% { transform: scale(3) translateY(-20px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.container-fichas {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+}
+
+@keyframes zoomInResultado {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    80% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.efeito-blur-giro { filter: blur(3px); }
+
+
+/* ============================================================================ */
+/* 🎲 CRAPS - FÍSICA DOS DADOS                                                  */
+/* ============================================================================ */
+
+.dado-craps {
+    font-size: 6rem;
+    color: #e74c3c; /* Dados vermelhos de cassino */
+    background: #fff;
+    line-height: 1;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.2);
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.1s;
+}
+
+/* A Animação Insana de Lançamento */
+.rolando-dado {
+    animation: agitarDado 0.3s infinite alternate;
+    filter: blur(2px);
+}
+
+@keyframes agitarDado {
+    0% { transform: rotate(-15deg) scale(0.9) translateY(-10px); }
+    100% { transform: rotate(25deg) scale(1.1) translateY(10px); }
+}
+
+/* ============================================================================ */
+/* 🀄 PAI GOW TILES - FÍSICA E ESTÉTICA DAS PEÇAS                               */
+/* ============================================================================ */
+
+.paigow-tile {
+    width: 40px;
+    height: 70px;
+    background: linear-gradient(145deg, #fdfbf7, #e0dcd3);
+    border: 1px solid #bdc3c7;
+    border-radius: 6px !important;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 2px 0;
+}
+
+.paigow-tile-back {
+    background: repeating-linear-gradient(45deg, #2c3e50 0, #2c3e50 5px, #34495e 5px, #34495e 10px) !important;
+    border: 2px solid #ecf0f1 !important;
+}
+
+.pt-top, .pt-bot {
+    width: 100%;
+    height: 48%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #c0392b; /* Vermelho Chinês */
+}
+
+.pt-divisor {
+    width: 80%;
+    height: 2px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
+}
+
+/* ============================================================================ */
+/* 📐 PADRONIZAÇÃO DE CORTE SECO (90°) - APENAS JANELAS DO LOBBY                */
+/* ============================================================================ */
+
+/* 1. Alvo Exato: Os retângulos principais de cada jogo no menu do Cassino */
+.cartao-vidro-mines,
+.cartao-pvp,
+.mesa-real-card {
+    border-radius: 0px !important;
+}
+
+/* 2. Alvo Exato: A pequena caixa colorida de fundo do Emoji dentro do cartão */
+.cartao-vidro-mines > div:first-child,
+.cartao-pvp > div:first-child,
+.mesa-real-card > div:first-child {
+    border-radius: 0px !important;
+}

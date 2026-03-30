@@ -446,7 +446,8 @@ function verificarFimDeJogo(palpite, palavraFinal) {
 // A CHAVE DO COFRE E A MISERICÓRDIA DO ORÁCULO
 // ==========================================
 function finalizarVitoria() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
+    const d = new Date();
+    const hoje = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     
     // 1. Salva na memória profunda e dá o dinheiro apenas 1 VEZ POR DIA
     if (localStorage.getItem('santuario_vitoria_dia') !== hoje) {
@@ -483,7 +484,8 @@ function finalizarVitoria() {
 // FUNÇÃO DE RECOMEÇO (CORRIGIDA - MATRIZ 2D)
 // ==========================================
 function resetarTermo() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
+    const d = new Date();
+    const hoje = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     
     // Se a pessoa já ganhou hoje, avisamos amigavelmente
     if (localStorage.getItem('santuario_vitoria_dia') === hoje) {
@@ -1463,8 +1465,12 @@ async function carregarLeis() {
 // 10. DINÂMICA DA HOME
 function atualizarDinamicaHome() {
     if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
+    
+    // 🚨 CORREÇÃO DA APPLE: Forçando o formato DD/MM/AAAA com zeros
+    const d = new Date();
+    const hoje = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    
     // Agora a função cuida exclusivamente da liberação visual das relíquias do Cofre
-    const hoje = new Date().toLocaleDateString('pt-BR');
     const ganhouHoje = localStorage.getItem('santuario_vitoria_dia') === hoje;
     
     const msgCofre = document.getElementById('msg-cofre');
@@ -3567,191 +3573,202 @@ window.fecharHolograma = function() {
 };
 
 // ============================================================================
-// PROJETO OMEGA: O TOQUE FANTASMA (TERMO-RASTREAMENTO QUÂNTICO)
+// 🌌 MOTOR QUÂNTICO: O PONTO DE SINGULARIDADE (TOQUE EM TEMPO REAL)
 // ============================================================================
-
-let loopFantasma = null;
-let ctxCalor = null;
-let canvasCalor = null;
-let meuDedoX = -1, meuDedoY = -1;
-let delaDedoX = -1, delaDedoY = -1;
-let almasConectadas = false;
-let ultimaVezEnviado = 0;
+let singularidadeLoop = null;
+let dbToqueRef = null;
+let listenerSingularidade = null;
+let meuRastro = [];
+let rastroDela = [];
 
 // Anexa a função diretamente no window para garantir que o HTML sempre a encontre
 window.iniciarToqueFantasma = function() {
     const container = document.getElementById('container-fantasma');
-    if (!container) {
-        console.error("[ERRO OMEGA] Container fantasma não encontrado no HTML!");
-        return;
-    }
-
+    if (!container) return;
+    
+    // Prepara a tela e pausa o áudio de fundo, se houver
     if(typeof window.pauseAudioJogos === 'function') window.pauseAudioJogos();
     document.body.classList.add('modo-jogo-ativo');
     container.classList.remove('escondido');
-
-    canvasCalor = document.getElementById('canvas-calor');
-    ctxCalor = canvasCalor.getContext('2d', { alpha: false });
+    container.style.display = 'block';
     
-    redimensionarCanvasOmega();
-    window.addEventListener('resize', redimensionarCanvasOmega);
-
-    container.addEventListener('touchstart', rastrearMeuDedoOmega, { passive: false });
-    container.addEventListener('touchmove', rastrearMeuDedoOmega, { passive: false });
-    container.addEventListener('touchend', soltarMeuDedoOmega);
+    const canvas = document.getElementById('canvas-calor');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
     
-    // Adiciona suporte a mouse para você testar no PC
-    container.addEventListener('mousemove', (e) => {
-        if(e.buttons === 1) rastrearMeuDedoOmega({ preventDefault: ()=>{}, touches: [{ clientX: e.clientX, clientY: e.clientY }] });
+    // Ajusta resolução dinâmica (Otimizado para iPhone)
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    // 🚨 CHAVES ESTRITAS: Sem acentos para garantir que os celulares se encontrem no Firebase
+    const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+    const chaveParceiro = window.souJoao ? 'thamiris' : 'joao';
+    const nomeParceiroUI = window.souJoao ? 'Thamiris' : 'João';
+    const pronome = window.souJoao ? 'Ela' : 'Ele';
+    
+    dbToqueRef = ref(db, 'singularidade_ativa');
+    
+    // Limpa o rastro atual ao entrar
+    set(ref(db, `singularidade_ativa/${minhaChave}`), { x: -100, y: -100, ativo: false });
+    
+    // Escuta os movimentos do parceiro em tempo real
+    listenerSingularidade = onValue(dbToqueRef, (snapshot) => {
+        const dados = snapshot.val();
+        if (!dados) return;
+        
+        const pDados = dados[chaveParceiro];
+        const texto = document.getElementById('texto-fantasma');
+        
+        if (pDados && pDados.ativo) {
+            if (texto) {
+                texto.innerText = `Conexão Quântica. ${pronome} está tocando a tela agora.`;
+                texto.style.color = "#00f2fe"; // Azul vibrante
+                texto.style.textShadow = "0 0 20px #00f2fe";
+            }
+            // Mapeia a posição do parceiro para a proporção local da tela
+            rastroDela.push({ x: pDados.x * canvas.width, y: pDados.y * canvas.height, alpha: 1.0 });
+        } else {
+            if (texto) {
+                texto.innerText = `Aguardando a presença de ${nomeParceiroUI}...`;
+                texto.style.color = "#fff";
+                texto.style.textShadow = "0 0 10px rgba(255,255,255,0.5)";
+            }
+        }
     });
-    container.addEventListener('mouseup', soltarMeuDedoOmega);
 
-    conectarSensoresFirebaseOmega();
+    // 🚨 LIMITADOR DE DADOS (Throttling) para não estrangular o Firebase
+    let ultimoEnvioFirebase = 0;
+    const enviarPosicao = (x, y, ativo) => {
+        const agora = Date.now();
+        
+        // Salva visualmente na tela na mesma hora
+        if (ativo) meuRastro.push({ x, y, alpha: 1.0 });
+        
+        // Envia para a nuvem apenas a cada 40ms
+        if (agora - ultimoEnvioFirebase > 40 || !ativo) {
+            const px = x / canvas.width;
+            const py = y / canvas.height;
+            set(ref(db, `singularidade_ativa/${minhaChave}`), { x: px, y: py, ativo: ativo });
+            ultimoEnvioFirebase = agora;
+        }
+    };
 
-    almasConectadas = false;
-    renderizarCalorOmega();
+    // Eventos de Toque Limpos
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    };
+
+    const iniciarToque = (e) => {
+        if(e.cancelable) e.preventDefault();
+        const pos = getPos(e);
+        enviarPosicao(pos.x, pos.y, true);
+        if(window.Haptics && window.Haptics.toqueLeve) window.Haptics.toqueLeve();
+    };
+
+    const moverToque = (e) => {
+        if(e.cancelable) e.preventDefault();
+        const pos = getPos(e);
+        enviarPosicao(pos.x, pos.y, true);
+    };
+
+    const finalizarToque = (e) => {
+        if(e.cancelable) e.preventDefault();
+        enviarPosicao(-100, -100, false);
+    };
+
+    // Aplica os eventos (Touch e Mouse)
+    canvas.onmousedown = iniciarToque;
+    canvas.onmousemove = (e) => { if(e.buttons > 0) moverToque(e); };
+    canvas.onmouseup = finalizarToque;
+    canvas.onmouseleave = finalizarToque;
+
+    canvas.ontouchstart = iniciarToque;
+    canvas.ontouchmove = moverToque;
+    canvas.ontouchend = finalizarToque;
+    canvas.ontouchcancel = finalizarToque;
+
+    // Motor de Renderização (60 FPS)
+    const corMinha = window.souJoao ? 'rgba(52, 152, 219,' : 'rgba(255, 51, 102,'; 
+    const corDela = window.souJoao ? 'rgba(255, 51, 102,' : 'rgba(52, 152, 219,';
+
+    const desenhar = () => {
+        // Efeito de "rastro" que some aos poucos
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Meu rastro
+        meuRastro.forEach((p) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
+            ctx.fillStyle = `${corMinha} ${p.alpha})`;
+            ctx.fill();
+            p.alpha -= 0.03; 
+        });
+
+        // Rastro dela e a Lógica de Colisão Quântica
+        rastroDela.forEach((p) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
+            ctx.fillStyle = `${corDela} ${p.alpha})`;
+            ctx.fill();
+            
+            // Se os rastros se tocarem, gera um clarão branco!
+            meuRastro.forEach(mp => {
+                const dist = Math.hypot(p.x - mp.x, p.y - mp.y);
+                if (dist < 40 && p.alpha > 0.5 && mp.alpha > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 45, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, 0.4)`;
+                    ctx.fill();
+                }
+            });
+
+            p.alpha -= 0.03;
+        });
+
+        // Limpa a memória das bolinhas invisíveis
+        meuRastro = meuRastro.filter(p => p.alpha > 0);
+        rastroDela = rastroDela.filter(p => p.alpha > 0);
+
+        singularidadeLoop = requestAnimationFrame(desenhar);
+    };
+    
+    desenhar();
 };
 
 window.fecharToqueFantasma = function() {
     const container = document.getElementById('container-fantasma');
-    if (container) container.classList.add('escondido');
+    if (container) {
+        container.classList.add('escondido');
+        container.style.display = 'none';
+    }
     document.body.classList.remove('modo-jogo-ativo');
-
-    cancelAnimationFrame(loopFantasma);
-    window.removeEventListener('resize', redimensionarCanvasOmega);
     
-    soltarMeuDedoOmega(); // Limpa o rastro no Firebase
+    // Mata a animação pesada
+    if (singularidadeLoop) cancelAnimationFrame(singularidadeLoop);
+    
+    // Limpa meu dedo no banco
+    if (window.SantuarioApp && window.SantuarioApp.modulos) {
+        const { db, set, ref } = window.SantuarioApp.modulos;
+        const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+        set(ref(db, `singularidade_ativa/${minhaChave}`), { x: -100, y: -100, ativo: false });
+    }
+    
+    // 🚨 DESCONECTA O OUVINTE! Para o Firebase parar de puxar a sua internet.
+    if (listenerSingularidade) {
+        listenerSingularidade(); 
+    }
+    
+    meuRastro = [];
+    rastroDela = [];
+    
     if(typeof window.playAudioJogos === 'function') window.playAudioJogos();
 };
-
-function redimensionarCanvasOmega() {
-    if(!canvasCalor) return;
-    canvasCalor.width = window.innerWidth;
-    canvasCalor.height = window.innerHeight;
-}
-
-function rastrearMeuDedoOmega(e) {
-    if(e.preventDefault) e.preventDefault();
-    const touch = e.touches ? e.touches[0] : e;
-    
-    meuDedoX = touch.clientX / canvasCalor.width;
-    meuDedoY = touch.clientY / canvasCalor.height;
-
-    const agora = Date.now();
-    if (agora - ultimaVezEnviado > 40) {
-        enviarSinalParaNuvemOmega(meuDedoX, meuDedoY);
-        ultimaVezEnviado = agora;
-    }
-    verificarSingularidadeOmega();
-}
-
-function soltarMeuDedoOmega() {
-    meuDedoX = -1; meuDedoY = -1;
-    enviarSinalParaNuvemOmega(-1, -1);
-    desfazerConexaoOmega();
-}
-
-// ---------------------------------------------------------
-// INTEGRAÇÃO BLINDADA COM FIREBASE
-// ---------------------------------------------------------
-function obterNomesOmega() {
-    const eu = window.SantuarioApp?.estado?.usuarioLogado || 'joao';
-    const parceiro = eu === 'joao' ? 'thamiris' : 'joao';
-    return { eu, parceiro };
-}
-
-function enviarSinalParaNuvemOmega(x, y) {
-    if (!window.SantuarioApp?.modulos) return;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    const { eu } = obterNomesOmega();
-    set(ref(db, `toque_fantasma/${eu}`), { x, y });
-}
-
-function conectarSensoresFirebaseOmega() {
-    if (!window.SantuarioApp?.modulos) return;
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    const { parceiro } = obterNomesOmega();
-    
-    onValue(ref(db, `toque_fantasma/${parceiro}`), (snapshot) => {
-        const dados = snapshot.val();
-        if (dados) {
-            delaDedoX = dados.x; delaDedoY = dados.y;
-            verificarSingularidadeOmega();
-        }
-    });
-}
-
-// ---------------------------------------------------------
-// FÍSICA E COLISÃO (MARGEM DE 6%)
-// ---------------------------------------------------------
-function verificarSingularidadeOmega() {
-    if (meuDedoX < 0 || delaDedoX < 0) {
-        if (almasConectadas) desfazerConexaoOmega();
-        return;
-    }
-
-    const dist = Math.hypot(meuDedoX - delaDedoX, meuDedoY - delaDedoY);
-    if (dist <= 0.06 && !almasConectadas) {
-        cravarConexaoOmega(meuDedoX * canvasCalor.width, meuDedoY * canvasCalor.height);
-    } else if (dist > 0.06 && almasConectadas) {
-        desfazerConexaoOmega();
-    }
-}
-
-function renderizarCalorOmega() {
-    ctxCalor.fillStyle = 'rgba(2, 2, 2, 0.3)';
-    ctxCalor.fillRect(0, 0, canvasCalor.width, canvasCalor.height);
-
-    if (meuDedoX >= 0) {
-        desenharOrbeOmega(meuDedoX * canvasCalor.width, meuDedoY * canvasCalor.height, 40, 'rgba(200, 200, 255, 0.5)', 'rgba(100, 150, 255, 0)');
-    }
-    if (delaDedoX >= 0) {
-        const pulsar = 50 + (Math.random() * 10);
-        desenharOrbeOmega(delaDedoX * canvasCalor.width, delaDedoY * canvasCalor.height, pulsar, 'rgba(255, 51, 102, 0.8)', 'rgba(212, 175, 55, 0)');
-    }
-
-    if (almasConectadas && meuDedoX >= 0 && delaDedoX >= 0) {
-        const meioX = ((meuDedoX + delaDedoX) / 2) * canvasCalor.width;
-        const meioY = ((meuDedoY + delaDedoY) / 2) * canvasCalor.height;
-        ctxCalor.globalCompositeOperation = 'lighter';
-        desenharOrbeOmega(meioX, meioY, 150, 'rgba(255, 255, 255, 0.9)', 'rgba(212, 175, 55, 0)');
-        ctxCalor.globalCompositeOperation = 'source-over';
-    }
-
-    loopFantasma = requestAnimationFrame(renderizarCalorOmega);
-}
-
-function desenharOrbeOmega(x, y, raio, corCentro, corBorda) {
-    const gradiente = ctxCalor.createRadialGradient(x, y, 0, x, y, raio);
-    gradiente.addColorStop(0, corCentro);
-    gradiente.addColorStop(1, corBorda);
-    ctxCalor.fillStyle = gradiente;
-    ctxCalor.beginPath();
-    ctxCalor.arc(x, y, raio, 0, Math.PI * 2);
-    ctxCalor.fill();
-}
-
-function cravarConexaoOmega(x, y) {
-    almasConectadas = true;
-    if ("vibrate" in navigator) navigator.vibrate([100, 50, 300]);
-    
-    const choque = document.createElement('div');
-    choque.className = 'onda-choque';
-    choque.style.left = `${x}px`;
-    choque.style.top = `${y}px`;
-    document.getElementById('container-fantasma').appendChild(choque);
-    setTimeout(() => choque.remove(), 1500);
-
-    const txt = document.getElementById('texto-fantasma');
-    if(txt) { txt.innerText = "Contato Estabelecido"; txt.classList.add('conectado'); }
-}
-
-function desfazerConexaoOmega() {
-    if (!almasConectadas) return;
-    almasConectadas = false;
-    const txt = document.getElementById('texto-fantasma');
-    if(txt) { txt.innerText = delaDedoX >= 0 ? "Aproxime o dedo do calor..." : "Aguardando contato..."; txt.classList.remove('conectado'); }
-}
 
 
 // ============================================================================
@@ -6860,14 +6877,14 @@ window.comprarItemBoutique = function(idItem) {
     renderizarBoutique(); // Atualiza a tela
 
     // 🚨 GERA A COBRANÇA NO WHATSAPP DO JOÃO!
-    let mensagem = `*RESGATE DE PRÊMIO - CASSINO DO AFETO* 🎰✨%0A%0AAmor, acabei de gastar minhas moedas suadas na Boutique e comprei:%0A%0A🎁 *${item.emoji} ${item.nome}*%0A📝 _${item.desc}_%0A💳 Custou: ${item.preco} moedas.%0A%0AQuando posso resgatar minha recompensa? 👀`;
+    let mensagem = `*RESGATE DE PRÊMIO - CASSINO DO AFETO* 🎰✨%0A%0AAmor, acabei de gastar minhas moedas suadas na Boutique e comprei:%0A%0A🎁 *${item.emoji} ${item.nome}*%0A📝 _${item.desc}_%0A💳 Custou: ${item.preco.toLocaleString('pt-BR')} moedas.%0A%0AQuando posso resgatar minha recompensa? 👀`;
     
-    // Substitua pelo SEU número de telefone (com DDI 55 e DDD)
-    let seuNumero = "5541996419950"; 
+    let seuNumero = "5541996419950"; // Seu número real aqui
     
     setTimeout(() => {
-        window.open(`https://wa.me/${seuNumero}?text=${mensagem}`, '_blank');
-    }, 1000); // Abre 1 segundo depois pra ela ver os confetes
+        // 🚨 MUDANÇA PARA O iPHONE: Força a abertura nativa do aplicativo do WhatsApp
+        window.location.href = `https://wa.me/${seuNumero}?text=${mensagem}`;
+    }, 1000); 
 };
 
 // ==========================================

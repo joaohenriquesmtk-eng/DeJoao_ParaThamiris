@@ -2529,67 +2529,83 @@ window.destruirFuturoLido = function() {
 
 
 // ==========================================
-// EXPANSÃO 1: RADAR DE TELEPRESENÇA VIVO
+// EXPANSÃO 1: RADAR DE TELEPRESENÇA VIVO (COM SINESTESIA)
 // ==========================================
 let loopVibracaoRadar = null;
 
 // Quando você aperta o dedo na tela
 window.iniciarPulsoRadar = function(e) {
-    if (e) e.preventDefault(); 
-    if (!window.SantuarioApp || !window.MEU_NOME) return;
+    if (e && e.cancelable) e.preventDefault(); // Proteção contra travamento de tela do iOS
+    if (!window.SantuarioApp) return;
     
     const { db, ref, set } = window.SantuarioApp.modulos;
-    const meuRadarRef = ref(db, 'telepresenca/' + window.MEU_NOME.toLowerCase());
+    
+    // 🚨 Chave estrita para evitar bugs de acentuação no banco de dados
+    const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+    const meuRadarRef = ref(db, 'telepresenca/' + minhaChave);
     
     // Manda o sinal luminoso "ONLINE/PULSANDO"
     set(meuRadarRef, { pulsando: true, timestamp: Date.now() });
     
-    // Dá um soquinho no seu celular para confirmar que o botão foi apertado
-    if (window.Haptics) navigator.vibrate(30); 
+    // Dá um feedback visual e tátil imediato para quem está enviando
+    const containerRadar = document.getElementById('radar-telepresenca');
+    if (containerRadar) containerRadar.style.transform = 'scale(0.9)'; // O botão afunda
+    if (window.Haptics) window.Haptics.toqueLeve(); 
 };
 
 // Quando você tira o dedo da tela
 window.pararPulsoRadar = function(e) {
-    if (e) e.preventDefault();
-    if (!window.SantuarioApp || !window.MEU_NOME) return;
+    if (e && e.cancelable) e.preventDefault();
+    if (!window.SantuarioApp) return;
     
     const { db, ref, set } = window.SantuarioApp.modulos;
-    const meuRadarRef = ref(db, 'telepresenca/' + window.MEU_NOME.toLowerCase());
+    const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+    const meuRadarRef = ref(db, 'telepresenca/' + minhaChave);
     
     // Desliga o sinal luminoso
     set(meuRadarRef, { pulsando: false, timestamp: Date.now() });
+    
+    const containerRadar = document.getElementById('radar-telepresenca');
+    if (containerRadar) containerRadar.style.transform = 'scale(1)'; // O botão volta ao normal
 };
 
-// O Ouvido Constante (Escuta a Thamiris 24 horas por dia)
+// O Ouvido Constante (Escuta o parceiro 24 horas por dia)
 window.escutarRadarParceiro = function() {
-    if (!window.SantuarioApp || !window.NOME_PARCEIRO) return;
+    if (!window.SantuarioApp) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    const radarParceiroRef = ref(db, 'telepresenca/' + window.NOME_PARCEIRO.toLowerCase());
+    const chaveParceiro = window.souJoao ? 'thamiris' : 'joao';
+    const radarParceiroRef = ref(db, 'telepresenca/' + chaveParceiro);
     
     onValue(radarParceiroRef, (snapshot) => {
         const dados = snapshot.val();
         const containerRadar = document.getElementById('radar-telepresenca');
         
         if (dados && dados.pulsando) {
-            // ELA APERTOU O DEDO LÁ EM GOIÁS!
+            // O PARCEIRO APERTOU O DEDO LÁ DO OUTRO LADO!
             if (containerRadar) containerRadar.classList.add('radar-recebendo');
             
-            // Inicia o motor de vibração rítmica (Batimento Cardíaco - 100 BPM)
+            // Inicia o motor de batimento (100 BPM)
             if (!loopVibracaoRadar) {
-                // Dá o primeiro pulso imediatamente
-                if (window.Haptics) navigator.vibrate([60, 80, 60]);
                 
-                // Repete o pulso enquanto ela segurar
+                // 🚨 A MÁGICA: Dispara o grave e o flash visual imediatamente
+                if (typeof window.dispararEfeitoCoracao === 'function') {
+                    window.dispararEfeitoCoracao(containerRadar);
+                }
+                
+                // Repete a sinestesia audiovisual enquanto o parceiro segurar o botão
                 loopVibracaoRadar = setInterval(() => {
-                    if (window.Haptics) navigator.vibrate([60, 80, 60]); 
+                    if (typeof window.dispararEfeitoCoracao === 'function') {
+                        window.dispararEfeitoCoracao(containerRadar);
+                    }
                 }, 800); 
             }
         } else {
-            // ELA SOLTOU O DEDO
+            // O PARCEIRO SOLTOU O DEDO
             if (containerRadar) containerRadar.classList.remove('radar-recebendo');
+            
             if (loopVibracaoRadar) {
-                clearInterval(loopVibracaoRadar);
+                clearInterval(loopVibracaoRadar); // Desliga a bateria de grave
                 loopVibracaoRadar = null;
             }
         }
@@ -2597,36 +2613,49 @@ window.escutarRadarParceiro = function() {
 };
 
 // ==========================================
-// OLHEIRO INTELIGENTE: OCULTA O RADAR EM JOGOS E RELÍQUIAS
+// OLHEIRO INTELIGENTE: OCULTA O RADAR E BOTÕES GLOBAIS
 // ==========================================
 window.addEventListener('load', () => {
     const radar = document.getElementById('radar-telepresenca');
+    const btnMutar = document.getElementById('btn-mutar-global'); // 🚨 Olheiro agora vigia o botão de mudo
     const modalReliquia = document.getElementById('modal-reliquia');
+    const telaLogin = document.getElementById('tela-login');
     
-    if (!radar) return;
-
-    const verificarVisibilidadeRadar = () => {
-        // Verifica se o usuário está dentro de um jogo ou no Painel do Futuro
+    const verificarVisibilidadeElementos = () => {
         const emJogo = document.body.classList.contains('modo-jogo-ativo');
-        // Verifica se o modal das relíquias padrão está aberto
         const emReliquia = modalReliquia && !modalReliquia.classList.contains('escondido');
+        const noLogin = telaLogin && telaLogin.style.display !== 'none'; // Verifica se está na tela de carregamento/senha
         
-        if (emJogo || emReliquia) {
-            radar.style.display = 'none'; // Esconde completamente
+        // Se estiver em jogo, lendo relíquia, ou na tela de login: ESCONDE TUDO
+        if (emJogo || emReliquia || noLogin) {
+            if (radar) radar.style.display = 'none'; 
+            if (btnMutar) btnMutar.style.display = 'none'; 
         } else {
-            radar.style.display = 'flex'; // Devolve o radar
+            // Se já logou e está livre pelo app: MOSTRA OS BOTÕES
+            if (radar) radar.style.display = 'flex'; 
+            if (btnMutar) btnMutar.style.display = 'flex'; 
         }
     };
 
-    // Fica vigiando o "body" (ele muda quando entraremos em jogos ou na Cápsula)
-    const observerBody = new MutationObserver(verificarVisibilidadeRadar);
+    // Vigia as mudanças de classe no Body (quando ela entra e sai dos jogos)
+    const observerBody = new MutationObserver(verificarVisibilidadeElementos);
     observerBody.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    // Fica vigiando a janela das Relíquias (Planetário, Ecos, etc)
+    // Vigia as Relíquias (Cápsula, Espelho, etc)
     if (modalReliquia) {
-        const observerModal = new MutationObserver(verificarVisibilidadeRadar);
+        const observerModal = new MutationObserver(verificarVisibilidadeElementos);
         observerModal.observe(modalReliquia, { attributes: true, attributeFilter: ['class'] });
     }
+    
+    // Vigia o Login (Para fazer os botões brotarem no exato milissegundo em que a senha é aceita)
+    if (telaLogin) {
+        const observerLogin = new MutationObserver(verificarVisibilidadeElementos);
+        observerLogin.observe(telaLogin, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    // Faz a checagem inicial da tela e uma checagem de segurança após a animação da logo (splash) terminar
+    verificarVisibilidadeElementos();
+    setTimeout(verificarVisibilidadeElementos, 3000); 
 });
 
 
@@ -4101,20 +4130,57 @@ function revelarCartaSecreta(stream) {
 }
 
 // ============================================================================
-// 🫀 MOTOR DE TELEMETRIA TÁTIL (O ECO DO CORAÇÃO)
+// 🫀 MOTOR DE TELEMETRIA TÁTIL E SINESTESIA (O ECO DO CORAÇÃO)
 // ============================================================================
 
+// 🚨 1. A NOVA MÁGICA: ÁUDIO GRAVE E FLASH DE LUZ (PARA ENGANAR O iPHONE)
+const somCoracaoGrave = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
+somCoracaoGrave.volume = 1.0; 
+
+window.dispararEfeitoCoracao = function(elementoCoracao) {
+    // Toca o grave profundo (respeitando o botão de Mudo global)
+    if (!window.SantuarioSomPausado) {
+        somCoracaoGrave.currentTime = 0;
+        somCoracaoGrave.play().catch(e => { console.log("Áudio contido pela Apple") });
+    }
+    
+    // Pulsa o botão fisicamente na tela
+    if (elementoCoracao) {
+        elementoCoracao.style.transform = "scale(1.4)";
+        setTimeout(() => { elementoCoracao.style.transform = "scale(1)"; }, 150);
+    }
+    
+    // Pisca a tela em tom de sangue bem rápido
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0'; overlay.style.left = '0';
+    overlay.style.width = '100vw'; overlay.style.height = '100vh';
+    overlay.style.backgroundColor = 'rgba(255, 0, 50, 0.15)'; 
+    overlay.style.zIndex = '9999999';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.transition = 'opacity 0.3s ease-out';
+    document.body.appendChild(overlay);
+    
+    // Se for o Android, vibra de verdade
+    if (window.Haptics) window.Haptics.toqueForte();
+    
+    setTimeout(() => { 
+        overlay.style.opacity = '0'; 
+        setTimeout(() => overlay.remove(), 300);
+    }, 50);
+};
+
+// ----------------------------------------------------------------------------
+// VARIÁVEIS DE CONTROLE DO GRAVADOR
 let gravandoEco = false;
 let temposBatidas = [];
 let inicioGravacao = 0;
 let padraoVibracaoParaEnviar = [];
 
-// 1. Abre a sala para gravar
 window.abrirSalaDeEco = function() {
     const overlay = document.getElementById('overlay-eco-coracao');
     if(overlay) overlay.classList.remove('takeover-escondido');
     
-    // Configura interface para gravação
     document.getElementById('titulo-eco').innerText = "Gravar Eco";
     document.getElementById('instrucao-eco').innerText = "Toque em 'Iniciar', feche os olhos e bata o ritmo na tela.";
     document.getElementById('controles-gravacao-eco').classList.remove('escondido');
@@ -4134,7 +4200,6 @@ window.fecharSalaEco = function() {
     gravandoEco = false;
 };
 
-// 2. Inicia o relógio
 window.iniciarGravacaoEco = function() {
     gravandoEco = true;
     temposBatidas = [];
@@ -4144,36 +4209,29 @@ window.iniciarGravacaoEco = function() {
     document.getElementById('btn-parar-eco').classList.remove('escondido');
     document.getElementById('instrucao-eco').innerText = "Gravando... Bata na área central.";
     
-    // Adiciona o escutador de toque rápido
     const radar = document.getElementById('radar-tátil');
     radar.addEventListener('touchstart', registrarBatida, {passive: false});
     radar.addEventListener('mousedown', registrarBatida);
 };
 
-// 3. Captura o milissegundo de cada toque
 function registrarBatida(e) {
     if (!gravandoEco) return;
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault(); // Proteção para não travar o iOS
     
     const agora = Date.now();
     temposBatidas.push(agora);
     
-    // Efeito visual e físico de gravação
-    if (navigator.vibrate) navigator.vibrate(40); // Feedback que o toque foi gravado
-    
-    // Faz o núcleo pulsar
     const nucleo = document.getElementById('nucleo-radar');
-    nucleo.style.transform = 'scale(0.8)';
-    setTimeout(() => nucleo.style.transform = 'scale(1)', 50);
+    
+    // 🚨 QUANDO ELA GRAVA: Dispara o Som Grave e a Luz para ela sentir o toque
+    window.dispararEfeitoCoracao(nucleo);
 
-    // Cria a onda acústica visual
     const onda = document.createElement('div');
     onda.className = 'anel-radar-eco explosao-tatil';
     document.getElementById('radar-tátil').appendChild(onda);
     setTimeout(() => onda.remove(), 800);
 }
 
-// 4. Calcula a matemática e dispara para o Firebase
 window.pararEEnviarEco = function() {
     gravandoEco = false;
     const radar = document.getElementById('radar-tátil');
@@ -4186,28 +4244,26 @@ window.pararEEnviarEco = function() {
         return;
     }
 
-    // A MÁGICA: Converter os tempos absolutos em um Array de intervalos (Vibra, Pausa, Vibra, Pausa)
-    // O motor navigator.vibrate() funciona assim: [duracaoVibracao, pausa, duracaoVibracao, pausa...]
     padraoVibracaoParaEnviar = [];
-    const duracaoToque = 50; // Cada batida dura 50ms de vibração
+    const duracaoToque = 50; 
     
     for (let i = 0; i < temposBatidas.length; i++) {
-        padraoVibracaoParaEnviar.push(duracaoToque); // Adiciona a vibração
+        padraoVibracaoParaEnviar.push(duracaoToque); 
         if (i < temposBatidas.length - 1) {
-            // Calcula o silêncio até o próximo toque
             let pausa = temposBatidas[i+1] - temposBatidas[i] - duracaoToque;
             if (pausa < 0) pausa = 0;
             padraoVibracaoParaEnviar.push(pausa);
         }
     }
 
-    // Salva no Firebase
     if (window.SantuarioApp && window.SantuarioApp.modulos && window.NOME_PARCEIRO) {
         const { db, ref, set } = window.SantuarioApp.modulos;
-        const caminho = `eco_santuario/${window.NOME_PARCEIRO.toLowerCase()}`;
+        // Chave estrita e segura (minúscula e sem acento)
+        const chaveParceiro = window.souJoao ? 'thamiris' : 'joao';
+        const caminho = `eco_santuario/${chaveParceiro}`;
         
         const payload = {
-            autor: window.MEU_NOME,
+            autor: window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris'),
             padrao: padraoVibracaoParaEnviar,
             timestamp: Date.now()
         };
@@ -4219,67 +4275,60 @@ window.pararEEnviarEco = function() {
     }
 };
 
-// ============================================================================
-// 📡 O RADAR DE RECEBIMENTO DO ECO
-// ============================================================================
 window.escutarEcosDoParceiro = function() {
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos || !window.MEU_NOME) return;
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    const caminho = `eco_santuario/${window.MEU_NOME.toLowerCase()}`;
+    const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+    const caminho = `eco_santuario/${minhaChave}`;
 
     onValue(ref(db, caminho), (snapshot) => {
         const dados = snapshot.val();
         if (dados && dados.padrao) {
-            // Um eco chegou para mim!
             window.ecoRecebido = dados.padrao;
             window.autorEco = dados.autor;
             
-            // Abre a sala automaticamente para a pessoa receber
             const overlay = document.getElementById('overlay-eco-coracao');
             if(overlay) overlay.classList.remove('takeover-escondido');
 
             document.getElementById('titulo-eco').innerText = `Sinfonia de ${dados.autor}`;
-            document.getElementById('instrucao-eco').innerText = "Ele enviou as batidas do coração. Sinta.";
+            document.getElementById('instrucao-eco').innerText = "Escute e sinta as batidas do coração.";
             document.getElementById('icone-radar-eco').innerText = "💓";
             
             document.getElementById('controles-gravacao-eco').classList.add('escondido');
             document.getElementById('controles-reproducao-eco').classList.remove('escondido');
             
-            // Vibra para chamar a atenção
-            if (navigator.vibrate) navigator.vibrate([100, 200, 100]);
+            if (window.Haptics) navigator.vibrate([100, 200, 100]);
         }
     });
 };
 
-// A pessoa clica e a física acontece
+// 🚨 QUANDO ELA RECEBE O SEU ECO: A REPRODUÇÃO SINESTÉSICA
 window.reproduzirEcoRecebido = function() {
     if (!window.ecoRecebido) return;
     
     document.getElementById('instrucao-eco').innerText = "Reproduzindo...";
     
-    // Toca o padrão que foi gravado pelo parceiro!
+    // Seu Android ainda vai vibrar perfeitamente
     if (navigator.vibrate) navigator.vibrate(window.ecoRecebido);
     
-    // Animação visual acompanhando a vibração
-    const nucleo = document.getElementById('nucleo-radar');
+    const nucleo = document.getElementById('icone-radar-eco');
     let tempoDecorrido = 0;
     
+    // O código lê o tempo de cada batida que você gravou
     for (let i = 0; i < window.ecoRecebido.length; i++) {
-        if (i % 2 === 0) { // É uma vibração
+        if (i % 2 === 0) { // Se for a hora da batida...
             setTimeout(() => {
-                nucleo.style.transform = 'scale(0.8)';
+                // 🚨 O iPHONE VAI TOCAR O GRAVE E PISCAR A TELA AQUI!
+                window.dispararEfeitoCoracao(nucleo);
+                
                 const onda = document.createElement('div');
                 onda.className = 'anel-radar-eco explosao-tatil';
                 document.getElementById('radar-tátil').appendChild(onda);
                 setTimeout(() => onda.remove(), 800);
             }, tempoDecorrido);
-        } else { // É uma pausa
-            setTimeout(() => {
-                nucleo.style.transform = 'scale(1)';
-            }, tempoDecorrido);
         }
-        tempoDecorrido += window.ecoRecebido[i];
+        tempoDecorrido += window.ecoRecebido[i]; // Soma o tempo para a próxima batida
     }
 
     setTimeout(() => {
@@ -4287,12 +4336,12 @@ window.reproduzirEcoRecebido = function() {
     }, tempoDecorrido + 500);
 };
 
-// Depois de ouvir, apaga do Firebase para não ficar repetindo
 window.fecharSalaEcoEApagar = function() {
     window.fecharSalaEco();
-    if (window.SantuarioApp && window.SantuarioApp.modulos && window.MEU_NOME) {
+    if (window.SantuarioApp && window.SantuarioApp.modulos) {
         const { db, ref, set } = window.SantuarioApp.modulos;
-        set(ref(db, `eco_santuario/${window.MEU_NOME.toLowerCase()}`), null);
+        const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+        set(ref(db, `eco_santuario/${minhaChave}`), null);
     }
 };
 
@@ -6991,3 +7040,42 @@ function destrancarAudioApple() {
 // Fica à espreita esperando o primeiríssimo toque (como ela digitando e-mail ou senha)
 document.addEventListener('click', destrancarAudioApple);
 document.addEventListener('touchstart', destrancarAudioApple);
+
+// ============================================================================
+// 🔄 MOTOR DE ATUALIZAÇÃO FORÇADA DE PWA (CACHE BUSTER)
+// ============================================================================
+window.forcarAtualizacao = function() {
+    const btn = document.getElementById('btn-verificar-atualizacao');
+    if (btn) {
+        btn.innerText = "Baixando Nova Versão... ⏳";
+        btn.style.opacity = "0.7";
+        btn.style.pointerEvents = "none"; // Impede duplo clique
+        if(window.Haptics) navigator.vibrate([50, 50, 50]);
+    }
+
+    // 1. Limpa TODOS os caches antigos salvos no celular dela
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (let name of names) {
+                caches.delete(name);
+            }
+        });
+    }
+
+    // 2. Mata o Service Worker velho (Aquele arquivo sw.js)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let registration of registrations) {
+                registration.unregister();
+            }
+        }).then(() => {
+            // 3. Força um "F5 Mágico" que ignora o cache e baixa tudo do GitHub de novo!
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+    } else {
+        // Se o celular for antigo e não tiver Service Worker, só dá um F5
+        window.location.reload();
+    }
+};

@@ -604,3 +604,67 @@ window.addEventListener('loginSucesso', window.iniciarContaConjunta);
 if (window.usuarioLogado) {
     window.iniciarContaConjunta();
 }
+
+
+// ============================================================================
+// 🔇 MOTOR DE SUSPENSÃO DE MÍDIA (COM AUDIÇÃO SELETIVA PARA MENSAGENS)
+// ============================================================================
+
+window.SantuarioSomPausado = false;
+
+window.alternarMutarSantuario = function() {
+    window.SantuarioSomPausado = !window.SantuarioSomPausado;
+    const btn = document.getElementById('btn-mutar-global');
+    
+    if (window.SantuarioSomPausado) {
+        if (btn) { btn.innerText = "🔇"; btn.style.background = "rgba(231, 76, 60, 0.2)"; btn.style.borderColor = "#e74c3c"; }
+        if(typeof mostrarToast === 'function') mostrarToast("Músicas de fundo silenciadas", "🔇");
+        
+        // 1. CAÇA E PAUSA: Encontra mídias rodando, mas POUPA as mensagens de vocês
+        document.querySelectorAll('audio, video').forEach(media => {
+            const url = media.src || "";
+            // Identifica se é uma mensagem pessoal (vem do Firebase Storage, gravação local 'blob:', ou tem classe explícita)
+            const isMensagemPessoal = url.includes('firebasestorage') || url.includes('blob:') || media.classList.contains('midia-pessoal');
+            
+            if (!isMensagemPessoal) {
+                media.pause(); // Só pausa se for música/som do sistema
+            }
+        });
+        
+        // 2. PAUSA O CASSINO: Desliga o rádio do cassino
+        if (window.CassinoAudio && typeof window.CassinoAudio.pausarBGM === 'function') {
+            window.CassinoAudio.pausarBGM();
+        }
+        
+    } else {
+        if (btn) { btn.innerText = "🔊"; btn.style.background = "rgba(0,0,0,0.7)"; btn.style.borderColor = "var(--cor-primaria)"; }
+        if(typeof mostrarToast === 'function') mostrarToast("Sistemas de Áudio Reativados", "🔊");
+        
+        // Retoma a música ambiente apenas se não estivermos no Cassino
+        const overlayCassino = document.getElementById('overlay-cassino');
+        if (!overlayCassino || overlayCassino.classList.contains('escondido')) {
+            const musicaApp = document.getElementById('audio-ambiente');
+            if (musicaApp) musicaApp.play().catch(e=>e);
+        }
+    }
+    
+    if (window.Haptics) window.Haptics.toqueLeve();
+};
+
+// 🚨 A MÁGICA SÊNIOR: INTERCEPTAÇÃO COM FILTRO DE ORIGEM
+const playOriginalAudio = HTMLMediaElement.prototype.play;
+HTMLMediaElement.prototype.play = function() {
+    if (window.SantuarioSomPausado) {
+        const url = this.src || "";
+        
+        // Filtro Seletivo: A voz de vocês tem passagem VIP livre!
+        const isMensagemPessoal = url.includes('firebasestorage') || url.includes('blob:') || this.classList.contains('midia-pessoal');
+        
+        if (!isMensagemPessoal) {
+            // É som de botão, música de fundo ou efeito. Bloqueia em silêncio.
+            return Promise.resolve(); 
+        }
+    }
+    // Se for mensagem de voz, ou se o app não estiver mutado, deixa tocar.
+    return playOriginalAudio.apply(this, arguments);
+};

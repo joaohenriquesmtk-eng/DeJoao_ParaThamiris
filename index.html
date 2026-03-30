@@ -316,7 +316,7 @@
                         <button id="btn-ativar-notificacoes" class="btn-acao" onclick="ativarNotificacoesApple()" style="width: 100%; max-width: 300px; padding: 15px 25px; background: rgba(0,0,0,0.4); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); border-radius: 30px; font-weight: bold; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); transition: all 0.3s ease; font-size: 1rem;">
                             🔔 Sincronizar Alertas
                         </button>
-                        <button id="btn-verificar-atualizacao" style="background: transparent; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--cor-primaria); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; transition: background 0.3s;">
+                        <button id="btn-verificar-atualizacao" onclick="window.forcarAtualizacao()" style="background: transparent; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--cor-primaria); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; transition: background 0.3s; cursor: pointer;">
                             🔄 Verificar atualização
                         </button>
                     </div>
@@ -2240,7 +2240,9 @@
     </div>
 </div>
 
-
+<button id="btn-mutar-global" onclick="alternarMutarSantuario()" style="display: none; position: fixed; bottom: 90px; left: 20px; z-index: 99999; background: rgba(0,0,0,0.7); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; justify-content: center; align-items: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: transform 0.2s, background 0.3s; cursor: pointer;">
+        🔊
+    </button>
 
 
 </body>

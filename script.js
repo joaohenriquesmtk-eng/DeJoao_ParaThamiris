@@ -4347,7 +4347,7 @@ window.fecharSalaEcoEApagar = function() {
 
 
 // ============================================================================
-// 💣 MOTOR MATEMÁTICO: CAMPO MINADO (MINES) - VERSÃO REESTRUTURADA
+// 💣 MOTOR MATEMÁTICO: CAMPO MINADO (MINES) - VERSÃO SINESTÉSICA (PITCH SHIFT)
 // ============================================================================
 
 let motorMines = {
@@ -4357,10 +4357,14 @@ let motorMines = {
     multiplicador: 1.0,
     diamantesAchados: 0,
     lucroPotencial: 0,
-    gradeSecreta: [] // 0 = Diamante 💎, 1 = Bomba 💣
+    gradeSecreta: [], // 0 = Diamante 💎, 1 = Bomba 💣
+    // 🚨 A MÁGICA: Variável para controlar a altura do som
+    frequenciaSomAtual: 1.0 
 };
 
-// 🚨 INJEÇÃO DE ÁUDIO NAS FICHAS DO MINES
+// 🚨 Som dedicado e manipulável do Diamante (Pitch Shift)
+const somDiamanteMines = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+
 window.ajustarApostaMines = function(valor) {
     if (motorMines.jogando) return;
     const visor = document.getElementById('mines-aposta-input');
@@ -4372,8 +4376,7 @@ window.ajustarApostaMines = function(valor) {
     
     visor.innerText = novaAposta;
     
-    // 🔊 Ouve o barulho da ficha de poker de plástico batendo
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
@@ -4388,8 +4391,7 @@ window.ajustarBombasMines = function(valor) {
     
     visor.innerText = qtd;
     
-    // 🔊 Som de ficha batendo mais suave para diferenciar
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.4);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.4);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
@@ -4405,7 +4407,6 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             desenharGradeMines();
         }
     } else if (typeof window.abrirMesaCassinoOriginal === 'function') {
-        // Fallback para outros jogos se necessário
         window.abrirMesaCassinoOriginal(nomeDoJogo);
     }
 };
@@ -4442,26 +4443,24 @@ function desenharGradeMines() {
     }
 }
 
-// 🚨 INJEÇÃO DE ÁUDIO NO START
 window.iniciarRodadaMines = function() {
     const aposta = parseInt(document.getElementById('mines-aposta-input').innerText);
     const bombas = parseInt(document.getElementById('mines-bombas-input').innerText);
     
     if (aposta < 10) {
         if(typeof mostrarToast === 'function') mostrarToast("Aposta mínima de 10💰", "⚠️");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         return;
     }
     if ((window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         return;
     }
 
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Aposta no Mines");
 
-    // 🔊 Som de embaralhar as minas!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('minesStart', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesStart', 0.8);
 
     motorMines.jogando = true;
     motorMines.apostaAtual = aposta;
@@ -4469,6 +4468,7 @@ window.iniciarRodadaMines = function() {
     motorMines.multiplicador = 1.0;
     motorMines.diamantesAchados = 0;
     motorMines.lucroPotencial = aposta;
+    motorMines.frequenciaSomAtual = 1.0; // 🚨 Zera a "escada musical"
 
     document.getElementById('btn-mines-iniciar').classList.add('escondido');
     document.getElementById('mines-painel-saque').classList.remove('escondido');
@@ -4485,10 +4485,9 @@ window.iniciarRodadaMines = function() {
     }
 
     desenharGradeMines();
-    if(window.Haptics) navigator.vibrate([100, 100]);
+    if(window.Haptics) window.Haptics.toqueForte();
 };
 
-// 🚨 INJEÇÃO DE ÁUDIO NO CLIQUE DO VIDRO (CRISTAL vs BOMBA)
 window.revelarBlocoMines = function(index) {
     if (!motorMines.jogando) return;
     
@@ -4498,17 +4497,31 @@ window.revelarBlocoMines = function(index) {
     const ehBomba = motorMines.gradeSecreta[index] === 1;
 
     if (ehBomba) {
-        // 🔊 SOM DE EXPLOSÃO!
-        if(window.CassinoAudio) window.CassinoAudio.tocar('minesBomba', 1.0);
+        // 🔊 SOM DE EXPLOSÃO! Quebra brutalmente a música.
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesBomba', 1.0);
         if(window.Haptics) navigator.vibrate([200, 100, 400]);
         
         bloco.classList.add('revelado-bomba');
         bloco.innerHTML = "💣";
+        
+        // Efeito de susto: A tela do jogo pisca em vermelho!
+        bloco.parentElement.style.boxShadow = "inset 0 0 50px rgba(255, 0, 50, 0.8)";
+        
         encerrarRodadaMines("derrota");
     } else {
-        // 🔊 SOM DE CRISTAL RELUZINDO!
-        if(window.CassinoAudio) window.CassinoAudio.tocar('minesDiamante', 0.9);
-        if(window.Haptics) navigator.vibrate(40);
+        // 🚨 A MÁGICA: A ESCADA MUSICAL DO DIAMANTE!
+        if (!window.SantuarioSomPausado) {
+            somDiamanteMines.currentTime = 0;
+            somDiamanteMines.playbackRate = motorMines.frequenciaSomAtual;
+            somDiamanteMines.volume = 0.8;
+            somDiamanteMines.play().catch(e=>{});
+            
+            // O próximo diamante fará um som ligeiramente mais rápido e agudo (Tensão/Dopamina)
+            motorMines.frequenciaSomAtual += 0.08; 
+            if (motorMines.frequenciaSomAtual > 2.5) motorMines.frequenciaSomAtual = 2.5; // Limite do navegador
+        }
+
+        if(window.Haptics) window.Haptics.sucesso();
         
         bloco.classList.add('revelado-diamante');
         bloco.innerHTML = "💎";
@@ -4520,13 +4533,13 @@ window.revelarBlocoMines = function(index) {
         motorMines.lucroPotencial = Math.floor(motorMines.apostaAtual * motorMines.multiplicador);
         atualizarPlacarMines();
 
+        // Se ela abriu o último diamante da grade, ela saca automaticamente
         if (motorMines.diamantesAchados === (25 - motorMines.qtdBombas)) {
             sacarMines();
         }
     }
 };
 
-// 🚨 INJEÇÃO DE ÁUDIO NO SAQUE (DOPAMINA DO JACKPOT)
 window.sacarMines = function() {
     if (!motorMines.jogando) return;
     
@@ -4534,8 +4547,7 @@ window.sacarMines = function() {
         atualizarPontosCasal(motorMines.lucroPotencial, "Saque vitorioso no Mines");
     }
 
-    // 🔊 SOM DE CHUVA DE MOEDAS!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('minesSaque', 1.0);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesSaque', 1.0);
     
     if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 300]);
     if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 150});
@@ -4554,6 +4566,7 @@ function atualizarPlacarMines() {
 function encerrarRodadaMines(resultado) {
     motorMines.jogando = false;
     
+    // Revela todo o tabuleiro
     for (let i = 0; i < 25; i++) {
         const bloco = document.getElementById(`bloco-mines-${i}`);
         if (bloco && !bloco.classList.contains('revelado-diamante') && !bloco.classList.contains('revelado-bomba')) {
@@ -4565,18 +4578,32 @@ function encerrarRodadaMines(resultado) {
     document.getElementById('btn-mines-iniciar').classList.remove('escondido');
     document.getElementById('mines-painel-saque').classList.add('escondido');
     
+    const gradeHTML = document.getElementById('grade-mines');
+    
     if (resultado === "derrota") {
         if(typeof mostrarToast === 'function') mostrarToast("BOOM! Você perdeu.", "🔥");
+    } else {
+        // Se ela sacou, o tabuleiro brilha em ouro
+        if (gradeHTML) gradeHTML.style.boxShadow = "inset 0 0 50px rgba(212, 175, 55, 0.4)";
     }
+    
+    // Limpa os efeitos visuais 3 segundos depois
+    setTimeout(() => {
+        if (gradeHTML) gradeHTML.style.boxShadow = "none";
+    }, 3000);
 }
 
 
 // ============================================================================
-// 🎰 MOTOR JS PURO E BLINDADO: CAÇA-NÍQUEL (SLOTS)
+// 🎰 MOTOR JS PURO E BLINDADO: CAÇA-NÍQUEL (SLOTS) COM TENSÃO NEAR-MISS
 // ============================================================================
 
 if (!window.SlotMachineAPI) {
-    window.SlotMachineAPI = { girando: false };
+    window.SlotMachineAPI = { 
+        girando: false, 
+        modoAuto: false, 
+        loopAuto: null 
+    };
 }
 
 // 🚪 Roteador
@@ -4588,6 +4615,25 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             mesa.classList.remove('escondido');
             mesa.style.display = 'flex';
             if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            
+            // Verifica e cria o Botão de Auto-Giro se não existir
+            if (!document.getElementById('btn-slots-auto')) {
+                const painelAposta = document.querySelector('.painel-aposta-slots');
+                if (painelAposta) {
+                    const btnAuto = document.createElement('button');
+                    btnAuto.id = 'btn-slots-auto';
+                    btnAuto.innerText = '🤖 MODO AUTO';
+                    btnAuto.style.marginTop = '10px';
+                    btnAuto.style.padding = '10px';
+                    btnAuto.style.background = 'linear-gradient(145deg, #3498db, #2980b9)';
+                    btnAuto.style.border = 'none';
+                    btnAuto.style.color = '#fff';
+                    btnAuto.style.borderRadius = '20px';
+                    btnAuto.style.cursor = 'pointer';
+                    btnAuto.onclick = window.alternarGiroAutomatico;
+                    painelAposta.appendChild(btnAuto);
+                }
+            }
         }
     } else if (typeof roteadorAntesSlots === 'function') {
         roteadorAntesSlots(nomeDoJogo);
@@ -4599,13 +4645,16 @@ window.fecharMesaSlots = function() {
         if(typeof mostrarToast === 'function') mostrarToast("Aguarde o giro terminar!", "⚠️");
         return;
     }
+    // Desliga o modo auto se estiver saindo
+    if (window.SlotMachineAPI.modoAuto) window.alternarGiroAutomatico();
+    
     const mesa = document.getElementById('mesa-slots');
     if(mesa) mesa.style.display = 'none';
 };
 
 // 💰 Botões de Aposta
 window.ajustarApostaSlots = function(valor) {
-    if (window.SlotMachineAPI.girando) return;
+    if (window.SlotMachineAPI.girando || window.SlotMachineAPI.modoAuto) return;
     
     const visor = document.getElementById('slots-aposta-input');
     if (!visor) return;
@@ -4616,14 +4665,30 @@ window.ajustarApostaSlots = function(valor) {
     
     visor.innerText = novaAposta;
     
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics && window.Haptics.toqueLeve) window.Haptics.toqueLeve();
 };
 
-// 🌪️ O Motor de Giro Físico com Suspense e Animação CSS Impecável
+// 🤖 Função do Modo Automático
+window.alternarGiroAutomatico = function() {
+    const btnAuto = document.getElementById('btn-slots-auto');
+    if (window.SlotMachineAPI.modoAuto) {
+        window.SlotMachineAPI.modoAuto = false;
+        clearInterval(window.SlotMachineAPI.loopAuto);
+        if (btnAuto) btnAuto.style.background = 'linear-gradient(145deg, #3498db, #2980b9)';
+        if(typeof mostrarToast === 'function') mostrarToast("Modo Automático Desativado.", "🛑");
+    } else {
+        window.SlotMachineAPI.modoAuto = true;
+        if (btnAuto) btnAuto.style.background = 'linear-gradient(145deg, #e74c3c, #c0392b)';
+        if(typeof mostrarToast === 'function') mostrarToast("Modo Automático Ativado! 🎰", "🤖");
+        window.girarSlots(); // Dispara o primeiro já de cara
+    }
+};
+
+// 🌪️ O Motor de Giro Físico (A MÁGICA DA TENSÃO ACONTECE AQUI)
 window.girarSlots = function() {
     const btn = document.getElementById('btn-slots-iniciar') || document.getElementById('btn-slots-girar');
-    if (btn && btn.style.pointerEvents === "none") return;
+    if (window.SlotMachineAPI.girando) return;
     
     const visor = document.getElementById('slots-aposta-input');
     let aposta = 50;
@@ -4631,30 +4696,34 @@ window.girarSlots = function() {
     
     if (isNaN(aposta) || aposta < 10) {
         if(typeof mostrarToast === 'function') mostrarToast("Aposta mínima é 10!", "⚠️");
+        if (window.SlotMachineAPI.modoAuto) window.alternarGiroAutomatico(); // Trava se quebrar a regra
         return;
     }
     
     if ((window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6);
         if(window.Haptics) window.Haptics.erro();
+        if (window.SlotMachineAPI.modoAuto) window.alternarGiroAutomatico(); // Para o robô se ficar pobre
         return;
     }
 
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Giro no Caça-Níquel");
+
+    window.SlotMachineAPI.girando = true;
 
     if (btn) {
         btn.style.opacity = "0.5";
         btn.style.pointerEvents = "none";
     }
 
-    if(window.CassinoAudio) window.CassinoAudio.tocar('slotsStart', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsStart', 0.8);
     if(window.Haptics) navigator.vibrate([50, 50, 50]);
 
     const simbolosLocais = ['🍒', '🍋', '🍇', '🔔', '💎', '7️⃣'];
     const premiosLocais = { '🍒': 3, '🍋': 5, '🍇': 10, '🔔': 20, '💎': 50, '7️⃣': 100 };
 
-    // Ativa a animação de velocidade extrema do CSS
+    // Ativa a animação de velocidade do CSS
     for(let i=1; i<=3; i++) {
         const slot = document.getElementById(`slot${i}`);
         if(slot) {
@@ -4664,38 +4733,36 @@ window.girarSlots = function() {
     }
 
     // =========================================================
-    // 🚨 O NOVO CÉREBRO MATEMÁTICO DE LAS VEGAS (39% Win Rate)
+    // 🚨 O CÉREBRO MATEMÁTICO (Gera o resultado por trás da cortina)
     // =========================================================
-    let chance = Math.random(); // Gera um número de 0.00 a 1.00
+    let chance = Math.random(); 
     let resultado = [];
+    let isNearMiss = false;
 
     if (chance <= 0.01) {
-        // 1% DE CHANCE: O Santo Graal (100x)
-        resultado = ['7️⃣', '7️⃣', '7️⃣'];
-        
+        resultado = ['7️⃣', '7️⃣', '7️⃣']; // 1% Jackpot
     } else if (chance <= 0.04) {
-        // 3% DE CHANCE: Grande Vitória (50x)
-        resultado = ['💎', '💎', '💎'];
-        
+        resultado = ['💎', '💎', '💎']; // 3% Mega
     } else if (chance <= 0.14) {
-        // 10% DE CHANCE: Vitória Média (10x ou 20x)
         let simboloMedio = Math.random() > 0.5 ? '🍇' : '🔔';
-        resultado = [simboloMedio, simboloMedio, simboloMedio];
-        
+        resultado = [simboloMedio, simboloMedio, simboloMedio]; // 10%
     } else if (chance <= 0.39) {
-        // 25% DE CHANCE: Sobrevivência (3x ou 5x) - Mantém ela jogando!
         let simboloPequeno = Math.random() > 0.5 ? '🍒' : '🍋';
-        resultado = [simboloPequeno, simboloPequeno, simboloPequeno];
-        
+        resultado = [simboloPequeno, simboloPequeno, simboloPequeno]; // 25%
     } else {
-        // 61% DE CHANCE: Derrota. MAS COM A PSICOLOGIA DO "QUASE" (Near Miss)!
+        // 61% de Chance de Perder
         let s1 = simbolosLocais[Math.floor(Math.random() * simbolosLocais.length)];
-        
-        // 50% de chance de forçar as duas primeiras roletas a serem IGUAIS para gerar suspense na última
-        let s2 = (Math.random() > 0.5) ? s1 : simbolosLocais[Math.floor(Math.random() * simbolosLocais.length)];
+        let s2 = simbolosLocais[Math.floor(Math.random() * simbolosLocais.length)];
         let s3 = simbolosLocais[Math.floor(Math.random() * simbolosLocais.length)];
 
-        // Blindagem: Se o acaso der 3 iguais na derrota, nós sabotamos a última roleta
+        // 🚨 A MÁGICA PSICOLÓGICA (Near Miss - Quase Lá)
+        // 40% das vezes que ela perde, os dois primeiros blocos serão OBRIGATORIAMENTE iguais para dar a ilusão de chance
+        if (Math.random() > 0.6) {
+            s2 = s1;
+            isNearMiss = true; 
+        }
+
+        // Garante que o terceiro símbolo seja diferente para consolidar a derrota
         while (s1 === s2 && s2 === s3) {
             s3 = simbolosLocais[Math.floor(Math.random() * simbolosLocais.length)];
         }
@@ -4703,7 +4770,7 @@ window.girarSlots = function() {
         resultado = [s1, s2, s3];
     }
 
-    // 🚨 Troca os emojis visualmente por baixo do blur do CSS
+    // Faz os emojis trocarem no fundo
     let motorVisual = setInterval(() => {
         for(let i=1; i<=3; i++) {
             let slotDiv = document.getElementById(`slot${i}`);
@@ -4711,34 +4778,52 @@ window.girarSlots = function() {
                 slotDiv.innerText = simbolosLocais[Math.floor(Math.random() * simbolosLocais.length)];
             }
         }
-    }, 60); // Troca super rápida para ajudar na ilusão de ótica
+    }, 50);
 
+    // =========================================================
+    // 🚨 CONTROLE DE TENSÃO E SUSPENSE DE PARADA
+    // =========================================================
+    // Os tempos de parada da roleta (1 e 2 param normais, a 3ª pode demorar!)
     let tempoParada = [1000, 1500, 2000];
 
-    // Para um por um, tira a classe de giro e toca o PLIN
+    // Se o resultado final for uma vitória OU um Near Miss (s1 e s2 iguais), a 3ª roleta vai entrar em TENSÃO
+    if ((resultado[0] === resultado[1] && resultado[1] === resultado[2]) || isNearMiss) {
+        tempoParada[2] = 3500; // Atrasa a parada em 1 segundo e meio a mais
+        
+        // Coloca o som de tensão rolando apenas na última roleta
+        setTimeout(() => {
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('roleta', 1.0); // Usa o som da roleta para simular o motor girando forte
+            const slot3 = document.getElementById('slot3');
+            if (slot3) slot3.style.boxShadow = "inset 0 0 30px rgba(255, 215, 0, 0.8)"; // Brilha em dourado de expectativa
+        }, 1500); // Exato momento em que o slot 2 parou
+    }
+
     for (let i = 0; i < 3; i++) {
         setTimeout(() => {
             let roleta = document.getElementById(`slot${i+1}`);
             if (roleta) {
                 roleta.classList.remove('slot-girando');
                 roleta.innerText = resultado[i];
-                roleta.style.transform = "translateY(0)"; // Crava ele no centro
+                roleta.style.transform = "translateY(0)"; 
+                roleta.style.boxShadow = "none"; // Remove o brilho dourado de tensão
             }
-            if(window.CassinoAudio) window.CassinoAudio.tocar('slotsPlin', 0.9);
-            if(window.Haptics) navigator.vibrate(30);
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsPlin', 0.9);
+            if(window.Haptics) navigator.vibrate(50);
         }, tempoParada[i]);
     }
 
-    // O Veredito com os SEUS Sons
+    // O Veredito Final (Ouve o último tempo programado)
     setTimeout(() => {
         clearInterval(motorVisual);
+        window.SlotMachineAPI.girando = false;
+        
         try {
             let venceu = (resultado[0] === resultado[1] && resultado[1] === resultado[2]);
             if (venceu) {
                 let mult = premiosLocais[resultado[0]] || 10;
                 let lucro = aposta * mult;
                 
-                if(window.CassinoAudio) window.CassinoAudio.tocar('slotsWin', 1.0); // 🚨 SEU SOM DE GANHAR
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
                 if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "JACKPOT no Caça-Níquel!");
                 if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
                 if(typeof confetti === 'function') confetti({colors: ['#e74c3c', '#D4AF37'], particleCount: 200});
@@ -4749,7 +4834,9 @@ window.girarSlots = function() {
                     if (slot) slot.classList.add('slot-vitoria-anim');
                 }
             } else {
-                if(window.CassinoAudio) window.CassinoAudio.tocar('slotsLose', 0.8); // 🚨 SEU SOM DE PERDER
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+                // Um leve suspiro de derrota visual
+                if (isNearMiss && window.Haptics) navigator.vibrate([20, 50, 20]);
             }
         } catch(e) {
             console.error(e);
@@ -4758,13 +4845,18 @@ window.girarSlots = function() {
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "auto";
             }
+            
+            // 🚨 Se estiver no Modo Auto, dispara de novo com segurança
+            if (window.SlotMachineAPI.modoAuto) {
+                window.SlotMachineAPI.loopAuto = setTimeout(window.girarSlots, 1500); 
+            }
         }
-    }, 2200);
+    }, tempoParada[2] + 200); // 200ms após o último cilindro parar para dar o feedback
 };
 
 
 // ============================================================================
-// 🚀 MOTOR GRÁFICO, MATEMÁTICO E SONORO: CRASH (ESTILO AVIATOR)
+// 🚀 MOTOR GRÁFICO, MATEMÁTICO E SONORO: CRASH (ESTILO AVIATOR) COM TENSÃO
 // ============================================================================
 
 const roteadorAntigo = window.abrirMesaCassino;
@@ -4778,7 +4870,7 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             resetarGraficoCrash();
         }
     } else {
-        roteadorAntigo(nomeDoJogo);
+        if(typeof roteadorAntigo === 'function') roteadorAntigo(nomeDoJogo);
     }
 };
 
@@ -4800,16 +4892,20 @@ let motorCrash = {
     motorVisual: null
 };
 
+// 🚨 NOVO MOTOR AUDIOVISUAL DO FOGUETINHO (BATIMENTO DE TENSÃO)
+const somTensaoCrash = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
+somTensaoCrash.loop = true;
+
 window.ajustarApostaCrash = function(valor) {
     if (motorCrash.voando) return;
     const input = document.getElementById('crash-aposta-input');
+    if(!input) return;
     let novaAposta = parseInt(input.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
-    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal;
+    if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     input.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo personalizado aposta.mp3 tocando!
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
@@ -4819,11 +4915,13 @@ window.acaoCrash = function() {
 };
 
 function iniciarVooCrash() {
-    const aposta = parseInt(document.getElementById('crash-aposta-input').innerText);
+    const input = document.getElementById('crash-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
-    if (aposta < 10 || window.pontosDoCasal < aposta) {
+    if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊 SOM DE ERRO
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
@@ -4845,15 +4943,24 @@ function iniciarVooCrash() {
     resetarGraficoCrash();
     
     const btn = document.getElementById('btn-acao-crash');
-    btn.innerHTML = `RETIRAR <span id="crash-btn-lucro">0</span>💰`;
-    btn.style.background = "linear-gradient(145deg, #f39c12, #d35400)";
-    btn.style.boxShadow = "0 10px 30px rgba(243, 156, 18, 0.6)";
+    if(btn) {
+        btn.innerHTML = `RETIRAR <span id="crash-btn-lucro">0</span>💰`;
+        btn.style.background = "linear-gradient(145deg, #f39c12, #d35400)";
+        btn.style.boxShadow = "0 10px 30px rgba(243, 156, 18, 0.6)";
+    }
     
-    document.getElementById('crash-foguete-icone').classList.add('foguete-voando-aviator');
+    const foguete = document.getElementById('crash-foguete-icone');
+    if(foguete) foguete.classList.add('foguete-voando-aviator');
     
-    // 🔊 SOM: Turbinas ligando e decolagem!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('crashStart', 0.8);
-    if(window.Haptics) navigator.vibrate([50, 50, 50, 50]);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('crashStart', 0.8);
+    if(window.Haptics) window.Haptics.toqueForte();
+
+    // 🚨 Inicia som de tensão do coração (Respeitando o Mudo Global)
+    if (!window.SantuarioSomPausado) {
+        somTensaoCrash.playbackRate = 1.0;
+        somTensaoCrash.volume = 0.5;
+        somTensaoCrash.play().catch(e=>{});
+    }
 
     // O CÉREBRO MATEMÁTICO (Roda independente do visual)
     motorCrash.motorLogica = setInterval(() => {
@@ -4866,30 +4973,46 @@ function iniciarVooCrash() {
             return;
         }
 
-        document.getElementById('crash-multiplicador-visor').innerText = motorCrash.multiplicadorAtual.toFixed(2) + "x";
-        document.getElementById('crash-btn-lucro').innerText = Math.floor(motorCrash.aposta * motorCrash.multiplicadorAtual);
+        const visorMult = document.getElementById('crash-multiplicador-visor');
+        const visorLucro = document.getElementById('crash-btn-lucro');
+        
+        if(visorMult) visorMult.innerText = motorCrash.multiplicadorAtual.toFixed(2) + "x";
+        if(visorLucro) visorLucro.innerText = Math.floor(motorCrash.aposta * motorCrash.multiplicadorAtual);
     }, 50);
 
     // O MOTOR GRÁFICO CANVAS (60 FPS)
-    motorCrash.motorVisual = requestAnimationFrame(desenharGraficoAviator);
+    desenharGraficoAviator();
 }
 
-// 🎨 A MÁGICA DE LAS VEGAS: Renderização da Curva
+// 🎨 A MÁGICA DE LAS VEGAS: Renderização da Curva e Alarme Visual
 function desenharGraficoAviator() {
     if (!motorCrash.voando) return; // Para de desenhar se explodiu ou sacou
 
     const canvas = document.getElementById('crash-canvas');
     if (!canvas) return;
     
-    // Ajusta a resolução para evitar embaçamento no celular
     const ctx = canvas.getContext('2d');
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    // Lógica do visual (Vai de 1.00x até 2.00x como referência para preencher a tela)
-    // Se passar de 2.0x, o foguete estaciona no alto e o fundo dá a sensação de movimento contínuo
     let progressoVisual = (motorCrash.multiplicadorAtual - 1.0) / 1.0; 
     if (progressoVisual > 1) progressoVisual = 1; 
+
+    // 🚨 A MÁGICA DO PITCH SHIFTING (Acelera o coração e deixa mais agudo conforme sobe!)
+    let taxaVelocidade = 1.0 + ((motorCrash.multiplicadorAtual - 1.0) * 0.5); 
+    if (taxaVelocidade > 3.0) taxaVelocidade = 3.0; // Limite do iOS
+    somTensaoCrash.playbackRate = taxaVelocidade;
+
+    // 🚨 ALARME VISUAL: Tela avermelhada de perigo se passar de 2.0x
+    const containerGrafico = document.getElementById('crash-tela-grafico');
+    if (motorCrash.multiplicadorAtual > 2.0 && containerGrafico) {
+        let intensidade = (motorCrash.multiplicadorAtual - 2.0) * 0.3;
+        if (intensidade > 0.6) intensidade = 0.6;
+        containerGrafico.style.boxShadow = `inset 0 0 50px rgba(255, 50, 50, ${intensidade})`;
+        
+        // Simula o tremor do ar no iOS (vibração de alta frequência baseada na tela)
+        if(window.Haptics && Math.random() > 0.9) window.Haptics.toqueLeve();
+    }
 
     // Coordenadas
     const startX = 20;
@@ -4902,13 +5025,13 @@ function desenharGraficoAviator() {
     // 1. Desenha o preenchimento de energia sob a curva
     ctx.beginPath();
     ctx.moveTo(startX, startY);
-    ctx.quadraticCurveTo(alvoX, startY, alvoX, alvoY); // A curva do Aviator
+    ctx.quadraticCurveTo(alvoX, startY, alvoX, alvoY);
     ctx.lineTo(alvoX, startY);
     ctx.lineTo(startX, startY);
     
     let gradienteFundo = ctx.createLinearGradient(0, alvoY, 0, startY);
-    gradienteFundo.addColorStop(0, "rgba(241, 196, 15, 0.4)"); // Amarelo no topo
-    gradienteFundo.addColorStop(1, "rgba(241, 196, 15, 0.0)"); // Transparente no chão
+    gradienteFundo.addColorStop(0, "rgba(241, 196, 15, 0.4)"); 
+    gradienteFundo.addColorStop(1, "rgba(241, 196, 15, 0.0)"); 
     ctx.fillStyle = gradienteFundo;
     ctx.fill();
 
@@ -4924,14 +5047,13 @@ function desenharGraficoAviator() {
 
     // 3. Move o Foguete Físico (Emoji) para a ponta da linha
     const foguete = document.getElementById('crash-foguete-icone');
-    foguete.style.left = `${alvoX - 25}px`; // Ajuste do centro do foguete
-    foguete.style.top = `${alvoY - 25}px`;
-    
-    // Inclina o foguete dependendo da curva
-    let inclinacao = progressoVisual * 45; // Sobe até 45 graus
-    foguete.style.transform = `rotate(${inclinacao}deg)`;
+    if(foguete) {
+        foguete.style.left = `${alvoX - 25}px`; 
+        foguete.style.top = `${alvoY - 25}px`;
+        let inclinacao = progressoVisual * 45; 
+        foguete.style.transform = `rotate(${inclinacao}deg)`;
+    }
 
-    // Continua o loop de animação
     motorCrash.motorVisual = requestAnimationFrame(desenharGraficoAviator);
 }
 
@@ -4939,15 +5061,18 @@ function sacarLucroCrash() {
     clearInterval(motorCrash.motorLogica);
     cancelAnimationFrame(motorCrash.motorVisual);
     motorCrash.voando = false;
+    somTensaoCrash.pause(); // Para o coração
     
     let lucroFinal = Math.floor(motorCrash.aposta * motorCrash.multiplicadorAtual);
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroFinal, "Voo Perfeito no Aviator!");
     
-    document.getElementById('crash-multiplicador-visor').style.color = "#2ecc71"; 
-    document.getElementById('crash-foguete-icone').classList.remove('foguete-voando-aviator');
+    const visor = document.getElementById('crash-multiplicador-visor');
+    const foguete = document.getElementById('crash-foguete-icone');
     
-    // 🔊 SOM: O SEU retirar.mp3 TOCANDO ALTO!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('crashCashout', 1.0);
+    if(visor) visor.style.color = "#2ecc71"; 
+    if(foguete) foguete.classList.remove('foguete-voando-aviator');
+    
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('crashCashout', 1.0);
     if(window.Haptics) navigator.vibrate([100, 200, 100, 200]);
     if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#f1c40f'], particleCount: 100});
     if(typeof mostrarToast === 'function') mostrarToast(`Saque Perfeito! +${lucroFinal}💰`, "🚀");
@@ -4959,24 +5084,33 @@ function explodirFoguete() {
     clearInterval(motorCrash.motorLogica);
     cancelAnimationFrame(motorCrash.motorVisual);
     motorCrash.voando = false;
+    somTensaoCrash.pause(); // Para o coração
     
-    document.getElementById('crash-multiplicador-visor').innerText = motorCrash.multiplicadorAtual.toFixed(2) + "x";
-    document.getElementById('crash-multiplicador-visor').classList.add('texto-explodiu');
-    document.getElementById('crash-tela-grafico').classList.add('tela-crash-explodiu');
+    const visor = document.getElementById('crash-multiplicador-visor');
+    if(visor) {
+        visor.innerText = motorCrash.multiplicadorAtual.toFixed(2) + "x";
+        visor.classList.add('texto-explodiu');
+    }
+    
+    const tela = document.getElementById('crash-tela-grafico');
+    if(tela) tela.classList.add('tela-crash-explodiu');
     
     const foguete = document.getElementById('crash-foguete-icone');
-    foguete.classList.remove('foguete-voando-aviator');
-    foguete.classList.add('foguete-explodido');
-    foguete.innerText = "💥";
+    if(foguete) {
+        foguete.classList.remove('foguete-voando-aviator');
+        foguete.classList.add('foguete-explodido');
+        foguete.innerText = "💥";
+    }
     
-    // Tinta o Canvas de vermelho (Sangue)
+    // Tinta o Canvas de vermelho
     const canvas = document.getElementById('crash-canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = "rgba(231, 76, 60, 0.3)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if(canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = "rgba(231, 76, 60, 0.3)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     
-    // 🔊 SOM: EXPLOSÃO PESADA
-    if(window.CassinoAudio) window.CassinoAudio.tocar('crashBoom', 0.9);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('crashBoom', 0.9);
     if(window.Haptics) navigator.vibrate([300, 100, 500]); 
     if(typeof mostrarToast === 'function') mostrarToast("CRASH! O foguete explodiu.", "💥");
 
@@ -4985,24 +5119,36 @@ function explodirFoguete() {
 
 function voltarBotaoApostarCrash() {
     const btn = document.getElementById('btn-acao-crash');
-    btn.innerHTML = "APOSTAR 🚀";
-    btn.style.background = "linear-gradient(145deg, #2ecc71, #27ae60)";
-    btn.style.boxShadow = "0 10px 30px rgba(46, 204, 113, 0.4)";
+    if(btn) {
+        btn.innerHTML = "APOSTAR 🚀";
+        btn.style.background = "linear-gradient(145deg, #2ecc71, #27ae60)";
+        btn.style.boxShadow = "0 10px 30px rgba(46, 204, 113, 0.4)";
+    }
 }
 
 function resetarGraficoCrash() {
-    document.getElementById('crash-multiplicador-visor').innerText = "1.00x";
-    document.getElementById('crash-multiplicador-visor').style.color = "#fff";
-    document.getElementById('crash-multiplicador-visor').classList.remove('texto-explodiu');
-    document.getElementById('crash-tela-grafico').classList.remove('tela-crash-explodiu');
+    const visor = document.getElementById('crash-multiplicador-visor');
+    if(visor) {
+        visor.innerText = "1.00x";
+        visor.style.color = "#fff";
+        visor.classList.remove('texto-explodiu');
+    }
+    
+    const tela = document.getElementById('crash-tela-grafico');
+    if(tela) {
+        tela.classList.remove('tela-crash-explodiu');
+        tela.style.boxShadow = "none"; // Reseta o alarme visual vermelho
+    }
     
     const foguete = document.getElementById('crash-foguete-icone');
-    foguete.classList.remove('foguete-explodido');
-    foguete.innerText = "🚀";
-    foguete.style.left = "20px";
-    foguete.style.bottom = "20px";
-    foguete.style.top = "auto";
-    foguete.style.transform = "rotate(0deg)";
+    if(foguete) {
+        foguete.classList.remove('foguete-explodido');
+        foguete.innerText = "🚀";
+        foguete.style.left = "20px";
+        foguete.style.bottom = "20px";
+        foguete.style.top = "auto";
+        foguete.style.transform = "rotate(0deg)";
+    }
 
     const canvas = document.getElementById('crash-canvas');
     if (canvas) {
@@ -5013,7 +5159,7 @@ function resetarGraficoCrash() {
 
 
 // ============================================================================
-// 🃏 MOTOR MATEMÁTICO, IA E ÁUDIO: BLACKJACK (21)
+// 🃏 MOTOR MATEMÁTICO, IA E ÁUDIO: BLACKJACK (21) - VERSÃO HIGH STAKES
 // ============================================================================
 
 // 🚨 Roteador Mestre Atualizado
@@ -5025,10 +5171,10 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             mesa.classList.remove('escondido');
             mesa.style.display = 'flex';
             if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
-            resetarMesaBJ(true); // Prepara a mesa limpa
+            resetarMesaBJ(true); 
         }
     } else {
-        roteadorMestre(nomeDoJogo);
+        if(typeof roteadorMestre === 'function') roteadorMestre(nomeDoJogo);
     }
 };
 
@@ -5037,6 +5183,7 @@ window.fecharMesaBlackjack = function() {
         if(typeof mostrarToast === 'function') mostrarToast("A rodada está em andamento!", "⚠️");
         return;
     }
+    somTensaoBJ.pause(); // Garante o silêncio ao sair
     const mesa = document.getElementById('mesa-blackjack');
     if(mesa) mesa.style.display = 'none';
 };
@@ -5047,33 +5194,37 @@ let motorBJ = {
     aposta: 0,
     maoJogador: [],
     maoDealer: [],
+    taxaCoracao: 1.0,
     baralho: {
         valores: ['2','3','4','5','6','7','8','9','10','J','Q','K','A'],
         naipes: ['♠', '♥', '♦', '♣']
     }
 };
 
+// 🚨 MOTOR DE TENSÃO DO BLACKJACK
+const somTensaoBJ = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
+somTensaoBJ.loop = true;
+
 window.ajustarApostaBJ = function(valor) {
     if (motorBJ.jogando) return;
     const input = document.getElementById('bj-aposta-input');
+    if(!input) return;
+    
     let novaAposta = parseInt(input.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
-    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal;
+    if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     input.innerText = novaAposta;
     
-    // 🔊 SOM: Toca o SEU aposta.mp3 padronizado
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
-// Puxa uma carta aleatória infinita
 function sacarCartaAletoria() {
     const valor = motorBJ.baralho.valores[Math.floor(Math.random() * motorBJ.baralho.valores.length)];
     const naipe = motorBJ.baralho.naipes[Math.floor(Math.random() * motorBJ.baralho.naipes.length)];
     return { valor, naipe };
 }
 
-// Matemática do 21 (Calcula o valor da mão, tratando os Ases inteligentemente)
 function calcularPontos(mao) {
     let pontos = 0;
     let ases = 0;
@@ -5089,7 +5240,6 @@ function calcularPontos(mao) {
         }
     }
 
-    // Se estourar 21 e tiver um Ás valendo 11, reduz o Ás para 1 ponto
     while (pontos > 21 && ases > 0) {
         pontos -= 10;
         ases -= 1;
@@ -5097,7 +5247,6 @@ function calcularPontos(mao) {
     return pontos;
 }
 
-// Renderiza a Carta na Tela HTML usando CSS
 function renderizarCartaHTML(carta, oculta = false) {
     const div = document.createElement('div');
     div.className = `carta-bj ${oculta ? 'oculta' : ''}`;
@@ -5115,68 +5264,70 @@ function renderizarCartaHTML(carta, oculta = false) {
 }
 
 function atualizarMesaVisual() {
-    // Atualiza o Jogador
     const divJogador = document.getElementById('bj-jogador-cartas');
-    divJogador.innerHTML = "";
-    motorBJ.maoJogador.forEach(c => divJogador.appendChild(renderizarCartaHTML(c)));
-    document.getElementById('bj-jogador-pontos').innerText = calcularPontos(motorBJ.maoJogador);
+    if(divJogador) {
+        divJogador.innerHTML = "";
+        motorBJ.maoJogador.forEach(c => divJogador.appendChild(renderizarCartaHTML(c)));
+    }
+    const pontosJog = document.getElementById('bj-jogador-pontos');
+    if(pontosJog) pontosJog.innerText = calcularPontos(motorBJ.maoJogador);
 
-    // Atualiza o Dealer
     const divDealer = document.getElementById('bj-dealer-cartas');
-    divDealer.innerHTML = "";
-    
-    if (motorBJ.jogando) {
-        // Se a rodada estiver rolando, a primeira carta do dealer é secreta!
-        divDealer.appendChild(renderizarCartaHTML(motorBJ.maoDealer[0], true));
-        if (motorBJ.maoDealer.length > 1) {
-            divDealer.appendChild(renderizarCartaHTML(motorBJ.maoDealer[1]));
+    const pontosDeal = document.getElementById('bj-dealer-pontos');
+    if(divDealer) {
+        divDealer.innerHTML = "";
+        if (motorBJ.jogando) {
+            divDealer.appendChild(renderizarCartaHTML(motorBJ.maoDealer[0], true));
+            if (motorBJ.maoDealer.length > 1) {
+                divDealer.appendChild(renderizarCartaHTML(motorBJ.maoDealer[1]));
+            }
+            if(pontosDeal) pontosDeal.innerText = "?";
+        } else {
+            motorBJ.maoDealer.forEach(c => divDealer.appendChild(renderizarCartaHTML(c)));
+            if(pontosDeal) pontosDeal.innerText = calcularPontos(motorBJ.maoDealer);
         }
-        document.getElementById('bj-dealer-pontos').innerText = "?";
-    } else {
-        // Rodada acabou, revela tudo do dealer
-        motorBJ.maoDealer.forEach(c => divDealer.appendChild(renderizarCartaHTML(c)));
-        document.getElementById('bj-dealer-pontos').innerText = calcularPontos(motorBJ.maoDealer);
     }
 }
 
-// Inicia a Rodada (O Croupier distribui as cartas)
 window.iniciarRodadaBJ = function() {
-    const aposta = parseInt(document.getElementById('bj-aposta-input').innerText);
+    const input = document.getElementById('bj-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
-    if (aposta < 10 || window.pontosDoCasal < aposta) {
+    if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊 SOM DE ERRO
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
 
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Aposta no Blackjack");
     
-    // 🔊 SOM: Fichas sendo empurradas para o centro
-    if(window.CassinoAudio) window.CassinoAudio.tocar('bjStart', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
 
     motorBJ.jogando = true;
     motorBJ.aposta = aposta;
     motorBJ.maoJogador = [];
     motorBJ.maoDealer = [];
+    motorBJ.taxaCoracao = 1.0;
 
-    // Troca os painéis
     document.getElementById('bj-painel-aposta').classList.add('escondido');
     document.getElementById('bj-painel-resultado').classList.add('escondido');
     document.getElementById('bj-painel-acao').classList.remove('escondido');
+    
+    const mesa = document.getElementById('mesa-blackjack');
+    if(mesa) mesa.style.boxShadow = "none"; // Reseta alarme visual
 
     if(window.Haptics) navigator.vibrate([30, 50, 30]);
 
-    // O Croupier dá 2 cartas para cada um (com delay e 🔊 som realista de carta deslizando)
-    setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.7); }, 200);
-    setTimeout(() => { motorBJ.maoDealer.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.7); }, 600);
-    setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.7); }, 1000);
+    setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7); }, 200);
+    setTimeout(() => { motorBJ.maoDealer.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7); }, 600);
+    setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7); }, 1000);
     setTimeout(() => { 
         motorBJ.maoDealer.push(sacarCartaAletoria()); 
         atualizarMesaVisual(); 
-        if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.7);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7);
         
-        // Verifica o Blackjack Natural (21 pontos de cara)
         if (calcularPontos(motorBJ.maoJogador) === 21) {
             if(window.Haptics) navigator.vibrate([100, 200, 300]);
             finalizarRodadaBJ("BLACKJACK");
@@ -5184,56 +5335,86 @@ window.iniciarRodadaBJ = function() {
     }, 1400);
 };
 
-// O Jogador pede mais uma carta
 window.comprarCartaBJ = function() {
     if (!motorBJ.jogando) return;
     
+    // 🚨 O RISCO: Se ela pedir carta com 15+ pontos, a mesa pisca em perigo
+    let pontosAtuais = calcularPontos(motorBJ.maoJogador);
+    if (pontosAtuais >= 15) {
+        const mesa = document.getElementById('mesa-blackjack');
+        if(mesa) {
+            mesa.style.boxShadow = "inset 0 0 50px rgba(231, 76, 60, 0.4)";
+            setTimeout(() => mesa.style.boxShadow = "none", 300);
+        }
+    }
+
     motorBJ.maoJogador.push(sacarCartaAletoria());
     atualizarMesaVisual();
     
-    // 🔊 SOM: Carta deslizando pro jogador
-    if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.8);
     if(window.Haptics) navigator.vibrate(30);
 
-    // Se estourar 21, perde na hora
     if (calcularPontos(motorBJ.maoJogador) > 21) {
         if(window.Haptics) navigator.vibrate([300, 100, 300]);
         finalizarRodadaBJ("ESTOUROU");
     }
 };
 
-// O Jogador para, e a IA do Dealer assume
 window.pararBJ = function() {
     if (!motorBJ.jogando) return;
     
-    motorBJ.jogando = false; // Revela a carta do dealer
-    atualizarMesaVisual();
+    // 🚨 THE SQUEEZE: O suspense da IA do Dealer
+    // Desativa os botões para ela só assistir o show
+    document.getElementById('bj-painel-acao').classList.add('escondido');
     
-    // 🔊 SOM: Revelando a carta oculta
-    if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.6);
-    
-    // A regra sagrada do cassino: O Dealer é obrigado a comprar até ter 17 ou mais
-    let loopIA = setInterval(() => {
-        let pontosDealer = calcularPontos(motorBJ.maoDealer);
+    // Inicia o coração se não estiver mutado
+    if (!window.SantuarioSomPausado) {
+        somTensaoBJ.currentTime = 0;
+        somTensaoBJ.playbackRate = motorBJ.taxaCoracao;
+        somTensaoBJ.volume = 0.6;
+        somTensaoBJ.play().catch(e=>{});
+    }
+
+    // Pausa dramática de 1.5s antes de revelar a carta secreta
+    setTimeout(() => {
+        motorBJ.jogando = false; 
+        atualizarMesaVisual(); 
         
-        if (pontosDealer < 17) {
-            motorBJ.maoDealer.push(sacarCartaAletoria());
-            atualizarMesaVisual();
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.8);
+        if(window.Haptics) navigator.vibrate(50);
+        
+        // Loop recursivo para o dealer comprar cartas lentamente e com aumento de tensão
+        function turnoDealer() {
+            let pontosDealer = calcularPontos(motorBJ.maoDealer);
             
-            // 🔊 SOM: Carta deslizando pro Dealer
-            if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.7);
-            if(window.Haptics) navigator.vibrate(30);
-        } else {
-            clearInterval(loopIA);
-            finalizarRodadaBJ("COMPARAÇÃO");
+            if (pontosDealer < 17) {
+                setTimeout(() => {
+                    motorBJ.maoDealer.push(sacarCartaAletoria());
+                    atualizarMesaVisual();
+                    
+                    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7);
+                    if(window.Haptics) navigator.vibrate(30);
+                    
+                    // Acelera o coração a cada carta do dealer
+                    motorBJ.taxaCoracao += 0.2;
+                    somTensaoBJ.playbackRate = motorBJ.taxaCoracao;
+                    
+                    turnoDealer(); // Chama de novo
+                }, 1200); // 1.2s de angústia entre cada carta
+            } else {
+                setTimeout(() => { finalizarRodadaBJ("COMPARAÇÃO"); }, 1000);
+            }
         }
-    }, 800);
+        
+        turnoDealer();
+
+    }, 1500);
 };
 
-// Veredito e Pagamento
 function finalizarRodadaBJ(motivo) {
     motorBJ.jogando = false;
-    atualizarMesaVisual(); // Força a revelação total
+    somTensaoBJ.pause(); // Cessa a tensão musical
+    atualizarMesaVisual(); 
 
     document.getElementById('bj-painel-acao').classList.add('escondido');
     document.getElementById('bj-painel-resultado').classList.remove('escondido');
@@ -5245,76 +5426,90 @@ function finalizarRodadaBJ(motivo) {
     let msgToast = "";
     let iconeToast = "";
 
-    // 🚨 AVALIAÇÃO SONORA DA RODADA
     if (motivo === "BLACKJACK") {
-        lucro = motorBJ.aposta * 2.5; // Paga 1.5x a aposta
+        lucro = motorBJ.aposta * 2.5; 
         msgToast = `BLACKJACK! +${lucro}💰`;
         iconeToast = "🃏✨";
-        if(window.CassinoAudio) window.CassinoAudio.tocar('bjBlackjack', 1.0); // 🔊 SOM: JACKPOT 21!
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjBlackjack', 1.0); 
         
     } else if (motivo === "ESTOUROU") {
-        msgToast = "Você estourou 21! A casa vence.";
+        msgToast = "Você estourou! A casa vence.";
         iconeToast = "💥";
-        if(window.CassinoAudio) window.CassinoAudio.tocar('bjBust', 0.8); // 🔊 SOM: BUZZER DE ESTOURO
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjBust', 0.8); 
         
+        // 🚨 TREMEDEIRA DE ESTOURO
+        const mesa = document.getElementById('mesa-blackjack');
+        if (mesa) {
+            mesa.style.boxShadow = "inset 0 0 80px rgba(231, 76, 60, 0.8)";
+            mesa.style.transform = "translateX(5px)";
+            setTimeout(()=> mesa.style.transform = "translateX(-5px)", 50);
+            setTimeout(()=> mesa.style.transform = "translateX(5px)", 100);
+            setTimeout(()=> { mesa.style.transform = "translateX(0)"; mesa.style.boxShadow = "none"; }, 150);
+        }
+
     } else {
-        // Comparação de pontos
         if (pontosD > 21) {
             lucro = motorBJ.aposta * 2; 
             msgToast = `Dealer estourou! Você venceu! +${lucro}💰`;
             iconeToast = "💸";
-            if(window.CassinoAudio) window.CassinoAudio.tocar('bjWin', 0.9); // 🔊 SOM: VITÓRIA
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjWin', 0.9); 
             
         } else if (pontosJ > pontosD) {
             lucro = motorBJ.aposta * 2; 
             msgToast = `Sua mão é maior! Você venceu! +${lucro}💰`;
             iconeToast = "🏆";
-            if(window.CassinoAudio) window.CassinoAudio.tocar('bjWin', 0.9); // 🔊 SOM: VITÓRIA
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjWin', 0.9); 
             
         } else if (pontosJ < pontosD) {
             msgToast = "O Dealer venceu esta mão.";
             iconeToast = "🏦";
-            if(window.CassinoAudio) window.CassinoAudio.tocar('bjLose', 0.7); // 🔊 SOM: DERROTA
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjLose', 0.7); 
             
         } else {
-            // Empate (Push)
             lucro = motorBJ.aposta; 
             msgToast = "Empate (Push). Aposta devolvida.";
             iconeToast = "🤝";
-            if(window.CassinoAudio) window.CassinoAudio.tocar('bjPush', 0.8); // 🔊 SOM: EMPATE (Fichas devolvidas)
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjPush', 0.8); 
         }
     }
 
-    // Paga a Thamiris
     if (lucro > 0) {
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Vitória no Blackjack");
         if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#ffffff'], particleCount: 150});
         if(window.Haptics) navigator.vibrate([100, 100, 200, 200]);
     } else if (lucro === 0 && pontosJ !== pontosD) {
-        if(window.Haptics) navigator.vibrate([200, 100, 200]); // Vibrar de perda
+        if(window.Haptics) navigator.vibrate([200, 100, 200]); 
     }
 
     if(typeof mostrarToast === 'function') mostrarToast(msgToast, iconeToast);
 }
 
-// Limpa a mesa para a próxima rodada
 window.resetarMesaBJ = function(init = false) {
     motorBJ.jogando = false;
+    somTensaoBJ.pause();
     document.getElementById('bj-painel-resultado').classList.add('escondido');
     document.getElementById('bj-painel-acao').classList.add('escondido');
     document.getElementById('bj-painel-aposta').classList.remove('escondido');
     
-    document.getElementById('bj-jogador-cartas').innerHTML = "";
-    document.getElementById('bj-dealer-cartas').innerHTML = "";
-    document.getElementById('bj-jogador-pontos').innerText = "0";
-    document.getElementById('bj-dealer-pontos').innerText = "?";
+    const divJog = document.getElementById('bj-jogador-cartas');
+    const divDeal = document.getElementById('bj-dealer-cartas');
+    const ptsJog = document.getElementById('bj-jogador-pontos');
+    const ptsDeal = document.getElementById('bj-dealer-pontos');
+    
+    if(divJog) divJog.innerHTML = "";
+    if(divDeal) divDeal.innerHTML = "";
+    if(ptsJog) ptsJog.innerText = "0";
+    if(ptsDeal) ptsDeal.innerText = "?";
+    
+    const mesa = document.getElementById('mesa-blackjack');
+    if(mesa) mesa.style.boxShadow = "none";
     
     if(!init && window.Haptics) window.Haptics.toqueLeve();
 };
 
 
 // ============================================================================
-// 🎡 MOTOR MATEMÁTICO, FÍSICO E SONORO: ROLETA DA SORTE (BLINDADO)
+// 🎡 MOTOR MATEMÁTICO, FÍSICO E SONORO: ROLETA DA SORTE (HIGH STAKES)
 // ============================================================================
 
 const roteadorAntesDaRoleta = window.abrirMesaCassino;
@@ -5332,13 +5527,13 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             disco.classList.add('roleta-respirando');
         }
     } else {
-        roteadorAntesDaRoleta(nomeDoJogo);
+        if(typeof roteadorAntesDaRoleta === 'function') roteadorAntesDaRoleta(nomeDoJogo);
     }
 };
 
 window.fecharMesaRoleta = function() {
     if (motorRoleta.girando) {
-        if(typeof mostrarToast === 'function') mostrarToast("A bola está girando! Aguarde.", "⚠️");
+        if(typeof mostrarToast === 'function') mostrarToast("A roda está girando! Aguarde.", "⚠️");
         return;
     }
     const mesa = document.getElementById('mesa-roleta');
@@ -5354,13 +5549,14 @@ let motorRoleta = {
 window.ajustarApostaRoleta = function(valor) {
     if (motorRoleta.girando) return;
     const input = document.getElementById('roleta-aposta-input');
+    if(!input) return;
+    
     let novaAposta = parseInt(input.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
-    if (novaAposta > window.pontosDoCasal) novaAposta = window.pontosDoCasal;
+    if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     input.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo personalizado aposta.mp3 tocando!
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
@@ -5381,31 +5577,29 @@ function obterAnguloVisualReal(elemento) {
 window.apostarRoleta = function(corApostada) {
     if (motorRoleta.girando) return;
     
-    const aposta = parseInt(document.getElementById('roleta-aposta-input').innerText);
+    const input = document.getElementById('roleta-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
-    if (aposta < 10 || window.pontosDoCasal < aposta) {
+    if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); 
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
 
-    // O Cassino recolhe as fichas
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, `Aposta no ${corApostada.toUpperCase()}`);
     
     motorRoleta.girando = true;
     const disco = document.getElementById('disco-roleta');
     
-    // Bate uma foto do ângulo exato no milissegundo do clique
     let anguloVisualCongelado = obterAnguloVisualReal(disco);
     
-    // Arranca a animação contínua e congela a roda onde o olho está vendo
     disco.classList.remove('roleta-respirando');
     disco.style.transition = 'none';
     disco.style.transform = `rotate(${anguloVisualCongelado}deg)`;
     
-    // Força o navegador a processar o congelamento (Reflow)
-    void disco.offsetWidth;
+    void disco.offsetWidth; // Reflow force
 
     // MATEMÁTICA PURA
     let numeroSorteado = Math.floor(Math.random() * 15); 
@@ -5426,25 +5620,47 @@ window.apostarRoleta = function(corApostada) {
         posicaoAlvoNaRoda = posicoesPretas[numeroSorteado - 8]; 
     }
 
-    // FÍSICA DE GIRO
     let rotacaoParaOAlvo = (360 - posicaoAlvoNaRoda) % 360;
     let distanciaFaltante = rotacaoParaOAlvo - (anguloVisualCongelado % 360);
     if (distanciaFaltante <= 0) distanciaFaltante += 360; 
 
-    // Adiciona o Torque do Croupier
+    // O Torque (Várias voltas antes de parar)
     motorRoleta.anguloAtual = anguloVisualCongelado + 3600 + distanciaFaltante;
     
-    // 🔊 SOM: A bola é lançada e a roleta gira!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('roletaSpin', 1.0);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('roletaSpin', 1.0);
 
-    // 🚨 ALTERAÇÃO AQUI: Liga os motores com tempo de 9 segundos
-    disco.style.transition = 'transform 9s cubic-bezier(0.15, 0.85, 0.15, 1)';
+    // Física de Rotação (9 Segundos)
+    disco.style.transition = 'transform 9s cubic-bezier(0.1, 0.95, 0.15, 1)';
     disco.style.transform = `rotate(${motorRoleta.anguloAtual}deg)`;
     
     if(window.Haptics) navigator.vibrate([20, 50, 20, 50, 20, 50]); 
     if(typeof mostrarToast === 'function') mostrarToast("Rien ne va plus! (Apostas encerradas)", "🎲");
 
-    // 🚨 ALTERAÇÃO AQUI: Aguarda os 9 segundos (9000ms) da física terminarem
+    // 🚨 A MÁGICA: O som da catraca desacelerando hiper-realista
+    let tempoAtual = 0;
+    let intervaloBase = 25; 
+    const somCatraca = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+    somCatraca.volume = 0.4;
+
+    function tocarCatraca() {
+        if (!motorRoleta.girando) return;
+        
+        if (!window.SantuarioSomPausado) {
+            somCatraca.currentTime = 0;
+            somCatraca.play().catch(e=>{});
+        }
+        
+        if (window.Haptics) window.Haptics.toqueLeve();
+
+        tempoAtual += intervaloBase;
+        intervaloBase = 25 + Math.pow(tempoAtual / 600, 2.5); // Desaceleração exponencial dramática
+
+        if (tempoAtual < 8600) { // Para um pouquinho antes da física CSS concluir
+            setTimeout(tocarCatraca, intervaloBase);
+        }
+    }
+    tocarCatraca();
+
     setTimeout(() => {
         verificarVitoriaRoleta(corApostada, corCaiu, aposta);
     }, 9000);
@@ -5453,43 +5669,46 @@ window.apostarRoleta = function(corApostada) {
 function verificarVitoriaRoleta(corApostada, corCaiu, aposta) {
     motorRoleta.girando = false;
     
-    // Devolve a roleta ao estado ocioso mantendo a posição final
     const disco = document.getElementById('disco-roleta');
-    let anguloFinal = obterAnguloVisualReal(disco);
-    disco.style.transition = 'none';
-    disco.style.transform = `rotate(${anguloFinal}deg)`;
-    void disco.offsetWidth;
-    disco.classList.add('roleta-respirando');
+    if(disco) {
+        let anguloFinal = obterAnguloVisualReal(disco);
+        disco.style.transition = 'none';
+        disco.style.transform = `rotate(${anguloFinal}deg)`;
+        void disco.offsetWidth;
+        disco.classList.add('roleta-respirando');
+    }
 
     let lucro = 0;
     let msgToast = "";
     let icone = "";
 
-    // 🚨 AVALIAÇÃO E PAGAMENTO SONORO
+    // 🚨 AVALIAÇÃO E O "ZERO VERDE DO AFETO"
     if (corApostada === corCaiu) {
         if (corCaiu === "verde") {
             lucro = aposta * 14;
-            msgToast = `JACKPOT VERDE! +${lucro}💰`;
-            icone = "🟢";
+            // O JACKPOT SUPREMO DO RELACIONAMENTO
+            msgToast = `ZERO VERDE! +${lucro}💰 E VOCÊ GANHOU UM MIMO ROMÂNTICO!`;
+            icone = "💚";
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+            if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37', '#ffffff'], particleCount: 300, spread: 150});
+            if(window.Haptics) navigator.vibrate([300, 100, 300, 100, 500]);
+            
         } else {
             lucro = aposta * 2;
             msgToast = `Caiu no ${corCaiu.toUpperCase()}! +${lucro}💰`;
             icone = (corCaiu === "vermelho") ? "🔴" : "⚫";
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+            if(typeof confetti === 'function') confetti({colors: ['#f1c40f', (corCaiu==='vermelho'?'#e74c3c':'#2c3e50')], particleCount: 100});
+            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
         }
         
-        // 🔊 SOM: O SEU ganar.mp3 TOCANDO ALTO!
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsWin', 1.0);
-        
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Vitória na Roleta (${corCaiu})`);
-        if(typeof confetti === 'function') confetti({colors: ['#f1c40f', (corCaiu==='vermelho'?'#e74c3c':'#2c3e50')], particleCount: 150});
-        if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Vitória na Roleta (${corCaiu.toUpperCase()})`);
         
     } else {
         msgToast = `Caiu no ${corCaiu.toUpperCase()}. A casa venceu.`;
         icone = "💸";
         
-        // 🔊 SOM: O SEU perder.mp3
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsLose', 0.8);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
         if(window.Haptics) navigator.vibrate([300, 100, 300]);
     }
 
@@ -5498,10 +5717,9 @@ function verificarVitoriaRoleta(corApostada, corCaiu, aposta) {
 
 
 // ============================================================================
-// ☄️ MOTOR FÍSICO, MATEMÁTICO E SONORO: PLINKO
+// ☄️ MOTOR FÍSICO, MATEMÁTICO E SONORO: PLINKO (MÚLTIPLAS BOLAS & RASTRO)
 // ============================================================================
 
-// 🚨 Atualiza o Roteador Mestre para abrir o Plinko
 const roteadorAntesPlinko = window.abrirMesaCassino;
 window.abrirMesaCassino = function(nomeDoJogo) {
     if (nomeDoJogo === 'plinko') {
@@ -5513,7 +5731,7 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             if (!motorPlinko.construido) construirPiramidePlinko();
         }
     } else {
-        roteadorAntesPlinko(nomeDoJogo);
+        if(typeof roteadorAntesPlinko === 'function') roteadorAntesPlinko(nomeDoJogo);
     }
 };
 
@@ -5524,47 +5742,49 @@ window.fecharMesaPlinko = function() {
 
 let motorPlinko = {
     construido: false,
-    linhas: 10, // 10 níveis de profundidade
-    multiplicadores: [50, 15, 5, 1.5, 0.2, 0.2, 1.5, 5, 15, 50], // Risco Alto (10 caçapas)
+    linhas: 10, 
+    multiplicadores: [50, 15, 5, 1.5, 0.2, 0.2, 1.5, 5, 15, 50], 
     coresCacapas: ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db', '#3498db', '#2ecc71', '#f1c40f', '#e67e22', '#e74c3c']
 };
 
 window.ajustarApostaPlinko = function(valor) {
     const visor = document.getElementById('plinko-aposta-input');
+    if(!visor) return;
     let novaAposta = parseInt(visor.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
     if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     visor.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo personalizado aposta.mp3
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
 function construirPiramidePlinko() {
     const board = document.getElementById('plinko-board');
     const cacapasDiv = document.getElementById('plinko-cacapas');
+    if(!board || !cacapasDiv) return;
     
-    // 1. Constrói os Pinos (Pegs)
-    for (let linha = 0; linha < motorPlinko.linhas; linha++) {
-        let qtdPinos = linha + 3; // O topo começa com 3 pinos para centralizar a queda
-        for (let pino = 0; pino < qtdPinos; pino++) {
-            let dot = document.createElement('div');
-            dot.className = 'plinko-pino';
-            
-            // Geometria da Pirâmide
-            let posX = 50 + ((pino - (qtdPinos - 1) / 2) * 8); // Afastamento X
-            let posY = 10 + (linha * 8.5); // Descida Y
-            
-            dot.style.left = `${posX}%`;
-            dot.style.top = `${posY}%`;
-            dot.id = `pino-${linha}-${pino}`;
-            board.appendChild(dot);
+    // 🚨 Removemos a linha "board.innerHTML = ''" que estava deletando as caçapas!
+    
+    // 1. Pinos (Só constrói se o quadro estiver vazio para evitar duplicação)
+    if (board.querySelectorAll('.plinko-pino').length === 0) {
+        for (let linha = 0; linha < motorPlinko.linhas; linha++) {
+            let qtdPinos = linha + 3; 
+            for (let pino = 0; pino < qtdPinos; pino++) {
+                let dot = document.createElement('div');
+                dot.className = 'plinko-pino';
+                let posX = 50 + ((pino - (qtdPinos - 1) / 2) * 8); 
+                let posY = 10 + (linha * 8.5); 
+                dot.style.left = `${posX}%`;
+                dot.style.top = `${posY}%`;
+                dot.id = `pino-${linha}-${pino}`;
+                board.appendChild(dot);
+            }
         }
     }
 
-    // 2. Constrói as Caçapas Inferiores
-    cacapasDiv.innerHTML = "";
+    // 2. Caçapas
+    cacapasDiv.innerHTML = ""; // Limpa apenas as caçapas antigas
     for (let i = 0; i < motorPlinko.multiplicadores.length; i++) {
         let cacapa = document.createElement('div');
         cacapa.className = 'plinko-cacapa';
@@ -5577,50 +5797,61 @@ function construirPiramidePlinko() {
     motorPlinko.construido = true;
 }
 
+// 🚨 SOM DA BOLINHA BATENDO (Permite Pitch Shifting por bola)
+function criarSomBatidaPlinko() {
+    const som = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3'); // Um 'ting' que vamos alterar
+    return som;
+}
+
 window.soltarBolinhaPlinko = function() {
-    const aposta = parseInt(document.getElementById('plinko-aposta-input').innerText);
+    const input = document.getElementById('plinko-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
     if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊 SOM: Erro
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
 
-    // Botão reage fisicamente
     const btn = document.getElementById('btn-plinko-jogar');
-    btn.style.transform = "scale(0.95)";
-    setTimeout(() => btn.style.transform = "scale(1)", 100);
+    if(btn) {
+        btn.style.transform = "scale(0.95)";
+        setTimeout(() => btn.style.transform = "scale(1)", 100);
+    }
 
-    // Cassino cobra a aposta
-    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Aposta no Plinko");
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Lançamento no Plinko");
 
     const board = document.getElementById('plinko-board');
     const bola = document.createElement('div');
     bola.className = 'plinko-bola';
     board.appendChild(bola);
 
-    // Início exato (Topo centro)
     let linhaAtual = 0;
-    let posIndex = (motorPlinko.linhas + 2) / 2; 
     let posX = 50; 
     let posY = 2; 
     
     bola.style.left = `${posX}%`;
     bola.style.top = `${posY}%`;
 
-    // 🔊 SOM: Lançamento da bola do topo
-    if(window.CassinoAudio) window.CassinoAudio.tocar('plinkoDrop', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('plinkoDrop', 0.8);
 
-    // Motor de Queda (Rodando a cada 300ms para casar com a transição CSS)
+    // 🚨 A MÁGICA: Cada bola ganha a sua própria física e áudio!
+    const somBatida = criarSomBatidaPlinko();
+    let frequenciaBatida = 2.0; // Começa agudo lá no topo da pirâmide
+
     let quedaInterval = setInterval(() => {
         if (linhaAtual >= motorPlinko.linhas) {
-            // A BOLA CAIU NA CAÇAPA!
             clearInterval(quedaInterval);
             bola.remove();
             
-            // Descobre em qual caçapa caiu baseado na posição final do X
-            let bucketIndex = Math.floor(((posX - 14) / 72) * motorPlinko.multiplicadores.length);
+            // FÍSICA PURA: Se a bola foi muito para o lado esquerdo (posX baixo) ou direito (posX alto), ela cai nas caçapas extremas
+            let range = 4.0 * motorPlinko.linhas; // Distância máxima possível de ser viajada do centro
+            let offsetCentral = (posX - 50); // - range a + range
+            let proporcao = (offsetCentral + range) / (range * 2); // 0.0 a 1.0
+            
+            let bucketIndex = Math.floor(proporcao * motorPlinko.multiplicadores.length);
             if (bucketIndex < 0) bucketIndex = 0;
             if (bucketIndex >= motorPlinko.multiplicadores.length) bucketIndex = motorPlinko.multiplicadores.length - 1;
 
@@ -5628,21 +5859,50 @@ window.soltarBolinhaPlinko = function() {
             return;
         }
 
-        // A Matemática do Quique: Vai pra Esquerda (-4%) ou Direita (+4%)
+        // 🚨 RASTRO LUMINOSO (Cauda de Cometa)
+        const fantasma = document.createElement('div');
+        fantasma.className = 'plinko-bola';
+        fantasma.style.left = `${posX}%`;
+        fantasma.style.top = `${posY}%`;
+        fantasma.style.opacity = '0.5';
+        fantasma.style.transform = 'scale(0.8)';
+        fantasma.style.transition = 'all 0.4s ease-out';
+        board.appendChild(fantasma);
+        setTimeout(() => fantasma.remove(), 400); // O fantasma some rápido
+
+        // Matemática do Quique
         let direcao = Math.random() > 0.5 ? 1 : -1;
         posX += (direcao * 4);
-        posY = 10 + (linhaAtual * 8.5); // Bate na linha atual
+        posY = 10 + (linhaAtual * 8.5); 
         
         bola.style.left = `${posX}%`;
         bola.style.top = `${posY}%`;
 
-        // 🔊 SOM: A batida no pino ("Ploc!")
-        // Brincamos com o volume para dar sensação de profundidade enquanto cai
-        let volumePloc = 0.3 + (linhaAtual * 0.05);
-        if(window.CassinoAudio) window.CassinoAudio.tocar('plinkoHit', volumePloc);
-        
-        // O haptics bate seco como a bolinha
-        if(window.Haptics) navigator.vibrate(10); 
+        // 🚨 A MÁGICA SONORA: O som fica mais grave (pesado) conforme a bola desce!
+        if (!window.SantuarioSomPausado) {
+            somBatida.currentTime = 0;
+            somBatida.playbackRate = frequenciaBatida;
+            somBatida.volume = 0.3 + (linhaAtual * 0.06); // Fica mais alto no fundo
+            somBatida.play().catch(e=>{});
+            frequenciaBatida -= 0.15; // O Pitch vai caindo para ficar grave
+            if (frequenciaBatida < 0.5) frequenciaBatida = 0.5;
+        }
+
+        if(window.Haptics) window.Haptics.toqueLeve();
+
+        // 🚨 FÍSICA: Dá um soquinho no pino que foi acertado
+        const pinoBatido = document.elementFromPoint(
+            bola.getBoundingClientRect().left + 10, 
+            bola.getBoundingClientRect().top + 10
+        );
+        if (pinoBatido && pinoBatido.classList.contains('plinko-pino')) {
+            pinoBatido.style.transform = 'scale(1.4)';
+            pinoBatido.style.background = '#f1c40f'; // Brilha em ouro
+            setTimeout(() => {
+                pinoBatido.style.transform = 'scale(1)';
+                pinoBatido.style.background = 'rgba(255,255,255,0.3)';
+            }, 150);
+        }
 
         linhaAtual++;
     }, 300);
@@ -5652,33 +5912,34 @@ function pagarPlinko(bucketIndex, aposta) {
     const mult = motorPlinko.multiplicadores[bucketIndex];
     const lucro = Math.floor(aposta * mult);
     
-    // Anima a caçapa exata
     const cacapa = document.getElementById(`cacapa-${bucketIndex}`);
-    cacapa.classList.add('plinko-cacapa-hit');
-    setTimeout(() => cacapa.classList.remove('plinko-cacapa-hit'), 200);
+    if(cacapa) {
+        cacapa.classList.add('plinko-cacapa-hit');
+        cacapa.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            cacapa.classList.remove('plinko-cacapa-hit');
+            cacapa.style.transform = 'scale(1)';
+        }, 200);
+    }
 
-    // 🚨 AVALIAÇÃO SONORA DA CAÇAPA
     if (lucro > aposta) {
-        // VITÓRIA (Cor quente)
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsWin', 1.0); // 🔊 O seu ganhar.mp3!
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Prêmio no Plinko!");
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0); 
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Prêmio Plinko (${mult}x)`);
         if(window.Haptics) navigator.vibrate([100, 100, 200]);
-        if(mult >= 15 && typeof confetti === 'function') confetti({colors: ['#e74c3c', '#f1c40f'], particleCount: 150}); // Jackpot!
+        if(mult >= 15 && typeof confetti === 'function') confetti({colors: ['#e74c3c', '#f1c40f'], particleCount: 100}); 
         if(typeof mostrarToast === 'function') mostrarToast(`PLINKO! ${mult}x (+${lucro}💰)`, "✨");
     } else {
-        // DERROTA PARCIAL (Cores frias, meio da pirâmide)
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsLose', 0.8); // 🔊 O seu perder.mp3!
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.6); 
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Retorno Plinko");
-        if(window.Haptics) navigator.vibrate(50);
+        if(window.Haptics) window.Haptics.toqueLeve();
     }
 }
 
 
 // ============================================================================
-// 🎫 MOTOR GRÁFICO, MATEMÁTICO E SONORO: RASPADINHA VIP
+// 🎫 MOTOR GRÁFICO, MATEMÁTICO E SONORO: RASPADINHA VIP (AUTO-REVEAL)
 // ============================================================================
 
-// 🚨 Atualiza o Roteador Mestre
 const roteadorAntesRaspadinha = window.abrirMesaCassino;
 window.abrirMesaCassino = function(nomeDoJogo) {
     if (nomeDoJogo === 'raspadinha') {
@@ -5687,7 +5948,7 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             mesa.classList.remove('escondido');
             mesa.style.display = 'flex';
             if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
-            prepararBilheteRaspadinha(true); // Prepara um bilhete vazio
+            prepararBilheteRaspadinha(true); 
         }
     } else if (typeof roteadorAntesRaspadinha === 'function') {
         roteadorAntesRaspadinha(nomeDoJogo);
@@ -5710,13 +5971,14 @@ let motorRaspadinha = {
     lucro: 0,
     simbolosNaMesa: [],
     pixelsRaspados: 0,
-    tempoUltimoSomFriccao: 0, // 🚨 Controle de ritmo do som de raspar
+    totalPixels: 0,
+    tempoUltimoSomFriccao: 0, 
     simbolos: [
         { emoji: '💎', mult: 50 },
         { emoji: '🍀', mult: 20 },
         { emoji: '🍒', mult: 5 },
         { emoji: '🍋', mult: 2 },
-        { emoji: '🥑', mult: 0 } // Abacate = Perda (Falso símbolo)
+        { emoji: '🥑', mult: 0 } 
     ],
     canvas: null,
     ctx: null
@@ -5725,25 +5987,25 @@ let motorRaspadinha = {
 window.ajustarApostaRaspadinha = function(valor) {
     if (motorRaspadinha.jogando && !motorRaspadinha.finalizado) return;
     const visor = document.getElementById('raspadinha-aposta-input');
+    if(!visor) return;
+    
     let novaAposta = parseInt(visor.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
     if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     visor.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo aposta.mp3
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
 function prepararBilheteRaspadinha(apenasVisual = false) {
     const grid = document.getElementById('raspadinha-grid');
+    if(!grid) return;
     grid.innerHTML = "";
     
-    // Cria os 9 quadrados
     for (let i = 0; i < 9; i++) {
         const div = document.createElement('div');
         div.className = 'raspadinha-celula';
-        // Se for só o visual inicial, deixa vazio. Se for valendo, bota o símbolo.
         div.innerText = apenasVisual ? "❓" : motorRaspadinha.simbolosNaMesa[i];
         div.id = `rasp-celula-${i}`;
         grid.appendChild(div);
@@ -5754,14 +6016,14 @@ function prepararBilheteRaspadinha(apenasVisual = false) {
     motorRaspadinha.canvas = canvas;
     motorRaspadinha.ctx = canvas.getContext('2d', { willReadFrequently: true });
     
-    // Ajusta a resolução para as telas (Samsung e iPhone)
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     
-    // Pinta a camada prateada (Tinta da Raspadinha)
+    // 🚨 Salva a área total para calcular a porcentagem raspada (Auto-Reveal)
+    motorRaspadinha.totalPixels = canvas.width * canvas.height;
+    
     motorRaspadinha.ctx.globalCompositeOperation = "source-over";
     
-    // Cria um gradiente prateado estilo bilhete real
     let gradient = motorRaspadinha.ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
     gradient.addColorStop(0, "#bdc3c7");
     gradient.addColorStop(0.5, "#ecf0f1");
@@ -5770,27 +6032,26 @@ function prepararBilheteRaspadinha(apenasVisual = false) {
     motorRaspadinha.ctx.fillStyle = gradient;
     motorRaspadinha.ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Texto de instrução
     motorRaspadinha.ctx.fillStyle = "#34495e";
     motorRaspadinha.ctx.font = "bold 24px Arial";
     motorRaspadinha.ctx.textAlign = "center";
     motorRaspadinha.ctx.fillText("RASPE AQUI", canvas.width/2, canvas.height/2);
 
-    // Configura os eventos de toque para arrancar a tinta
     configurarToqueRaspadinha();
 }
 
 window.comprarRaspadinha = function() {
-    const aposta = parseInt(document.getElementById('raspadinha-aposta-input').innerText);
+    const input = document.getElementById('raspadinha-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
     if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
 
-    // Cassino cobra a aposta
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Compra de Bilhete");
 
     motorRaspadinha.jogando = true;
@@ -5798,62 +6059,51 @@ window.comprarRaspadinha = function() {
     motorRaspadinha.apostaAtual = aposta;
     motorRaspadinha.pixelsRaspados = 0;
 
-    // MATEMÁTICA: Decide se ganha ou perde AGORA (RTP de ~90%)
     let sorte = Math.random();
     motorRaspadinha.simbolosNaMesa = Array(9).fill("");
     motorRaspadinha.lucro = 0;
 
-    if (sorte < 0.40) {
-        // VITÓRIA! Escolhe qual símbolo vai ganhar baseado em probabilidade
+    if (sorte < 0.40) { // 40% de chance de vitória
         let symSorte = Math.random();
         let simboloVencedor;
-        if (symSorte < 0.02) simboloVencedor = motorRaspadinha.simbolos[0]; // 💎 50x (Raro)
-        else if (symSorte < 0.10) simboloVencedor = motorRaspadinha.simbolos[1]; // 🍀 20x
-        else if (symSorte < 0.40) simboloVencedor = motorRaspadinha.simbolos[2]; // 🍒 5x
-        else simboloVencedor = motorRaspadinha.simbolos[3]; // 🍋 2x (Comum)
+        if (symSorte < 0.02) simboloVencedor = motorRaspadinha.simbolos[0]; 
+        else if (symSorte < 0.10) simboloVencedor = motorRaspadinha.simbolos[1]; 
+        else if (symSorte < 0.40) simboloVencedor = motorRaspadinha.simbolos[2]; 
+        else simboloVencedor = motorRaspadinha.simbolos[3]; 
 
         motorRaspadinha.lucro = aposta * simboloVencedor.mult;
 
-        // Bota 3 símbolos vencedores em posições aleatórias
         let posicoesVit = [];
         while(posicoesVit.length < 3) {
             let p = Math.floor(Math.random() * 9);
             if (!posicoesVit.includes(p)) posicoesVit.push(p);
         }
         
-        // Preenche os 3 vencedores
         posicoesVit.forEach(p => motorRaspadinha.simbolosNaMesa[p] = simboloVencedor.emoji);
         
-        // Preenche o resto com "lixo" garantindo que não forme 3 de outro
         for (let i = 0; i < 9; i++) {
             if (motorRaspadinha.simbolosNaMesa[i] === "") {
                 let lixo = motorRaspadinha.simbolos[Math.floor(Math.random() * 5)].emoji;
-                // Evita colocar o vencedor de novo
                 while (lixo === simboloVencedor.emoji) {
                     lixo = motorRaspadinha.simbolos[Math.floor(Math.random() * 5)].emoji;
                 }
                 motorRaspadinha.simbolosNaMesa[i] = lixo;
             }
         }
-    } else {
-        // DERROTA CRUEL (The Near Miss)
-        // Coloca exatamente DOIS de vários símbolos para ela achar que vai ganhar
+    } else { // 60% de chance de perder (Near Miss - Quase Lá)
         let lixos = [
-            motorRaspadinha.simbolos[0].emoji, motorRaspadinha.simbolos[0].emoji, // 2x 💎
-            motorRaspadinha.simbolos[1].emoji, motorRaspadinha.simbolos[1].emoji, // 2x 🍀
-            motorRaspadinha.simbolos[2].emoji, motorRaspadinha.simbolos[2].emoji, // 2x 🍒
-            motorRaspadinha.simbolos[3].emoji, motorRaspadinha.simbolos[3].emoji, // 2x 🍋
-            motorRaspadinha.simbolos[4].emoji // 1x 🥑
+            motorRaspadinha.simbolos[0].emoji, motorRaspadinha.simbolos[0].emoji, 
+            motorRaspadinha.simbolos[1].emoji, motorRaspadinha.simbolos[1].emoji, 
+            motorRaspadinha.simbolos[2].emoji, motorRaspadinha.simbolos[2].emoji, 
+            motorRaspadinha.simbolos[3].emoji, motorRaspadinha.simbolos[3].emoji, 
+            motorRaspadinha.simbolos[4].emoji 
         ];
-        // Embaralha o array
         lixos.sort(() => Math.random() - 0.5);
         motorRaspadinha.simbolosNaMesa = lixos;
     }
 
-    // Desenha o bilhete real
     prepararBilheteRaspadinha(false);
 
-    // Revela o Canvas para raspar e bloqueia o botão de compra
     const canvas = document.getElementById('raspadinha-canvas');
     canvas.style.opacity = "1";
     canvas.style.pointerEvents = "auto";
@@ -5863,62 +6113,70 @@ window.comprarRaspadinha = function() {
     btn.style.background = "#555";
     btn.style.pointerEvents = "none";
     
-    // 🔊 SOM: Fichas pagas pelo bilhete
-    if(window.CassinoAudio) window.CassinoAudio.tocar('bjStart', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
     if(window.Haptics) navigator.vibrate([50, 50]);
 };
 
 function configurarToqueRaspadinha() {
     const canvas = motorRaspadinha.canvas;
     let raspando = false;
+    let ultimaChamada = 0; // Para throttling de performance
 
     const apagarTinta = (x, y) => {
         if (!motorRaspadinha.jogando || motorRaspadinha.finalizado) return;
         
         const ctx = motorRaspadinha.ctx;
         
-        // O segredo do Scratch Card: Apaga os pixels em vez de desenhar
+        // 🚨 MOEDA MAIOR: Aumentado o raio de 18 para 35! Limpa muito mais rápido!
+        const RAIO_MOEDA = 35;
+        
         ctx.globalCompositeOperation = "destination-out";
         ctx.beginPath();
-        
-        // DIMINUÍMOS O RAIO DE 35 PARA 18 (A moeda agora é menor, raspa menos por vez)
-        ctx.arc(x, y, 18, 0, Math.PI * 2); 
+        ctx.arc(x, y, RAIO_MOEDA, 0, Math.PI * 2); 
         ctx.fill();
 
-        // 🚨 O SOM DA MOEDA RASPANDO (Controle de FPS do Áudio para não travar o celular)
         let agora = Date.now();
-        if (agora - motorRaspadinha.tempoUltimoSomFriccao > 100) { // Toca a cada 100ms de fricção
-            if(window.CassinoAudio) window.CassinoAudio.tocar('raspando', 0.5);
+        if (agora - motorRaspadinha.tempoUltimoSomFriccao > 150) { 
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('raspando', 0.5);
             motorRaspadinha.tempoUltimoSomFriccao = agora;
+            if(window.Haptics && Math.random() > 0.6) window.Haptics.toqueLeve();
         }
 
-        if(window.Haptics && Math.random() > 0.85) navigator.vibrate(5);
-
-        motorRaspadinha.pixelsRaspados++;
+        // 🚨 A MÁGICA DO AUTO-REVEAL: Calcula os "arranhões" com base na área da moeda
+        // A cada raspada de raio 35, ela apaga aproximadamente 3848 pixels da tela
+        motorRaspadinha.pixelsRaspados += (Math.PI * Math.pow(RAIO_MOEDA, 2));
         
-        // AUMENTAMOS O ESFORÇO DE 100 PARA 1200 MOVIMENTOS!
-        if (motorRaspadinha.pixelsRaspados > 1200) {
+        // Se ela raspar 60% da área do bilhete, o jogo revela o resto sozinho!
+        if (motorRaspadinha.pixelsRaspados > (motorRaspadinha.totalPixels * 0.6)) {
             revelarTudoRaspadinha();
         }
     };
 
-    // Para Celulares (Touch)
-    canvas.addEventListener('touchstart', (e) => {
-        raspando = true;
+    // 🚨 THROTTLING: Impede o iPhone de engasgar com 120Hz de toque na tela
+    const desenharComThrottling = (e) => {
+        let agora = Date.now();
+        if (agora - ultimaChamada < 15) return; // Limita a ~60FPS
+        ultimaChamada = agora;
+        
         const rect = canvas.getBoundingClientRect();
         apagarTinta(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+    };
+
+    canvas.addEventListener('touchstart', (e) => {
+        raspando = true;
+        desenharComThrottling(e);
     }, {passive: false});
 
     canvas.addEventListener('touchmove', (e) => {
         if (!raspando) return;
-        e.preventDefault(); // Impede a tela de rolar enquanto ela raspa
-        const rect = canvas.getBoundingClientRect();
-        apagarTinta(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+        if(e.cancelable) e.preventDefault(); 
+        desenharComThrottling(e);
     }, {passive: false});
 
     canvas.addEventListener('touchend', () => raspando = false);
+    canvas.addEventListener('touchcancel', () => raspando = false);
 
-    // Para PC (Mouse)
+    // Mouse PC
     canvas.addEventListener('mousedown', (e) => {
         raspando = true;
         const rect = canvas.getBoundingClientRect();
@@ -5936,12 +6194,11 @@ function configurarToqueRaspadinha() {
 function revelarTudoRaspadinha() {
     motorRaspadinha.finalizado = true;
     
-    // Some com o canvas de vez (Revelação final)
     const canvas = motorRaspadinha.canvas;
+    canvas.style.transition = "opacity 0.8s ease-out"; // 🚨 Dissolução mágica suave
     canvas.style.opacity = "0";
     canvas.style.pointerEvents = "none";
 
-    // Lógica para brilhar os vencedores
     let contagem = {};
     motorRaspadinha.simbolosNaMesa.forEach(s => contagem[s] = (contagem[s] || 0) + 1);
     
@@ -5949,46 +6206,44 @@ function revelarTudoRaspadinha() {
     for (const [simbolo, qtd] of Object.entries(contagem)) {
         if (qtd >= 3) {
             achouVencedor = true;
-            // Faz os quadrados vencedores piscarem
             for (let i = 0; i < 9; i++) {
                 if (motorRaspadinha.simbolosNaMesa[i] === simbolo) {
-                    document.getElementById(`rasp-celula-${i}`).classList.add('raspadinha-vitoria-anim');
+                    const cel = document.getElementById(`rasp-celula-${i}`);
+                    if(cel) cel.classList.add('raspadinha-vitoria-anim');
                 }
             }
         }
     }
 
-    // Paga a conta
-    if (motorRaspadinha.lucro > 0) {
-        // 🔊 SOM: O SEU ganhar.mp3
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsWin', 1.0);
-        
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(motorRaspadinha.lucro, "Prêmio na Raspadinha!");
-        if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
-        if(typeof confetti === 'function') confetti({colors: ['#bdc3c7', '#D4AF37'], particleCount: 200});
-        if(typeof mostrarToast === 'function') mostrarToast(`RASPOU E GANHOU! +${motorRaspadinha.lucro}💰`, "🎫");
-    } else {
-        // 🔊 SOM: O SEU perder.mp3
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsLose', 0.8);
-        
-        if(window.Haptics) navigator.vibrate([300, 100, 300]);
-        if(typeof mostrarToast === 'function') mostrarToast("Não foi dessa vez. Tente novamente!", "💸");
-    }
+    // Atraso de 0.8s para deixar a dissolução da tinta acontecer antes da tela piscar os prêmios
+    setTimeout(() => {
+        if (motorRaspadinha.lucro > 0) {
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+            if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(motorRaspadinha.lucro, "Prêmio na Raspadinha!");
+            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
+            if(typeof confetti === 'function') confetti({colors: ['#bdc3c7', '#D4AF37'], particleCount: 200});
+            if(typeof mostrarToast === 'function') mostrarToast(`RASPOU E GANHOU! +${motorRaspadinha.lucro}💰`, "🎫");
+        } else {
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            if(window.Haptics) navigator.vibrate([300, 100, 300]);
+            if(typeof mostrarToast === 'function') mostrarToast("Não foi dessa vez. Tente novamente!", "💸");
+        }
 
-    // Restaura o botão
-    const btn = document.getElementById('btn-raspadinha-comprar');
-    btn.innerHTML = "Comprar Novo Bilhete 🎫";
-    btn.style.background = "linear-gradient(145deg, #bdc3c7, #7f8c8d)";
-    btn.style.pointerEvents = "auto";
-    motorRaspadinha.jogando = false;
+        const btn = document.getElementById('btn-raspadinha-comprar');
+        if(btn) {
+            btn.innerHTML = "Comprar Novo Bilhete 🎫";
+            btn.style.background = "linear-gradient(145deg, #bdc3c7, #7f8c8d)";
+            btn.style.pointerEvents = "auto";
+        }
+        motorRaspadinha.jogando = false;
+    }, 800);
 }
 
 
 // ============================================================================
-// 🗼 MOTOR MATEMÁTICO, GRÁFICO E SONORO: A TORRE (TOWERS)
+// 🗼 MOTOR MATEMÁTICO, GRÁFICO E SONORO: A TORRE (TOWERS) COM TENSÃO VERTICAL
 // ============================================================================
 
-// 🚨 Injetando a Torre no Roteador Mestre
 const roteadorAntesTowers = window.abrirMesaCassino;
 window.abrirMesaCassino = function(nomeDoJogo) {
     if (nomeDoJogo === 'towers') {
@@ -5997,7 +6252,7 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             mesa.classList.remove('escondido');
             mesa.style.display = 'flex';
             if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
-            desenharGradeTowers(); // Desenha a torre apagada
+            desenharGradeTowers(); 
         }
     } else if (typeof roteadorAntesTowers === 'function') {
         roteadorAntesTowers(nomeDoJogo);
@@ -6019,32 +6274,39 @@ const MULTIPLICADORES_TOWERS = [1.42, 2.02, 2.88, 4.09, 5.82, 8.27, 11.76, 16.71
 let motorTowers = {
     jogando: false,
     apostaAtual: 0,
-    andarAtual: 0, // Vai de 0 a 7
+    andarAtual: 0, // Vai de 0 a 7 (0 é o chão)
     lucroPotencial: 0,
-    gradeSecreta: [] // Matriz 8x3. Ex: [ [0,1,0], [0,0,1]... ] onde 1 é bomba
+    frequenciaSomTowers: 1.0, 
+    gradeSecreta: [] 
 };
+
+// 🚨 O Áudio Manipulável do Cristal
+const somCristalTowers = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
 
 window.ajustarApostaTowers = function(valor) {
     if (motorTowers.jogando) return;
     const visor = document.getElementById('towers-aposta-input');
+    if(!visor) return;
+    
     let novaAposta = parseInt(visor.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
     if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     visor.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo personalizado aposta.mp3 tocando!
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
 function desenharGradeTowers() {
     const grid = document.getElementById('towers-grid');
+    if(!grid) return;
     grid.innerHTML = "";
     
-    // Constrói de 0 a 7 (O CSS flex-direction: column-reverse faz o 0 ficar embaixo!)
+    // 🚨 CORREÇÃO: Restaurada a sua ordem original (0 a 7)! 
+    // O CSS 'column-reverse' cuida de empurrar o 0 para a base da tela perfeitamente.
     for (let linha = 0; linha < 8; linha++) {
         const rowDiv = document.createElement('div');
-        rowDiv.className = 'towers-row towers-row-disabled'; // Todas começam desativadas
+        rowDiv.className = 'towers-row towers-row-disabled'; 
         rowDiv.id = `towers-row-${linha}`;
 
         for (let col = 0; col < 3; col++) {
@@ -6066,11 +6328,13 @@ function desenharGradeTowers() {
 }
 
 window.iniciarRodadaTowers = function() {
-    const aposta = parseInt(document.getElementById('towers-aposta-input').innerText);
+    const input = document.getElementById('towers-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
     if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊 SOM DE ERRO
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
@@ -6081,13 +6345,18 @@ window.iniciarRodadaTowers = function() {
     motorTowers.apostaAtual = aposta;
     motorTowers.andarAtual = 0;
     motorTowers.lucroPotencial = aposta;
+    motorTowers.frequenciaSomTowers = 1.0; // Reseta a música!
 
-    document.getElementById('btn-towers-iniciar').classList.add('escondido');
-    document.getElementById('towers-painel-saque').classList.remove('escondido');
-    document.getElementById('towers-lucro-texto').innerText = "0";
-    document.getElementById('towers-proximo-mult').innerText = MULTIPLICADORES_TOWERS[0];
+    const btnIniciar = document.getElementById('btn-towers-iniciar');
+    const painelSaque = document.getElementById('towers-painel-saque');
+    if(btnIniciar) btnIniciar.classList.add('escondido');
+    if(painelSaque) painelSaque.classList.remove('escondido');
+    
+    const lucroVisor = document.getElementById('towers-lucro-texto');
+    const multVisor = document.getElementById('towers-proximo-mult');
+    if(lucroVisor) lucroVisor.innerText = "0";
+    if(multVisor) multVisor.innerText = MULTIPLICADORES_TOWERS[0];
 
-    // GERA A MATRIZ DE BOMBAS (1 Bomba por andar)
     motorTowers.gradeSecreta = [];
     for (let i = 0; i < 8; i++) {
         let linha = [0, 0, 0];
@@ -6096,36 +6365,47 @@ window.iniciarRodadaTowers = function() {
         motorTowers.gradeSecreta.push(linha);
     }
 
-    desenharGradeTowers(); // Limpa e reseta
-    ativarAndarTowers(0); // Libera o andar de baixo
+    desenharGradeTowers(); 
+    ativarAndarTowers(0); // Começa pela base!
     
-    // 🔊 SOM: Início do jogo (O mesmo barulho de embaralhamento do Mines)
-    if(window.CassinoAudio) window.CassinoAudio.tocar('minesStart', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesStart', 0.8);
     if(window.Haptics) navigator.vibrate([100, 100]);
 };
 
 function ativarAndarTowers(linha) {
     if (linha > 0) {
-        // Desativa a linha anterior
         const linhaAnterior = document.getElementById(`towers-row-${linha - 1}`);
-        if(linhaAnterior) linhaAnterior.classList.add('towers-row-disabled');
+        if(linhaAnterior) {
+            linhaAnterior.classList.add('towers-row-disabled');
+            Array.from(linhaAnterior.children).forEach(b => b.classList.remove('towers-bloco-ativo'));
+        }
     }
 
     const linhaAtual = document.getElementById(`towers-row-${linha}`);
     if(linhaAtual) {
         linhaAtual.classList.remove('towers-row-disabled');
-        // Adiciona o pulso Ciano nos blocos do andar atual
-        Array.from(linhaAtual.children).forEach(bloco => bloco.classList.add('towers-bloco-ativo'));
+        Array.from(linhaAtual.children).forEach(bloco => {
+            bloco.classList.add('towers-bloco-ativo');
+            // 🚨 EFEITO DE PULSO NEON AO ATIVAR O ANDAR
+            bloco.style.transform = "scale(1.1)";
+            bloco.style.boxShadow = "0 0 15px #00d4ff";
+            setTimeout(() => {
+                bloco.style.transform = "scale(1)";
+                bloco.style.boxShadow = "none";
+            }, 300);
+        });
     }
 }
 
 function clicarBlocoTowers(linha, col) {
     const ehBomba = motorTowers.gradeSecreta[linha][col] === 1;
     const blocoClicado = document.getElementById(`towers-bloco-${linha}-${col}`);
+    if(!blocoClicado) return;
 
-    // Remove a pulsação de todos os blocos desta linha
     const linhaDOM = document.getElementById(`towers-row-${linha}`);
-    Array.from(linhaDOM.children).forEach(b => b.classList.remove('towers-bloco-ativo'));
+    if(linhaDOM) {
+        Array.from(linhaDOM.children).forEach(b => b.classList.remove('towers-bloco-ativo'));
+    }
 
     if (ehBomba) {
         // PERDEU TUDO
@@ -6133,52 +6413,70 @@ function clicarBlocoTowers(linha, col) {
         blocoClicado.innerHTML = "💣";
         revelarRestoAndarTowers(linha, col);
         
-        // 🔊 SOM: Explosão e o seu som de perda!
-        if(window.CassinoAudio) {
+        // 🚨 FÍSICA: O SOLAVANCO DE QUEDA!
+        const grade = document.getElementById('towers-grid');
+        if (grade) {
+            grade.style.transition = "transform 0.1s ease-in-out";
+            grade.style.transform = "translateY(20px)"; // Despenca visualmente
+            grade.style.boxShadow = "inset 0 0 50px rgba(255, 0, 50, 0.8)"; // Luz de emergência
+            setTimeout(() => {
+                grade.style.transform = "translateY(0)";
+            }, 150);
+        }
+
+        if(window.CassinoAudio && !window.SantuarioSomPausado) {
             window.CassinoAudio.tocar('minesBomba', 1.0);
-            setTimeout(() => window.CassinoAudio.tocar('slotsLose', 0.8), 300); // Toca o seu perder.mp3 logo em seguida
+            setTimeout(() => window.CassinoAudio.tocar('slotsLose', 0.8), 300); 
         }
         if(window.Haptics) navigator.vibrate([300, 100, 400]);
         
         encerrarTowers("derrota");
     } else {
-        // ACHOU DIAMANTE / SUBIU DE ANDAR
+        // 🚨 A ESCADA MUSICAL DO CRISTAL
+        if (!window.SantuarioSomPausado) {
+            somCristalTowers.currentTime = 0;
+            somCristalTowers.playbackRate = motorTowers.frequenciaSomTowers;
+            somCristalTowers.volume = 0.5 + (linha * 0.05); // Mais alto no topo
+            somCristalTowers.play().catch(e=>{});
+            
+            motorTowers.frequenciaSomTowers += 0.15; // O tom sobe!
+            if (motorTowers.frequenciaSomTowers > 2.5) motorTowers.frequenciaSomTowers = 2.5; 
+        }
+
+        if(window.Haptics) navigator.vibrate(30 + (linha * 5)); // O "clique" físico fica mais forte no topo
+
         blocoClicado.classList.add('towers-bloco-safe');
         blocoClicado.innerHTML = "💎";
         revelarRestoAndarTowers(linha, col);
 
-        // Atualiza a fortuna visualmente com a matemática da Torre
         motorTowers.lucroPotencial = Math.floor(motorTowers.apostaAtual * MULTIPLICADORES_TOWERS[linha]);
-        document.getElementById('towers-lucro-texto').innerText = motorTowers.lucroPotencial;
-
-        // 🔊 SOM: Cristal! (O volume sobe a cada andar para aumentar o suspense)
-        let volumeCristal = 0.5 + (linha * 0.05);
-        if(window.CassinoAudio) window.CassinoAudio.tocar('minesDiamante', volumeCristal);
-        if(window.Haptics) navigator.vibrate([50, 30]);
+        const lucroVisor = document.getElementById('towers-lucro-texto');
+        if(lucroVisor) lucroVisor.innerText = motorTowers.lucroPotencial;
 
         motorTowers.andarAtual++;
 
         if (motorTowers.andarAtual < 8) {
-            // Continua escalando
-            document.getElementById('towers-proximo-mult').innerText = MULTIPLICADORES_TOWERS[motorTowers.andarAtual];
-            ativarAndarTowers(motorTowers.andarAtual);
+            const multVisor = document.getElementById('towers-proximo-mult');
+            if(multVisor) multVisor.innerText = MULTIPLICADORES_TOWERS[motorTowers.andarAtual];
+            
+            setTimeout(() => { ativarAndarTowers(motorTowers.andarAtual); }, 400); // 🚨 Delay de suspense para o próximo andar!
         } else {
-            // ZEROU A TORRE (Jackpot Máximo!)
-            sacarTowers();
+            setTimeout(() => { sacarTowers(); }, 500); // Zerou a torre
         }
     }
 }
 
 function revelarRestoAndarTowers(linha, colClicada) {
-    // Mostra o que tinha nos outros vidros para dar "alívio" ou "raiva" (Near Miss mental)
     for (let c = 0; c < 3; c++) {
         if (c !== colClicada) {
             let bloco = document.getElementById(`towers-bloco-${linha}-${c}`);
-            bloco.style.opacity = "0.5";
-            if (motorTowers.gradeSecreta[linha][c] === 1) {
-                bloco.innerHTML = "💣";
-            } else {
-                bloco.innerHTML = "💎";
+            if(bloco) {
+                bloco.style.opacity = "0.5";
+                if (motorTowers.gradeSecreta[linha][c] === 1) {
+                    bloco.innerHTML = "💣";
+                } else {
+                    bloco.innerHTML = "💎";
+                }
             }
         }
     }
@@ -6188,14 +6486,13 @@ window.sacarTowers = function() {
     if (!motorTowers.jogando) return;
     
     if(typeof atualizarPontosCasal === 'function') {
-        atualizarPontosCasal(motorTowers.lucroPotencial, "Saque vitorioso na Torre");
+        atualizarPontosCasal(motorTowers.lucroPotencial, "Saque nas Alturas da Torre");
     }
 
-    // 🔊 SOM: O SEU retirar.mp3 tocando!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('minesSaque', 1.0);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesSaque', 1.0);
 
     if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 400]);
-    if(typeof confetti === 'function') confetti({colors: ['#00d4ff', '#D4AF37'], particleCount: 200});
+    if(typeof confetti === 'function') confetti({colors: ['#00d4ff', '#D4AF37', '#ffffff'], particleCount: 250, spread: 120, origin: {y: 0.1}}); 
     if(typeof mostrarToast === 'function') mostrarToast(`Saque nas Alturas! +${motorTowers.lucroPotencial}💰`, "🗼");
 
     encerrarTowers("vitoria");
@@ -6204,10 +6501,12 @@ window.sacarTowers = function() {
 function encerrarTowers(resultado) {
     motorTowers.jogando = false;
     
-    // Congela a tela atual
-    const linhaAtual = document.getElementById(`towers-row-${motorTowers.andarAtual}`);
-    if (linhaAtual) {
-        Array.from(linhaAtual.children).forEach(b => b.classList.remove('towers-bloco-ativo'));
+    const grade = document.getElementById('towers-grid');
+    if (resultado === "vitoria" && grade) {
+        grade.style.boxShadow = "inset 0 0 50px rgba(0, 212, 255, 0.4)"; 
+        setTimeout(() => grade.style.boxShadow = "none", 3000);
+    } else if (resultado === "derrota" && grade) {
+        setTimeout(() => grade.style.boxShadow = "none", 3000);
     }
 
     document.getElementById('btn-towers-iniciar').classList.remove('escondido');
@@ -6219,7 +6518,7 @@ function encerrarTowers(resultado) {
 }
 
 // ============================================================================
-// ↕️ MOTOR MATEMÁTICO, FÍSICO E SONORO: HI-LO (MAIOR / MENOR)
+// ↕️ MOTOR MATEMÁTICO, FÍSICO E SONORO: HI-LO (COM SUSPENSE E STREAK)
 // ============================================================================
 
 const roteadorAntesHiLo = window.abrirMesaCassino;
@@ -6242,6 +6541,7 @@ window.fecharMesaHiLo = function() {
         if(typeof mostrarToast === 'function') mostrarToast("Aposta rolando! Retire o lucro primeiro.", "⚠️");
         return;
     }
+    somTensaoHiLo.pause();
     const mesa = document.getElementById('mesa-hilo');
     if(mesa) mesa.style.display = 'none';
 };
@@ -6252,19 +6552,26 @@ let motorHiLo = {
     lucroPotencial: 0,
     multiplicadorAtual: 1.00,
     cartaAtual: 8,
+    acertosSeguidos: 0, // 🚨 Rastreador de Combo para a Escada Musical
+    frequenciaSomAcerto: 1.0,
     naipes: ['♠', '♥', '♦', '♣']
 };
+
+// 🚨 MOTOR DE TENSÃO DO HI-LO
+const somTensaoHiLo = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
+somTensaoHiLo.loop = true;
+const somAcertoHiLo = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
 
 window.ajustarApostaHiLo = function(valor) {
     if (motorHiLo.jogando) return;
     const visor = document.getElementById('hilo-aposta-input');
+    if(!visor) return;
     let novaAposta = parseInt(visor.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
     if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     visor.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo aposta.mp3
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
@@ -6292,9 +6599,9 @@ function atualizarVisualCarta(valor) {
     cartaFrente.className = `carta-bj ${cor}`;
     let strValor = formatarValorCarta(valor);
 
-    topo.innerText = strValor + naipe;
-    centro.innerText = naipe;
-    base.innerText = strValor + naipe;
+    if(topo) topo.innerText = strValor + naipe;
+    if(centro) centro.innerText = naipe;
+    if(base) base.innerText = strValor + naipe;
 }
 
 function calcularMultiplicadores(valorCarta) {
@@ -6319,31 +6626,39 @@ function atualizarBotoesEPlacar() {
     const btnMenor = document.getElementById('btn-hilo-menor');
 
     if (mults.maior == 0) {
-        btnMaior.classList.add('hilo-btn-bloqueado');
-        document.getElementById('hilo-mult-maior').innerText = "Bloqueado";
+        if(btnMaior) btnMaior.classList.add('hilo-btn-bloqueado');
+        const m = document.getElementById('hilo-mult-maior');
+        if(m) m.innerText = "Bloqueado";
     } else {
-        btnMaior.classList.remove('hilo-btn-bloqueado');
-        document.getElementById('hilo-mult-maior').innerText = mults.maior + "x";
+        if(btnMaior) btnMaior.classList.remove('hilo-btn-bloqueado');
+        const m = document.getElementById('hilo-mult-maior');
+        if(m) m.innerText = mults.maior + "x";
     }
 
     if (mults.menor == 0) {
-        btnMenor.classList.add('hilo-btn-bloqueado');
-        document.getElementById('hilo-mult-menor').innerText = "Bloqueado";
+        if(btnMenor) btnMenor.classList.add('hilo-btn-bloqueado');
+        const m = document.getElementById('hilo-mult-menor');
+        if(m) m.innerText = "Bloqueado";
     } else {
-        btnMenor.classList.remove('hilo-btn-bloqueado');
-        document.getElementById('hilo-mult-menor').innerText = mults.menor + "x";
+        if(btnMenor) btnMenor.classList.remove('hilo-btn-bloqueado');
+        const m = document.getElementById('hilo-mult-menor');
+        if(m) m.innerText = mults.menor + "x";
     }
 
-    document.getElementById('hilo-lucro-texto').innerText = motorHiLo.lucroPotencial;
-    document.getElementById('hilo-multiplicador-texto').innerText = motorHiLo.multiplicadorAtual.toFixed(2);
+    const lTexto = document.getElementById('hilo-lucro-texto');
+    const mTexto = document.getElementById('hilo-multiplicador-texto');
+    if(lTexto) lTexto.innerText = motorHiLo.lucroPotencial;
+    if(mTexto) mTexto.innerText = motorHiLo.multiplicadorAtual.toFixed(2);
 }
 
 window.iniciarRodadaHiLo = function() {
-    const aposta = parseInt(document.getElementById('hilo-aposta-input').innerText);
+    const input = document.getElementById('hilo-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
     if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊 SOM DE ERRO
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
@@ -6354,19 +6669,27 @@ window.iniciarRodadaHiLo = function() {
     motorHiLo.aposta = aposta;
     motorHiLo.lucroPotencial = aposta;
     motorHiLo.multiplicadorAtual = 1.00;
+    motorHiLo.acertosSeguidos = 0;
+    motorHiLo.frequenciaSomAcerto = 1.0;
 
-    document.getElementById('hilo-painel-aposta').classList.add('escondido');
-    document.getElementById('btn-hilo-iniciar').classList.add('escondido');
-    document.getElementById('hilo-painel-lucro').classList.remove('escondido');
-    document.getElementById('hilo-painel-decisao').classList.remove('escondido');
+    const pAposta = document.getElementById('hilo-painel-aposta');
+    const bIniciar = document.getElementById('btn-hilo-iniciar');
+    const pLucro = document.getElementById('hilo-painel-lucro');
+    const pDecisao = document.getElementById('hilo-painel-decisao');
+    
+    if(pAposta) pAposta.classList.add('escondido');
+    if(bIniciar) bIniciar.classList.add('escondido');
+    if(pLucro) pLucro.classList.remove('escondido');
+    if(pDecisao) pDecisao.classList.remove('escondido');
 
     const cartaFrente = document.getElementById('hilo-carta-frente');
-    cartaFrente.classList.remove('hilo-carta-girando');
-    void cartaFrente.offsetWidth; 
-    cartaFrente.classList.add('hilo-carta-girando');
+    if(cartaFrente) {
+        cartaFrente.classList.remove('hilo-carta-girando');
+        void cartaFrente.offsetWidth; 
+        cartaFrente.classList.add('hilo-carta-girando');
+    }
 
-    // 🔊 SOM: Fichas sendo empurradas na mesa
-    if(window.CassinoAudio) window.CassinoAudio.tocar('bjStart', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
     if(window.Haptics) navigator.vibrate([100, 100]);
 
     setTimeout(() => {
@@ -6374,14 +6697,15 @@ window.iniciarRodadaHiLo = function() {
         atualizarVisualCarta(motorHiLo.cartaAtual);
         atualizarBotoesEPlacar();
         
-        // 🔊 SOM: Primeira carta virando
-        if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.7);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7);
     }, 300);
 };
 
 window.adivinharHiLo = function(escolha) {
     if (!motorHiLo.jogando) return;
-    document.getElementById('hilo-painel-decisao').style.pointerEvents = 'none';
+    
+    const painelDecisao = document.getElementById('hilo-painel-decisao');
+    if(painelDecisao) painelDecisao.style.pointerEvents = 'none'; // Trava a mesa
 
     let novaCarta = gerarCartaAleatoria();
     while (novaCarta === motorHiLo.cartaAtual) {
@@ -6401,41 +6725,85 @@ window.adivinharHiLo = function(escolha) {
     }
 
     const cartaFrente = document.getElementById('hilo-carta-frente');
-    cartaFrente.classList.remove('hilo-carta-girando');
-    void cartaFrente.offsetWidth; 
-    cartaFrente.classList.add('hilo-carta-girando');
     
-    // 🔊 SOM: Ação de deslizar e virar a nova carta
-    if(window.CassinoAudio) window.CassinoAudio.tocar('bjCard', 0.8);
-    if(window.Haptics) navigator.vibrate(40);
+    // 🚨 O SQUEEZE: Suspense pesado antes de revelar a carta
+    if (!window.SantuarioSomPausado) {
+        somTensaoHiLo.currentTime = 0;
+        // O coração bate mais rápido a cada acerto em sequência!
+        somTensaoHiLo.playbackRate = 1.0 + (motorHiLo.acertosSeguidos * 0.15); 
+        somTensaoHiLo.volume = 0.6;
+        somTensaoHiLo.play().catch(e=>{});
+    }
 
+    if (cartaFrente) {
+        cartaFrente.style.transform = "scale(1.05)";
+        cartaFrente.style.boxShadow = "0 0 30px rgba(241, 196, 15, 0.5)"; // Brilho de expectativa
+    }
+    
+    if(window.Haptics) navigator.vibrate(30);
+
+    // O Tempo do Medo (1.2 segundos de coração batendo antes de virar)
     setTimeout(() => {
-        motorHiLo.cartaAtual = novaCarta;
-        atualizarVisualCarta(motorHiLo.cartaAtual);
+        somTensaoHiLo.pause();
         
-        if (venceu) {
-            cartaFrente.classList.add('hilo-vitoria-glow');
-            setTimeout(() => cartaFrente.classList.remove('hilo-vitoria-glow'), 500);
-            
-            motorHiLo.multiplicadorAtual *= ganhoMultiplicador;
-            motorHiLo.lucroPotencial = Math.floor(motorHiLo.aposta * motorHiLo.multiplicadorAtual);
-            
-            atualizarBotoesEPlacar();
-            document.getElementById('hilo-painel-decisao').style.pointerEvents = 'auto';
-            
-            // 🔊 SOM: Um rápido 'Plin' de acerto
-            if(window.CassinoAudio) window.CassinoAudio.tocar('minesDiamante', 0.7);
-            if(window.Haptics) navigator.vibrate([50, 50, 100]);
-        } else {
-            cartaFrente.classList.add('hilo-derrota-glow');
-            
-            // 🔊 SOM: O SEU perder.mp3 (slotsLose está mapeado pro seu som de perder)
-            if(window.CassinoAudio) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(window.Haptics) navigator.vibrate([300, 100, 500]);
-            
-            encerrarRodadaHiLo("derrota");
+        if(cartaFrente) {
+            cartaFrente.style.transform = "scale(1)";
+            cartaFrente.style.boxShadow = "none";
+            cartaFrente.classList.remove('hilo-carta-girando');
+            void cartaFrente.offsetWidth; 
+            cartaFrente.classList.add('hilo-carta-girando');
         }
-    }, 300);
+        
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.8);
+        if(window.Haptics) navigator.vibrate(50);
+
+        setTimeout(() => {
+            motorHiLo.cartaAtual = novaCarta;
+            atualizarVisualCarta(motorHiLo.cartaAtual);
+            
+            if (venceu) {
+                motorHiLo.acertosSeguidos++;
+                
+                if(cartaFrente) {
+                    cartaFrente.classList.add('hilo-vitoria-glow');
+                    setTimeout(() => cartaFrente.classList.remove('hilo-vitoria-glow'), 500);
+                }
+                
+                motorHiLo.multiplicadorAtual *= ganhoMultiplicador;
+                motorHiLo.lucroPotencial = Math.floor(motorHiLo.aposta * motorHiLo.multiplicadorAtual);
+                
+                atualizarBotoesEPlacar();
+                if(painelDecisao) painelDecisao.style.pointerEvents = 'auto';
+                
+                // 🚨 ESCADA MUSICAL: O plin fica mais agudo e frenético!
+                if (!window.SantuarioSomPausado) {
+                    somAcertoHiLo.currentTime = 0;
+                    somAcertoHiLo.playbackRate = motorHiLo.frequenciaSomAcerto;
+                    somAcertoHiLo.volume = 0.8;
+                    somAcertoHiLo.play().catch(e=>{});
+                    
+                    motorHiLo.frequenciaSomAcerto += 0.1;
+                    if (motorHiLo.frequenciaSomAcerto > 2.5) motorHiLo.frequenciaSomAcerto = 2.5;
+                }
+                
+                if(window.Haptics) navigator.vibrate([50, 50, 100]);
+            } else {
+                if(cartaFrente) cartaFrente.classList.add('hilo-derrota-glow');
+                
+                // 🚨 EXPLOSÃO DE DERROTA VISUAL
+                const mesa = document.getElementById('mesa-hilo');
+                if (mesa) {
+                    mesa.style.boxShadow = "inset 0 0 80px rgba(231, 76, 60, 0.8)";
+                    setTimeout(() => mesa.style.boxShadow = "none", 400);
+                }
+
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+                if(window.Haptics) navigator.vibrate([300, 100, 500]);
+                
+                encerrarRodadaHiLo("derrota");
+            }
+        }, 300); // Tempo da animação CSS da carta girando
+    }, 1200); // O Squeeze de 1.2 segundos
 };
 
 window.sacarHiLo = function() {
@@ -6445,8 +6813,7 @@ window.sacarHiLo = function() {
         atualizarPontosCasal(motorHiLo.lucroPotencial, "Saque Mestre no Hi-Lo");
     }
 
-    // 🔊 SOM: O SEU retirar.mp3 (minesSaque está mapeado pro seu som de saque)
-    if(window.CassinoAudio) window.CassinoAudio.tocar('minesSaque', 1.0);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesSaque', 1.0);
 
     if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 400]);
     if(typeof confetti === 'function') confetti({colors: ['#e67e22', '#D4AF37'], particleCount: 200});
@@ -6457,7 +6824,10 @@ window.sacarHiLo = function() {
 
 function encerrarRodadaHiLo(resultado) {
     motorHiLo.jogando = false;
-    document.getElementById('hilo-painel-decisao').style.pointerEvents = 'auto';
+    somTensaoHiLo.pause();
+    
+    const painelDecisao = document.getElementById('hilo-painel-decisao');
+    if(painelDecisao) painelDecisao.style.pointerEvents = 'auto';
     
     setTimeout(() => {
         resetarMesaHiLo();
@@ -6469,25 +6839,32 @@ function encerrarRodadaHiLo(resultado) {
 
 function resetarMesaHiLo() {
     motorHiLo.jogando = false;
-    document.getElementById('hilo-painel-aposta').classList.remove('escondido');
-    document.getElementById('btn-hilo-iniciar').classList.remove('escondido');
-    document.getElementById('hilo-painel-lucro').classList.add('escondido');
-    document.getElementById('hilo-painel-decisao').classList.add('escondido');
+    const pAposta = document.getElementById('hilo-painel-aposta');
+    const bIniciar = document.getElementById('btn-hilo-iniciar');
+    const pLucro = document.getElementById('hilo-painel-lucro');
+    const pDecisao = document.getElementById('hilo-painel-decisao');
+    
+    if(pAposta) pAposta.classList.remove('escondido');
+    if(bIniciar) bIniciar.classList.remove('escondido');
+    if(pLucro) pLucro.classList.add('escondido');
+    if(pDecisao) pDecisao.classList.add('escondido');
     
     const cartaFrente = document.getElementById('hilo-carta-frente');
-    cartaFrente.className = "carta-bj oculta";
+    if(cartaFrente) cartaFrente.className = "carta-bj oculta";
     
-    document.getElementById('hilo-topo').innerText = "";
-    document.getElementById('hilo-centro').innerText = "";
-    document.getElementById('hilo-base').innerText = "";
+    const topo = document.getElementById('hilo-topo');
+    const centro = document.getElementById('hilo-centro');
+    const base = document.getElementById('hilo-base');
+    if(topo) topo.innerText = "";
+    if(centro) centro.innerText = "";
+    if(base) base.innerText = "";
 }
 
 
 // ============================================================================
-// 🎲 MOTOR MATEMÁTICO E SONORO: DADO DE OURO (CRYPTO DICE)
+// 🎲 MOTOR MATEMÁTICO E SONORO: DADO DE OURO (CRYPTO DICE HIGH STAKES)
 // ============================================================================
 
-// 🚨 Roteador Mestre
 const roteadorAntesDice = window.abrirMesaCassino;
 window.abrirMesaCassino = function(nomeDoJogo) {
     if (nomeDoJogo === 'dice') {
@@ -6496,7 +6873,7 @@ window.abrirMesaCassino = function(nomeDoJogo) {
             mesa.classList.remove('escondido');
             mesa.style.display = 'flex';
             if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
-            atualizarSliderDice(); // Garante que a barra esteja desenhada
+            atualizarSliderDice(); 
         }
     } else if (typeof roteadorAntesDice === 'function') {
         roteadorAntesDice(nomeDoJogo);
@@ -6508,6 +6885,7 @@ window.fecharMesaDice = function() {
         if(typeof mostrarToast === 'function') mostrarToast("O dado está girando!", "⚠️");
         return;
     }
+    somTickDice.pause();
     const mesa = document.getElementById('mesa-dice');
     if(mesa) mesa.style.display = 'none';
 };
@@ -6516,43 +6894,48 @@ let motorDice = {
     rolando: false,
     aposta: 0,
     chanceVitoria: 50,
-    multiplicador: 1.98 // RTP de 99%
+    multiplicador: 1.98 
 };
+
+// 🚨 O MOTOR SONORO DO DADO (Para criar tensão na desaceleração)
+const somTickDice = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
 
 window.ajustarApostaDice = function(valor) {
     if (motorDice.rolando) return;
     const visor = document.getElementById('dice-aposta-input');
+    if(!visor) return;
     let novaAposta = parseInt(visor.innerText) + valor;
     if (novaAposta < 10) novaAposta = 10;
     if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
     visor.innerText = novaAposta;
     
-    // 🔊 SOM: O seu arquivo personalizado aposta.mp3
-    if(window.CassinoAudio) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
     if(window.Haptics) window.Haptics.toqueLeve();
 };
 
-// A Mágica do Slider em Tempo Real (ULTRA UI)
 window.atualizarSliderDice = function() {
     if (motorDice.rolando) return;
     
     const slider = document.getElementById('dice-slider');
+    if(!slider) return;
     let valor = parseFloat(slider.value);
     
     motorDice.chanceVitoria = valor;
-    // RTP 99%
     motorDice.multiplicador = (99 / motorDice.chanceVitoria);
 
-    document.getElementById('dice-alvo-visor').innerText = motorDice.chanceVitoria.toFixed(2);
-    document.getElementById('dice-chance-visor').innerText = motorDice.chanceVitoria.toFixed(0) + "%";
-    document.getElementById('dice-mult-visor').innerText = motorDice.multiplicador.toFixed(2) + "x";
+    const alvoV = document.getElementById('dice-alvo-visor');
+    const chanceV = document.getElementById('dice-chance-visor');
+    const multV = document.getElementById('dice-mult-visor');
+    
+    if(alvoV) alvoV.innerText = motorDice.chanceVitoria.toFixed(2);
+    if(chanceV) chanceV.innerText = motorDice.chanceVitoria.toFixed(0) + "%";
+    if(multV) multV.innerText = motorDice.multiplicador.toFixed(2) + "x";
 
     const track = document.getElementById('dice-track-visual');
     const thumb = document.getElementById('dice-thumb-visual');
     
-    // Gradiente de Alta Fidelidade (Verde Esmeralda para Carmesim)
-    track.style.background = `linear-gradient(to right, #00b09b 0%, #96c93d ${valor}%, #ff0844 ${valor}%, #ffb199 100%)`;
-    thumb.style.left = `${valor}%`;
+    if(track) track.style.background = `linear-gradient(to right, #00b09b 0%, #96c93d ${valor}%, #ff0844 ${valor}%, #ffb199 100%)`;
+    if(thumb) thumb.style.left = `${valor}%`;
     
     if(window.Haptics && Math.random() > 0.8) window.Haptics.toqueLeve();
 };
@@ -6560,11 +6943,13 @@ window.atualizarSliderDice = function() {
 window.jogarDice = function() {
     if (motorDice.rolando) return;
 
-    const aposta = parseInt(document.getElementById('dice-aposta-input').innerText);
+    const input = document.getElementById('dice-aposta-input');
+    if(!input) return;
+    const aposta = parseInt(input.innerText);
     
     if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
         if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6); // 🔊 SOM DE ERRO
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
         if(window.Haptics) window.Haptics.erro();
         return;
     }
@@ -6576,41 +6961,75 @@ window.jogarDice = function() {
     const visor = document.getElementById('dice-resultado-visor');
     const anel = document.getElementById('dice-anel-energia');
     
-    visor.classList.remove('dice-vitoria-glow', 'dice-derrota-glow');
-    visor.classList.add('dice-texto-rolando');
-    visor.style.color = "#fff";
+    if(visor) {
+        visor.classList.remove('dice-vitoria-glow', 'dice-derrota-glow');
+        visor.classList.add('dice-texto-rolando');
+        visor.style.color = "#fff";
+    }
     
-    // Ativa o Anel HUD 
-    anel.classList.add('dice-anel-rolando');
+    if(anel) anel.classList.add('dice-anel-rolando');
     
     const btn = document.getElementById('btn-dice-iniciar');
-    btn.style.opacity = "0.5";
-    btn.style.pointerEvents = "none";
+    if(btn) {
+        btn.style.opacity = "0.5";
+        btn.style.pointerEvents = "none";
+    }
 
-    // 🚨 A ÚNICA ALTERAÇÃO ESTÁ AQUI 🚨
-    // 🔊 SOM: O SEU som personalizado de dados rolando!
-    if(window.CassinoAudio) window.CassinoAudio.tocar('diceRoll', 0.8);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('diceRoll', 0.8);
 
     let numeroSorteado = (Math.random() * 100).toFixed(2);
-
     let tempoRolagem = 0;
-    let animacaoLoop = setInterval(() => {
-        visor.innerText = (Math.random() * 100).toFixed(2);
-        if(window.Haptics && tempoRolagem % 100 === 0) navigator.vibrate(5);
-        tempoRolagem += 50;
+    let intervalo = 30; // Começa absurdamente rápido
+    let rolagens = 0;
 
-        if (tempoRolagem >= 1500) {
-            clearInterval(animacaoLoop);
-            visor.classList.remove('dice-texto-rolando');
-            anel.classList.remove('dice-anel-rolando'); // Para de girar o anel
+    // 🚨 A MÁGICA: Loop recursivo para aplicar fricção/desaceleração e o Estrobo de Cores
+    function rodarDadoAnimacao() {
+        let numTemp = (Math.random() * 100).toFixed(2);
+        if(visor) visor.innerText = numTemp;
+
+        // 🚨 ESTROBO DA ESPERANÇA: Pinta a tela se está ganhando ou perdendo naquele milissegundo!
+        if (parseFloat(numTemp) < motorDice.chanceVitoria) {
+            if(visor) visor.style.color = "#2ecc71";
+            if(anel) anel.style.borderColor = "rgba(46, 204, 113, 0.4)";
+        } else {
+            if(visor) visor.style.color = "#e74c3c";
+            if(anel) anel.style.borderColor = "rgba(231, 76, 60, 0.4)";
+        }
+
+        // 🚨 PITCH SHIFTING: O clique do dado vai ficando mais agudo e lento
+        if (!window.SantuarioSomPausado) {
+            somTickDice.currentTime = 0;
+            somTickDice.playbackRate = 1.0 + (rolagens * 0.05);
+            if (somTickDice.playbackRate > 3.0) somTickDice.playbackRate = 3.0;
+            somTickDice.volume = 0.4;
+            somTickDice.play().catch(e=>{});
+        }
+
+        if(window.Haptics && rolagens % 3 === 0) navigator.vibrate(10); // Vibração que acompanha a lentidão
+
+        rolagens++;
+        tempoRolagem += intervalo;
+        intervalo = 30 + Math.pow(rolagens, 1.8); // A curva inercial de frenagem
+
+        if (tempoRolagem < 2500) { // 2.5s de pura tensão
+            setTimeout(rodarDadoAnimacao, intervalo);
+        } else {
+            // FIM DA ROLAGEM
+            if(visor) {
+                visor.classList.remove('dice-texto-rolando');
+                visor.style.color = "#fff";
+                visor.innerText = numeroSorteado;
+            }
+            if(anel) {
+                anel.classList.remove('dice-anel-rolando'); 
+                anel.style.border = "4px solid rgba(0, 242, 254, 0.2)";
+            }
             
-            // Restaura o estilo neutro do anel
-            anel.style.border = "4px solid rgba(0, 242, 254, 0.2)";
-            
-            visor.innerText = numeroSorteado;
             finalizarRolagemDice(parseFloat(numeroSorteado), aposta);
         }
-    }, 50);
+    }
+    
+    rodarDadoAnimacao(); // Dispara o motor inercial
 };
 
 function finalizarRolagemDice(resultado, aposta) {
@@ -6622,37 +7041,72 @@ function finalizarRolagemDice(resultado, aposta) {
 
     if (venceu) {
         let lucro = Math.floor(aposta * motorDice.multiplicador);
-        visor.classList.add('dice-vitoria-glow');
-        anel.style.borderColor = "#2ecc71"; // Anel fica verde!
-        anel.style.boxShadow = "0 0 30px rgba(46, 204, 113, 0.6), inset 0 0 15px rgba(46, 204, 113, 0.3)";
         
-        // 🔊 SOM: O SEU ganhar.mp3 TOCANDO!
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsWin', 1.0);
+        // 🚨 O MEGA JACKPOT DE RISCO (Menos de 15% de chance)
+        if (motorDice.chanceVitoria <= 15) {
+            if(visor) visor.classList.add('dice-vitoria-glow');
+            if(anel) {
+                anel.style.borderColor = "#f1c40f"; // Ouro Supremo!
+                anel.style.boxShadow = "0 0 50px rgba(241, 196, 15, 0.8), inset 0 0 25px rgba(241, 196, 15, 0.5)";
+            }
+            
+            // Tremor de tela absurdo
+            const mesa = document.getElementById('mesa-dice');
+            if(mesa) {
+                mesa.style.transform = "scale(1.05)";
+                setTimeout(()=> mesa.style.transform = "scale(1)", 150);
+            }
+
+            if(window.CassinoAudio && !window.SantuarioSomPausado) {
+                window.CassinoAudio.tocar('slotsWin', 1.0);
+                setTimeout(()=> window.CassinoAudio.tocar('slotsWin', 1.0), 300); // Toca dobrado!
+            }
+            if(window.Haptics) navigator.vibrate([200, 100, 300, 100, 500, 200, 500]);
+            if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#e67e22', '#ffffff'], particleCount: 300, spread: 160});
+            if(typeof mostrarToast === 'function') mostrarToast(`🔥 MEGA JACKPOT EXTREMO! +${lucro}💰`, "👑");
+            
+        } else {
+            // Vitória Normal
+            if(visor) visor.classList.add('dice-vitoria-glow');
+            if(anel) {
+                anel.style.borderColor = "#2ecc71"; 
+                anel.style.boxShadow = "0 0 30px rgba(46, 204, 113, 0.6), inset 0 0 15px rgba(46, 204, 113, 0.3)";
+            }
+            
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
+            if(typeof confetti === 'function') confetti({colors: ['#00f2fe', '#2ecc71'], particleCount: 150});
+            if(typeof mostrarToast === 'function') mostrarToast(`Golpe de Mestre! +${lucro}💰`, "🎲");
+        }
+
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Vitória no Dado (${motorDice.multiplicador.toFixed(2)}x)`);
         
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Vitória no Dado");
-        if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
-        if(typeof confetti === 'function') confetti({colors: ['#00f2fe', '#2ecc71'], particleCount: 150});
-        if(typeof mostrarToast === 'function') mostrarToast(`Golpe de Mestre! +${lucro}💰`, "🎲");
     } else {
-        visor.classList.add('dice-derrota-glow');
-        anel.style.borderColor = "#ff0844"; // Anel fica vermelho!
-        anel.style.boxShadow = "0 0 30px rgba(255, 8, 68, 0.6), inset 0 0 15px rgba(255, 8, 68, 0.3)";
+        if(visor) visor.classList.add('dice-derrota-glow');
+        if(anel) {
+            anel.style.borderColor = "#ff0844"; 
+            anel.style.boxShadow = "0 0 30px rgba(255, 8, 68, 0.6), inset 0 0 15px rgba(255, 8, 68, 0.3)";
+        }
         
-        // 🔊 SOM: O SEU perder.mp3 TOCANDO!
-        if(window.CassinoAudio) window.CassinoAudio.tocar('slotsLose', 0.8);
-        
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
         if(window.Haptics) navigator.vibrate([300, 100, 400]);
         if(typeof mostrarToast === 'function') mostrarToast("Queimou os circuitos! A casa venceu.", "🔥");
     }
 
     setTimeout(() => {
         motorDice.rolando = false;
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
-        visor.classList.remove('dice-vitoria-glow', 'dice-derrota-glow');
-        visor.style.color = "#fff";
-        anel.style.borderColor = "rgba(0, 242, 254, 0.2)";
-        anel.style.boxShadow = "inset 0 0 20px rgba(0, 242, 254, 0.1), 0 0 30px rgba(0,0,0,0.8)";
+        if(btn) {
+            btn.style.opacity = "1";
+            btn.style.pointerEvents = "auto";
+        }
+        if(visor) {
+            visor.classList.remove('dice-vitoria-glow', 'dice-derrota-glow');
+            visor.style.color = "#fff";
+        }
+        if(anel) {
+            anel.style.borderColor = "rgba(0, 242, 254, 0.2)";
+            anel.style.boxShadow = "inset 0 0 20px rgba(0, 242, 254, 0.1), 0 0 30px rgba(0,0,0,0.8)";
+        }
     }, 2000); 
 }
 
@@ -6778,7 +7232,7 @@ window.CassinoAudio.carregarTudo();
 // 1. O ESTOQUE DA LOJA (30 Itens Exclusivos para Amor à Distância)
 const BOUTIQUE_CATALOGO = [
     // 🥉 NÍVEL BRONZE (Carinhos Digitais - Até 50k)
-    { id: 'item1', emoji: '🎬', nome: 'Controle Remoto do Rave', desc: 'Direito de escolher o filme/série da call hoje sem que eu possa dar um pio.', preco: 5000 },
+    { id: 'item1', emoji: '🎬', nome: 'Controle Remoto da Decisão', desc: 'Direito de escolher o filme/série da call hoje sem que eu possa dar um pio.', preco: 5000 },
     { id: 'item2', emoji: '📸', nome: 'Selfie Exclusiva', desc: 'Obrigação de mandar uma foto minha na hora, do jeito que você pedir.', preco: 7500 },
     { id: 'item3', emoji: '🎵', nome: 'DJ da Call', desc: 'Você dita a playlist de músicas enquanto conversamos ou jogamos.', preco: 10000 },
     { id: 'item4', emoji: '🗣️', nome: 'Áudio de Bom Dia', desc: 'Um áudio de pelo menos 2 minutos de muito chamego ao acordar.', preco: 12000 },
@@ -7079,3 +7533,326 @@ window.forcarAtualizacao = function() {
         window.location.reload();
     }
 };
+
+
+// ============================================================================
+// 🐯 MOTOR MATEMÁTICO, GRÁFICO E SONORO: TIGRINHO (FORTUNE TIGER)
+// ============================================================================
+
+// 🚨 ROTEADOR MESTRE DE MESAS (ATUALIZADO PARA O TIGRINHO)
+const roteadorMestreCassino = window.abrirMesaCassino;
+window.abrirMesaCassino = function(nomeDoJogo) {
+    if (nomeDoJogo === 'tigrinho') {
+        const mesa = document.getElementById('mesa-tigrinho');
+        if(mesa) {
+            mesa.classList.remove('escondido');
+            mesa.style.display = 'flex';
+            if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+            if(typeof construirGridTigrinho === 'function') construirGridTigrinho();
+        }
+    } else {
+        // Se não for tigrinho, tenta abrir os outros jogos através do roteador antigo
+        if(typeof roteadorMestreCassino === 'function') {
+            roteadorMestreCassino(nomeDoJogo);
+        }
+    }
+};
+
+// FUNÇÃO PARA FECHAR O TIGRINHO
+window.fecharMesaTigrinho = function() {
+    if (typeof motorTigrinho !== 'undefined' && motorTigrinho.girando) {
+        if(typeof mostrarToast === 'function') mostrarToast("Aguarde o giro terminar!", "⚠️");
+        return;
+    }
+    // Desliga o modo auto se estiver saindo
+    if (typeof motorTigrinho !== 'undefined' && motorTigrinho.modoAuto) {
+        window.alternarGiroAutoTigrinho();
+    }
+    const mesa = document.getElementById('mesa-tigrinho');
+    if(mesa) mesa.style.display = 'none';
+};
+
+let motorTigrinho = {
+    gridCriado: false,
+    girando: false,
+    modoAuto: false,
+    loopAuto: null,
+    modoCartaSorte: false,
+    simboloSorte: "",
+    gridAtual: ["", "", "", "", "", "", "", "", ""],
+    simbolos: [
+        { id: 'moeda', emoji: '🪙', mult: 2 },
+        { id: 'lanterna', emoji: '🏮', mult: 5 },
+        { id: 'saco', emoji: '💰', mult: 10 },
+        { id: 'foguete', emoji: '🎇', mult: 20 },
+        { id: 'envelope', emoji: '🧧', mult: 50 },
+        { id: 'wild', emoji: '🐯', mult: 100 } // O Wild serve como coringa e paga mais
+    ],
+    // As 5 linhas clássicas de pagamento 3x3
+    linhasPagamento: [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontais
+        [0, 4, 8], [2, 4, 6]             // Diagonais
+    ]
+};
+
+window.ajustarApostaTigrinho = function(valor) {
+    if (motorTigrinho.girando || motorTigrinho.modoAuto) return;
+    const visor = document.getElementById('tigrinho-aposta-input');
+    if(!visor) return;
+    let novaAposta = parseInt(visor.innerText) + valor;
+    if (novaAposta < 10) novaAposta = 10;
+    if (novaAposta > (window.pontosDoCasal || 0)) novaAposta = window.pontosDoCasal;
+    visor.innerText = novaAposta;
+    
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar(valor > 0 ? 'fichaAdd' : 'fichaSub', 0.6);
+    if(window.Haptics) window.Haptics.toqueLeve();
+};
+
+function construirGridTigrinho() {
+    const grid = document.getElementById('tigrinho-grid');
+    grid.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+        let cel = document.createElement('div');
+        cel.className = 'tigrinho-celula';
+        cel.id = `tigrinho-cel-${i}`;
+        // Preenche com símbolos aleatórios iniciais
+        let symAleatorio = motorTigrinho.simbolos[Math.floor(Math.random() * motorTigrinho.simbolos.length)].emoji;
+        cel.innerText = symAleatorio;
+        motorTigrinho.gridAtual[i] = symAleatorio;
+        grid.appendChild(cel);
+    }
+    motorTigrinho.gridCriado = true;
+}
+
+window.alternarGiroAutoTigrinho = function() {
+    const btnAuto = document.getElementById('btn-tigrinho-auto');
+    if (motorTigrinho.modoAuto) {
+        motorTigrinho.modoAuto = false;
+        clearInterval(motorTigrinho.loopAuto);
+        if(btnAuto) btnAuto.style.background = 'linear-gradient(145deg, #3498db, #2980b9)';
+        if(typeof mostrarToast === 'function') mostrarToast("Modo Auto Desligado", "🛑");
+    } else {
+        motorTigrinho.modoAuto = true;
+        if(btnAuto) btnAuto.style.background = 'linear-gradient(145deg, #e74c3c, #c0392b)';
+        if(typeof mostrarToast === 'function') mostrarToast("Modo Auto Ligado! 🤖", "✨");
+        girarTigrinho(); 
+    }
+};
+
+window.girarTigrinho = function() {
+    if (motorTigrinho.girando) return;
+
+    const input = document.getElementById('tigrinho-aposta-input');
+    const aposta = parseInt(input.innerText);
+    
+    if (aposta < 10 || (window.pontosDoCasal || 0) < aposta) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💔");
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6); 
+        if(motorTigrinho.modoAuto) alternarGiroAutoTigrinho();
+        return;
+    }
+
+    // Se NÃO estiver no modo "Carta da Sorte", cobra a aposta normal
+    if (!motorTigrinho.modoCartaSorte) {
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-aposta, "Giro no Tigrinho");
+    }
+
+    motorTigrinho.girando = true;
+    const btn = document.getElementById('btn-tigrinho-girar');
+    if(btn) { btn.style.opacity = "0.5"; btn.style.pointerEvents = "none"; }
+    
+    limparVitoriasTigrinho();
+
+    // 🚨 A MÁGICA: Sorteio do Modo Carta da Sorte (10% de chance num giro normal)
+    if (!motorTigrinho.modoCartaSorte && Math.random() < 0.10) {
+        iniciarModoCartaSorte();
+        return; // Interrompe o giro normal, o modo carta sorte assume
+    }
+
+    executarAnimacaoRolosTigrinho(aposta);
+};
+
+function iniciarModoCartaSorte() {
+    motorTigrinho.modoCartaSorte = true;
+    const mascote = document.getElementById('tigrinho-mascote');
+    const msg = document.getElementById('tigrinho-mensagem');
+    
+    // Escolhe o símbolo da sorte
+    const symObj = motorTigrinho.simbolos[Math.floor(Math.random() * (motorTigrinho.simbolos.length - 1))]; // Exclui o Wild
+    motorTigrinho.simboloSorte = symObj.emoji;
+
+    if(mascote) mascote.classList.add('tigrinho-modo-sorte');
+    if(msg) {
+        msg.innerText = `🔥 CARTA DA SORTE: ${motorTigrinho.simboloSorte} 🔥`;
+        msg.style.color = "#00f2fe";
+    }
+
+    // 🔊 SOM DE TENSÃO SUPREMA!
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('roleta', 1.0); // Som tenso longo
+    if(window.Haptics) navigator.vibrate([300, 100, 300, 100, 500]);
+    if(typeof mostrarToast === 'function') mostrarToast(`O Tigre escolheu ${motorTigrinho.simboloSorte}! Giros Grátis!`, "🐯");
+
+    setTimeout(() => {
+        executarAnimacaoRolosTigrinho(parseInt(document.getElementById('tigrinho-aposta-input').innerText));
+    }, 2000);
+}
+
+// =========================================
+// 🐯 MOTOR AUDIOVISUAL DO TIGRINHO PREMIER
+// =========================================
+
+function executarAnimacaoRolosTigrinho(aposta) {
+    if(!window.SantuarioSomPausado && window.CassinoAudio) window.CassinoAudio.tocar('slotsStart', 0.8);
+    if(window.Haptics) window.Haptics.toqueForte();
+
+    let novoGrid = [];
+    let chanceDerrota = motorTigrinho.modoCartaSorte ? 0.35 : 0.70;
+
+    for (let i = 0; i < 9; i++) {
+        if (motorTigrinho.modoCartaSorte && motorTigrinho.gridAtual[i] === motorTigrinho.simboloSorte) {
+            novoGrid[i] = motorTigrinho.simboloSorte;
+            continue; 
+        }
+        let sorteio = Math.random();
+        novoGrid[i] = sorteio < chanceDerrota ? 
+                      motorTigrinho.simbolos[Math.floor(Math.random() * 3)].emoji : 
+                      motorTigrinho.simbolos[Math.floor(Math.random() * motorTigrinho.simbolos.length)].emoji;
+    }
+
+    // 🚨 A MÁGICA: Inicia animação e garante a limpeza posterior
+    for(let i=0; i<9; i++) {
+        const cel = document.getElementById(`tigrinho-cel-${i}`);
+        if(cel && !cel.classList.contains('tigrinho-celula-trancada')) {
+            cel.classList.add('tigrinho-girando');
+        }
+    }
+
+    let trocasFalsas = setInterval(() => {
+        for (let i = 0; i < 9; i++) {
+            const cel = document.getElementById(`tigrinho-cel-${i}`);
+            if (cel && cel.classList.contains('tigrinho-girando')) {
+                cel.innerText = motorTigrinho.simbolos[Math.floor(Math.random() * motorTigrinho.simbolos.length)].emoji;
+            }
+        }
+    }, 60);
+
+    // Parada escalonada das colunas para gerar suspense (0.8s, 1.4s, 2.0s)
+    [0, 1, 2].forEach(col => {
+        setTimeout(() => {
+            for (let lin = 0; lin < 3; lin++) {
+                let index = col + (lin * 3);
+                const cel = document.getElementById(`tigrinho-cel-${index}`);
+                if (cel && cel.classList.contains('tigrinho-girando')) {
+                    cel.classList.remove('tigrinho-girando'); // 🚨 LIMPA O DESFOQUE AQUI
+                    cel.innerText = novoGrid[index];
+                    motorTigrinho.gridAtual[index] = novoGrid[index];
+                    
+                    // Juice: Pequeno "pulo" ao parar
+                    cel.style.transform = "scale(0.9)";
+                    setTimeout(() => cel.style.transform = "scale(1)", 100);
+                }
+            }
+            if(!window.SantuarioSomPausado && window.CassinoAudio) window.CassinoAudio.tocar('slotsPlin', 0.6);
+            if(window.Haptics) window.Haptics.toqueLeve();
+        }, 800 + (col * 600));
+    });
+
+    setTimeout(() => {
+        clearInterval(trocasFalsas);
+        avaliarGridTigrinho(novoGrid, aposta);
+    }, 2200);
+}
+
+function avaliarGridTigrinho(grid, aposta) {
+    let lucroTotal = 0;
+    let celulasVencedoras = new Set();
+    const msgVisor = document.getElementById('tigrinho-mensagem');
+
+    // 1. MODO CARTA DA SORTE (RESPEITANDO O RITMO)
+    if (motorTigrinho.modoCartaSorte) {
+        let novosTrancados = 0;
+        for (let i = 0; i < 9; i++) {
+            if (grid[i] === motorTigrinho.simboloSorte) {
+                if (!document.getElementById(`tigrinho-cel-${i}`).classList.contains('tigrinho-celula-trancada')) {
+                    novosTrancados++;
+                }
+                celulasVencedoras.add(i);
+                document.getElementById(`tigrinho-cel-${i}`).classList.add('tigrinho-celula-trancada');
+            }
+        }
+
+        if (celulasVencedoras.size === 9) {
+            let multSym = motorTigrinho.simbolos.find(s => s.emoji === motorTigrinho.simboloSorte).mult;
+            lucroTotal = aposta * multSym * 10;
+            encerrarGiroTigrinho(lucroTotal, true, true);
+            return;
+        }
+
+        if (novosTrancados > 0) {
+            if(!window.SantuarioSomPausado && window.CassinoAudio) window.CassinoAudio.tocar('minesDiamante', 0.8);
+            msgVisor.innerText = `MAIS UM! ${motorTigrinho.simboloSorte}`;
+            setTimeout(() => executarAnimacaoRolosTigrinho(aposta), 1200);
+            return;
+        } else {
+            // Fim do Modo Sorte
+            motorTigrinho.modoCartaSorte = false;
+            document.getElementById('tigrinho-mascote').classList.remove('tigrinho-modo-sorte-ativo');
+            msgVisor.innerText = "Calculando Vitórias...";
+            Array.from(document.querySelectorAll('.tigrinho-celula')).forEach(c => c.classList.remove('tigrinho-celula-trancada'));
+        }
+    }
+
+    // 2. VERIFICAÇÃO DE LINHAS (DOPAMINA AUDIOVISUAL)
+    motorTigrinho.linhasPagamento.forEach(linha => {
+        let s1 = grid[linha[0]], s2 = grid[linha[1]], s3 = grid[linha[2]];
+        if ((s1===s2 && s2===s3) || (s1==='🐯' && s2===s3) || (s2==='🐯' && s1===s3)) {
+            linha.forEach(i => celulasVencedoras.add(i));
+            let symReal = s1 === '🐯' ? s2 : s1;
+            let mult = (motorTigrinho.simbolos.find(s => s.emoji === symReal) || {mult:10}).mult;
+            lucroTotal += aposta * mult;
+        }
+    });
+
+    celulasVencedoras.forEach(i => document.getElementById(`tigrinho-cel-${i}`).classList.add('tigrinho-celula-vitoria'));
+    encerrarGiroTigrinho(lucroTotal, lucroTotal > 0, false);
+}
+
+function encerrarGiroTigrinho(lucro, venceu, telaCheia) {
+    if (venceu) {
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Bênção do Tigrinho!");
+        
+        if (telaCheia) {
+            // O MEGA PAGAMENTO DA CARTA DA SORTE
+            if(window.CassinoAudio && !window.SantuarioSomPausado) setTimeout(()=> window.CassinoAudio.tocar('slotsWin', 1.0), 500);
+            if(window.Haptics) navigator.vibrate([200, 100, 300, 100, 500, 200, 500]);
+            if(typeof confetti === 'function') confetti({colors: ['#e74c3c', '#f1c40f', '#ffffff'], particleCount: 300, spread: 160});
+            if(typeof mostrarToast === 'function') mostrarToast(`TELA CHEIA! MEGA BIG WIN! +${lucro}💰`, "🐯");
+        } else {
+            // Pagamento normal de linha
+            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
+            if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#d35400'], particleCount: 100});
+            if(typeof mostrarToast === 'function') mostrarToast(`BIG WIN! +${lucro}💰`, "🎉");
+        }
+    } else {
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+        if(window.Haptics) navigator.vibrate([300, 100, 300]);
+    }
+
+    setTimeout(() => {
+        motorTigrinho.girando = false;
+        const btn = document.getElementById('btn-tigrinho-girar');
+        if(btn) { btn.style.opacity = "1"; btn.style.pointerEvents = "auto"; }
+
+        // Se estiver no Modo Auto e não for a Carta da Sorte travando, roda de novo
+        if (motorTigrinho.modoAuto && !motorTigrinho.modoCartaSorte) {
+            motorTigrinho.loopAuto = setTimeout(window.girarTigrinho, 1500);
+        }
+    }, 2000);
+}
+
+function limparVitoriasTigrinho() {
+    Array.from(document.querySelectorAll('.tigrinho-celula')).forEach(cel => {
+        cel.classList.remove('tigrinho-celula-vitoria');
+    });
+}

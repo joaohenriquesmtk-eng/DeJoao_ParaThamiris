@@ -1,19 +1,17 @@
 // ============================================================================
-// O VEREDITO CULINÁRIO (MOTOR RETINA E FÍSICA INERCIAL) - SUPREME TIER
+// O VEREDITO CULINÁRIO (MOTOR RETINA, FÍSICA INERCIAL E QUEBRA DE LINHA)
 // ============================================================================
 
 window.estadoRoleta = {
-    opcoes: ["Pizza 🍕", "Sushi 🍣", "Hambúrguer 🍔"],
+    opcoes: [], // Será preenchido pelo Firebase
     girando: false,
     rotacaoAtual: 0,
     // Paleta de Alta Saturação (Cassino)
-    paletaCores: ['#c0392b', '#2c3e50', '#e67e22', '#27ae60', '#8e44ad', '#16a085', '#d35400', '#2980b9']
+    paletaCores: ['#c0392b', '#2c3e50', '#e67e22', '#8e44ad', '#d35400', '#2980b9']
 };
 
 window.inicializarRoleta = function() {
-    console.log("Acionando Motor Retina da Roleta...");
     window.escutarOpcoesRoleta();
-    
     const txtVencedor = document.getElementById('texto-vencedor-roleta');
     if (txtVencedor) {
         txtVencedor.classList.remove('revelacao-ativa');
@@ -26,7 +24,7 @@ window.toggleInstrucoesRoleta = function() {
     if (inst) inst.classList.toggle('escondido');
 };
 
-// --- SINCRONIZAÇÃO FIREBASE ---
+// --- SINCRONIZAÇÃO FIREBASE COM "ZERO VERDE" ---
 window.escutarOpcoesRoleta = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) {
         window.desenharCanvasRetina();
@@ -39,13 +37,18 @@ window.escutarOpcoesRoleta = function() {
     
     onValue(refOpcoes, (snapshot) => {
         const dados = snapshot.val();
+        let opcoesNuvem = [];
+        
         if (dados && Array.isArray(dados)) {
-            window.estadoRoleta.opcoes = dados;
+            opcoesNuvem = dados;
         } else if (dados) {
-            window.estadoRoleta.opcoes = Object.values(dados);
+            opcoesNuvem = Object.values(dados);
         } else {
-            window.estadoRoleta.opcoes = ["Pizza 🍕", "Sushi 🍣", "Hambúrguer 🍔", "Churrasco 🥩"];
+            opcoesNuvem = ["Pizza 🍕", "Sushi 🍣", "Hambúrguer 🍔"];
         }
+        
+        // O "Zero Verde" do Afeto sempre no topo!
+        window.estadoRoleta.opcoes = ["Voucher Especial 💚", ...opcoesNuvem];
         
         window.renderizarFichasComida();
         window.desenharCanvasRetina();
@@ -54,14 +57,14 @@ window.escutarOpcoesRoleta = function() {
 
 window.salvarOpcoesNoFirebase = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const opcoesLimpo = window.estadoRoleta.opcoes.filter(o => o !== "Voucher Especial 💚");
     const { db, ref, set } = window.SantuarioApp.modulos;
-    set(ref(db, 'utilitarios/roleta_comidas'), window.estadoRoleta.opcoes);
+    set(ref(db, 'utilitarios/roleta_comidas'), opcoesLimpo);
 };
 
 // --- GESTÃO DE FICHAS ---
 window.adicionarComidaRoleta = function() {
     if (window.estadoRoleta.girando) return;
-    
     const input = document.getElementById('input-nova-comida');
     const valor = input.value.trim();
     
@@ -80,9 +83,15 @@ window.adicionarComidaRoleta = function() {
 
 window.removerComidaRoleta = function(index) {
     if (window.estadoRoleta.girando) return;
-    if (window.estadoRoleta.opcoes.length <= 2) {
-        if(typeof mostrarToast === 'function') mostrarToast("A roda não pode girar com menos de 2 opções.", "⚠️");
+    
+    if (window.estadoRoleta.opcoes[index] === "Voucher Especial 💚") {
+        if(typeof mostrarToast === 'function') mostrarToast("O Destino do Afeto não pode ser apagado!", "💚");
         if(window.Haptics) window.Haptics.erro();
+        return;
+    }
+
+    if (window.estadoRoleta.opcoes.length <= 2) {
+        if(typeof mostrarToast === 'function') mostrarToast("A roda precisa de opções.", "⚠️");
         return;
     }
     
@@ -99,26 +108,30 @@ window.renderizarFichasComida = function() {
     window.estadoRoleta.opcoes.forEach((comida, index) => {
         const div = document.createElement('div');
         div.className = 'tag-ficha-ouro';
-        div.innerHTML = `
-            <span>${comida}</span>
-            <button class="btn-remover-ficha" onclick="window.removerComidaRoleta(${index})">✖</button>
-        `;
+        
+        if (comida === "Voucher Especial 💚") {
+            div.style.background = "linear-gradient(145deg, rgba(46, 204, 113, 0.2), rgba(0,0,0,0.8))";
+            div.style.borderColor = "#2ecc71";
+            div.innerHTML = `<span style="color: #2ecc71; font-weight: bold;">${comida}</span>
+                             <button class="btn-remover-ficha" onclick="window.removerComidaRoleta(${index})">🔒</button>`;
+        } else {
+            div.innerHTML = `<span>${comida}</span>
+                             <button class="btn-remover-ficha" onclick="window.removerComidaRoleta(${index})">✖</button>`;
+        }
         lista.appendChild(div);
     });
 };
 
-// --- MOTOR GRÁFICO (CANVAS RETINA) ---
+// --- MOTOR GRÁFICO (COM QUEBRA DE LINHA INTELIGENTE) ---
 window.desenharCanvasRetina = function() {
     const canvas = document.getElementById('canvas-roleta');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    // O Canvas físico tem 680px (Alta resolução), desenhamos baseados nisso.
     const largura = canvas.width;
     const altura = canvas.height;
     const centroX = largura / 2;
     const centroY = altura / 2;
-    // O raio da pizza é ligeiramente menor que o canvas para caber a borda grossa
     const raio = centroX - 15; 
 
     const opcoes = window.estadoRoleta.opcoes;
@@ -130,9 +143,13 @@ window.desenharCanvasRetina = function() {
     for (let i = 0; i < fatias; i++) {
         const anguloInicio = i * arco;
         const anguloFim = (i + 1) * arco;
-        const corBase = window.estadoRoleta.paletaCores[i % window.estadoRoleta.paletaCores.length];
+        
+        let corBase = window.estadoRoleta.paletaCores[i % window.estadoRoleta.paletaCores.length];
+        if (opcoes[i] === "Voucher Especial 💚") {
+            corBase = "#27ae60"; 
+        }
 
-        // 1. A Fatia
+        // Pinta a fatia
         ctx.beginPath();
         ctx.moveTo(centroX, centroY);
         ctx.arc(centroX, centroY, raio, anguloInicio, anguloFim);
@@ -140,12 +157,10 @@ window.desenharCanvasRetina = function() {
         ctx.fillStyle = corBase;
         ctx.fill();
 
-        // Linhas Douradas separadoras
         ctx.lineWidth = 6;
         ctx.strokeStyle = "#D4AF37"; 
         ctx.stroke();
 
-        // 2. O Texto Retina
         ctx.save();
         ctx.translate(centroX, centroY);
         ctx.rotate(anguloInicio + arco / 2);
@@ -153,24 +168,51 @@ window.desenharCanvasRetina = function() {
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#FFFFFF";
-        // Fonte gigante pois o canvas é 680px (encolherá via CSS mantendo a nitidez)
-        ctx.font = "bold 36px 'Playfair Display', serif"; 
         
-        // Sombra profunda para destacar no metal
         ctx.shadowColor = "rgba(0,0,0,0.8)";
         ctx.shadowBlur = 10;
         ctx.shadowOffsetX = 3;
         ctx.shadowOffsetY = 3;
         
-        ctx.fillText(opcoes[i], raio - 40, 0);
+        // 🚨 A MÁGICA DA QUEBRA DE LINHA E AJUSTE DE FONTE
+        let textoFatia = opcoes[i];
+        let linhas = [];
+        
+        // Regra de separação das palavras
+        if (textoFatia === "Voucher Especial 💚") {
+            linhas = ["Voucher", "Especial 💚"];
+        } else if (textoFatia.length > 11 && textoFatia.includes(" ")) {
+            // Se for outra comida longa com espaços (ex: "Macarrão ao Sugo")
+            const palavras = textoFatia.split(" ");
+            const meio = Math.ceil(palavras.length / 2);
+            linhas.push(palavras.slice(0, meio).join(" "));
+            linhas.push(palavras.slice(meio).join(" "));
+        } else {
+            linhas.push(textoFatia); // Uma palavra só ou curtinha
+        }
+
+        // Ajusta a fonte dinamicamente
+        if (linhas.length > 1) {
+            ctx.font = "bold 24px 'Playfair Display', serif"; 
+        } else {
+            ctx.font = "bold 32px 'Playfair Display', serif"; 
+        }
+        
+        // Desenha as linhas perfeitamente centralizadas
+        const alturaLinha = 28; 
+        const inicioY = (linhas.length === 1) ? 0 : -((linhas.length - 1) * alturaLinha) / 2;
+        
+        for(let j = 0; j < linhas.length; j++) {
+            ctx.fillText(linhas[j], raio - 40, inicioY + (j * alturaLinha));
+        }
+        
         ctx.restore();
     }
 
-    // 3. O Bezel Metálico Externo (Aro de Ouro)
+    // Moldura Dourada Externa
     ctx.beginPath();
     ctx.arc(centroX, centroY, raio, 0, 2 * Math.PI);
     ctx.lineWidth = 20;
-    // Gradiente Dourado para o aro externo
     const gradExterno = ctx.createLinearGradient(0, 0, largura, altura);
     gradExterno.addColorStop(0, "#f1c40f");
     gradExterno.addColorStop(0.5, "#d35400");
@@ -178,7 +220,7 @@ window.desenharCanvasRetina = function() {
     ctx.strokeStyle = gradExterno;
     ctx.stroke();
 
-    // 4. O Eixo de Aço Central
+    // Núcleo de Ferro
     ctx.beginPath();
     ctx.arc(centroX, centroY, 40, 0, 2 * Math.PI);
     const gradInterno = ctx.createRadialGradient(centroX, centroY, 0, centroX, centroY, 40);
@@ -202,51 +244,50 @@ window.iniciarGiroRoleta = function() {
     const txtVencedor = document.getElementById('texto-vencedor-roleta');
     txtVencedor.classList.remove('revelacao-ativa');
     txtVencedor.innerText = "CALCULANDO DESTINO...";
-    txtVencedor.style.opacity = 1; // Deixa visível a mensagem de suspense
+    txtVencedor.style.color = "#fff";
+    txtVencedor.style.opacity = 1; 
 
     const canvas = document.getElementById('canvas-roleta');
     
-    // Aumentamos a violência do giro para o nível Supreme: 8 a 15 voltas completas
-    const girosExtras = Math.floor(Math.random() * 8) + 8; 
+    const girosExtras = Math.floor(Math.random() * 8) + 12; 
     const grauAleatorio = Math.floor(Math.random() * 360);
     const rotacaoFinalAlvo = window.estadoRoleta.rotacaoAtual + (girosExtras * 360) + grauAleatorio;
     
-    const tempoGiroMs = 6000; // O giro dura 6 segundos cravados (mais suspense)
+    const tempoGiroMs = 7000; 
     
-    canvas.style.transition = `transform ${tempoGiroMs}ms cubic-bezier(0.1, 0.85, 0.15, 1)`;
+    canvas.style.transition = `transform ${tempoGiroMs}ms cubic-bezier(0.1, 0.95, 0.15, 1)`;
     canvas.style.transform = `rotate(${rotacaoFinalAlvo}deg)`;
 
-    // Lógica da Catraca Desacelerando (Simulação Inercial)
     let tempoAtual = 0;
-    let intervaloBase = 30; // Começa clicando muito rápido
+    let intervaloBase = 20; 
     const somCatraca = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-    somCatraca.volume = 0.4;
+    somCatraca.volume = 0.5;
 
     function tocarCatraca() {
         if (!window.estadoRoleta.girando) return;
         
-        somCatraca.currentTime = 0;
-        somCatraca.play().catch(e=>{});
+        if (!window.SantuarioSomPausado) {
+            somCatraca.currentTime = 0;
+            somCatraca.play().catch(e=>{});
+        }
         
-        if (window.Haptics) navigator.vibrate(15);
+        if (window.Haptics) window.Haptics.toqueLeve();
         
         const agulha = document.querySelector('.roleta-agulha-suprema');
         if(agulha) {
             agulha.classList.add('agulha-tremendo-titan');
-            setTimeout(() => agulha.classList.remove('agulha-tremendo-titan'), 50);
+            setTimeout(() => agulha.classList.remove('agulha-tremendo-titan'), 40);
         }
 
         tempoAtual += intervaloBase;
-        // O intervalo aumenta exponencialmente conforme o tempo passa (desaceleração)
-        intervaloBase = 30 + Math.pow(tempoAtual / 400, 2); 
+        intervaloBase = 20 + Math.pow(tempoAtual / 450, 2.5); 
 
-        if (tempoAtual < tempoGiroMs - 200) { // Para de tocar 200ms antes pra dar o silêncio dramático final
+        if (tempoAtual < tempoGiroMs - 300) { 
             setTimeout(tocarCatraca, intervaloBase);
         }
     }
     tocarCatraca();
 
-    // A REVELAÇÃO DO VENCEDOR
     setTimeout(() => {
         window.estadoRoleta.rotacaoAtual = rotacaoFinalAlvo;
         window.estadoRoleta.girando = false;
@@ -262,14 +303,24 @@ window.iniciarGiroRoleta = function() {
         const indiceVencedor = Math.floor(anguloNoTopo / grausPorFatia);
         const vencedor = opcoes[indiceVencedor];
 
-        txtVencedor.innerText = `👑 ${vencedor.toUpperCase()}`;
-        txtVencedor.classList.add('revelacao-ativa');
+        if (vencedor === "Voucher Especial 💚") {
+            txtVencedor.innerHTML = `💚 Mimo Desbloqueado!`;
+            txtVencedor.style.color = "#2ecc71";
+            if(typeof mostrarToast === 'function') mostrarToast("Você ganhou um voucher romântico surpresa!", "✨");
+            if(window.Haptics) navigator.vibrate([300, 100, 300, 100, 500]);
+            if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37', '#ffffff'], particleCount: 300, spread: 150, zIndex: 999999, origin: {y: 0.6}});
+        } else {
+            txtVencedor.innerText = `👑 ${vencedor.toUpperCase()}`;
+            if(window.Haptics) navigator.vibrate([200, 100, 200, 100, 600]);
+            if(typeof confetti === 'function') confetti({colors: ['#ff4757', '#FFD700', '#ffffff'], particleCount: 300, spread: 150, zIndex: 999999, origin: {y: 0.6}});
+        }
 
-        if(window.Haptics) navigator.vibrate([200, 100, 200, 100, 600]);
-        if(typeof confetti === 'function') confetti({colors: ['#ff4757', '#FFD700', '#ffffff'], particleCount: 300, spread: 150, zIndex: 999999, origin: {y: 0.6}});
+        txtVencedor.classList.add('revelacao-ativa');
         
-        const winSom = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
-        winSom.volume = 1.0; winSom.play().catch(e=>{});
+        if (!window.SantuarioSomPausado) {
+            const winSom = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+            winSom.volume = 1.0; winSom.play().catch(e=>{});
+        }
 
     }, tempoGiroMs);
 };

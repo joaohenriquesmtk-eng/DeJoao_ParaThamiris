@@ -1492,6 +1492,14 @@
 
         <div style="padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px;">
             
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('tigrinho')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e74c3c; box-shadow: 0 0 20px rgba(231, 76, 60, 0.4); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+                <div style="font-size: 2.5rem; background: rgba(231, 76, 60, 0.15); border-radius: 15px; padding: 10px; border: 1px solid rgba(231, 76, 60, 0.5);">🐯</div>
+                <div>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Tigre da Sorte (Fortune)</h4>
+                    <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Ache a Carta da Sorte e leve o Mega Jackpot.</p>
+                </div>
+            </div>
+
             <div class="cartao-vidro-mines cartao-mines-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('mines')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
                 <div style="font-size: 2.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 15px; padding: 10px; border: 1px solid rgba(0, 212, 255, 0.3);">💣</div>
                 <div>
@@ -1574,7 +1582,6 @@
 
         </div>
     </div>
-
 
     <div id="mesa-mines" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 5, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;">
         
@@ -2102,6 +2109,47 @@
                 </div>
 
                 <button id="btn-dice-iniciar" onclick="jogarDice()" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #00f2fe, #4facfe); color: #000; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">ROLAR DADO 🎲</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mesa-tigrinho" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(40, 5, 5, 0.98), rgba(15, 0, 0, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(241, 196, 15, 0.7); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseYellow 1.5s infinite; z-index: 100;">
+            <button onclick="fecharMesaTigrinho()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(241, 196, 15, 0.4); border-radius: 15px; color: #f1c40f;">← Sair do Tigre</button>
+            <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                <span style="font-size: 0.9rem;">💰</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: space-between; max-width: 430px; margin: 0 auto; width: 100%;">
+            
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div id="tigrinho-mascote" style="font-size: 4rem; text-shadow: 0 0 20px #f1c40f; margin-bottom: 5px; transition: transform 0.3s;">🐯</div>
+                <div id="tigrinho-mensagem" style="color: #fff; font-size: 1.1rem; font-weight: bold; text-align: center; min-height: 25px; text-shadow: 0 0 10px rgba(255,255,255,0.5);">Faça sua aposta!</div>
+            </div>
+
+            <div class="tigrinho-container" style="width: 100%; aspect-ratio: 1/1; background: #1a0000; padding: 10px; border-radius: 20px; border: 3px solid #f1c40f; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 30px rgba(241, 196, 15, 0.2); position: relative;">
+                <div id="tigrinho-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; width: 100%; height: 100%;"></div>
+            </div>
+
+            <div style="width: 100%; margin-top: 15px;">
+                <div style="background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%); backdrop-filter: blur(1px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 12px 8px; margin-bottom: 15px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label style="color: rgba(255,255,255,0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Aposta Base 💰</label>
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 250px;">
+                            <button onclick="ajustarApostaTigrinho(-10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">-</button>
+                            <span id="tigrinho-aposta-input" style="color: #D4AF37; font-size: 1.6rem; font-weight: bold; font-family: 'monospace'; min-width: 50px; text-align: center;">50</span>
+                            <button onclick="ajustarApostaTigrinho(10)" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid #D4AF37; font-size: 1.2rem; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button id="btn-tigrinho-auto" onclick="alternarGiroAutoTigrinho()" style="flex: 1; padding: 15px; font-size: 1rem; font-weight: bold; border-radius: 20px; background: linear-gradient(145deg, #3498db, #2980b9); color: white; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">🤖 AUTO</button>
+                    <button id="btn-tigrinho-girar" onclick="girarTigrinho()" style="flex: 2; padding: 15px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 20px; background: linear-gradient(145deg, #f1c40f, #d35400); color: white; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(243, 156, 18, 0.4); animation: btnNeonPulse 1.5s infinite; transition: all 0.2s;">GIRAR 🧧</button>
+                </div>
             </div>
         </div>
     </div>

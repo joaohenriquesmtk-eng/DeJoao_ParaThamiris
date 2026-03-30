@@ -11735,3 +11735,69 @@ body > .container-palco {
     90% { transform: translate(1px, 2px) rotate(0deg); }
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
+
+
+/* ============================================================================ */
+/* 🐯 TIGRINHO PREMIER: FÍSICA E ALINHAMENTO                                    */
+/* ============================================================================ */
+
+.tigrinho-container {
+    width: 100%;
+    max-width: 320px; /* Evita que estique demais no iPhone */
+    margin: 0 auto;
+    background: linear-gradient(145deg, #2c0000, #4a0000);
+    padding: 12px;
+    border-radius: 20px;
+    border: 4px solid #f1c40f;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(241, 196, 15, 0.2);
+}
+
+.tigrinho-celula {
+    aspect-ratio: 1/1; /* Garante que seja sempre um quadrado perfeito */
+    background: radial-gradient(circle at center, #3d0000 0%, #1a0000 100%);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem; /* Tamanho ajustado para não vazar */
+    border: 1px solid rgba(241, 196, 15, 0.2);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    transition: transform 0.2s, background 0.3s;
+    position: relative;
+}
+
+/* 🚨 CORREÇÃO DA VIBRAÇÃO: Agora o desfoque é controlado */
+.tigrinho-girando {
+    animation: giroVeloz 0.15s infinite linear;
+    filter: blur(4px) grayscale(0.5);
+    opacity: 0.8;
+}
+
+@keyframes giroVeloz {
+    0% { transform: translateY(-5px); }
+    50% { transform: translateY(5px); }
+    100% { transform: translateY(-5px); }
+}
+
+.tigrinho-celula-vitoria {
+    background: linear-gradient(145deg, #f1c40f, #d35400) !important;
+    border-color: #fff !important;
+    box-shadow: 0 0 25px #f1c40f, inset 0 0 10px #fff !important;
+    z-index: 10;
+    animation: pulsoVitoria 0.4s infinite alternate ease-in-out;
+}
+
+@keyframes pulsoVitoria {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+.tigrinho-modo-sorte-ativo {
+    animation: tremorDourado 0.3s infinite;
+    filter: drop-shadow(0 0 20px #f1c40f);
+}
+
+@keyframes tremorDourado {
+    0% { transform: scale(1.2) rotate(-2deg); }
+    100% { transform: scale(1.2) rotate(2deg); }
+}

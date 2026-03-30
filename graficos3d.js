@@ -146,7 +146,7 @@ window.otimizadorDeResize = function(func, delay = 100) {
     powerPreference: "high-performance" /* Dá ordem máxima ao Android */
 });
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -267,6 +267,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+
+            // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
+            if (!container || container.offsetParent === null) return;
             
             // Trava Nativa e Inquebrável de Hibernação
             const elEco = document.getElementById('orbe-clima-3d');
@@ -430,6 +433,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         // 5. O Loop de Renderização
         const animar = () => {
             requestAnimationFrame(animar);
+
+                        // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
+            if (!container || container.offsetParent === null) return;
             if (!ecoVisivel || window.SantuarioAtivo === false) return;
             if (canvas.width === 0) redimensionar();
 
@@ -696,7 +702,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     powerPreference: "high-performance" /* Dá ordem máxima ao Android */
 });
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
         
         renderer.setSize(largura, altura);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -747,6 +753,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         let tempo = 0;
         const animar = () => {
             requestAnimationFrame(animar);
+                        // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
+            if (!container || container.offsetParent === null) return;
             const elBussola = document.getElementById('bussola-3d');
         if (!elBussola || elBussola.clientWidth === 0) return;
             if (!window.RadarDePerformance.podeAnimar('bussola-3d')) return;
@@ -1201,7 +1209,7 @@ window.inicializarPrisma3D = () => {
     powerPreference: "high-performance" /* Dá ordem máxima ao Android */
 });
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
     
     renderer.setSize(w, h);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -1299,7 +1307,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     let tempo = 0;
     const animar = () => {
         requestAnimationFrame(animar);
-        
+                    // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
+            if (!container || container.offsetParent === null) return;
         // Auto-Cura de Tela: Se o container finalmente ganhou largura real (ex: saiu do esconderijo), a placa de vídeo se ajusta sozinha
         if (container.clientWidth > 0 && Math.abs(container.clientWidth - w) > 5) {
              w = container.clientWidth;
@@ -1584,7 +1593,7 @@ window.inicializarGalaxia3D = () => {
     powerPreference: "high-performance" /* Dá ordem máxima ao Android */
 });
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
     
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -1628,6 +1637,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     let tempo = 0;
     const animar = () => {
         requestAnimationFrame(animar);
+                    // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
+            if (!container || container.offsetParent === null) return;
         const elGalaxia = document.getElementById('galaxia-3d-fundo');
         if (!elGalaxia || elGalaxia.clientWidth === 0) return;
         tempo += 0.001;
@@ -1662,8 +1673,8 @@ window.inicializarJornada3D = () => {
     powerPreference: "high-performance" /* Dá ordem máxima ao Android */
 });
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Otimização severa para celulares
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0)); // Otimização severa para celulares
     container.appendChild(renderer.domElement);
 
     const progressoData = { atual: 0.0 };
@@ -1810,6 +1821,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
     const animar = () => {
         requestAnimationFrame(animar);
+                    // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
+            if (!container || container.offsetParent === null) return;
         
         // MOTOR DE HIBERNAÇÃO (Para não queimar bateria em outras telas)
         if (telaJornada && telaJornada.classList.contains('escondido')) {

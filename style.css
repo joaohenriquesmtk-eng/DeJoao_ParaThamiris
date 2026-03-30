@@ -12304,3 +12304,24 @@ body > .container-palco {
 .mesa-real-card > div:first-child {
     border-radius: 0px !important;
 }
+
+/* ==========================================
+   🚀 ACELERAÇÃO DE HARDWARE GLOBAL (ANTI-LAG)
+========================================== */
+.cartao-vidro, .cartao-palco, .menu-inferior, .top-bar, .peca-julgamento {
+    /* Obriga o iOS e Android a alocarem GPU dedicada para estes itens */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    
+    /* Prepara o navegador para mudanças drásticas */
+    will-change: transform, opacity;
+    
+    /* Remove artefatos de renderização durante a rolagem */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Deixa a rolagem macia e contínua em toda a extensão do app */
+.tela {
+    -webkit-overflow-scrolling: touch;
+}

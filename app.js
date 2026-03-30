@@ -212,11 +212,20 @@ window.addEventListener('DOMContentLoaded', () => {
     // --- MELHORIA: EFEITO PARALLAX NAS PARTÍCULAS ---
     const particulas = document.querySelector('.particulas');
     if (particulas) {
-        window.addEventListener('deviceorientation', (e) => {
-            const x = Math.min(Math.max(e.gamma, -30), 30); 
-            const y = Math.min(Math.max(e.beta - 45, -30), 30); 
-            particulas.style.transform = `translate(${x * 0.5}px, ${y * 0.5}px)`;
-        });
+        let animacaoParallaxPendente = false;
+window.addEventListener('deviceorientation', (e) => {
+    if (animacaoParallaxPendente) return;
+    animacaoParallaxPendente = true;
+    requestAnimationFrame(() => {
+        const x = Math.min(Math.max(e.gamma, -30), 30);
+        const y = Math.min(Math.max(e.beta - 45, -30), 30);
+        if (particulas) {
+            // translate3d obriga a placa de vídeo a fazer o trabalho suavemente
+            particulas.style.transform = `translate3d(${x * 0.5}px, ${y * 0.5}px, 0)`;
+        }
+        animacaoParallaxPendente = false;
+    });
+});
 
         window.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 20;

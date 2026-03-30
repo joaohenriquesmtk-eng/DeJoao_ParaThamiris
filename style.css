@@ -155,14 +155,22 @@ body {
     position: fixed; bottom: 0; width: 100%; z-index: 999;
 }
 
-/* BARRA SUPERIOR DOS JOGOS ACRÍLICO */
+/* BARRA SUPERIOR DOS JOGOS ACRÍLICO (COM PROTEÇÃO PARA O NOTCH DO IPHONE) */
 .top-bar {
-    height: 60px;
+    /* Altura da barra + o espaço físico da câmera do iPhone */
+    height: calc(60px + env(safe-area-inset-top)) !important;
+    padding-top: env(safe-area-inset-top) !important;
+    
     background: rgba(12, 12, 14, 0.95);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 15px; z-index: 10; flex-shrink: 0;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    padding-left: 15px; 
+    padding-right: 15px; 
+    z-index: 100; 
+    flex-shrink: 0;
 }
 
 /* PAINEL LATERAL DA FAZENDA ACRÍLICO */

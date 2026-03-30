@@ -1,12 +1,36 @@
 // ==========================================
-// MOTOR TÁTIL SÊNIOR (ILUSÃO FÍSICA)
+// MOTOR TÁTIL SÊNIOR (BLINDADO PARA iOS)
 // ==========================================
-window.Haptics = {
-    toqueLeve: () => { if(navigator.vibrate) navigator.vibrate(10); }, // Tique muito sutil
-    toqueForte: () => { if(navigator.vibrate) navigator.vibrate(30); }, // Confirmação
-    sucesso: () => { if(navigator.vibrate) navigator.vibrate([20, 50, 20]); }, // Tique-tique
-    erro: () => { if(navigator.vibrate) navigator.vibrate([40, 50, 40, 50, 60]); } // Tum-Tum grave
+
+// Função auxiliar interna para vibrar apenas se o celular permitir (Anti-Crash Apple)
+const vibrarSeguro = (padrao) => {
+    try {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(padrao);
+        }
+    } catch (e) {
+        // O iPhone ignorou a vibração. Silenciamos o erro para não travar o app.
+    }
 };
+
+window.Haptics = {
+    toqueLeve: () => vibrarSeguro(10), // Tique muito sutil
+    toqueForte: () => vibrarSeguro(30), // Confirmação
+    sucesso: () => vibrarSeguro([20, 50, 20]), // Tique-tique
+    erro: () => vibrarSeguro([40, 50, 40, 50, 60]) // Tum-Tum grave
+};
+
+// Sobrescrevemos o navigator.vibrate globalmente para proteger TODOS os scripts de uma vez!
+if (typeof navigator !== 'undefined') {
+    const vibrateOriginal = navigator.vibrate;
+    navigator.vibrate = function(padrao) {
+        if (vibrateOriginal) {
+            try {
+                vibrateOriginal.call(navigator, padrao);
+            } catch(e) {}
+        }
+    };
+}
 
 // Aplicando magicamente a todos os botões do aplicativo de uma vez:
 window.addEventListener('load', () => {

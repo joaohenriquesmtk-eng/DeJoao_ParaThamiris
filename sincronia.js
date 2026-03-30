@@ -521,7 +521,7 @@ function atualizarInterfaceSincronia() {
     
     // 2. Ela já respondeu, mas eu ainda não
     else if (minhaResposta === "" && respostaDela !== "") {
-        inputMeu.value = "";
+        // 🚨 CORREÇÃO: Removemos o inputMeu.value = "" que apagava o texto da Thamiris!
         statusDela.classList.add('escondido');
         boxOculta.classList.remove('escondido'); // Mostra a caixa "Resposta Trancada!"
         orbe.className = "orbe orbe-conectada";

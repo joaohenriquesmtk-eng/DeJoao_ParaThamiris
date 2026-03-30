@@ -2948,7 +2948,11 @@ const PERGUNTAS_ESPELHO = [
 ];
 
 window.escutarEspelhoDaAlma = function() {
-    if (!window.SantuarioApp || !window.MEU_NOME || !window.NOME_PARCEIRO) return;
+    // 🚨 FALLBACK DE SEGURANÇA PARA O IPHONE DELA: Se o window.MEU_NOME sumir, pega do login!
+    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
+    const parceiro = window.NOME_PARCEIRO || (window.souJoao ? 'Thamiris' : 'João');
+
+    if (!window.SantuarioApp || !eu || !parceiro) return;
     
     // Pega a data de hoje no fuso horário do celular
     const hoje = new Date();
@@ -2963,7 +2967,7 @@ window.escutarEspelhoDaAlma = function() {
     
     document.getElementById('pergunta-espelho').innerText = `"${PERGUNTAS_ESPELHO[indicePergunta]}"`;
     const tagNomeParceiro = document.getElementById('nome-parceiro-espelho');
-    if (tagNomeParceiro) tagNomeParceiro.innerText = `A alma de ${window.NOME_PARCEIRO}`;
+    if (tagNomeParceiro) tagNomeParceiro.innerText = `A alma de ${parceiro}`;
     
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     // Ouve especificamente o diretório da data de hoje!
@@ -2972,8 +2976,9 @@ window.escutarEspelhoDaAlma = function() {
     onValue(refEspelho, (snapshot) => {
         const dados = snapshot.val() || {};
         
-        const minhaResposta = dados[window.MEU_NOME.toLowerCase()];
-        const respostaDela = dados[window.NOME_PARCEIRO.toLowerCase()];
+        // 🚨 Busca ignorando maiúsculas e minúsculas com segurança
+        const minhaResposta = dados[eu.toLowerCase()];
+        const respostaDela = dados[parceiro.toLowerCase()];
         
         const boxResponder = document.getElementById('estado-espelho-responder');
         const boxAguardando = document.getElementById('estado-espelho-aguardando');
@@ -3000,13 +3005,13 @@ window.escutarEspelhoDaAlma = function() {
             if(boxResponder) boxResponder.classList.add('escondido');
             if(boxAguardando) boxAguardando.classList.remove('escondido');
             if(boxRevelado) boxRevelado.classList.add('escondido');
-            document.getElementById('texto-aguardando-espelho').innerText = `A sua verdade foi gravada. Aguardando ${window.NOME_PARCEIRO} responder em Goiânia para que o espelho se estilhace... 🔒`;
+            document.getElementById('texto-aguardando-espelho').innerText = `A sua verdade foi gravada. Aguardando ${parceiro} responder em Goiânia para que o espelho se estilhace... 🔒`;
         } else if (!minhaResposta && respostaDela) {
             // ESTADO 2.B: SÓ ELA RESPONDEU (A PRESSÃO PSICOLÓGICA!)
             if(boxResponder) boxResponder.classList.remove('escondido');
             if(boxAguardando) boxAguardando.classList.remove('escondido');
             if(boxRevelado) boxRevelado.classList.add('escondido');
-            document.getElementById('texto-aguardando-espelho').innerHTML = `<span style="color: #ff9ff3; font-weight:bold; font-size:1.1rem;">✨ ${window.NOME_PARCEIRO} já respondeu!</span><br>O espelho agora aguarda a sua resposta para ser revelado.`;
+            document.getElementById('texto-aguardando-espelho').innerHTML = `<span style="color: #ff9ff3; font-weight:bold; font-size:1.1rem;">✨ ${parceiro} já respondeu!</span><br>O espelho agora aguarda a sua resposta para ser revelado.`;
         } else {
             // ESTADO 1: O DIA COMEÇOU, NINGUÉM RESPONDEU
             if(boxResponder) boxResponder.classList.remove('escondido');
@@ -3033,8 +3038,11 @@ window.enviarRespostaEspelho = function() {
     const { db, ref, update } = window.SantuarioApp.modulos;
     const refEspelho = ref(db, `espelho_alma/${stringData}`);
     
+    // 🚨 Usa a mesma trava de segurança de nome
+    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
+    
     const payload = {};
-    payload[window.MEU_NOME.toLowerCase()] = resposta;
+    payload[eu.toLowerCase()] = resposta;
     
     // Usamos UPDATE em vez de SET para não apagar a resposta dela se ela já respondeu!
     update(refEspelho, payload).then(() => {
@@ -6663,9 +6671,28 @@ window.CassinoAudio = {
 
     tocar: function(nomeSom, volume = 1.0) {
         if (!this.ativo || !this.sonsProntos[nomeSom]) return;
-        let sfx = this.sonsProntos[nomeSom].cloneNode();
-        sfx.volume = volume;
-        sfx.play().catch(e => e);
+        
+        try {
+            let sfx = this.sonsProntos[nomeSom];
+            
+            if (sfx.readyState === 0) {
+                sfx.load();
+            }
+            
+            let clone = sfx.cloneNode();
+            clone.volume = volume;
+            
+            // 🚨 A BLINDAGEM DA APPLE: A promessa de áudio absorve os erros de reprodução silenciosamente
+            let playPromise = clone.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // O Safari bloqueou o som. Não fazemos nada, apenas impedimos que o jogo trave.
+                    console.log("iOS bloqueou o áudio: " + nomeSom);
+                });
+            }
+        } catch(e) {
+            console.error("Erro no motor de áudio:", e);
+        }
     }
 };
 

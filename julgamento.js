@@ -1,9 +1,9 @@
 // ============================================================================
-// JULGAMENTO DA SAFRA: THE MAGNETIC MATCH-3 (ARQUITETURA DEFINITIVA)
+// JULGAMENTO DA SAFRA: THE MAGNETIC MATCH-3 (BLINDADO PARA iOS)
 // ============================================================================
 
 (function() {
-    // 1. ÁUDIOS CINEMATOGRÁFICOS E LOCAIS
+    // 1. ÁUDIOS CINEMATOGRÁFICOS E LOCAIS (Com tratamento anti-crash Apple)
     const AudioMatch = {
         troca: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
         match3: new Audio('assets/sons/acerto.mp3'),
@@ -14,7 +14,13 @@
     };
     Object.values(AudioMatch).forEach(a => a.volume = 0.5);
 
-    // 2. CONFIGURAÇÕES DO TABULEIRO (GEOMETRIA RIGOROSA)
+    // Função de reprodução segura (Evita que o Safari trave o jogo)
+    function playAudioSeguro(audio) {
+        if (!audio) return;
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Áudio contido pelo iOS."));
+    }
+
     const LINHAS = 7;
     const COLUNAS = 6;
     const JOIAS = [
@@ -27,7 +33,6 @@
     ];
     const SEMENTE_DOURADA = '🌟';
 
-    // 3. ESTADO DO JOGO
     let grade = []; 
     let pontuacao = 0;
     let nivel = 1;
@@ -38,16 +43,13 @@
     let processandoCascata = false; 
     window.julgamentoAtivo = false; 
 
-    // Variáveis para detectar Arraste (Swipe)
     let startX = 0, startY = 0;
 
-    // 4. INICIALIZAÇÃO
     window.iniciarJulgamento = function() {
-        console.log("Iniciando Match-3 Motor Definitivo...");
-        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO DO BANCO CENTRAL NA HORA
+        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); 
         
         nivel = 1;
-        metaNivel = 500; // 🚨 BALANCEAMENTO: 1000 era frustrante. 500 é perfeito para a fase 1.
+        metaNivel = 500; 
         iniciarNovoNivel();
         
         const btnNovo = document.getElementById('julgamento-btn-novo');
@@ -56,8 +58,6 @@
 
     function iniciarNovoNivel(resetarTudo = false) {
         if(resetarTudo) { pontuacao = 0; nivel = 1; metaNivel = 500; }
-        
-        // 🚨 MAIS TRANQUILIDADE: Aumentamos a base de movimentos de 15 para 30!
         movimentosRestantes = 30 + (nivel * 3); 
         processandoCascata = false;
         
@@ -65,7 +65,6 @@
         atualizarPlacarUI();
     }
 
-    // 5. GERAÇÃO INTELIGENTE (ANTI-DEADLOCK)
     function gerarGradeInicial() {
         const tabuleiro = document.getElementById('julgamento-grade');
         tabuleiro.innerHTML = '';
@@ -89,7 +88,6 @@
                     grade[l][c] = { ...joia };
                 }
             }
-            // Verifica se o tabuleiro recém-criado possui PELO MENOS um movimento possível
             if (existemMovimentosPossiveis()) tabuleiroValido = true;
         }
 
@@ -130,12 +128,11 @@
         return div;
     }
 
-    // 6. A LÓGICA DE MOVIMENTO CINÉTICO
     function lidarSelecaoInicial(l, c, el) {
         if (!joiaSelecionada) {
             joiaSelecionada = { l, c, el };
             el.classList.add('joia-selecionada');
-            if(window.Haptics) window.Haptics.toqueLeve();
+            if(window.Haptics && window.Haptics.toqueLeve) window.Haptics.toqueLeve();
         }
     }
 
@@ -161,7 +158,6 @@
             }
             joiaSelecionada = null;
         } else {
-            // Lida com clique em duas peças separadamente
             if (joiaSelecionada.l !== origemL || joiaSelecionada.c !== origemC) {
                 joiaSelecionada.el.classList.remove('joia-selecionada');
                 const adjacente = (Math.abs(joiaSelecionada.l - origemL) === 1 && joiaSelecionada.c === origemC) || 
@@ -174,7 +170,6 @@
         }
     }
 
-    // 🚨 MOTOR DE TROCA E BOMBA DE COR (COLOR BOMB)
     async function tentarTroca(l1, c1, l2, c2) {
         if (processandoCascata) return;
         processandoCascata = true;
@@ -182,27 +177,21 @@
         movimentosRestantes--;
         atualizarPlacarUI();
 
-        // 1. Troca Física na Memória
         let temp = grade[l1][c1];
         grade[l1][c1] = grade[l2][c2];
         grade[l2][c2] = temp;
 
         atualizarVisualDaGrade();
-        if(AudioMatch.troca) {
-            AudioMatch.troca.currentTime = 0;
-            AudioMatch.troca.play().catch(e => console.log(e));
-        }
+        playAudioSeguro(AudioMatch.troca);
 
         await new Promise(r => setTimeout(r, 250)); 
 
-        // 🚨 LÓGICA DA BOMBA DE COR (SEMENTE DOURADA)
         let isBomba1 = grade[l1][c1].emoji === SEMENTE_DOURADA;
         let isBomba2 = grade[l2][c2].emoji === SEMENTE_DOURADA;
 
         if (isBomba1 || isBomba2) {
             let matchesBomb = [];
             
-            // SUPERNOVA (Duas bombas se chocando)
             if (isBomba1 && isBomba2) {
                 mostrarTextoFlutuante("SUPERNOVA!");
                 for (let l = 0; l < LINHAS; l++) {
@@ -211,12 +200,11 @@
                     }
                 }
             } else {
-                // ANIMAÇÃO DE BOMBA DE COR
                 let corAlvo = isBomba1 ? grade[l2][c2].emoji : grade[l1][c1].emoji;
                 mostrarTextoFlutuante("RAIO DOURADO!");
                 
-                matchesBomb.push({l: l1, c: c1}); // Destrói a bomba
-                matchesBomb.push({l: l2, c: c2}); // Destrói o alvo
+                matchesBomb.push({l: l1, c: c1}); 
+                matchesBomb.push({l: l2, c: c2}); 
                 
                 for (let l = 0; l < LINHAS; l++) {
                     for (let c = 0; c < COLUNAS; c++) {
@@ -227,20 +215,19 @@
                 }
             }
             
-            AudioMatch.explosaoNuke.play();
-            if(window.Haptics) navigator.vibrate([100, 50, 200, 100, 300]);
+            playAudioSeguro(AudioMatch.explosaoNuke);
+            if(navigator.vibrate) navigator.vibrate([100, 50, 200, 100, 300]); // 🚨 TRAVA DO iOS AQUI
+            
             await processarMatchesComArray(matchesBomb, true);
-            return; // Encerra aqui pois a bomba limpa a etapa
+            return; 
         }
 
-        // LÓGICA TRADICIONAL DE MATCH-3
         const matches = encontrarMatches();
         if (matches.length > 0) {
             await processarMatchesComArray(matches, false);
         } else {
-            // Se NÃO deu match e não foi bomba, desfaz a troca na memória!
             if(typeof mostrarToast === 'function') mostrarToast("Movimento inválido!", "⚠️");
-            if(window.Haptics) navigator.vibrate(50);
+            if(navigator.vibrate) navigator.vibrate(50); // 🚨 TRAVA DO iOS AQUI
             
             temp = grade[l1][c1];
             grade[l1][c1] = grade[l2][c2];
@@ -255,7 +242,6 @@
         }
     }
 
-    // 7. O ALGORITMO DE MATCH-3 (BLINDADO)
     function encontrarMatches() {
         let matches = new Set(); 
 
@@ -293,47 +279,40 @@
         });
     }
 
-    // 8. O MOTOR DE CASCATA E RESOLUÇÃO
     async function processarMatchesComArray(matches, isBombAttack = false) {
         if (matches.length === 0 || !window.julgamentoAtivo) {
             processandoCascata = false; 
             return; 
         }
 
-        // Remove duplicatas do array (caso o match cruzado crie)
         const matchesUnicos = matches.filter((v, i, a) => a.findIndex(t => (t.l === v.l && t.c === v.c)) === i);
 
         const recompensa = matchesUnicos.length * (isBombAttack ? 25 : 15);
         pontuacao += recompensa;
         
-        // 🚨 INFLAÇÃO DO BEM: Paga 1 Moeda por cada pecinha destruída no jogo!
         if (typeof atualizarPontosCasal === 'function') {
             atualizarPontosCasal(matchesUnicos.length, "Pedras Quebradas na Safra");
-            // Atualiza a interface da Fazenda (se aberta no fundo) para ela não perder a conta
             const capitalUI = document.getElementById('fazenda-capital');
             if (capitalUI) capitalUI.innerText = window.pontosDoCasal;
         }
         
         if (!isBombAttack) {
-            AudioMatch.match3.currentTime = 0; AudioMatch.match3.play();
+            playAudioSeguro(AudioMatch.match3);
         }
-        if(window.Haptics) navigator.vibrate([30, 50]);
+        if(navigator.vibrate) navigator.vibrate([30, 50]); // 🚨 TRAVA DO iOS AQUI
 
         if (typeof integrarComArvoreDaVida === 'function') integrarComArvoreDaVida(recompensa);
 
-        // Gera a Semente Dourada se for um match massivo (e não for um ataque de bomba)
         if (!isBombAttack && matchesUnicos.length >= 5) {
-            AudioMatch.match5.play();
+            playAudioSeguro(AudioMatch.match5);
             mostrarTextoFlutuante("SEMENTE DOURADA!");
             const meio = matchesUnicos[Math.floor(matchesUnicos.length / 2)];
             grade[meio.l][meio.c] = { emoji: SEMENTE_DOURADA, cor: '#f1c40f' };
-            // Remove a peça do meio da lista de destruição
             matchesUnicos.splice(matchesUnicos.findIndex(m => m.l === meio.l && m.c === meio.c), 1);
         } else if (!isBombAttack && matchesUnicos.length === 4) {
             mostrarTextoFlutuante("COLHEITA FORTE!");
         }
 
-        // Efeito visual de explosão
         matchesUnicos.forEach(m => {
             const el = document.getElementById(`joia-${m.l}-${m.c}`);
             if (el) el.classList.add('anim-explodindo');
@@ -357,7 +336,6 @@
             if(!isBombAttack) mostrarTextoFlutuante("CASCATA!");
             await processarMatchesComArray(novosMatches, false); 
         } else {
-            // CASCATA CONCLUÍDA. HORA DA VERIFICAÇÃO MESTRA DE INTELIGÊNCIA ARTIFICIAL:
             if (!existemMovimentosPossiveis() && pontuacao < metaNivel && movimentosRestantes > 0) {
                 await executarAutoShuffle();
             } else {
@@ -367,30 +345,25 @@
         }
     }
 
-    // 🚨 A INTELIGÊNCIA ARTIFICIAL: DETECTOR DE DEADLOCK
     function existemMovimentosPossiveis() {
-        // Simula todos os movimentos possíveis invisivelmente
         for (let l = 0; l < LINHAS; l++) {
             for (let c = 0; c < COLUNAS; c++) {
-                
-                // Simula troca para a direita
                 if (c < COLUNAS - 1) {
                     swapGradeInvisivel(l, c, l, c + 1);
                     if (encontrarMatchesInvisiveis() || simularBomba(l, c, l, c+1)) {
-                        swapGradeInvisivel(l, c, l, c + 1); // Desfaz
+                        swapGradeInvisivel(l, c, l, c + 1); 
                         return true;
                     }
-                    swapGradeInvisivel(l, c, l, c + 1); // Desfaz
+                    swapGradeInvisivel(l, c, l, c + 1); 
                 }
                 
-                // Simula troca para baixo
                 if (l < LINHAS - 1) {
                     swapGradeInvisivel(l, c, l + 1, c);
                     if (encontrarMatchesInvisiveis() || simularBomba(l, c, l+1, c)) {
-                        swapGradeInvisivel(l, c, l + 1, c); // Desfaz
+                        swapGradeInvisivel(l, c, l + 1, c); 
                         return true;
                     }
-                    swapGradeInvisivel(l, c, l + 1, c); // Desfaz
+                    swapGradeInvisivel(l, c, l + 1, c); 
                 }
             }
         }
@@ -415,9 +388,8 @@
 
     async function executarAutoShuffle() {
         mostrarTextoFlutuante("EMBARALHANDO...");
-        if(window.Haptics) navigator.vibrate([100, 100, 100]);
+        if(navigator.vibrate) navigator.vibrate([100, 100, 100]); // 🚨 TRAVA
         
-        // Efeito visual de quebra
         for (let l = 0; l < LINHAS; l++) {
             for (let c = 0; c < COLUNAS; c++) {
                 const el = document.getElementById(`joia-${l}-${c}`);
@@ -429,16 +401,14 @@
         }
         
         await new Promise(r => setTimeout(r, 500));
-        
-        gerarGradeInicial(); // Esta função já é blindada contra deadlocks iniciais!
-        
+        gerarGradeInicial(); 
         await new Promise(r => setTimeout(r, 200));
+        
         mostrarTextoFlutuante("JOGO SALVO!");
         processandoCascata = false;
         verificarFimDeTurno();
     }
 
-    // 9. GRAVIDADE E PREENCHIMENTO
     function aplicarGravidade() {
         for (let c = 0; c < COLUNAS; c++) {
             let chao = LINHAS - 1;
@@ -505,7 +475,6 @@
         }
     }
 
-    // 10. CONTROLE DE TURNOS
     function verificarFimDeTurno() {
         if (pontuacao >= metaNivel) {
             subirDeNivel();
@@ -519,15 +488,12 @@
         nivel++;
         pontuacao = 0;
         metaNivel = Math.floor(metaNivel * 1.5); 
-        
-        // 🚨 BUG CORRIGIDO: Mantendo a mesma generosidade matemática de 30 turnos + bônus do nível.
         movimentosRestantes = 30 + (nivel * 3); 
         
-        AudioMatch.subirNivel.play();
+        playAudioSeguro(AudioMatch.subirNivel);
         mostrarTextoFlutuante(`NÍVEL ${nivel}! +150💰`);
         if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#9b59b6'], spread: 90});
         
-        // 🚨 INFLAÇÃO DO BEM: O prêmio gordo por passar de fase
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(150, `Subiu para o Nível ${nivel} na Safra`);
         
         let statsTribunal = JSON.parse(localStorage.getItem('estatisticasCasalTribunal')) || { ganhos: 0, perdidos: 0 };
@@ -543,9 +509,9 @@
 
     function gameOver() {
         processandoCascata = true;
-        AudioMatch.erroGameOver.play();
+        playAudioSeguro(AudioMatch.erroGameOver);
         mostrarTextoFlutuante("SEM MOVIMENTOS!");
-        if(window.Haptics) navigator.vibrate([200, 100, 200]);
+        if(navigator.vibrate) navigator.vibrate([200, 100, 200]); // 🚨 TRAVA
         
         setTimeout(() => {
             if(typeof mostrarToast === 'function') mostrarToast("A safra foi perdida. Tentando novamente!", "⏳");
@@ -553,7 +519,6 @@
         }, 2500);
     }
 
-    // 11. INTERFACE
     function atualizarPlacarUI() {
         document.getElementById('julgamento-pontuacao').innerText = pontuacao;
         document.getElementById('julgamento-nivel').innerText = nivel;
@@ -577,18 +542,14 @@
     function mostrarTextoFlutuante(texto) {
         const div = document.getElementById('texto-combo-flutuante');
         if (!div) return;
-        
         div.innerHTML = texto;
         div.classList.remove('escondido'); 
         div.classList.remove('mostrar-animacao');
-        
         void div.offsetWidth; 
-        
         div.classList.add('mostrar-animacao');
     }
 
     window.toggleInstrucoesJulgamento = function() {
         document.getElementById('instrucoes-julgamento').classList.toggle('escondido');
     };
-
 })();

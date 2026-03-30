@@ -66,7 +66,7 @@ self.addEventListener('notificationclick', (event) => {
 // ==========================================
 // ESTRATÉGIA DE CACHE INTELIGENTE
 // ==========================================
-const CACHE_NAME = 'santuario-cache-v3-ouro'; // Atualizado para forçar o reset global
+const CACHE_NAME = 'santuario-cache-ouro-v4.0'; // Atualizado para forçar o reset global
 
 // Apenas os arquivos vitais para a tela carregar se estiver offline
 const ASSETS_TO_CACHE = [

@@ -107,12 +107,18 @@
 
 body {
     background-color: var(--cor-fundo);
-    color: #ffffff;
+    color: #fff;
     font-family: var(--fonte-padrao);
-    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
     overflow: hidden;
-    /* CORREÇÃO: 100dvh garante a leitura da tela real do iPhone, ignorando as barras do navegador */
-    height: 100dvh; 
+    
+    /* 🚨 TRAVA DE IMERSÃO DO iPHONE: Impede o efeito de tela "descolando" */
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
 }
 
 #app-shell {
@@ -146,13 +152,22 @@ body {
 
 /* ===== MENU INFERIOR ACRÍLICO ===== */
 .menu-inferior {
-    height: calc(60px + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
-    background: rgba(12, 12, 14, 0.95);
-    display: flex; justify-content: space-around; align-items: center;
-    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    display: flex;
+    justify-content: space-around;
+    background: rgba(10, 10, 12, 0.95);
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 10px 0;
+    
+    /* 🚨 PROTEÇÃO PARA O IPHONE: Empurra os ícones para cima da Barra de Início */
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
-    position: fixed; bottom: 0; width: 100%; z-index: 999;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 /* BARRA SUPERIOR DOS JOGOS ACRÍLICO (COM PROTEÇÃO PARA O NOTCH DO IPHONE) */

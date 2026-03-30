@@ -545,3 +545,62 @@ window.fecharCassino = function() {
         musicaApp.play().catch(e => console.log("Áudio bloqueado pelo navegador ao voltar pro app"));
     }
 };
+
+// ============================================================================
+// 🏦 SISTEMA BANCÁRIO CENTRAL (CONTA CONJUNTA EM TEMPO REAL)
+// ============================================================================
+
+window.pontosDoCasal = 0; // Variável global de memória da UI
+
+window.iniciarContaConjunta = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    // 1. Ouve o saldo consolidado do casal na nuvem em tempo real
+    const saldoRef = ref(db, 'banco_central/conta_conjunta/saldo');
+    
+    onValue(saldoRef, (snapshot) => {
+        // Atualiza a memória do celular
+        window.pontosDoCasal = snapshot.val() || 0;
+        
+        // Atualiza TODOS os visores de moeda do aplicativo ao mesmo tempo
+        const visores = document.querySelectorAll('.visor-moedas-global-texto, #boutique-moedas-visor, #fazenda-capital');
+        visores.forEach(visor => {
+            visor.innerText = window.pontosDoCasal.toLocaleString('pt-BR');
+        });
+    });
+};
+
+window.atualizarPontosCasal = function(valorAlteracao, motivo = "Transação") {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, runTransaction, push } = window.SantuarioApp.modulos;
+    
+    const saldoRef = ref(db, 'banco_central/conta_conjunta/saldo');
+    const extratoRef = ref(db, 'banco_central/conta_conjunta/extrato');
+    
+    // 2. A MÁGICA: runTransaction enfileira as somas lá no servidor do Google.
+    // Se vocês dois ganharem 500 no exato mesmo milissegundo, ele soma +1000 perfeitamente!
+    runTransaction(saldoRef, (saldoAtual) => {
+        let novoSaldo = (saldoAtual || 0) + valorAlteracao;
+        return novoSaldo < 0 ? 0 : novoSaldo; // Impede que o casal fique com saldo negativo
+    }).then(() => {
+        // 3. (Opcional) Cria um "Extrato Bancário" invisível na nuvem para registro
+        const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
+        push(extratoRef, {
+            autor: eu,
+            valor: valorAlteracao,
+            motivo: motivo,
+            data: Date.now()
+        });
+    }).catch((erro) => {
+        console.error("Erro na transação bancária:", erro);
+    });
+};
+
+// 4. Inicia a sincronização bancária assim que o login for aprovado
+window.addEventListener('loginSucesso', window.iniciarContaConjunta);
+
+// Fallback: Se o login já aconteceu e o script carregou depois, inicia forçado
+if (window.usuarioLogado) {
+    window.iniciarContaConjunta();
+}

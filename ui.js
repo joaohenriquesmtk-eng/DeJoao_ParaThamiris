@@ -314,11 +314,15 @@ window.LottieManager = {
            Isso evita que a CPU tenha que recalcular curvas de vetor 60 vezes por segundo, 
            transformando o Lottie em uma imagem rasterizada controlada pela placa de vídeo. */
         window.LottieManager.instancia = lottie.loadAnimation({
-            container: container,
-            renderer: 'canvas',
-            loop: true,
-            autoplay: true,
-            path: url
-        });
+    container: container,
+    renderer: 'canvas',
+    loop: true,
+    autoplay: true,
+    path: url,
+    rendererSettings: {
+        preserveAspectRatio: 'xMidYMid slice',
+        clearCanvas: true /* Ajuda o Android a limpar o frame anterior da memória */
+    }
+});
     }
 };

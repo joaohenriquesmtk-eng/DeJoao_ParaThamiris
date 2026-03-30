@@ -281,8 +281,6 @@ body.modo-jogo-ativo .tela {
     width: min(56px, 10vw);
     height: min(56px, 10vw);
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     border: 2px solid rgba(212, 175, 55, 0.3);
     border-radius: 16px;
     display: flex;
@@ -891,7 +889,6 @@ body.modo-jogo-ativo .tela {
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-block;
-    backdrop-filter: blur(10px);
 }
 
 .btn-refresh:active {
@@ -996,14 +993,8 @@ body.modo-jogo-ativo .tela {
     text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
     transform-style: preserve-3d;
     transform: perspective(500px) rotateX(0deg) rotateY(0deg);
-    animation: brilhoSlot 3s infinite alternate;
 }
 
-/* Brilho suave nos slots */
-@keyframes brilhoSlot {
-    from { filter: brightness(1); }
-    to { filter: brightness(1.15); }
-}
 
 /* Efeito ao passar o mouse (hover) */
 .slot-fazenda:hover {
@@ -1029,8 +1020,8 @@ body.modo-jogo-ativo .tela {
 
 /* Animações existentes (já estão no seu CSS, mas vou reforçar) */
 @keyframes pulsar-pronto {
-    0% { transform: scale(1); box-shadow: inset 0 -4px 0 #3D2A0A, 0 0 10px rgba(46,204,113,0.4); }
-    100% { transform: scale(1.08); box-shadow: inset 0 -4px 0 #3D2A0A, 0 0 20px rgba(46,204,113,0.8), 0 0 15px #D4AF37; }
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
 }
 
 @keyframes respiracao-crescimento {
@@ -1770,8 +1761,8 @@ body.modo-jogo-ativo .tela {
 
 /* Animação de brilho suave */
 @keyframes brilhoPeca {
-    from { filter: brightness(1); }
-    to { filter: brightness(1.2); text-shadow: 0 0 5px gold; }
+    from { opacity: 0.9; }
+    to { opacity: 1; }
 }
 
 /* Efeito quando a peça é selecionada para troca */
@@ -1930,8 +1921,6 @@ body.modo-jogo-ativo .tela {
 
 /* Efeito de "vidro" mais pronunciado no cartão principal */
 #container-julgamento .cartao-vidro {
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
     border: 1px solid rgba(212, 175, 55, 0.4);
     box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(212,175,55,0.2) inset;
 }
@@ -2578,7 +2567,6 @@ body.jogo-aberto #btn-mute-jogos {
     background: linear-gradient(145deg, rgba(52, 152, 219, 0.1), rgba(255, 255, 255, 0.05));
     border: 2px solid transparent;
     background-clip: padding-box;
-    animation: brilhoClima 3s infinite alternate ease-in-out;
 }
 
 /* Borda gradiente com cores que remetem ao clima (azul, dourado, branco) */
@@ -2594,16 +2582,6 @@ body.jogo-aberto #btn-mute-jogos {
     border-radius: 26px;
     z-index: -1;
     animation: bordaClima 6s ease infinite;
-}
-
-/* Animação de brilho pulsante */
-@keyframes brilhoClima {
-    0% {
-        box-shadow: 0 0 5px rgba(52, 152, 219, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-    100% {
-        box-shadow: 0 0 25px rgba(52, 152, 219, 0.6), 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
 }
 
 /* Animação do gradiente na borda */
@@ -2659,7 +2637,6 @@ body.jogo-aberto #btn-mute-jogos {
     height: 45px;
     border-radius: 50%;
     background: var(--cor-vidro);
-    backdrop-filter: blur(10px);
     border: 1px solid var(--cor-primaria);
     color: var(--cor-primaria);
     font-size: 20px;
@@ -2842,7 +2819,6 @@ body.modo-alerta {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
     flex: 1 1 calc(30% - 10px); /* Cria uma grade de 3 colunas perfeitas */
     text-align: center;
 }
@@ -2932,7 +2908,6 @@ body.modo-alerta {
 }
 .tema-selector .cartao-vidro {
     background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(10px);
     border: 1px solid var(--cor-primaria);
 }
 
@@ -2961,7 +2936,6 @@ body.modo-alerta {
     text-align: center;
     padding: 20px;
     box-sizing: border-box;
-    backdrop-filter: blur(5px);
 }
 
 .aviso-orientacao p {
@@ -3002,8 +2976,6 @@ body.modo-alerta {
 .top-bar {
     height: 60px;
     background: var(--cor-vidro);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     display: flex;
     align-items: center;
@@ -3082,8 +3054,6 @@ body.modo-alerta {
 .painel-area {
     width: 300px;
     background: var(--cor-vidro);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border-left: 1px solid rgba(212, 175, 55, 0.3);
     padding: 15px;
     overflow-y: auto; /* ← O scroll dos menus voltará a funcionar magicamente */
@@ -3138,8 +3108,6 @@ body.modo-alerta {
 .painel-area {
     width: 300px;
     background: var(--cor-vidro);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border-left: 1px solid rgba(212, 175, 55, 0.3);
     padding: 15px;
     overflow-y: auto; /* permite rolar se conteúdo for maior */
@@ -3303,7 +3271,6 @@ body.modo-alerta {
     gap: 10px;                     /* reduzido de 15px */
     transition: all 0.2s ease;
     cursor: pointer;
-    backdrop-filter: blur(5px);
     width: 100%;
     box-sizing: border-box;
     flex-wrap: wrap;               /* permite quebra se necessário */
@@ -3785,7 +3752,6 @@ body.modo-alerta {
     gap: 4px;
     transition: all 0.2s ease;
     cursor: pointer;
-    backdrop-filter: blur(5px);
     width: 100%;
     box-sizing: border-box;
 }
@@ -3907,8 +3873,6 @@ body.modo-alerta {
 .top-bar {
     height: 60px;
     background: var(--cor-vidro);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     display: flex;
     align-items: center;
@@ -4046,8 +4010,6 @@ body.modo-alerta {
 .painel-area {
     width: 300px;
     background: var(--cor-vidro);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border-left: 1px solid rgba(212, 175, 55, 0.3);
     padding: 15px;
     overflow-y: auto; /* rolagem vertical */
@@ -4526,8 +4488,6 @@ body {
     left: 0;
     width: 100%;
     background: rgba(10, 15, 26, 0.85); /* Vidro escuro */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     color: var(--cor-primaria);
     z-index: 10000; /* Fica por cima de absolutamente tudo */
@@ -4644,8 +4604,6 @@ body.aura-ansiosa {
     width: 100vw; /* Força a largura exata da tela */
     height: 100vh; /* Força a altura exata da tela */
     background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     z-index: 99999;
     opacity: 1;
     transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -4712,8 +4670,6 @@ body.aura-ansiosa {
     opacity: 0;
     pointer-events: none;
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     
     /* 🚨 MATEMÁTICA DE TELAS (A55 5G & IPHONE 14 PRO MAX) 🚨 */
     width: max-content; /* Força o box a tentar ficar em 1 linha comprida primeiro */
@@ -5099,8 +5055,6 @@ body.aura-ansiosa {
 ========================================= */
 #btn-pulso {
     background: rgba(212, 175, 55, 0.04);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border: 2px solid rgba(212, 175, 55, 0.3);
     width: 95px; height: 95px; border-radius: 50%;
     cursor: pointer;
@@ -5280,7 +5234,6 @@ body.aura-ansiosa {
     font-size: 2rem; font-weight: 900; color: #fff;
     text-transform: uppercase;
     box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-    backdrop-filter: blur(8px);
     transition: transform 0.1s, border-color 0.2s;
     /* Preparo para o 3D Flip */
     perspective: 1000px;
@@ -5337,7 +5290,7 @@ body.aura-ansiosa {
     border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
     color: white; font-weight: bold; font-size: 1.1rem;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; backdrop-filter: blur(5px);
+    cursor: pointer;
     transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     user-select: none; -webkit-tap-highlight-color: transparent;
 }
@@ -5366,7 +5319,6 @@ body.aura-ansiosa {
     width: min(60px, 15vw);
     height: min(60px, 15vw);
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
     border: 2px solid rgba(212, 175, 55, 0.2);
     border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
@@ -5706,7 +5658,6 @@ body.aura-ansiosa {
     background: rgba(255,255,255,0.05); border-radius: 15px;
     border: 1px solid rgba(155, 89, 182, 0.3); padding: 20px;
     display: flex; flex-direction: column; gap: 20px;
-    backdrop-filter: blur(10px);
 }
 
 .campo-jogador, .campo-parceiro { display: flex; flex-direction: column; gap: 8px; }
@@ -5812,7 +5763,7 @@ body.aura-ansiosa {
 
 .modulo-economia {
     flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 15px; padding: 15px; backdrop-filter: blur(10px);
+    border-radius: 15px; padding: 15px;
 }
 
 .modulo-economia h5 { color: #D4AF37; margin-bottom: 10px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 5px; }
@@ -5936,7 +5887,7 @@ body.aura-ansiosa {
 .painel-score-choque {
     background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(155, 89, 182, 0.4);
     border-radius: 15px; padding: 15px; text-align: center; width: 100%; max-width: 400px;
-    backdrop-filter: blur(10px); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 .score-titulo { font-size: 0.8rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 2px; }
 .score-valor { font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 15px #9b59b6; font-family: monospace; }
@@ -6126,7 +6077,6 @@ body.aura-ansiosa {
     font-size: 0.85rem;
     font-weight: bold;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.1);
-    backdrop-filter: blur(5px);
     text-transform: uppercase;
     letter-spacing: 1px;
     white-space: nowrap; 
@@ -6163,7 +6113,7 @@ body.aura-ansiosa {
 .btn-nutrir {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 10px; border-radius: 15px; border: none; cursor: pointer;
-    background: rgba(255,255,255,0.05); backdrop-filter: blur(5px);
+    background: rgba(255,255,255,0.05);
     transition: all 0.2s; border-top: 1px solid rgba(255,255,255,0.2);
 }
 .btn-nutrir:active { transform: scale(0.9); }
@@ -6215,7 +6165,7 @@ body.aura-ansiosa {
 /* O Visor de Tempo (Mantido da última atualização) */
 .visor-tempo {
     width: 100%; background: linear-gradient(145deg, rgba(20, 5, 10, 0.95), rgba(0, 0, 0, 0.9));
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 51, 102, 0.3);
+    border: 1px solid rgba(255, 51, 102, 0.3);
     border-radius: 15px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 25px rgba(255, 51, 102, 0.15);
     position: relative; overflow: hidden;
@@ -6246,7 +6196,7 @@ body.aura-ansiosa {
 .btn-anexo {
     flex: 1; background: rgba(255, 51, 102, 0.1); border: 1px dashed rgba(255, 51, 102, 0.4);
     color: #ff9ff3; border-radius: 8px; padding: 10px; font-size: 0.85rem; font-weight: bold;
-    text-align: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px);
+    text-align: center; cursor: pointer; transition: all 0.2s;
 }
 .btn-anexo:active { transform: scale(0.95); background: rgba(255, 51, 102, 0.3); }
 
@@ -6283,7 +6233,6 @@ body.aura-ansiosa {
 
 #btn-coracao-radar {
     background: radial-gradient(circle, rgba(20, 5, 10, 0.95), rgba(0, 0, 0, 0.9));
-    backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 51, 102, 0.5);
     border-radius: 50%;
     width: 65px;
@@ -6469,7 +6418,6 @@ body.aura-ansiosa {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(10, 10, 10, 0.85);
-    backdrop-filter: blur(8px);
     padding: 20px;
     box-sizing: border-box;
     display: flex;
@@ -6829,7 +6777,6 @@ body.aura-ansiosa {
 ========================================== */
 .cartao-jornada-holografico {
     background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(5,5,5,0.6)) !important;
-    backdrop-filter: blur(8px);
     border: 1px solid rgba(212,175,55,0.2) !important;
     box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.02) !important;
 }
@@ -6874,7 +6821,6 @@ body.aura-ansiosa {
     padding: 15px;
     border-radius: 5px;
     display: inline-block;
-    backdrop-filter: blur(5px);
 }
 
 .hud-label {
@@ -6925,7 +6871,6 @@ body.aura-ansiosa {
     height: 65px;
     background: rgba(212,175,55,0.1) !important;
     border: 1px solid var(--cor-primaria) !important;
-    backdrop-filter: blur(10px);
     border-radius: 0 !important;
     position: relative;
     overflow: hidden;
@@ -7037,22 +6982,20 @@ body.aura-ansiosa {
 }
 
 
-/* ==========================================
-   FUNDO CINEMATOGRÁFICO EM VÍDEO (GALÁXIA)
-========================================== */
 .video-fundo {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    /* A Mágica do Object-Fit: Faz o vídeo preencher toda a tela, cortando as bordas que sobrarem, sem NUNCA achatar ou distorcer a galáxia */
-    object-fit: cover; 
-    /* O z-index negativo mais profundo garante que o vídeo fique atrás das telas, cartões de vidro e botões */
-    z-index: -5; 
-    pointer-events: none; /* O dedo dela vai atravessar o vídeo e clicar nos botões do app */
-    opacity: 0.65; /* Damos uma leve escurecida no vídeo para que os textos em branco e dourado tenham contraste perfeito e sejam fáceis de ler */
-    transition: opacity 1s ease-in-out;
+    object-fit: cover;
+    z-index: -2;
+    transform: translateZ(0); /* Força o uso da Placa de Vídeo (GPU) */
+    -webkit-transform: translateZ(0);
+    will-change: transform; /* Diz ao navegador para se preparar */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    pointer-events: none;
 }
 
 
@@ -7162,8 +7105,6 @@ body.aura-ansiosa {
     background: rgba(0,0,0,0.7);
     border-radius: 20px;
     border: 1px solid rgba(212,175,55,0.3);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
     text-transform: uppercase;
     letter-spacing: 1px;
     opacity: 0;
@@ -7649,7 +7590,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 #btn-surpresa:not(.btn-desativado):active { transform: scale(0.95); filter: brightness(1.2); }
 .btn-desativado { opacity: 0.4 !important; pointer-events: none !important; cursor: not-allowed !important; filter: grayscale(0.8) !important; transition: all 0.3s ease !important; }
 
-.btn-tema { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 10px 5px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px); flex: 1 1 calc(30% - 10px); text-align: center; }
+.btn-tema { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--cor-primaria); color: var(--cor-primaria); padding: 10px 5px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; flex: 1 1 calc(30% - 10px); text-align: center; }
 .btn-tema.ativo { background: var(--cor-primaria) !important; color: #000 !important; box-shadow: 0 0 12px var(--cor-primaria); transform: scale(1.05); }
 .cabecalho-colapsavel:active { opacity: 0.7; }
 .tema-icon { position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); right: 15px; width: 50px; height: 50px; background: var(--cor-primaria); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); z-index: 1000; transition: transform 0.2s; }
@@ -7790,7 +7731,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
-    backdrop-filter: blur(5px);
 }
 .btn-estufa-ajuste:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
 
@@ -7984,7 +7924,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 /* Modais Fintech */
 .modal-financeiro {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
-    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.85);
     z-index: 99999; display: flex; align-items: center; justify-content: center;
     transition: opacity 0.3s;
 }
@@ -8045,7 +7985,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 }
 
 .cartao-depoimento {
-    background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(15px);
+    background: rgba(10, 10, 15, 0.8);
     border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 12px; padding: 25px;
     box-shadow: inset 0 0 40px rgba(231, 76, 60, 0.05), 0 15px 30px rgba(0,0,0,0.8);
     position: relative;
@@ -8187,7 +8127,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
         inset -5px -5px 15px rgba(0, 212, 255, 0.1),
         0 15px 30px rgba(0,0,0,0.8);
     position: relative; overflow: hidden;
-    backdrop-filter: blur(5px);
 }
 
 /* O Reflexo Especular da Luz no Vidro Curvo */
@@ -8302,7 +8241,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 25px;
     position: relative; display: flex; align-items: center; gap: 25px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.05);
-    overflow: hidden; backdrop-filter: blur(10px);
+    overflow: hidden;
 }
 .cartao-tempo-titan::after {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
@@ -8568,7 +8507,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     width: 100%; background: linear-gradient(135deg, rgba(15,18,22,0.9), rgba(5,8,10,0.95));
     border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 25px 20px;
     box-shadow: 0 15px 30px rgba(0,0,0,0.9), inset 0 2px 10px rgba(255,255,255,0.02);
-    display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; backdrop-filter: blur(10px);
+    display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;
 }
 .linha-status-pet { display: flex; align-items: center; gap: 15px; }
 .icone-status-pet { font-size: 1.2rem; width: 30px; text-align: center; filter: grayscale(0.5); }
@@ -8655,7 +8594,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 /* Contagem Regressiva Cinematográfica */
 .overlay-contagem-titan {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
-    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+    background: rgba(0,0,0,0.85);
     display: flex; align-items: center; justify-content: center;
 }
 #numero-contagem-cinema {
@@ -8833,8 +8772,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     width: 100vw;
     height: 100vh;
     background: rgba(10, 10, 15, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     z-index: 99999;
     display: flex;
     justify-content: center;
@@ -9069,8 +9006,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     margin: 15px auto;
     padding: 20px;
     background: rgba(255, 255, 255, 0.03); /* Vidro super translúcido */
-    backdrop-filter: blur(15px); /* Blur de alta qualidade */
-    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.08); /* Borda sutil de vidro */
     border-radius: 24px;
     cursor: pointer;
@@ -9366,8 +9301,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 /* Fundo hiper escuro com o núcleo ROXO MÍSTICO restaurado e isolamento do que está atrás */
 .sincronia-perfeita-bg {
     background: radial-gradient(circle at center, rgba(160, 100, 255, 0.25) 0%, rgba(2, 0, 10, 0.98) 100%) !important;
-    backdrop-filter: blur(50px) !important;
-    -webkit-backdrop-filter: blur(50px) !important;
 }
 
 /* Quando entra em Sincronia Perfeita, os Orbes abandonam o Tema e se fundem no Roxo */
@@ -9403,8 +9336,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     display: flex;
     gap: 12px;
     background: rgba(20, 20, 25, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     padding: 8px 8px 8px 20px;
@@ -9432,7 +9363,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(255, 51, 102, 0.3), inset 0 0 15px rgba(255, 51, 102, 0.4);
-    backdrop-filter: blur(10px);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 10;
 }
@@ -9785,7 +9715,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 .wrapped-bar {
     flex: 1; height: 4px; background: rgba(255, 255, 255, 0.2);
     border-radius: 4px; overflow: hidden;
-    backdrop-filter: blur(5px);
 }
 
 .wrapped-fill {
@@ -9926,7 +9855,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
 /* O Vidro Fosco que separa as duas dimensões */
 .vidro-quantico {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     background: rgba(10, 5, 10, 0.4); z-index: 10; pointer-events: none;
 }
 
@@ -9993,8 +9921,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     background-size: 400% 400%; /* Essencial para a animação mover o gradiente */
     
     /* A Mágica do Vidro (Glassmorphism) */
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
     
     /* Bordas e Sombras de Luxo */
     border-bottom: 1px solid rgba(212, 175, 55, 0.4);
@@ -10177,8 +10103,6 @@ body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0
     background: rgba(20, 20, 25, 0.4); 
     
     /* O Desfoque Perfeito: Muito blur (24px) e saturação controlada (140% em vez de 220%) */
-    backdrop-filter: blur(24px) saturate(140%);
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
     
     /* Força a renderização 3D na placa de vídeo do iPhone */
     transform: translateZ(0);
@@ -10458,8 +10382,6 @@ body::before { display: none !important; }
     
     /* O DESFOQUE INTELIGENTE: Apenas 10px e SEM saturação extra.
        O olho humano lê perfeitamente como vidro fosco, mas o processador trabalha folgado. */
-    backdrop-filter: blur(1px) !important;
-    -webkit-backdrop-filter: blur(1px) !important;
     
     /* Edge Lighting (O corte chanfrado na quina do vidro) */
     border: 1px solid rgba(255, 255, 255, 0.04) !important;
@@ -10485,8 +10407,6 @@ body::before { display: none !important; }
     animation: animaSedaOuroBarra 10s linear infinite !important;
 
     /* Sem desfoque para focar 100% da performance no resto do app */
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
     box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255, 255, 255, 0.3) !important;
@@ -10519,7 +10439,6 @@ body::before { display: none !important; }
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100dvh;
     background: rgba(0, 0, 0, 0.85); /* Fundo super escuro para isolar a atenção */
-    backdrop-filter: blur(5px);
     z-index: 999999; /* Soberania absoluta, acima de TUDO */
     display: flex;
     justify-content: center;
@@ -10630,7 +10549,6 @@ body::before { display: none !important; }
 #overlay-carta-selada {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
     background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(10px);
     z-index: 999999;
     display: flex; justify-content: center; align-items: center;
     padding: 20px;
@@ -10842,8 +10760,6 @@ body.modo-jogo-ativo .rastro-luz {
 /* 1. Alívio de Renderização dos Cartões Deslizantes */
 .palco-slide .cartao-palco {
     /* O GRANDE VILÃO: Remove o desfoque que mata a GPU quando sobreposto ao vídeo MP4 */
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     
     /* REMOVE a animação contínua de "respiração de sombra" do vidro principal */
     animation: none !important;
@@ -10881,8 +10797,6 @@ body > .container-palco {
 /* 1. Alívio de Renderização dos Cartões Deslizantes */
 .palco-slide .cartao-palco {
     /* O GRANDE VILÃO: Remove o desfoque que mata a GPU quando sobreposto ao vídeo MP4 */
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     
     /* REMOVE a animação contínua de "respiração de sombra" do vidro principal */
     animation: none !important;
@@ -10930,8 +10844,6 @@ body > .container-palco {
     font-size: 1.15rem;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(212, 175, 55, 0.2);
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     gap: 6px;
     z-index: 999;
 }
@@ -10945,8 +10857,6 @@ body > .container-palco {
 .moldura-vidro-separador {
     /* 1. O SEU CRISTAL FUMÊ (Base sólida grafite com desfoque inteligente) */
     background: linear-gradient(135deg, rgba(42, 42, 48, 0.75) 0%, rgba(20, 20, 24, 0.90) 100%) !important;
-    backdrop-filter: blur(1px) !important;
-    -webkit-backdrop-filter: blur(1px) !important;
     
     /* 2. EDGE LIGHTING (O corte chanfrado na quina do vidro que você criou) */
     border: 1px solid rgba(255, 255, 255, 0.04) !important;

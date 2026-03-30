@@ -140,7 +140,13 @@ window.otimizadorDeResize = function(func, delay = 100) {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ 
+    alpha: true, 
+    antialias: false, /* Desliga o anti-serrilhado, que suga a GPU */
+    powerPreference: "high-performance" /* Dá ordem máxima ao Android */
+});
+/* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -684,7 +690,13 @@ window.otimizadorDeResize = function(func, delay = 100) {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ 
+    alpha: true, 
+    antialias: false, /* Desliga o anti-serrilhado, que suga a GPU */
+    powerPreference: "high-performance" /* Dá ordem máxima ao Android */
+});
+/* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         
         renderer.setSize(largura, altura);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -1183,7 +1195,13 @@ window.inicializarPrisma3D = () => {
     let h = container.clientHeight || 400;
 
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ 
+    alpha: true, 
+    antialias: false, /* Desliga o anti-serrilhado, que suga a GPU */
+    powerPreference: "high-performance" /* Dá ordem máxima ao Android */
+});
+/* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     
     renderer.setSize(w, h);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -1560,7 +1578,13 @@ window.inicializarGalaxia3D = () => {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ 
+    alpha: true, 
+    antialias: false, /* Desliga o anti-serrilhado, que suga a GPU */
+    powerPreference: "high-performance" /* Dá ordem máxima ao Android */
+});
+/* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -1632,7 +1656,13 @@ window.inicializarJornada3D = () => {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     
-    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ 
+    alpha: true, 
+    antialias: false, /* Desliga o anti-serrilhado, que suga a GPU */
+    powerPreference: "high-performance" /* Dá ordem máxima ao Android */
+});
+/* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Otimização severa para celulares
     container.appendChild(renderer.domElement);
 

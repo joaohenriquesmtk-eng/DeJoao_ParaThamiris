@@ -183,7 +183,6 @@ window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => rastro.remove(), 800);
     };
     window.addEventListener('mousemove', criarRastro);
-    window.addEventListener('touchmove', criarRastro, {passive: true});
 
     // --- 3. EFEITO RIPPLE NOS BOTÕES (ONDAS NA ÁGUA) ---
     const elementosClicaveis = document.querySelectorAll('button, .item-menu, .btn-acao, .item-jogo, .item-cofre');

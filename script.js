@@ -6965,3 +6965,29 @@ window.comprarLootbox = function(preco) {
         }, 300); // Meio segundo pra explosão
     }, 3000); // 3 Segundos de tensão
 };
+
+// ==========================================
+// DESTRANCADOR GLOBAL DE ÁUDIO (BLINDAGEM APPLE)
+// Desperta o alto-falante do iPhone silenciosamente
+// ==========================================
+function destrancarAudioApple() {
+    const audioAmbiente = document.getElementById('audio-ambiente');
+    const audioJogos = document.getElementById('audio-jogos');
+    
+    // Dispara o som e pausa imediatamente nos bastidores.
+    // Isso ensina ao sistema da Apple: "Ela tocou na tela, áudio liberado!"
+    if (audioAmbiente) {
+        audioAmbiente.play().then(() => audioAmbiente.pause()).catch(() => {});
+    }
+    if (audioJogos) {
+        audioJogos.play().then(() => audioJogos.pause()).catch(() => {});
+    }
+    
+    // Destrói este espião, pois basta um único toque inicial para destrancar para sempre
+    document.removeEventListener('click', destrancarAudioApple);
+    document.removeEventListener('touchstart', destrancarAudioApple);
+}
+
+// Fica à espreita esperando o primeiríssimo toque (como ela digitando e-mail ou senha)
+document.addEventListener('click', destrancarAudioApple);
+document.addEventListener('touchstart', destrancarAudioApple);

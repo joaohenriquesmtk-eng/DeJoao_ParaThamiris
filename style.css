@@ -12829,5 +12829,15 @@ body > .container-palco {
     align-items: center !important;
 }
 
-
+/* =======================================================
+   🛡️ BLINDAGEM DO CONTAINER DO CORAÇÃO (MOOD) - GLOBAL
+======================================================= */
+/* Força o contêiner a ocupar seu espaço no fluxo do layout */
+#coracao-3d {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    z-index: 1000 !important;
+}
 

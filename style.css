@@ -12559,6 +12559,36 @@ body > .container-palco {
 }
 
 
+/* =======================================================
+   🛡️ BLINDAGEM DEFINITIVA CONTRA O NOTCH (iPHONE SAFARI)
+======================================================= */
+
+/* 1. Proteção da Barra dos Jogos (Telas Cheias) */
+.top-bar {
+    height: calc(65px + env(safe-area-inset-top)) !important;
+    padding-top: env(safe-area-inset-top) !important;
+    padding-bottom: 0 !important;
+    align-items: center !important;
+}
+
+/* 2. Proteção do Cabeçalho da Tela Inicial (Santuário) */
+.cabecalho-fixo-home {
+    padding-top: calc(15px + env(safe-area-inset-top)) !important;
+    padding-bottom: 15px !important;
+}
+
+/* 3. Proteção do Menu Inferior (Contra a barra de arrastar do iOS) */
+.menu-inferior {
+    padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
+}
+
+/* 4. Proteção extra para Modais/Telas que sobem */
+.conteudo-modal {
+    margin-top: env(safe-area-inset-top) !important;
+    margin-bottom: env(safe-area-inset-bottom) !important;
+}
+
+
 
 /* =======================================================
    🚀 MODO DE ALTO DESEMPENHO (SAMSUNG / ANDROID CHROMIUM)

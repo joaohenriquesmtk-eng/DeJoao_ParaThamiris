@@ -12415,37 +12415,53 @@ body > .container-palco {
 
 
 /* =======================================================
-   🚀 MODO DE ALTO DESEMPENHO (EXCLUSIVO PARA ANDROID)
+   🚀 MODO DE ALTO DESEMPENHO (SAMSUNG / ANDROID CHROMIUM)
+   Otimização Extrema + Design "Fake Glass" Premium
 ======================================================= */
 
-/* Quando a etiqueta 'modo-android-desempenho' estiver ativa, essas regras substituem as antigas */
+/* 1. O FALSO VIDRO (Ilusão de Ótica sem gastar Placa de Vídeo) */
 .modo-android-desempenho .cartao-vidro,
 .modo-android-desempenho .bottom-sheet,
 .modo-android-desempenho .modal-overlay,
 .modo-android-desempenho .menu-inferior,
 .modo-android-desempenho .top-bar {
-    /* 1. MATA O VILÃO DA PLACA DE VÍDEO (Desliga o vidro fosco) */
+    /* Desliga o cálculo matemático pesado do desfoque */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     
-    /* 2. Coloca um fundo preto levemente translúcido e sofisticado no lugar */
-    background: rgba(12, 12, 12, 0.98) !important;
+    /* O SEGREDO DO LUXO: Um gradiente sutil que simula o reflexo da luz no vidro escuro */
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%) !important;
     
-    /* 3. Simplifica a sombra para o celular não precisar calcular esfumaçados complexos */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8) !important;
+    /* Borda finíssima semi-transparente para dar a ilusão de profundidade do cristal */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important; /* Luz batendo em cima */
     
-    /* 4. Remove a alocação forçada de memória que pesa no Android */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
+    
     transform: none !important;
     will-change: auto !important;
 }
 
-/* Desliga as partículas 3D ou flutuantes do fundo (opcional, mas ajuda absurdamente no FPS) */
+/* 2. A ARMA SECRETA DO CHROME: CONTENT VISIBILITY */
+/* Essa propriedade diz ao seu Samsung: "Se este contêiner de jogo não estiver na tela agora, apague ele da memória RAM e não calcule seu CSS!" */
+.modo-android-desempenho [id^="container-"], 
+.modo-android-desempenho .tela {
+    content-visibility: auto;
+    contain-intrinsic-size: 1000px; /* Mantém a estrutura para a rolagem não bugar */
+    
+    /* O 'contain' isola os cálculos do CSS. Se algo mudar dentro do jogo da fazenda, o navegador não recalcula a tela inicial inteira. */
+    contain: strict; 
+}
+
+/* 3. SIMPLIFICAÇÃO INTELIGENTE DE PARTÍCULAS */
 .modo-android-desempenho .particulas {
     display: none !important;
 }
 
-/* Simplifica botões com ripple pesado para o Android */
-.modo-android-desempenho .btn-ripple {
-    box-shadow: none !important;
-    border: 1px solid var(--cor-primaria) !important;
+/* 4. OTIMIZAÇÃO DO RIPPLE (Onda de Toque) */
+/* Animar largura/altura frita a CPU. No Android, animamos SÓ a escala e opacidade */
+.modo-android-desempenho .ripple-onda {
+    will-change: transform, opacity;
+    /* Garante que o efeito de clique na tela seja suave como seda no seu Samsung */
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-out; 
 }

@@ -591,3 +591,57 @@ window.injetarMotor3D = function() {
     
     document.body.appendChild(script); // Dispara o download em segundo plano
 };
+
+// ==========================================
+// 🚀 O ANIQUILADOR DE GARGALOS (UNMOUNTING & LAZY LOAD DEFINITIVO)
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+    const motorDeUnmount = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const elemento = mutation.target;
+                
+                // Verifica se a tela/jogo acabou de ser ocultada
+                const foiOcultado = elemento.classList.contains('escondido') || 
+                                    elemento.classList.contains('takeover-escondido') ||
+                                    (!elemento.classList.contains('ativo') && elemento.classList.contains('tela'));
+                
+                if (foiOcultado) {
+                    // 1. LIBERAÇÃO DE PLACA DE VÍDEO (GPU): Destrói Canvas 3D perdidos
+                    const graficos3D = elemento.querySelectorAll('canvas');
+                    graficos3D.forEach(canvas => {
+                        const gl = canvas.getContext('webgl') || canvas.getContext('webgl2');
+                        if (gl) {
+                            const ext = gl.getExtension('WEBGL_lose_context');
+                            if (ext) ext.loseContext(); // Purga a RAM imediatamente
+                        }
+                        canvas.remove(); // Remove o esqueleto do DOM para ser recriado limpo no futuro
+                    });
+
+                    // 2. HIBERNAÇÃO MULTIMÍDIA: Para todos os vídeos ocultos (ex: galaxia.mp4, reencontro.mp4)
+                    const videos = elemento.querySelectorAll('video');
+                    videos.forEach(v => v.pause());
+
+                    // 3. UNMOUNTING REAL (DESTRUIÇÃO DE DOM): Limpa as entranhas dos minigames
+                    // Protegemos os containers que você fez "hardcoded" direto no HTML (água, fantasma e paradoxo)
+                    const containersProtegidos = ['container-agua', 'container-fantasma', 'container-paradoxo', 'container-roleta'];
+                    
+                    if (elemento.id.startsWith('container-') && !containersProtegidos.includes(elemento.id)) {
+                        // Aguarda 300ms (tempo da animação visual de fechamento do jogo) antes de pulverizar o código
+                        setTimeout(() => { 
+                            if (elemento.classList.contains('escondido')) {
+                                elemento.innerHTML = ''; // 🔥 A MÁGICA: Apaga as mil linhas de HTML do jogo da memória!
+                            }
+                        }, 300);
+                    }
+                }
+            }
+        });
+    });
+
+    // Coloca o Motor para vigiar absolutamente TODAS as janelas pesadas do Santuário
+    const blocosPesados = document.querySelectorAll('.tela, [id^="container-"], [id^="mesa-"], [id^="overlay-"]');
+    blocosPesados.forEach(bloco => {
+        motorDeUnmount.observe(bloco, { attributes: true });
+    });
+});

@@ -155,6 +155,21 @@ body {
     /* 🚨 TRAVA DE IMERSÃO DO iPHONE: Impede o efeito de tela "descolando" */
     overscroll-behavior-y: none;
     overscroll-behavior-x: none;
+
+    /* 🚨 TRAVA DE LUPA E SELEÇÃO DO iPHONE */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* 🚨 LIBERA A DIGITAÇÃO NOS CAMPOS DE TEXTO */
+input, textarea {
+    -webkit-user-select: auto !important;
+    user-select: auto !important;
+}
+
+/* Impede que o iPhone "descole" imagens ou links ao arrastar o dedo */
+img, a, svg {
+    -webkit-user-drag: none;
 }
 
 #app-shell {

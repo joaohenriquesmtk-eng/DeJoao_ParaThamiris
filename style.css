@@ -12558,6 +12558,46 @@ body > .container-palco {
     100% { transform: scale(1); }
 }
 
+/* =======================================================
+   🍏 OTIMIZAÇÃO EXCLUSIVA PARA iPHONE (SAFARI FIX)
+======================================================= */
+@supports (-webkit-touch-callout: none) {
+    /* 1. Recupera o espaço vertical perdido reduzindo as bordas internas do cartão */
+    .cartao-palco {
+        padding: 12px 15px !important; 
+    }
+
+    /* 2. Reduz o título principal sutilmente para não encostar no Orbe */
+    .cartao-palco h3 {
+        font-size: 1.45rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* 3. Encolhe o Orbe Quântico (Astrolábio) proporcionalmente e sobe ele um pouco */
+    .recipiente-astrolabio {
+        transform: scale(0.80) !important;
+        margin-top: -10px !important;
+    }
+
+    /* 4. Otimiza os 3 botões inferiores (Mandado, Eco, Carta) para não ficarem esmagados */
+    .cartao-palco div[style*="justify-content: space-between"] button {
+        padding: 8px 2px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    /* Diminui os emojis de dentro dos botões inferiores */
+    .cartao-palco div[style*="justify-content: space-between"] button span {
+        font-size: 1.1rem !important; 
+    }
+
+    /* 5. Ajusta o contador de "Você pensou nele hoje" */
+    #contador-pulso {
+        padding: 6px 15px !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 5px !important;
+    }
+}
+
 
 
 /* =======================================================

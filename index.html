@@ -125,7 +125,6 @@
                     
                     <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px; position: relative; width: 100%;">
                         <h4 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Mural de Recados</h4>
-                        
                         <button onclick="document.getElementById('modal-arquivo-postits').style.display='flex'" style="position: absolute; right: 0; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); color: #D4AF37; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: transform 0.2s ease;">
                             🗂️
                         </button>
@@ -140,16 +139,20 @@
 
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="text" id="input-postit" placeholder="Deixe um recado..." style="flex: 1; padding: 14px 15px; border-radius: 14px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; outline: none; font-size: 1rem; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);">
-                        <button onclick="enviarPostit()" class="btn-acao" style="width: auto; margin: 0; padding: 14px 20px; border-radius: 14px; font-size: 1rem; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">📌 Fixar</button>
+                        
+                        <button onclick="enviarPostit()" class="btn-acao" style="width: 50px; height: 50px; margin: 0; padding: 0; border-radius: 14px; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; flex-shrink: 0; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">📌</button>
                     </div>
                     
                 </div>
             </div>
 
             <div class="palco-slide">
-                <div class="cartao-vidro cartao-palco" id="cartao-termometro" style="justify-content: center;">
-                    <h4 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; text-align: center; margin-bottom: 25px;">Como está seu coração agora?</h4>
-                    <div id="coracao-3d" style="width: 100%; height: 130px; margin-top: -30px; margin-bottom: 25px; position: relative; z-index: 1; pointer-events: none;"></div>
+                <div class="cartao-vidro cartao-palco" id="cartao-termometro" style="justify-content: center; display: flex; flex-direction: column;">
+                    
+                    <h4 style="color: var(--cor-primaria); font-family: 'Playfair Display', serif; font-size: 1.4rem; text-align: center; margin-bottom: 5px;">Como está seu coração agora?</h4>
+                    
+                    <div id="coracao-3d" style="width: 100%; height: 105px; margin-top: -15px; margin-bottom: 10px; position: relative; z-index: 1; pointer-events: none;"></div>
+                    
                     <div class="botoes-mood">
                         <button class="btn-mood" onclick="enviarMood('radiante')">✨ Radiante</button>
                         <button class="btn-mood" onclick="enviarMood('ansiosa')">🌪️ Ansiosa</button>
@@ -158,11 +161,14 @@
                         <button class="btn-mood" onclick="enviarMood('saudade')">🥺 Saudade</button>
                         <button class="btn-mood" onclick="enviarMood('apaixonada')">💖 Apaixonada</button>
                     </div>
-                    <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="2" style="width:100%; margin-top:15px; padding:12px; border-radius:12px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3); font-size: 1rem;"></textarea>
-                    <button class="btn-acao" onclick="iniciarResgateEmocional()" style="width: 100%; background: linear-gradient(145deg, #c0392b, #8e44ad); box-shadow: 0 0 20px rgba(192, 57, 43, 0.6); border: 1px solid #ff6b6b; font-weight: 900; letter-spacing: 1px; color: white; margin-top: 15px; height: 50px; font-size: 1.05rem;">
+                    
+                    <textarea id="input-mood" placeholder="Quer dizer algo mais? (opcional)" rows="1" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(212,175,55,0.3); font-size: 1rem;"></textarea>
+                    
+                    <button class="btn-acao" onclick="iniciarResgateEmocional()" style="width: 100%; background: linear-gradient(145deg, #c0392b, #8e44ad); box-shadow: 0 0 20px rgba(192, 57, 43, 0.6); border: 1px solid #ff6b6b; font-weight: 900; letter-spacing: 1px; color: white; margin-top: 10px; height: 45px; font-size: 1.05rem;">
                         🚨 Preciso de Você (S.O.S)
                     </button>
-                    <div id="status-parceiro" style="margin-top: 15px; font-size: 1rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">Aguardando a sintonia do outro lado...</div>
+
+                    <div id="status-parceiro" style="margin-top: 12px; font-size: 0.95rem; font-style: italic; color: #ddd; min-height: 25px; text-align: center; font-family: 'Playfair Display', serif;">Aguardando a sintonia do outro lado...</div>
                 </div>
             </div>
 

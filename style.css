@@ -12598,43 +12598,6 @@ body > .container-palco {
     }
 }
 
-/* =======================================================
-   🍏 A RÉGUA DEFINITIVA DA APPLE (iPhone 12 ao 15 Pro Max)
-======================================================= */
-
-/* 📱 GRUPO 1: Tamanho P (iPhone 12 Mini e 13 Mini) - 375x812px */
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-    .cartao-palco { padding: 8px 10px !important; justify-content: space-around !important; }
-    .cartao-palco h3 { font-size: 1.25rem !important; margin-bottom: 2px !important; margin-top: 0 !important; }
-    .recipiente-astrolabio { transform: scale(0.65) !important; margin-top: -30px !important; margin-bottom: -20px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] button { padding: 6px 4px !important; font-size: 0.7rem !important; flex-direction: row !important; gap: 4px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 0.9rem !important; margin-bottom: 0 !important; }
-    #contador-pulso { font-size: 0.7rem !important; padding: 4px 10px !important; margin-top: 0 !important; }
-}
-
-/* 📱 GRUPO 2: Tamanho M (iPhone 12/13/14/15 e versões Pro) - 390x844px a 393x852px */
-/* (Esta é a alfaiataria perfeita para o iPhone 13 Pro da Thamiris) */
-@media only screen and (min-device-width: 390px) and (max-device-width: 393px) and (min-device-height: 844px) and (max-device-height: 852px) {
-    .cartao-palco { padding: 10px 12px !important; justify-content: space-around !important; }
-    .cartao-palco h3 { font-size: 1.35rem !important; margin-top: 0px !important; margin-bottom: 2px !important; }
-    .recipiente-astrolabio { transform: scale(0.70) !important; margin-top: -25px !important; margin-bottom: -15px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] { gap: 6px !important; margin-bottom: 5px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] button { padding: 8px 4px !important; font-size: 0.75rem !important; border-radius: 12px !important; flex-direction: row !important; gap: 4px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1rem !important; margin-bottom: 0 !important; }
-    #contador-pulso { padding: 6px 15px !important; font-size: 0.75rem !important; margin-top: 0px !important; }
-}
-
-/* 📱 GRUPO 3: Tamanho G (iPhone 12/13/14/15 Pro Max e Plus) - 428x926px a 430x932px */
-@media only screen and (min-device-width: 428px) and (max-device-width: 430px) and (min-device-height: 926px) and (max-device-height: 932px) {
-    .cartao-palco { padding: 15px 18px !important; }
-    .cartao-palco h3 { font-size: 1.5rem !important; }
-    .recipiente-astrolabio { transform: scale(0.85) !important; margin-top: -10px !important; margin-bottom: -5px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] { gap: 10px !important; margin-bottom: 10px !important; }
-    /* Nas telas gigantes, tem espaço de sobra, então o layout original dos botões (emoji em cima do texto) volta a ficar lindo */
-    .cartao-palco div[style*="justify-content: space-between"] button { padding: 10px 5px !important; font-size: 0.85rem !important; flex-direction: column !important; } 
-    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1.2rem !important; }
-    #contador-pulso { padding: 8px 20px !important; font-size: 0.85rem !important; }
-}
 
 
 /* =======================================================
@@ -12697,39 +12660,174 @@ body > .container-palco {
 }
 
 /* =======================================================
+   🛡️ BLINDAGEM GERAL PARA iPHONE (TODOS OS MODELOS)
+======================================================= */
+@supports (-webkit-touch-callout: none) {
+    /* 1. Botões Flutuantes (Som e Coração) colados perfeitamente no topo do menu inferior */
+    .controle-som-rodape, #btn-menu-botoes-home {
+        /* A altura exata do menu (65px) + a margem de segurança da Apple */
+        bottom: calc(65px + env(safe-area-inset-bottom)) !important; 
+    }
+    
+    #btn-menu-botoes-home {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    #coracao-icone { font-size: 1.1rem !important; }
+
+    /* 2. Top Bar dos Jogos e Salas (Ajuste Universal) */
+    .top-bar {
+        height: calc(50px + env(safe-area-inset-top)) !important;
+        padding-top: env(safe-area-inset-top) !important;
+        padding-bottom: 0 !important;
+        align-items: center !important;
+    }
+    .top-bar * { margin-top: 0 !important; margin-bottom: 0 !important; }
+    .titulo-sala { font-size: 1.1rem !important; }
+    .voltar-btn-sala { width: 32px !important; height: 32px !important; font-size: 1.1rem !important; }
+}
+
+/* =======================================================
    🍏 A RÉGUA DEFINITIVA DA APPLE (iPhone 12 ao 15 Pro Max)
 ======================================================= */
 
 /* 📱 GRUPO 1: Tamanho P (iPhone 12 Mini e 13 Mini) - 375x812px */
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+@media only screen and (min-device-width: 375px) and (max-device-width: 375px) and (max-device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    .cabecalho-fixo-home { padding-top: calc(5px + env(safe-area-inset-top)) !important; padding-bottom: 5px !important; }
+    #info-casal { padding: 4px 8px !important; font-size: 0.75rem !important; margin-bottom: 5px !important; }
+    #tela-home-titulo { font-size: 1.3rem !important; margin-bottom: 5px !important; }
     .cartao-palco { padding: 8px 10px !important; justify-content: space-around !important; }
-    .cartao-palco h3 { font-size: 1.25rem !important; margin-bottom: 2px !important; margin-top: 0 !important; }
+    .cartao-palco h3 { font-size: 1.25rem !important; margin-bottom: 2px !important; margin-top: -10px !important; }
     .recipiente-astrolabio { transform: scale(0.65) !important; margin-top: -30px !important; margin-bottom: -20px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] { gap: 4px !important; margin-bottom: 0 !important;}
     .cartao-palco div[style*="justify-content: space-between"] button { padding: 6px 4px !important; font-size: 0.7rem !important; flex-direction: row !important; gap: 4px !important; }
     .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 0.9rem !important; margin-bottom: 0 !important; }
     #contador-pulso { font-size: 0.7rem !important; padding: 4px 10px !important; margin-top: 0 !important; }
 }
 
-/* 📱 GRUPO 2: Tamanho M (iPhone 12/13/14/15 e versões Pro) - 390x844px a 393x852px */
-/* (Esta é a alfaiataria perfeita para o iPhone 13 Pro da Thamiris) */
+/* 📱 GRUPO 2: Tamanho M (iPhone 12, 13, 14, 15 Padrão e Pro) - 390x844px a 393x852px */
 @media only screen and (min-device-width: 390px) and (max-device-width: 393px) and (min-device-height: 844px) and (max-device-height: 852px) {
+    .cabecalho-fixo-home { padding-top: calc(10px + env(safe-area-inset-top)) !important; padding-bottom: 5px !important; }
+    #info-casal { padding: 6px 10px !important; font-size: 0.8rem !important; margin-bottom: 5px !important; }
+    #tela-home-titulo { font-size: 1.4rem !important; margin-bottom: 8px !important; }
     .cartao-palco { padding: 10px 12px !important; justify-content: space-around !important; }
-    .cartao-palco h3 { font-size: 1.35rem !important; margin-top: 0px !important; margin-bottom: 2px !important; }
+    .cartao-palco h3 { font-size: 1.35rem !important; margin-top: -10px !important; margin-bottom: 2px !important; }
     .recipiente-astrolabio { transform: scale(0.70) !important; margin-top: -25px !important; margin-bottom: -15px !important; }
     .cartao-palco div[style*="justify-content: space-between"] { gap: 6px !important; margin-bottom: 5px !important; }
-    .cartao-palco div[style*="justify-content: space-between"] button { padding: 8px 4px !important; font-size: 0.75rem !important; border-radius: 12px !important; flex-direction: row !important; gap: 4px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 8px 4px !important; font-size: 0.75rem !important; flex-direction: row !important; gap: 4px !important; border-radius: 12px !important;}
     .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1rem !important; margin-bottom: 0 !important; }
     #contador-pulso { padding: 6px 15px !important; font-size: 0.75rem !important; margin-top: 0px !important; }
 }
 
 /* 📱 GRUPO 3: Tamanho G (iPhone 12/13/14/15 Pro Max e Plus) - 428x926px a 430x932px */
 @media only screen and (min-device-width: 428px) and (max-device-width: 430px) and (min-device-height: 926px) and (max-device-height: 932px) {
+    .cabecalho-fixo-home { padding-top: calc(15px + env(safe-area-inset-top)) !important; }
+    #info-casal { padding: 8px 15px !important; font-size: 0.9rem !important; }
     .cartao-palco { padding: 15px 18px !important; }
-    .cartao-palco h3 { font-size: 1.5rem !important; }
+    .cartao-palco h3 { font-size: 1.5rem !important; margin-top: -5px !important; }
     .recipiente-astrolabio { transform: scale(0.85) !important; margin-top: -10px !important; margin-bottom: -5px !important; }
     .cartao-palco div[style*="justify-content: space-between"] { gap: 10px !important; margin-bottom: 10px !important; }
-    /* Nas telas gigantes, tem espaço de sobra, então o layout original dos botões (emoji em cima do texto) volta a ficar lindo */
+    /* Nas telas gigantes, tem espaço de sobra, então o layout original volta */
     .cartao-palco div[style*="justify-content: space-between"] button { padding: 10px 5px !important; font-size: 0.85rem !important; flex-direction: column !important; } 
-    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1.2rem !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1.2rem !important; margin-bottom: 5px !important;}
     #contador-pulso { padding: 8px 20px !important; font-size: 0.85rem !important; }
 }
+
+/* =======================================================
+   🛡️ AJUSTES GLOBAIS DE BOTÕES FLUTUANTES (SANTUÁRIO)
+======================================================= */
+
+/* 🔇 Botão de Pausar Som (Canto Inferior Esquerdo) */
+.controle-som-rodape {
+    left: 20px;
+    /* 🚨 A MÁGICA: Fixa a base do botão a 70px do fundo (60px do menu + 10px de margem) */
+    bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+    position: fixed;
+    z-index: 1000000;
+}
+
+/* 💓 Botão do Coração (Canto Inferior Direito) */
+#btn-menu-botoes-home {
+    right: 20px;
+    /* 🚨 A MÁGICA: Fixa a base do botão na mesma altura do som */
+    bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+    position: fixed;
+    z-index: 1000000;
+    
+    /* 🚨 Diminuição minuciosa do tamanho total do círculo */
+    width: 48px !important;
+    height: 48px !important;
+}
+
+/* 💓 Ajuste do Ícone dentro do Coração */
+#coracao-icone {
+    font-size: 1.2rem !important; /* Ícone menor e mais discreto */
+}
+
+/* =======================================================
+   🚀 EXTIRPAÇÃO DEFINITIVA DOS ESPAÇOS VAZIOS (O PENTE FINO)
+   Cura o "Gap" no topo de todos os Jogos e Cassinos
+======================================================= */
+
+/* 1. MATA O PADDING INLINE DAS MESAS DE CASSINO E OVERLAYS */
+/* Isso conserta a Roleta da Sorte, Slots, Dice, HiLo, etc. */
+[id^="mesa-"], #overlay-cassino, #overlay-cassino-dois, #overlay-boutique {
+    padding-top: 0 !important;
+}
+
+/* 2. LIBERTA OS JOGOS DO APP-SHELL */
+/* Isso arranca a Mini Fazenda, Tribunal, Julgamento, etc., do fluxo normal 
+   (que os empurrava para baixo) e gruda todos no teto absoluto da tela! */
+#conteudo-principal > div[id^="container-"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    padding-bottom: env(safe-area-inset-bottom) !important; /* Protege a barra do iPhone */
+    z-index: 99999 !important;
+    background-color: var(--cor-fundo); /* Fundo sólido para ocultar a Home */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Garante que os jogos que JÁ TINHAM um fundo customizado não percam sua arte */
+#container-roleta, #container-cinema, #container-guardiao, #container-agenda, #container-correio, #container-pager, #container-tesouro, #container-agua, #container-pericia, #container-banco, #container-logistica, #container-cartorio, #container-estufa, #container-paradoxo {
+    background-color: transparent !important; 
+}
+
+/* 3. A TOP BAR SUPREMA E IMUTÁVEL (PERFEITA NO ANDROID E IOS) */
+.top-bar {
+    height: calc(60px + env(safe-area-inset-top)) !important;
+    padding-top: env(safe-area-inset-top) !important;
+    padding-bottom: 0 !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    align-items: center !important;
+    display: flex !important;
+    position: sticky !important; /* Gruda a barra no topo para não sumir ao rolar a tela */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 100000 !important;
+    box-sizing: border-box !important;
+}
+
+/* Mata qualquer margem teimosa dentro da barra que possa empurrar o texto */
+.top-bar * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Alinhamento milimétrico ao centro exato para os botões "Voltar" e Status */
+.top-bar-left, .top-bar-right {
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+
+

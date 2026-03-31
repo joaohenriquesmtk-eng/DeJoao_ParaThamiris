@@ -9,11 +9,14 @@
     -webkit-text-size-adjust: 100%;
 }
 
-/* Retira o visual de botão nativo e feio do iOS de dentro dos seus formulários e botões */
+/* BLINDAGEM DE BOTÕES E INPUTS DO iOS */
 input, textarea, button, select {
     -webkit-appearance: none;
     appearance: none;
-    border-radius: 0; /* Você aplica o seu próprio border-radius depois */
+    border-radius: 0;
+    
+    /* 🚨 OBRIGATÓRIO PARA O iPHONE: Impede o Zoom Automático ao digitar! */
+    font-size: 16px !important; 
 }
 
 /* Rolagem macia nativa em qualquer área que precise de scroll (como menus ou regras) */
@@ -12409,3 +12412,40 @@ body > .container-palco {
     will-change: transform, opacity !important;
 }
 
+
+
+/* =======================================================
+   🚀 MODO DE ALTO DESEMPENHO (EXCLUSIVO PARA ANDROID)
+======================================================= */
+
+/* Quando a etiqueta 'modo-android-desempenho' estiver ativa, essas regras substituem as antigas */
+.modo-android-desempenho .cartao-vidro,
+.modo-android-desempenho .bottom-sheet,
+.modo-android-desempenho .modal-overlay,
+.modo-android-desempenho .menu-inferior,
+.modo-android-desempenho .top-bar {
+    /* 1. MATA O VILÃO DA PLACA DE VÍDEO (Desliga o vidro fosco) */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    /* 2. Coloca um fundo preto levemente translúcido e sofisticado no lugar */
+    background: rgba(12, 12, 12, 0.98) !important;
+    
+    /* 3. Simplifica a sombra para o celular não precisar calcular esfumaçados complexos */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8) !important;
+    
+    /* 4. Remove a alocação forçada de memória que pesa no Android */
+    transform: none !important;
+    will-change: auto !important;
+}
+
+/* Desliga as partículas 3D ou flutuantes do fundo (opcional, mas ajuda absurdamente no FPS) */
+.modo-android-desempenho .particulas {
+    display: none !important;
+}
+
+/* Simplifica botões com ripple pesado para o Android */
+.modo-android-desempenho .btn-ripple {
+    box-shadow: none !important;
+    border: 1px solid var(--cor-primaria) !important;
+}

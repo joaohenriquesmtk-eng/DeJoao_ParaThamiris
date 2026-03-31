@@ -159,6 +159,18 @@ function verificarAtualizacao() {
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
 
+    // ==========================================
+    // 🚀 MOTOR ADAPTATIVO (DETECÇÃO DE ANDROID)
+    // ==========================================
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (isAndroid) {
+        // Se for Android, injeta a classe de performance direto na raiz do HTML
+        document.documentElement.classList.add('modo-android-desempenho');
+        console.log("🤖 Android detectado! Modo de Alto Desempenho ativado.");
+    } else {
+        console.log("🍏 iOS detectado! Gráficos no modo Ultra.");
+    }
+
     // --- 1. REMOVER SPLASH SCREEN ---
     const splash = document.getElementById('splash-screen');
     if (splash) {
@@ -305,7 +317,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            if (navigator.vibrate) {
+            if (window.Haptics && navigator.vibrate) {
                 navigator.vibrate([50, 100, 50]); 
             }
         };

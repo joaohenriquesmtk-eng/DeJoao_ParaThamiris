@@ -12277,3 +12277,198 @@ setInterval(() => {
         }
     }
 }, 2000); // Checa a cada 2 segundos (Custo de bateria imperceptível)
+
+
+// ==========================================
+// 🫀 SENSOR DE PRESENÇA QUÂNTICA (AURA)
+// ==========================================
+window.iniciarSensorDePresenca = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, onValue, set, onDisconnect } = window.SantuarioApp.modulos;
+
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    const parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    const nomeParceiro = window.souJoao ? 'Thamiris' : 'João';
+
+    const minhaRef = ref(db, `presenca_online/${euId}`);
+    const parceiroRef = ref(db, `presenca_online/${parceiroId}`);
+    
+    // O '.info/connected' é uma ferramenta secreta do Firebase que diz se você tem internet
+    const conexaoRef = ref(db, '.info/connected');
+
+    // 1. AVISA O FIREBASE QUE VOCÊ ESTÁ ONLINE
+    onValue(conexaoRef, (snap) => {
+        if (snap.val() === true) {
+            set(minhaRef, true);
+            // Se o Safari/Chrome fechar, o servidor apaga sua luz sozinho!
+            onDisconnect(minhaRef).set(false);
+        }
+    });
+
+    // 2. FICA OLHANDO A LUZ DO PARCEIRO
+    onValue(parceiroRef, (snap) => {
+        const parceiroOnline = snap.val();
+        const aura = document.getElementById('aura-conexao-global');
+        
+        if (parceiroOnline) {
+            if (aura) {
+                aura.className = 'aura-presenca-ativa';
+                if(typeof mostrarToast === 'function') mostrarToast(`Sua alma gêmea acaba de entrar no Santuário...`, "🫀");
+                if(window.Haptics) window.Haptics.toqueForte();
+            }
+        } else {
+            if (aura) aura.className = 'escondido';
+        }
+    });
+};
+
+// 3. LIGA O MOTOR ASSIM QUE O APLICATIVO CARREGAR
+window.addEventListener('load', () => {
+    // Dá 2 segundos para ter certeza que o login confirmou quem é quem
+    setTimeout(() => {
+        if (typeof window.iniciarSensorDePresenca === 'function') {
+            window.iniciarSensorDePresenca();
+        }
+    }, 2000);
+});
+
+// ==========================================
+// 🔔 MOTOR DE NOTIFICAÇÕES PUSH NATIVAS
+// ==========================================
+window.ativarNotificacoesApple = async function() {
+    // 1. Pede a permissão oficial do sistema operacional
+    const permissao = await Notification.requestPermission();
+    
+    if (permissao === 'granted') {
+        if(typeof mostrarToast === 'function') mostrarToast("Sincronizando com os satélites...", "📡");
+        
+        try {
+            if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+            const { messaging, getToken, db, ref, set } = window.SantuarioApp.modulos;
+            
+            // 2. Pega o endereço único do celular (Token)
+            const tokenAtual = await getToken(messaging, { 
+                vapidKey: 'BMfoiE5OUoxMK970zucUsdMO-X6zPX36rmOwlTKPEp8JTzDZzGbwqm097kQKd_508hZORw-B3AwKC6gRxm5iMjg' // <--- COLE SUA CHAVE AQUI
+            });
+            
+            if (tokenAtual) {
+                // 3. Salva no Firebase para o Backend saber para onde atirar
+                const euId = window.souJoao ? 'joao' : 'thamiris';
+                await set(ref(db, `fcmTokens/${euId}`), tokenAtual);
+                
+                // Muda o botão visualmente para mostrar que deu certo
+                const btn = document.getElementById('btn-ativar-notificacoes');
+                if (btn) {
+                    btn.innerHTML = '✨ Alertas Sincronizados';
+                    btn.style.background = 'rgba(46, 204, 113, 0.2)';
+                    btn.style.borderColor = '#2ecc71';
+                    btn.style.color = '#2ecc71';
+                }
+                
+                if(typeof mostrarToast === 'function') mostrarToast("Conexão estabelecida! O Santuário agora pode te chamar.", "🔔");
+                if (window.Haptics) window.Haptics.sucesso();
+            }
+        } catch (erro) {
+            console.error("Erro ao gerar token Push:", erro);
+            if(typeof mostrarToast === 'function') mostrarToast("Falha ao sincronizar. Tente novamente.", "❌");
+        }
+    } else {
+        if(typeof mostrarToast === 'function') mostrarToast("Você precisa permitir as notificações no navegador.", "⚠️");
+    }
+};
+
+// ==========================================
+// 🌌 RADAR QUÂNTICO (GEOFENCING DE REENCONTRO)
+// ==========================================
+
+// Fórmula matemática para calcular a distância em metros entre dois pontos GPS na Terra
+function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Raio da Terra em metros
+    const rad = Math.PI / 180;
+    const φ1 = lat1 * rad;
+    const φ2 = lat2 * rad;
+    const Δφ = (lat2 - lat1) * rad;
+    const Δλ = (lon2 - lon1) * rad;
+
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return Math.round(R * c);
+}
+
+window.iniciarRadarGeofencing = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, set, onValue } = window.SantuarioApp.modulos;
+
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    const parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    let minhaUltimaLat = null;
+    let minhaUltimaLon = null;
+
+    // 1. Pede a localização do celular de forma suave (apenas quando o app está aberto)
+    if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition((position) => {
+            minhaUltimaLat = position.coords.latitude;
+            minhaUltimaLon = position.coords.longitude;
+
+            // Envia para o Firebase
+            set(ref(db, `gps/${euId}`), {
+                lat: minhaUltimaLat,
+                lon: minhaUltimaLon,
+                timestamp: Date.now()
+            });
+        }, (erro) => {
+            console.warn("Radar Quântico: Permissão de GPS negada ou indisponível.");
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 60000,
+            timeout: 10000
+        });
+    }
+
+    // 2. Fica de olho no GPS da parceira e cruza os dados
+    onValue(ref(db, `gps/${parceiroId}`), (snapshot) => {
+        const gpsParceiro = snapshot.val();
+        
+        if (gpsParceiro && minhaUltimaLat && minhaUltimaLon) {
+            // Ignora dados antigos (mais de 1 hora) para não disparar falso positivo
+            if (Date.now() - gpsParceiro.timestamp > 3600000) return;
+
+            const distanciaMetros = calcularDistanciaMetros(
+                minhaUltimaLat, minhaUltimaLon, 
+                gpsParceiro.lat, gpsParceiro.lon
+            );
+
+            console.log(`[Radar Quântico] Distância atual: ${distanciaMetros} metros.`);
+
+            // 🚨 A MÁGICA: Se a distância for menor ou igual a 50 metros!
+            if (distanciaMetros <= 50) {
+                const telaReencontro = document.getElementById('tela-reencontro');
+                if (telaReencontro && !telaReencontro.classList.contains('revelado')) {
+                    
+                    // Dispara a animação épica!
+                    telaReencontro.classList.add('revelado');
+                    if (window.Haptics) navigator.vibrate([200, 100, 200, 100, 500]); // Batida do coração forte
+                    
+                    if (typeof confetti === 'function') {
+                        // Faz chover confetes brancos e dourados para combinar com a tela clara
+                        confetti({ colors: ['#D4AF37', '#ffffff', '#ffd700'], particleCount: 300, spread: 180, zIndex: 999999999 });
+                    }
+                }
+            }
+        }
+    });
+};
+
+// 3. Liga o Radar assim que a identidade do usuário for confirmada (pós-login)
+window.addEventListener('loginSucesso', () => {
+    setTimeout(() => {
+        if(typeof window.iniciarRadarGeofencing === 'function') {
+            window.iniciarRadarGeofencing();
+        }
+    }, 5000); // Espera 5 segundos para não pedir 20 permissões de uma vez na primeira abertura
+});
+
+// Fallback: Se o usuário já estava logado ao abrir o app
+if (window.usuarioLogado) {
+    setTimeout(() => { if(typeof window.iniciarRadarGeofencing === 'function') window.iniciarRadarGeofencing(); }, 5000);
+}

@@ -33,6 +33,8 @@
 </head>
 <body>
 
+    <div id="aura-conexao-global" class="escondido"></div>
+
     <div id="fundo-climatico" class="fundo-climatico"></div>
 
     <div id="aviso-offline" class="aviso-offline escondido">
@@ -1026,7 +1028,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
-        import { getDatabase, ref, set, get, onValue, runTransaction, push, update } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
+        import { getDatabase, ref, set, get, onValue, runTransaction, push, update, onDisconnect } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
         import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js';
         // 🚨 IMPORTAÇÃO DO STORAGE
@@ -1058,7 +1060,7 @@
         
         // 🚨 INJETA O STORAGE NA MEMÓRIA GLOBAL PARA SER USADO NOS JOGOS
         window.SantuarioApp.modulos = { 
-            db, ref, onValue, set, get, runTransaction, push, update, 
+            db, ref, onValue, set, get, runTransaction, push, update, onDisconnect,
             messaging: getMessaging(app), getToken: getToken,
             storage, storageRef, uploadString, getDownloadURL, deleteObject 
         };
@@ -3420,6 +3422,20 @@ background: conic-gradient(
         <div id="conteudo-arquivo-postits" style="flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 10px;"></div>
         
         <button class="btn-acao" onclick="document.getElementById('modal-arquivo-postits').style.display='none'" style="width: 100%; margin-top: 20px; background: #333; color: white; padding: 12px; font-size: 1rem;">Fechar Arquivo</button>
+    </div>
+</div>
+
+<div id="tela-reencontro">
+    <div class="texto-reencontro">
+        <div class="distancia-zerada">0 Metros</div>
+        <h2 style="font-size: 2rem; margin-bottom: 15px; color: #333;">O Fim da Espera.</h2>
+        <p style="font-size: 1.2rem; color: #666; line-height: 1.6; font-style: italic;">
+            O Santuário detectou que as coordenadas de Colombo e Goiânia colidiram.<br><br>
+            Vocês venceram a distância. Desliguem as telas e aproveitem cada segundo deste abraço.
+        </p>
+        <button class="btn-acao" onclick="document.getElementById('tela-reencontro').classList.remove('revelado')" style="margin-top: 40px; background: rgba(212,175,55,0.2); color: #D4AF37; border: 1px solid #D4AF37;">
+            Voltar ao Aplicativo
+        </button>
     </div>
 </div>
 

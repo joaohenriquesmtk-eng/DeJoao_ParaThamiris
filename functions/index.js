@@ -5,7 +5,50 @@ const moment = require('moment-timezone');
 
 admin.initializeApp();
 
-// --- Função 1: enviarNotificacaoMood (Alerta de S.O.S/Humor) ---
+// ============================================================================
+// 🚨 NOTIFICAÇÕES PUSH NATIVAS (SANTUÁRIO)
+// ============================================================================
+
+// --- Função 1: enviarNotificacaoPostit (Mural de Recados) [NOVA!] ---
+exports.enviarNotificacaoPostit = onValueWritten(
+    '/notificacoes_postit/{recebedorId}',
+    async (event) => {
+        if (!event.data.after.exists()) return;
+
+        const dados = event.data.after.val();
+        
+        // Só dispara se houver uma nova notificação e o valor 'temNovo' for true
+        if (!dados || dados.temNovo !== true) return;
+
+        const recebedorId = event.params.recebedorId; // 'joao' ou 'thamiris'
+        const nomeRemetente = (recebedorId === 'joao') ? 'Thamiris' : 'João';
+
+        const snapshotToken = await admin.database().ref(`/fcmTokens/${recebedorId}`).once('value');
+        const tokenDestino = snapshotToken.val();
+
+        if (!tokenDestino) return;
+
+        const message = {
+            notification: { 
+                title: `📌 Novo recado no Mural!`, 
+                body: `${nomeRemetente} acabou de deixar um post-it para você.` 
+            },
+            android: { priority: 'high' },
+            webpush: {
+                fcmOptions: { link: "/" },
+                notification: {
+                    icon: "https://joaohenriquesmtk-eng.github.io/DeJoao_ParaThamiris/assets/icons/icon-192.png", 
+                    vibrate: [200, 100, 200]
+                }
+            },
+            token: tokenDestino
+        };
+
+        return admin.messaging().send(message);
+    }
+);
+
+// --- Função 2: enviarNotificacaoMood (Alerta de S.O.S/Humor) ---
 exports.enviarNotificacaoMood = onValueWritten(
     '/moods/{userId}',
     async (event) => {
@@ -53,7 +96,7 @@ exports.enviarNotificacaoMood = onValueWritten(
     }
 );
 
-// --- Função 1.5: enviarNotificacaoPulso (Aperto no Orbe) ---
+// --- Função 3: enviarNotificacaoPulso (Aperto no Orbe) ---
 exports.enviarNotificacaoPulso = onValueWritten(
     '/pulsos/{userId}',
     async (event) => {
@@ -92,7 +135,12 @@ exports.enviarNotificacaoPulso = onValueWritten(
     }
 );
 
-// --- Função 2: gerarMetasDiarias ---
+
+// ============================================================================
+// 🌽 ECOSSISTEMA DA MINI FAZENDA (CRON JOBS E REGRAS)
+// ============================================================================
+
+// --- Função 4: gerarMetasDiarias ---
 exports.gerarMetasDiarias = onSchedule(
     { schedule: '0 3 * * *', timeZone: 'America/Sao_Paulo' },
     async (event) => {
@@ -135,7 +183,7 @@ exports.gerarMetasDiarias = onSchedule(
     }
 );
 
-// --- Função 3: verificarConquistas ---
+// --- Função 5: verificarConquistas ---
 exports.verificarConquistas = onValueUpdated(
     { ref: '/jogadores/{userId}/estatisticas', region: 'us-central1' },
     async (event) => {
@@ -164,7 +212,7 @@ exports.verificarConquistas = onValueUpdated(
     }
 );
 
-// --- Função 4: atualizarClima ---
+// --- Função 6: atualizarClima ---
 exports.atualizarClima = onSchedule(
     { schedule: '0 3 * * *', timeZone: 'America/Sao_Paulo' },
     async (event) => {
@@ -177,7 +225,7 @@ exports.atualizarClima = onSchedule(
     }
 );
 
-// --- Função 5: atualizarPrecosPorOferta ---
+// --- Função 7: atualizarPrecosPorOferta ---
 exports.atualizarPrecosPorOferta = onSchedule(
     { schedule: '0 3 * * *', timeZone: 'America/Sao_Paulo' },
     async (event) => {

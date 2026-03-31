@@ -12473,6 +12473,92 @@ body > .container-palco {
 }
 
 
+/* =======================================================
+   🫀 AURA DE PRESENÇA (BORDAS DISCRETAS E ELEGANTES)
+======================================================= */
+.aura-presenca-ativa {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; /* Deixa o dedo passar direto para clicar na tela */
+    z-index: 1000; 
+    /* Base da sombra bem fina e colada aos limites da tela */
+    box-shadow: inset 0 0 15px rgba(231, 76, 60, 0.1);
+    opacity: 0;
+    /* Ciclo de respiração calmo de 3.5 segundos */
+    animation: pulsar-borda-discreta 3.5s ease-in-out infinite; 
+}
+
+/* Otimizado para GPU: Expansão máxima controlada (apenas 35px nas bordas) */
+@keyframes pulsar-borda-discreta {
+    0% { opacity: 0; box-shadow: inset 0 0 10px rgba(231, 76, 60, 0.0); }
+    
+    /* Tum... (Primeira batida contornando o vidro) */
+    20% { opacity: 1; box-shadow: inset 0 0 35px 5px rgba(231, 76, 60, 0.45); }
+    
+    /* Pausa leve */
+    40% { opacity: 0.5; box-shadow: inset 0 0 20px 2px rgba(231, 76, 60, 0.2); }
+    
+    /* TUM! (Segunda batida contornando o vidro) */
+    60% { opacity: 1; box-shadow: inset 0 0 35px 5px rgba(231, 76, 60, 0.45); }
+    
+    /* Relaxamento até sumir */
+    100% { opacity: 0; box-shadow: inset 0 0 10px rgba(231, 76, 60, 0.0); }
+}
+
+/* =======================================================
+   🌌 PROTOCOLO REENCONTRO (EASTER EGG DE GEOFENCING)
+======================================================= */
+#tela-reencontro {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at center, #ffffff 0%, #fdfbfb 50%, #ebedee 100%);
+    z-index: 99999999; /* Cobre todo o aplicativo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 3s ease-in-out;
+}
+
+#tela-reencontro.revelado {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.texto-reencontro {
+    font-family: 'Playfair Display', serif;
+    color: #D4AF37;
+    text-align: center;
+    padding: 30px;
+    transform: translateY(30px);
+    opacity: 0;
+    transition: all 4s ease-out 1s; /* Atrasa 1 segundo para o Fade-in */
+}
+
+#tela-reencontro.revelado .texto-reencontro {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.distancia-zerada {
+    font-size: 4rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #D4AF37, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+    animation: pulso-distancia 2s infinite;
+}
+
+@keyframes pulso-distancia {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+
 
 /* =======================================================
    🚀 MODO DE ALTO DESEMPENHO (SAMSUNG / ANDROID CHROMIUM)

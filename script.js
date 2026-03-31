@@ -7507,7 +7507,7 @@ window.iniciarEconomiaBoutique = function() {
 };
 
 // ==========================================
-// RENDERIZAÇÃO INTELIGENTE DA BOUTIQUE VIP
+// RENDERIZAÇÃO INTELIGENTE DA BOUTIQUE VIP (C/ BLINDAGEM DE IDENTIDADE)
 // ==========================================
 
 window.abrirBoutique = function() {
@@ -7515,8 +7515,6 @@ window.abrirBoutique = function() {
     if (overlay) {
         overlay.classList.remove('escondido');
         overlay.style.display = 'flex';
-        
-        // Liga o rastreador de gastos do Firebase assim que abrir a loja
         if(typeof iniciarEconomiaBoutique === 'function') iniciarEconomiaBoutique();
         if(typeof renderizarBoutique === 'function') renderizarBoutique();
     }
@@ -7531,19 +7529,22 @@ window.renderizarBoutique = function() {
     const visor = document.getElementById('boutique-moedas-visor');
     const divCatalogo = document.getElementById('boutique-catalogo');
     if(!divCatalogo) return;
-    divCatalogo.innerHTML = "";
+    
+    // Botão do Livro de Acordos
+    divCatalogo.innerHTML = `
+        <button onclick="abrirChecklistBoutique()" class="btn-acao" style="width: 100%; margin-bottom: 20px; background: linear-gradient(145deg, #c0392b, #8e44ad); font-size: 1.1rem; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);">
+            📋 Ver Nossos Acordos Íntimos
+        </button>
+    `;
 
-    // 🚨 CÁLCULO DA ECONOMIA ESPELHADA
-    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
-    const meusGastos = window.gastosBoutique[eu] || 0;
+    // 🚨 A MÁGICA: IDENTIDADE ABSOLUTA
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    const meusGastos = window.gastosBoutique[euId] || 0;
     
-    // O Saldo Real = Todo o dinheiro que o casal já ganhou MENOS o que a pessoa já gastou
     const meuSaldoIndividual = (window.pontosDoCasal || 0) - meusGastos;
-    
-    // Mostra o saldo individual no topo da loja
     if(visor) visor.innerText = meuSaldoIndividual.toLocaleString('pt-BR');
 
-    const catalogoAtivo = (eu === 'João') ? BOUTIQUE_JOAO : BOUTIQUE_THAMIRIS;
+    const catalogoAtivo = window.souJoao ? BOUTIQUE_JOAO : BOUTIQUE_THAMIRIS;
 
     catalogoAtivo.forEach(item => {
         let btnStatus = (meuSaldoIndividual >= item.preco) ? 
@@ -7581,15 +7582,14 @@ window.renderizarBoutique = function() {
 // ==========================================
 // LÓGICA DE COMPRA E COBRANÇA CRUZADA VIA WHATSAPP
 // ==========================================
-
 window.comprarItemBoutique = function(idItem) {
-    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
-    const catalogoAtivo = (eu === 'João') ? BOUTIQUE_JOAO : BOUTIQUE_THAMIRIS;
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    const catalogoAtivo = window.souJoao ? BOUTIQUE_JOAO : BOUTIQUE_THAMIRIS;
 
     let item = catalogoAtivo.find(i => i.id === idItem);
     if (!item) return;
 
-    const meusGastos = window.gastosBoutique[eu] || 0;
+    const meusGastos = window.gastosBoutique[euId] || 0;
     const meuSaldoIndividual = (window.pontosDoCasal || 0) - meusGastos;
 
     if (meuSaldoIndividual < item.preco) {
@@ -7597,13 +7597,23 @@ window.comprarItemBoutique = function(idItem) {
         return;
     }
 
-    // 🚨 A MÁGICA: Registra o gasto apenas na carteira individual da pessoa no Firebase
     if (window.SantuarioApp && window.SantuarioApp.modulos) {
         const { db, ref, set } = window.SantuarioApp.modulos;
-        set(ref(db, `jogos/boutique_gastos/${eu}`), meusGastos + item.preco);
+        
+        // Desconta as moedas da carteira
+        set(ref(db, `jogos/boutique_gastos/${euId}`), meusGastos + item.preco);
+        
+        // Registra o acordo íntimo no banco de dados
+        const idPedido = "ped_" + Date.now();
+        set(ref(db, `jogos/boutique_pedidos/${euId}/${idPedido}`), {
+            emoji: item.emoji,
+            nome: item.nome,
+            desc: item.desc,
+            concluido: false,
+            timestamp: Date.now()
+        });
     }
     
-    // Atualiza a tela imediatamente
     if(typeof renderizarBoutique === 'function') renderizarBoutique();
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjWin', 1.0);
@@ -7612,9 +7622,8 @@ window.comprarItemBoutique = function(idItem) {
     let mensagem = `*RESGATE DE PRÊMIO - BOUTIQUE VIP* 🛍️✨%0A%0AAmor, acabei de gastar as minhas moedas individuais e comprei um luxo pra mim:%0A%0A🎁 *${item.emoji} ${item.nome}*%0A📝 _${item.desc}_%0A💳 Custou: ${item.preco.toLocaleString('pt-BR')} moedas.%0A%0AEstou indo cobrar a minha recompensa agora mesmo! 👀🔥`;
     
     let numeroJoao = "5541996419950";
-    let numeroThamiris = "5562994838837"; // <-- COLOQUE O NÚMERO DELA AQUI!
-
-    let numeroDestino = (eu === 'João') ? numeroThamiris : numeroJoao;
+    let numeroThamiris = "5562994838837"; 
+    let numeroDestino = window.souJoao ? numeroThamiris : numeroJoao;
 
     setTimeout(() => {
         window.location.href = `https://wa.me/${numeroDestino}?text=${mensagem}`;
@@ -7622,8 +7631,8 @@ window.comprarItemBoutique = function(idItem) {
 };
 
 window.comprarLootbox = function(preco) {
-    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
-    const meusGastos = window.gastosBoutique[eu] || 0;
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    const meusGastos = window.gastosBoutique[euId] || 0;
     const meuSaldoIndividual = (window.pontosDoCasal || 0) - meusGastos;
 
     if (meuSaldoIndividual < preco) {
@@ -7631,10 +7640,9 @@ window.comprarLootbox = function(preco) {
         return;
     }
     
-    // Deduz o valor apenas da carteira individual
     if (window.SantuarioApp && window.SantuarioApp.modulos) {
         const { db, ref, set } = window.SantuarioApp.modulos;
-        set(ref(db, `jogos/boutique_gastos/${eu}`), meusGastos + preco);
+        set(ref(db, `jogos/boutique_gastos/${euId}`), meusGastos + preco);
     }
 
     if(typeof renderizarBoutique === 'function') renderizarBoutique();
@@ -7663,7 +7671,7 @@ window.comprarLootbox = function(preco) {
     }, 2000);
 
     setTimeout(() => {
-        const premiosAtivos = (eu === 'João') ? LOOTBOX_JOAO : LOOTBOX_THAMIRIS;
+        const premiosAtivos = window.souJoao ? LOOTBOX_JOAO : LOOTBOX_THAMIRIS;
 
         let random = Math.random();
         let premioSorteado = premiosAtivos[premiosAtivos.length - 1]; 
@@ -7684,6 +7692,19 @@ window.comprarLootbox = function(preco) {
         descResultado.innerText = premioSorteado.desc;
         painelResultado.classList.remove('escondido');
 
+        // Registra o prêmio da caixa misteriosa no Livro de Acordos
+        if (window.SantuarioApp && window.SantuarioApp.modulos) {
+            const { db, ref, set } = window.SantuarioApp.modulos;
+            const idPedido = "ped_" + Date.now();
+            set(ref(db, `jogos/boutique_pedidos/${euId}/${idPedido}`), {
+                emoji: premioSorteado.emoji,
+                nome: premioSorteado.nome,
+                desc: premioSorteado.desc,
+                concluido: false,
+                timestamp: Date.now()
+            });
+        }
+
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjWin', 1.0);
         if(typeof confetti === 'function') confetti({colors: ['#9b59b6', '#D4AF37', '#ffffff'], particleCount: 200, spread: 160});
         if(window.Haptics && navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
@@ -7692,8 +7713,8 @@ window.comprarLootbox = function(preco) {
         if (btnResgatar) {
             btnResgatar.onclick = () => {
                 let numeroJoao = "5541996419950";
-                let numeroThamiris = "5562994838837"; // <-- NÚMERO DELA DE NOVO AQUI
-                let numeroDestino = (eu === 'João') ? numeroThamiris : numeroJoao;
+                let numeroThamiris = "5562994838837"; 
+                let numeroDestino = window.souJoao ? numeroThamiris : numeroJoao;
 
                 let mensagem = `*CAIXA DE PANDORA ABERTA* 🎁✨%0A%0AAmor, gastei as minhas moedas na Caixa Misteriosa e tirei a sorte grande:%0A%0A✨ *${premioSorteado.emoji} ${premioSorteado.nome}*%0A📝 _${premioSorteado.desc}_%0A%0AEstou indo cobrar o meu prêmio agora mesmo! 👀🔥`;
                 
@@ -7703,6 +7724,123 @@ window.comprarLootbox = function(preco) {
             };
         }
     }, 4500);
+};
+
+// ==========================================
+// SISTEMA DE CHECKLIST: ACORDOS ÍNTIMOS
+// ==========================================
+window.abrirChecklistBoutique = function() {
+    if(window.Haptics) window.Haptics.toqueLeve();
+    
+    // 🚨 MENSAGEM NOVA PARA PROVAR QUE O CACHE ATUALIZOU
+    if(typeof mostrarToast === 'function') mostrarToast("Sincronizando Livro de Ouro...", "📖");
+
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) {
+        if(typeof mostrarToast === 'function') mostrarToast("Erro de conexão com o satélite.", "❌");
+        return;
+    }
+    
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    // Usamos onValue contínuo. Assim, se a Thamiris cumprir a missão, a sua tela fica verde na mesma hora!
+    onValue(ref(db, 'jogos/boutique_pedidos'), (snapshot) => {
+        try {
+            const dados = snapshot.exists() ? snapshot.val() : {};
+            if (typeof window.renderizarModalChecklist === 'function') {
+                window.renderizarModalChecklist(dados);
+            }
+        } catch (erro) {
+            console.error("Erro ao renderizar checklist:", erro);
+        }
+    });
+};
+
+window.renderizarModalChecklist = function(dados) {
+    let modal = document.getElementById('modal-checklist-boutique');
+    if(!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modal-checklist-boutique';
+        modal.className = 'modal-overlay';
+        // 🚨 Z-INDEX ABSOLUTO: Garante que a janela nasça na frente da Boutique!
+        modal.style.zIndex = "9999999"; 
+        document.body.appendChild(modal);
+    }
+    
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    const parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    const nomeParceiro = window.souJoao ? 'Thamiris' : 'João';
+    
+    let meusDesejosHtml = window.gerarListaAcordos(dados[euId], euId); 
+    let meusDeveresHtml = window.gerarListaAcordos(dados[parceiroId], parceiroId);
+    
+    modal.innerHTML = `
+        <div class="cartao-vidro" style="width: 90%; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative;">
+            <h2 style="color: var(--cor-primaria); text-align: center; margin-bottom: 5px; font-family: 'Playfair Display', serif;">Acordos Íntimos</h2>
+            <p style="text-align: center; color: #ccc; font-size: 0.85rem; margin-bottom: 20px;">O que deve ser cumprido no mundo real.</p>
+            
+            <h3 style="color: #e74c3c; margin-top: 10px; border-bottom: 1px solid #e74c3c; padding-bottom: 5px;">🔥 Meus Deveres</h3>
+            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">O que ${nomeParceiro} comprou e eu devo cumprir.</p>
+            <div style="margin-bottom: 25px;">${meusDeveresHtml}</div>
+
+            <h3 style="color: #2ecc71; border-bottom: 1px solid #2ecc71; padding-bottom: 5px;">👑 Meus Desejos</h3>
+            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">O que eu comprei e ${nomeParceiro} me deve.</p>
+            <div>${meusDesejosHtml}</div>
+
+            <button class="btn-acao" onclick="document.getElementById('modal-checklist-boutique').style.display='none'" style="width: 100%; margin-top: 25px; background: #333; color: white;">Fechar Livro 📖</button>
+        </div>
+    `;
+    modal.style.display = 'flex';
+    modal.classList.remove('escondido');
+};
+
+window.gerarListaAcordos = function(pedidosObj, donoDosPedidos) {
+    if(!pedidosObj) return '<p style="color: #666; font-style: italic; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">Nenhum acordo registrado.</p>';
+    
+    let html = '';
+    let arr = Object.keys(pedidosObj).map(k => ({ id: k, ...pedidosObj[k] })).sort((a,b) => b.timestamp - a.timestamp);
+    
+    if(arr.length === 0) return '<p style="color: #666; font-style: italic; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">Nenhum acordo registrado.</p>';
+
+    arr.forEach(p => {
+        let corBorda = p.concluido ? '#27ae60' : '#D4AF37';
+        let statusTxt = p.concluido ? '✓ Cumprido com Sucesso' : '⏳ Pendente (Aguardando Cumprimento)';
+        let opacidade = p.concluido ? '0.5' : '1';
+        
+        let btnHtml = '';
+        if (!p.concluido) {
+             btnHtml = `<button onclick="marcarAcordoConcluido('${donoDosPedidos}', '${p.id}')" class="btn-ripple" style="margin-top: 12px; width: 100%; background: #27ae60; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold;">Marcar como Cumprido ✅</button>`;
+        }
+
+        html += `
+            <div style="background: rgba(0,0,0,0.6); border-left: 4px solid ${corBorda}; padding: 12px; border-radius: 8px; margin-top: 12px; opacity: ${opacidade}; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <span style="font-size: 2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${p.emoji}</span>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.1rem;">${p.nome}</h4>
+                </div>
+                <p style="font-size: 0.9rem; color: #ddd; margin: 5px 0 10px 0; line-height: 1.4;">${p.desc}</p>
+                <div style="font-size: 0.75rem; font-weight: bold; color: ${corBorda}; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; display: inline-block;">${statusTxt}</div>
+                ${btnHtml}
+            </div>
+        `;
+    });
+    return html;
+};
+
+window.marcarAcordoConcluido = function(dono, idPedido) {
+    if(confirm("Tem certeza que este acordo íntimo foi cumprido na vida real? 🔥")) {
+        if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        
+        set(ref(db, `jogos/boutique_pedidos/${dono}/${idPedido}/concluido`), true)
+        .then(() => {
+            if(typeof mostrarToast === 'function') mostrarToast("Acordo Cumprido! 🔥", "✅");
+            if(window.Haptics) window.Haptics.toqueLeve();
+            if(typeof confetti === 'function') confetti({colors: ['#27ae60', '#ffffff'], particleCount: 100});
+        }).catch(err => {
+            console.error("Erro ao concluir:", err);
+            if(typeof mostrarToast === 'function') mostrarToast("Erro ao salvar.", "❌");
+        });
+    }
 };
 
 // ==========================================
@@ -11915,3 +12053,5 @@ async function processarRecompensaCraps() {
         document.getElementById('craps-resultado-texto').classList.add('escondido');
     }, 3500);
 }
+
+

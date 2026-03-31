@@ -437,6 +437,28 @@ window.escutarPostits = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
+    // 🚨 1. O OLHEIRO DE NOTIFICAÇÕES (Acende a luz verde no Pulso de Vida)
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    onValue(ref(db, `notificacoes_postit/${euId}`), (snapshot) => {
+        const dados = snapshot.val();
+        const notifEl = document.getElementById('notificacao-postit');
+        
+        if (dados && dados.temNovo) {
+            // Formata a hora exata em que o recado foi mandado (Ex: 14:30)
+            const horaFormatada = new Date(dados.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const nomeParceiro = window.souJoao ? 'Thamiris' : 'João';
+            
+            if (notifEl) {
+                notifEl.innerText = `📌 ${nomeParceiro} deixou um post-it às ${horaFormatada}`;
+                notifEl.classList.remove('escondido');
+            }
+        } else {
+            // Apaga a luz se a mensagem já foi lida
+            if (notifEl) notifEl.classList.add('escondido');
+        }
+    });
+
+    // 2. O LEITOR DE POST-ITS (Constrói o mural com as cores e pastas)
     onValue(ref(db, 'postits'), (snapshot) => {
         const areaAtual = document.getElementById('area-postits');
         const areaArquivo = document.getElementById('conteudo-arquivo-postits');
@@ -463,17 +485,14 @@ window.escutarPostits = function() {
             const txtDecodificado = window.SantuarioCrypto ? window.SantuarioCrypto.decodificar(postit.mensagem) : postit.mensagem;
             const dataFormatada = new Date(postit.timestamp).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
             
-            // 🚨 A MÁGICA RESTAURADA: Puxando as cores clássicas do seu CSS
             const classeAutor = (postit.autor === 'João') ? 'postit-joao' : 'postit-thamiris';
             const iconeFixado = postit.fixado ? '📌 Fixado' : '📍 Fixar';
             
-            // Monta o botão de fixar apenas se o recado for seu
             let btnFixarHtml = '';
             if (postit.autor === window.MEU_NOME) {
                 btnFixarHtml = `<button onclick="fixarPostit('${postit.id}', ${!postit.fixado})" class="btn-fixar">${iconeFixado}</button>`;
             }
 
-            // O Chassi Clássico do Postit com as classes originais!
             const htmlPostit = `
                 <div class="postit ${classeAutor}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;">
@@ -488,7 +507,6 @@ window.escutarPostits = function() {
                 </div>
             `;
             
-            // A MÁGICA DA TRIAGEM
             if (postit.fixado || semanaPostit === semanaAtualString) {
                 areaAtual.insertAdjacentHTML('beforeend', htmlPostit);
             } else {
@@ -501,7 +519,6 @@ window.escutarPostits = function() {
             areaAtual.innerHTML = '<p style="color: #888; font-style: italic; text-align: center; width: 100%;">Nenhum recado na semana atual.</p>';
         }
 
-        // Renderiza o Arquivo Histórico montando as pastas de semanas
         let htmlArquivoFinal = '';
         for (const [semanaStr, listaHtml] of Object.entries(gruposArquivo)) {
             htmlArquivoFinal += `

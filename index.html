@@ -100,6 +100,8 @@
                     <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px; margin-top: 10px; position: relative; z-index: 5;">
                         <span id="msg-feedback" class="feedback-pulso" style="font-weight: bold; letter-spacing: 1px; text-shadow: 0 0 10px var(--cor-primaria);"></span>
                         <p id="contador-pulso" style="font-size: 0.9rem; color: #fff; font-family: 'Playfair Display', serif; text-shadow: 0 2px 5px rgba(0,0,0,0.8); margin: 0; padding: 10px 20px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.5); white-space: nowrap;">Você pensou nele hoje?</p>
+
+<div id="notificacao-postit" class="escondido" style="font-size: 0.8rem; color: #fff; background: rgba(46, 204, 113, 0.2); padding: 5px 15px; border-radius: 20px; border: 1px solid #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); text-align: center; font-weight: bold; margin-top: -5px; letter-spacing: 0.5px;"></div>
                         
                         <div style="display: flex; justify-content: space-between; width: 100%; gap: 8px;">
                             
@@ -121,7 +123,7 @@
             </div>
 
                         <div class="palco-slide">
-                <div class="cartao-vidro cartao-palco" id="cartao-postits" style="display: flex; flex-direction: column;">
+                <div class="cartao-vidro cartao-palco" id="cartao-postits" onclick="if(typeof marcarPostitsComoLido === 'function') marcarPostitsComoLido()" ontouchstart="if(typeof marcarPostitsComoLido === 'function') marcarPostitsComoLido()" style="display: flex; flex-direction: column;">
                     <h4 style="color: var(--cor-primaria); margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 1.3rem; text-align: center;">Mural de Recados</h4>
                     <div id="area-postits" class="area-postits" style="display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; padding-right: 5px;"></div>
                     <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">

@@ -1644,6 +1644,9 @@ function atualizarDinamicaHome() {
         }
     };
 
+// ==========================================
+// MURAL DE RECADOS: ENVIO COM NOTIFICAÇÃO
+// ==========================================
 window.enviarPostit = function() {
     if (!window.SantuarioApp.inicializado || !window.MEU_NOME) return;
     
@@ -1653,19 +1656,47 @@ window.enviarPostit = function() {
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     
-    // Usamos a data/hora atual como ID. Fica salvo na nuvem ETERNAMENTE.
     const idUnico = Date.now(); 
     const refNovoPostit = ref(db, 'postits/' + idUnico);
     
+    // 1. Salva o Post-it no mural
     set(refNovoPostit, {
-    autor: window.MEU_NOME,
-    mensagem: window.SantuarioCrypto.codificar(texto), // <--- Corrigido para 'texto'
-    timestamp: idUnico,
-    fixado: false,
-    curtidas: 0
-});
+        autor: window.MEU_NOME,
+        mensagem: window.SantuarioCrypto.codificar(texto), 
+        timestamp: idUnico,
+        fixado: false,
+        curtidas: 0
+    });
+
+    // 2. 🚨 A MÁGICA DA NOTIFICAÇÃO: Avisa a conta do parceiro que tem mensagem!
+    const parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    set(ref(db, `notificacoes_postit/${parceiroId}`), {
+        temNovo: true,
+        timestamp: idUnico
+    });
 
     input.value = ""; 
+};
+
+// ==========================================
+// LIMPANDO A NOTIFICAÇÃO DO MURAL DE RECADOS
+// ==========================================
+window.marcarPostitsComoLido = function() {
+    const notifEl = document.getElementById('notificacao-postit');
+    
+    // Só gasta internet para avisar o Firebase se a notificação estiver visível!
+    if (notifEl && !notifEl.classList.contains('escondido')) {
+        const euId = window.souJoao ? 'joao' : 'thamiris';
+        if (window.SantuarioApp && window.SantuarioApp.modulos) {
+            const { db, ref, set } = window.SantuarioApp.modulos;
+            
+            // Avisa o Firebase que você já leu, apagando a luz
+            set(ref(db, `notificacoes_postit/${euId}`), {
+                temNovo: false,
+                timestamp: 0
+            });
+        }
+    }
 };
 
 // SUBSTITUA A PARTIR DO EVENTO loginSucesso
@@ -7365,8 +7396,8 @@ const BOUTIQUE_JOAO = [
 
     // 💎 NÍVEL DIAMANTE (Metas Absolutas - 1 Milhão+)
     { id: 'j28', emoji: '👑', nome: 'Mestre do Quarto', desc: 'Na nossa primeira noite juntos no reencontro, EU dito todas as regras. Você apenas obedece.', preco: 1000000 },
-    { id: 'j29', emoji: '🧳', nome: 'Fundo da Viagem', desc: 'Transfira R$ 150 direto para a poupança do nosso próximo encontro.', preco: 2000000 },
-    { id: 'j30', emoji: '✈️', nome: 'A Passagem Aérea', desc: 'O CUSTO ZERO! Você banca integralmente a passagem do nosso reencontro.', preco: 5000000 }
+    { id: 'j29', emoji: '🥂', nome: 'O Primeiro Brinde', desc: 'No nosso reencontro, você banca a nossa primeira refeição juntos (pode ser um lanche na chegada ou um jantarzinho).', preco: 2000000 },
+    { id: 'j30', emoji: '🎁', nome: 'Recepção VIP', desc: 'Você vai me receber no dia do reencontro com um presentinho físico surpresa e um abraço de urso.', preco: 5000000 }
 ];
 
 // 🛒 O QUE A THAMIRIS PODE COMPRAR (O João cumpre/paga)
@@ -7407,7 +7438,7 @@ const BOUTIQUE_THAMIRIS = [
     // 💎 NÍVEL DIAMANTE (Metas Absolutas - 1 Milhão+)
     { id: 't28', emoji: '👗', nome: 'Surto na Shein', desc: 'Pix de R$ 150 exclusivamente para eu renovar as minhas blusinhas e lingeries.', preco: 1000000 },
     { id: 't29', emoji: '✨', nome: 'Dia de Princesa', desc: 'Pix generoso bancando um dia de salão de beleza completo pra mim.', preco: 2000000 },
-    { id: 't30', emoji: '✈️', nome: 'A Passagem Aérea', desc: 'O CUSTO ZERO! Você banca integralmente a passagem do nosso reencontro.', preco: 5000000 }
+    { id: 't30', emoji: '🍷', nome: 'O Primeiro Jantar', desc: 'No nosso reencontro, o nosso primeiro jantar romântico para comemorarmos a distância vencida é totalmente por sua conta!', preco: 5000000 }
 ];
 
 
@@ -7445,7 +7476,7 @@ const LOOTBOX_JOAO = [
 
     // 🔴 LENDÁRIOS (2%)
     { chance: 0.01999, emoji: '🎉', nome: 'Fim de Semana Pago', desc: 'A Thamiris banca o rolê e a comida do seu próximo final de semana inteiro!' },
-    { chance: 0.00001, emoji: '✈️', nome: 'O REENCONTRO', desc: 'O PRÊMIO MÁXIMO! Ela banca a sua passagem!' }
+    { chance: 0.00001, emoji: '🎁', nome: 'Recepção VIP', desc: 'O PRÊMIO MÁXIMO! No reencontro, ela vai te receber com uma surpresa inesquecível e um abraço de urso!' }
 ];
 
 // 🎁 O QUE PODE SAIR NA CAIXA DA THAMIRIS (O João cumpre/paga)
@@ -7478,7 +7509,7 @@ const LOOTBOX_THAMIRIS = [
 
     // 🔴 LENDÁRIOS (2%)
     { chance: 0.01999, emoji: '👗', nome: 'Surto na Shein', desc: 'O João te deve um Pix de R$ 150 DIRETO na conta pras suas lingeries e blusinhas!' },
-    { chance: 0.00001, emoji: '✈️', nome: 'O REENCONTRO', desc: 'O PRÊMIO MÁXIMO! Ele banca integralmente a passagem!' }
+    { chance: 0.00001, emoji: '🎁', nome: 'Recepção VIP', desc: 'O PRÊMIO MÁXIMO! No reencontro, ela vai te receber com uma surpresa inesquecível e um abraço de urso!' }
 ];
 
 // ==========================================

@@ -160,13 +160,12 @@ function verificarAtualizacao() {
 window.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 🚀 MOTOR ADAPTATIVO (DETECÇÃO DE ANDROID)
+    // 🚀 MOTOR ADAPTATIVO (DETECÇÃO GLOBAL DE ANDROID)
     // ==========================================
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    if (isAndroid) {
-        // Se for Android, injeta a classe de performance direto na raiz do HTML
+    window.isAndroidDevice = /Android/i.test(navigator.userAgent);
+    if (window.isAndroidDevice) {
         document.documentElement.classList.add('modo-android-desempenho');
-        console.log("🤖 Android detectado! Modo de Alto Desempenho ativado.");
+        console.log("🤖 Android detectado! Cortando processamentos pesados.");
     } else {
         console.log("🍏 iOS detectado! Gráficos no modo Ultra.");
     }
@@ -224,21 +223,25 @@ window.addEventListener('DOMContentLoaded', () => {
     // --- MELHORIA: EFEITO PARALLAX NAS PARTÍCULAS ---
     const particulas = document.querySelector('.particulas');
     if (particulas) {
-        let animacaoParallaxPendente = false;
-        window.addEventListener('deviceorientation', (e) => {
-            if (animacaoParallaxPendente) return;
-            animacaoParallaxPendente = true;
-            requestAnimationFrame(() => {
-                const x = Math.min(Math.max(e.gamma, -30), 30);
-                const y = Math.min(Math.max(e.beta - 45, -30), 30);
-                if (particulas) {
-                    // translate3d obriga a placa de vídeo a fazer o trabalho suavemente
+        // 🚨 TRAVA ANDROID: Impede a leitura do sensor para mover partículas
+        if (window.isAndroidDevice) {
+            console.log("Parallax desativado para salvar CPU no Android.");
+        } else {
+            let animacaoParallaxPendente = false;
+            window.addEventListener('deviceorientation', (e) => {
+                // ... seu código original do parallax continua aqui dentro ...
+                if (animacaoParallaxPendente) return;
+                animacaoParallaxPendente = true;
+                requestAnimationFrame(() => {
+                    const x = Math.min(Math.max(e.gamma, -30), 30);
+                    const y = Math.min(Math.max(e.beta - 45, -30), 30);
                     particulas.style.transform = `translate3d(${x * 0.5}px, ${y * 0.5}px, 0)`;
-                }
-                animacaoParallaxPendente = false;
+                    animacaoParallaxPendente = false;
+                });
             });
-        });
-
+        }
+        
+        // O movimento pelo mouse (PC) pode continuar normal
         window.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 20;
             const y = (e.clientY / window.innerHeight - 0.5) * 20;
@@ -381,13 +384,16 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(ativarReflexo, 6000);
 
     let ultimoTempoReflexo = 0;
-    window.addEventListener('deviceorientation', (e) => {
-        const agora = Date.now();
-        if ((Math.abs(e.gamma) > 10 || Math.abs(e.beta) > 10) && agora - ultimoTempoReflexo > 2000) {
-            ativarReflexo();
-            ultimoTempoReflexo = agora;
-        }
-    });
+    // 🚨 TRAVA ANDROID: O iPhone mantém, o Android ignora o giroscópio
+    if (!window.isAndroidDevice) {
+        window.addEventListener('deviceorientation', (e) => {
+            const agora = Date.now();
+            if ((Math.abs(e.gamma) > 10 || Math.abs(e.beta) > 10) && agora - ultimoTempoReflexo > 2000) {
+                ativarReflexo();
+                ultimoTempoReflexo = agora;
+            }
+        });
+    }
 
     // ==========================================
     // SISTEMA DE ALERTA INTELIGENTE
@@ -469,9 +475,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // MOTOR DO VIDRO MAGNÉTICO + GLARE (OTIMIZADO PARA GPU)
     // ==========================================
     window.ativarVidroMagnetico = () => {
+        // 🚨 TRAVA ANDROID: A cura definitiva para o lag de layout!
+        if (window.isAndroidDevice) return; 
+
         if (window.DeviceOrientationEvent) {
             let animacaoPendente = false;
-
             window.addEventListener('deviceorientation', (e) => {
                 // Se a placa de vídeo ainda não processou o último quadro, ignora a leitura do sensor
                 if (animacaoPendente) return;

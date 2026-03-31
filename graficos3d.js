@@ -299,11 +299,16 @@ window.inicializarOrbeClima = () => {
     }));
 
     let tempo = 0;
-    const animar = () => {
-        // 🚨 TRAVA DE DESTRUIÇÃO: Para o laço de animação se o componente foi purgado da VRAM
-        if (!window.OrbeClimaRenderer) return;
+    let ultimoFrameOrbe = 0;
+    const limiteFpsOrbe = window.isAndroidDevice ? 1000 / 30 : 0; // Trava 30 FPS no Android
 
+    const animar = (tempoAtual) => {
+        if (!window.OrbeClimaRenderer) return;
         requestAnimationFrame(animar);
+
+        // O Escudo de Quadros (FPS Limiter)
+        if (limiteFpsOrbe > 0 && (tempoAtual - ultimoFrameOrbe < limiteFpsOrbe)) return;
+        ultimoFrameOrbe = tempoAtual;
 
         // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
         if (!container || container.offsetParent === null) return;
@@ -1152,10 +1157,15 @@ window.inicializarPrisma3D = () => {
     observerArvore.observe(container);
 
     let tempo = 0;
-    const animar = () => {
+    let ultimoFramePrisma = 0;
+    const limiteFpsPrisma = window.isAndroidDevice ? 1000 / 30 : 0;
+
+    const animar = (tempoAtual) => {
         if (!window.PrismaRenderer) return;
-        
         requestAnimationFrame(animar);
+
+        if (limiteFpsPrisma > 0 && (tempoAtual - ultimoFramePrisma < limiteFpsPrisma)) return;
+        ultimoFramePrisma = tempoAtual;
         
         // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
         if (!container || container.offsetParent === null) return;
@@ -1222,7 +1232,7 @@ window.inicializarPlanetario3D = () => {
     const container = document.querySelector('#modal-reliquia #planetario-3d-container');
     if (!container || container.querySelector('.planetario-canvas-wrapper')) return;
 
-    const QUANTIDADE_ESTRELAS = 8000; 
+    const QUANTIDADE_ESTRELAS = window.isAndroidDevice ? 2000 : 8000;
     const TAMANHO_UNIVERSO = 2000; 
     const PROPORCAO_POEIRA = 0.85; 
     const VELOCIDADE_ROTACAO_X = -0.15;
@@ -1414,7 +1424,7 @@ window.inicializarGalaxia3D = () => {
 
     // Criação do Campo Estelar
     const starGeo = new THREE.BufferGeometry();
-    const starCount = 2000;
+    const starCount = window.isAndroidDevice ? 600 : 2000;
     const starPos = new Float32Array(starCount * 3);
 
     for(let i=0; i < starCount; i++) {
@@ -1574,7 +1584,10 @@ window.inicializarJornada3D = () => {
                 float t = 0.0, glowAlmas = 0.0, glowTunnel = 0.0;
                 vec3 p;
                 
-                for(int i = 0; i < 64; i++) { 
+                // 🚨 TRAVA ANDROID NO SHADER: Corta o processamento pela metade
+                int maxIteracoes = ${window.isAndroidDevice ? "32" : "64"};
+                
+                for(int i = 0; i < maxIteracoes; i++) { 
                     p = ro + rd * t;
                     vec3 pLocal = p;
                     pLocal.z -= ro.z; 
@@ -1639,11 +1652,15 @@ window.inicializarJornada3D = () => {
 
     const telaJornada = document.getElementById('jornada');
     let tempoAnterior = performance.now();
+    let ultimoFrameJornada = 0;
+    const limiteFpsJornada = window.isAndroidDevice ? 1000 / 30 : 0;
 
-    const animar = () => {
+    const animar = (tempoAtual) => {
         if (!window.JornadaRenderer) return;
-        
         requestAnimationFrame(animar);
+
+        if (limiteFpsJornada > 0 && (tempoAtual - ultimoFrameJornada < limiteFpsJornada)) return;
+        ultimoFrameJornada = tempoAtual;
         
         // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
         if (!container || container.offsetParent === null) return;

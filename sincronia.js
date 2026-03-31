@@ -383,11 +383,10 @@ const bancoPerguntasSincronia = [
     "Quem de nós dois é a maior certeza de que o futuro será brilhante?",
 ];
 
-// 2. IDENTIFICAÇÃO DO JOGADOR
-// Como o app roda nos dois celulares, precisamos saber quem é quem para salvar no Firebase correto.
-// Substitua esta lógica pela que você usa no seu app para definir o usuário logado.
-let meuPerfil = localStorage.getItem('perfilSincronia') || 'João'; // Pode ser 'João' ou 'Thamiris'
-let perfilParceiro = meuPerfil === 'João' ? 'Thamiris' : 'João';
+// 2. IDENTIFICAÇÃO DO JOGADOR (Blindada pelo Núcleo do Santuário)
+// Puxa a identidade real que foi validada pelo Firebase no momento do Login!
+let obterMeuPerfil = () => window.MEU_NOME ? window.MEU_NOME : (window.souJoao ? 'João' : 'Thamiris');
+let obterPerfilParceiro = () => window.NOME_PARCEIRO ? window.NOME_PARCEIRO : (window.souJoao ? 'Thamiris' : 'João');
 
 // 3. VARIÁVEIS DE ESTADO
 let sincroniaListener = null;
@@ -487,8 +486,11 @@ window.iniciarNovaInvestigacao = function() {
 function atualizarInterfaceSincronia() {
     document.getElementById('tema-sincronia').innerText = `"${rodadaAtual.pergunta}"`;
     
-    const minhaResposta = meuPerfil === 'João' ? rodadaAtual.respostaJoao : rodadaAtual.respostaThamiris;
-    const respostaDela = meuPerfil === 'João' ? rodadaAtual.respostaThamiris : rodadaAtual.respostaJoao;
+    const eu = obterMeuPerfil();
+    const parceiro = obterPerfilParceiro();
+
+    const minhaResposta = eu === 'João' ? rodadaAtual.respostaJoao : rodadaAtual.respostaThamiris;
+    const respostaDela = eu === 'João' ? rodadaAtual.respostaThamiris : rodadaAtual.respostaJoao;
     
     const orbe = document.getElementById('orbe-energia');
     const inputMeu = document.getElementById('input-minha-palavra');
@@ -515,7 +517,7 @@ function atualizarInterfaceSincronia() {
         inputMeu.disabled = true;
         btnTravar.disabled = true;
         btnTravar.innerText = "Aguardando Parceira... ⏳";
-        statusDela.innerText = `${perfilParceiro} está pensando... 💭`;
+        statusDela.innerText = `${parceiro} está pensando... 💭`;
         orbe.className = "orbe orbe-conectada"; // Orbe pulsando em Roxo
     }
     
@@ -566,26 +568,21 @@ window.travarPalavra = function() {
     
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     
-    // Mudança cirúrgica: usamos 'set' no lugar de 'update'
     const { db, ref, set } = window.SantuarioApp.modulos; 
     
-    const campoParaAtualizar = meuPerfil === 'João' ? 'respostaJoao' : 'respostaThamiris';
+    // 🚨 PUXA A IDENTIDADE REAL DO NÚCLEO
+    const eu = obterMeuPerfil();
+    const campoParaAtualizar = eu === 'João' ? 'respostaJoao' : 'respostaThamiris';
     
-    // Atualiza APENAS o campo específico de quem digitou, acessando o caminho direto do banco
+    // Atualiza APENAS o campo específico de quem digitou
     set(ref(db, `jogos/sincronia_casal/${campoParaAtualizar}`), minhaPalavra)
     .then(() => {
         if(window.Haptics) window.Haptics.toqueLeve();
     }).catch(error => console.error("Erro na telepatia:", error));
 };
 
-// 8. O VEREDITO DA CONEXÃO
 // 8. O VEREDITO DA CONEXÃO (COM NORMALIZAÇÃO DE ELITE)
 function verificarMatch(palavra1, palavra2) {
-    // FUNÇÃO INTERNA DE NORMALIZAÇÃO
-    // 1. normalize('NFD'): Separa a letra do acento (ex: 'ã' vira 'a' + '~')
-    // 2. replace: Remove o acento flutuante
-    // 3. toLowerCase: Deixa tudo minúsculo
-    // 4. trim: Remove espaços em branco acidentais no começo ou fim
     const normalizar = (texto) => {
         return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     };
@@ -593,21 +590,24 @@ function verificarMatch(palavra1, palavra2) {
     const p1 = normalizar(palavra1);
     const p2 = normalizar(palavra2);
     
-    // Se forem exatamente iguais após a "limpeza"
+    // 🚨 PUXA A IDENTIDADE REAL
+    const eu = obterMeuPerfil();
+    
     if (p1 === p2) {
         if(typeof mostrarToast === 'function') mostrarToast("Sincronia Perfeita! As mentes colidiram! +100💰", "✨🧠✨");
-        if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]); // Vibração de festa
+        if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]); 
         
         if(typeof confetti === 'function') confetti({colors: ['#e056fd', '#f9ca24'], particleCount: 150, spread: 100});
         
-        if (meuPerfil === 'João' && typeof atualizarPontosCasal === 'function') {
+        // Apenas o João processa o dinheiro para não duplicar os ganhos no banco
+        if (eu === 'João' && typeof atualizarPontosCasal === 'function') {
             atualizarPontosCasal(100, "Sincronia Perfeita Quântica");
             salvarNoHistorico("Match Perfeito", p1, p2);
         }
     } else {
         if(typeof mostrarToast === 'function') mostrarToast("As mentes seguiram caminhos diferentes... Mas a verdade foi revelada!", "🔮");
         
-        if (meuPerfil === 'João') salvarNoHistorico("Divergência", p1, p2);
+        if (eu === 'João') salvarNoHistorico("Divergência", p1, p2);
     }
 }
 

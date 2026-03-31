@@ -7321,94 +7321,204 @@ window.CassinoAudio.carregarTudo();
 
 
 // ============================================================================
-// 🛍️ MOTOR DA BOUTIQUE VIP E LOOTBOXES
-// ============================================================================
-
-// ============================================================================
 // 🛍️ MOTOR DA BOUTIQUE VIP E LOOTBOXES (ECONOMIA INFLACIONADA)
 // ============================================================================
 
-// 1. O ESTOQUE DA LOJA (Catálogo Gigante e Preços de Cassino)
-// 1. O ESTOQUE DA LOJA (30 Itens Exclusivos para Amor à Distância)
-const BOUTIQUE_CATALOGO = [
-    // 🥉 NÍVEL BRONZE (Carinhos Digitais - Até 50k)
-    { id: 'item1', emoji: '🎬', nome: 'Controle Remoto da Decisão', desc: 'Direito de escolher o filme/série da call hoje sem que eu possa dar um pio.', preco: 5000 },
-    { id: 'item2', emoji: '📸', nome: 'Selfie Exclusiva', desc: 'Obrigação de mandar uma foto minha na hora, do jeito que você pedir.', preco: 7500 },
-    { id: 'item3', emoji: '🎵', nome: 'DJ da Call', desc: 'Você dita a playlist de músicas enquanto conversamos ou jogamos.', preco: 10000 },
-    { id: 'item4', emoji: '🗣️', nome: 'Áudio de Bom Dia', desc: 'Um áudio de pelo menos 2 minutos de muito chamego ao acordar.', preco: 12000 },
-    { id: 'item5', emoji: '🎮', nome: 'Player 2 Submisso', desc: 'Vou jogar o jogo que VOCÊ quiser, no seu ritmo, por 2 horas.', preco: 15000 },
-    { id: 'item6', emoji: '👕', nome: 'Estilista Pessoal', desc: 'Você escolhe a roupa que eu vou usar para sair hoje.', preco: 20000 },
-    { id: 'item7', emoji: '✍️', nome: 'Declaração Textual', desc: 'Um textão romântico no WhatsApp pra você ler e sorrir.', preco: 25000 },
-    { id: 'item8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. Você ganha a razão.', preco: 30000 },
-    { id: 'item9', emoji: '💤', nome: 'Nana Neném', desc: 'Vou ler um livro ou contar história na call até você dormir.', preco: 40000 },
-    { id: 'item10', emoji: '📱', nome: 'Detox de Tela', desc: 'Largo os jogos e redes sociais para focar 100% em você na call por 2 horas.', preco: 50000 },
+// ==========================================
+// 1. O ESTOQUE DA LOJA (CATÁLOGOS EXCLUSIVOS E 🔥 PICANTES 🔥)
+// ==========================================
 
-    // 🥈 NÍVEL PRATA (Mimos de Delivery e Entregas - Até 200k)
-    { id: 'item11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Um docinho ou açaí enviado pelo iFood para sua casa AGORA.', preco: 75000 },
-    { id: 'item12', emoji: '☕', nome: 'Café da Manhã Surpresa', desc: 'Acorde com um iFood de padaria pago por mim.', preco: 90000 },
-    { id: 'item13', emoji: '💌', nome: 'Correio Elegante', desc: 'Escreverei e enviarei uma carta de papel de verdade pelos Correios.', preco: 110000 },
-    { id: 'item14', emoji: '🚗', nome: 'Pix do Uber', desc: 'Seu Uber pago por mim para te salvar de um perrengue ou chuva.', preco: 130000 },
-    { id: 'item15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Noite de pizza pelo iFood paga por mim. Você escolhe os sabores.', preco: 150000 },
-    { id: 'item16', emoji: '🍔', nome: 'Lanchão Monstruoso', desc: 'O combo de hambúrguer mais gostoso da sua cidade na sua porta.', preco: 180000 },
-    { id: 'item17', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera o placar de uma pequena DR. Paz absoluta restaurada.', preco: 200000 },
+// 🛒 O QUE O JOÃO PODE COMPRAR (A Thamiris cumpre/paga)
+const BOUTIQUE_JOAO = [
+    // 🥉 NÍVEL BRONZE (Carinhos & Provocações Iniciais - Até 50k)
+    { id: 'j1', emoji: '🎬', nome: 'Controle Remoto', desc: 'Direito de escolher o filme/série da call hoje sem que você possa dar um pio.', preco: 5000 },
+    { id: 'j2', emoji: '📸', nome: 'Selfie Provocante', desc: 'Pare o que está fazendo e me mande uma foto só de calcinha/sutiã agora mesmo.', preco: 7500 },
+    { id: 'j3', emoji: '🎵', nome: 'DJ da Call', desc: 'Você vai escutar as minhas músicas hoje enquanto conversamos.', preco: 10000 },
+    { id: 'j4', emoji: '🗣️', nome: 'Áudio Ofegante', desc: 'Quero um áudio seu de 2 minutos narrando exatamente o que você quer que eu te faça.', preco: 12000 },
+    { id: 'j5', emoji: '🎮', nome: 'Player 2 Submissa', desc: 'Você vai jogar o meu jogo favorito comigo, no meu ritmo, por 2 horas.', preco: 15000 },
+    { id: 'j6', emoji: '🔥', nome: 'Confissão Obscena', desc: 'Vou te fazer uma pergunta extremamente íntima e você TEM que responder com detalhes.', preco: 20000 },
+    { id: 'j7', emoji: '👙', nome: 'Lingerie do Dia', desc: 'Eu escolho a lingerie exata que você vai vestir por baixo da roupa hoje.', preco: 25000 },
+    { id: 'j8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. Eu ganho a razão e um pedido de desculpas.', preco: 30000 },
+    { id: 'j9', emoji: '😈', nome: 'Nude de 5 Segundos', desc: 'Uma foto visualização-única no WhatsApp, sem censura, agora.', preco: 40000 },
+    { id: 'j10', emoji: '🎲', nome: 'Verdade ou Consequência +18', desc: 'Vamos jogar na call hoje. E as prendas serão pagas na câmera.', preco: 50000 },
 
-    // 🥇 NÍVEL OURO (Mimos de Alto Valor - Até 800k)
-    { id: 'item18', emoji: '💐', nome: 'Flores no Portão', desc: 'Um buquê surpresa entregue diretamente na sua casa.', preco: 250000 },
-    { id: 'item19', emoji: '💅', nome: 'Pix da Beleza (R$ 50)', desc: 'Dinheiro na conta para você fazer as unhas ou sobrancelha.', preco: 300000 },
-    { id: 'item20', emoji: '📖', nome: 'Clube do Livro', desc: 'Escolha um livro na Amazon que eu compro e mando entregar aí.', preco: 350000 },
-    { id: 'item21', emoji: '🛒', nome: 'Carrinho da Shopee', desc: 'Vou pagar aquele carrinho da Shopee que tá parado (Até R$ 50).', preco: 400000 },
-    { id: 'item22', emoji: '🧸', nome: 'Pelúcia de Saudade', desc: 'Mando entregar uma pelúcia gigante pra você abraçar no meu lugar.', preco: 500000 },
-    { id: 'item23', emoji: '🍣', nome: 'Combo de Sushi', desc: 'Um barcão de sushi entregue no iFood pra sua janta de hoje.', preco: 600000 },
-    { id: 'item24', emoji: '💄', nome: 'Skincare e Make', desc: 'Pix para repor aquele seu creme ou maquiagem que acabou.', preco: 700000 },
-    { id: 'item25', emoji: '🍷', nome: 'Jantar Virtual de Gala', desc: 'Pedimos jantares chiques, nos arrumamos e comemos juntos na call em vídeo.', preco: 800000 },
+    // 🥈 NÍVEL PRATA (Delivery & Exibicionismo Privado - Até 250k)
+    { id: 'j11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Você banca um docinho ou açaí no meu iFood AGORA.', preco: 75000 },
+    { id: 'j12', emoji: '🚿', nome: 'Áudio no Chuveiro', desc: 'Quero ouvir o barulho da água e seus gemidos enquanto você toma banho pensando em mim.', preco: 90000 },
+    { id: 'j13', emoji: '💌', nome: 'Carta Física', desc: 'Escreva e me mande uma carta de amor com seu perfume (e uma marca de batom) pelos Correios.', preco: 110000 },
+    { id: 'j14', emoji: '🍻', nome: 'Pix da Gelada', desc: 'Você banca o Pix da minha cervejinha/drink do final de semana.', preco: 130000 },
+    { id: 'j15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Noite de pizza pelo iFood paga por você!', preco: 150000 },
+    { id: 'j16', emoji: '💃', nome: 'Strip-Tease Particular', desc: 'Você vai colocar uma música e dançar tirando a roupa pra mim na call de vídeo.', preco: 170000 },
+    { id: 'j17', emoji: '🍔', nome: 'Combo Artesanal Monstro', desc: 'Aquele combo de hambúrguer artesanal absurdo pago por você.', preco: 180000 },
+    { id: 'j18', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera o placar de um vacilo meu. Paz absoluta restaurada.', preco: 200000 },
+    { id: 'j19', emoji: '🎥', nome: 'Strip-Poker Virtual', desc: 'Quem perde a mão do jogo, tira uma peça de roupa. Vamos jogar na cam.', preco: 220000 },
+    { id: 'j20', emoji: '👅', nome: 'Realização de Fantasia', desc: 'Você vai me confessar um fetiche oculto seu e nós vamos planejar como realizar.', preco: 250000 },
 
-    // 💎 NÍVEL DIAMANTE (Metas de Relacionamento - 1 Milhão+)
-    { id: 'item26', emoji: '👗', nome: 'Surto na Shein (R$ 150)', desc: 'Pix de R$ 150 exclusivamente para você renovar suas blusinhas.', preco: 1000000 },
-    { id: 'item27', emoji: '💇‍♀️', nome: 'Dia de Princesa', desc: 'Pix generoso bancando um dia de salão de beleza para você.', preco: 1500000 },
-    { id: 'item28', emoji: '🎟️', nome: 'O Rolê com as Amigas', desc: 'Pago o seu ingresso do show/festa pra você curtir com as meninas.', preco: 2000000 },
-    { id: 'item29', emoji: '🧳', nome: 'Fundo da Viagem', desc: 'Transfiro R$ 300 direto para a poupança do nosso próximo encontro.', preco: 3500000 },
-    { id: 'item30', emoji: '✈️', nome: 'A Passagem Aérea', desc: 'O CUSTO ZERO! Eu banco integralmente a passagem para o nosso reencontro.', preco: 5000000 }
+    // 🥇 NÍVEL OURO (Prêmios Pesados & Luxo - Até 900k)
+    { id: 'j21', emoji: '🛒', nome: 'Carrinho da Shopee', desc: 'Você vai pagar aquele carrinho meu que tá parado (Até R$ 50).', preco: 300000 },
+    { id: 'j22', emoji: '🧸', nome: 'Pelúcia com seu Cheiro', desc: 'Me mande uma pelúcia gigante borrifada com o seu perfume pra eu dormir agarrado.', preco: 350000 },
+    { id: 'j23', emoji: '⛓️', nome: 'Submissão Total', desc: 'Por 1 hora na call de hoje, você é minha e tem que obedecer QUALQUER comando meu na câmera.', preco: 400000 },
+    { id: 'j24', emoji: '🥩', nome: 'Rodízio de Carnes', desc: 'Você banca um jantar de churrascaria/carnes premium pra mim hoje!', preco: 500000 },
+    { id: 'j25', emoji: '🔥', nome: 'Conjunto Erótico', desc: 'EU escolho a lingerie/brinquedo online, VOCÊ compra e usa pra mim na nossa próxima call.', preco: 600000 },
+    { id: 'j26', emoji: '🍷', nome: 'Jantar de Gala Virtual', desc: 'Você planeja o date, a gente se arruma e jantamos "juntos" em vídeo.', preco: 700000 },
+    { id: 'j27', emoji: '📸', nome: 'Ensaio Sensual Completo', desc: 'Um pack de fotos e vídeos explícitos, feitos no seu quarto, única e exclusivamente para mim.', preco: 800000 },
+
+    // 💎 NÍVEL DIAMANTE (Metas Absolutas - 1 Milhão+)
+    { id: 'j28', emoji: '👑', nome: 'Mestre do Quarto', desc: 'Na nossa primeira noite juntos no reencontro, EU dito todas as regras. Você apenas obedece.', preco: 1000000 },
+    { id: 'j29', emoji: '🧳', nome: 'Fundo da Viagem', desc: 'Transfira R$ 150 direto para a poupança do nosso próximo encontro.', preco: 2000000 },
+    { id: 'j30', emoji: '✈️', nome: 'A Passagem Aérea', desc: 'O CUSTO ZERO! Você banca integralmente a passagem do nosso reencontro.', preco: 5000000 }
 ];
 
-// 2. O ESTOQUE DA LOOTBOX (20 Itens balanceados para fechar 100% de probabilidade)
-const LOOTBOX_PREMIOS = [
-    // 🟢 COMUNS (40% de chance no total - 10% cada)
-    { chance: 0.10, emoji: '📸', nome: 'Foto de Agora', desc: 'Tenho que parar tudo e te mandar uma selfie do que estou fazendo.' },
-    { chance: 0.10, emoji: '🎵', nome: 'Música do Dia', desc: 'Te mando uma música que me lembra você agora mesmo.' },
-    { chance: 0.10, emoji: '🗣️', nome: 'Áudio Espontâneo', desc: 'Um áudio de 1 minuto me declarando pra você.' },
-    { chance: 0.10, emoji: '🍫', nome: 'Pix do Chocolate', desc: 'Pix de R$ 10 pra você ir na padaria comprar um doce agora!' },
+// 🛒 O QUE A THAMIRIS PODE COMPRAR (O João cumpre/paga)
+const BOUTIQUE_THAMIRIS = [
+    // 🥉 NÍVEL BRONZE (Carinhos & Provocações Iniciais - Até 50k)
+    { id: 't1', emoji: '🎬', nome: 'Controle Remoto', desc: 'Direito de escolher o filme/série da call hoje sem que você reclame.', preco: 5000 },
+    { id: 't2', emoji: '📸', nome: 'Selfie Pós-Banho', desc: 'Quero uma foto sua só de toalha ou sem camisa, no espelho, agora.', preco: 7500 },
+    { id: 't3', emoji: '🎵', nome: 'DJ da Call', desc: 'Você vai ser obrigado a escutar a minha playlist hoje.', preco: 10000 },
+    { id: 't4', emoji: '🗣️', nome: 'Voz Grossa de Bom Dia', desc: 'Quero um áudio de voz de sono, bem grossa, dizendo o que quer fazer comigo amanhã.', preco: 12000 },
+    { id: 't5', emoji: '🎮', nome: 'Player 2 Submisso', desc: 'Você vai assistir o meu programa/jogar meu jogo favorito sem reclamar.', preco: 15000 },
+    { id: 't6', emoji: '🔥', nome: 'Segredo Sujo', desc: 'Vou fazer uma pergunta bem safada e você TEM que responder a verdade absoluta.', preco: 20000 },
+    { id: 't7', emoji: '🩲', nome: 'Estilista Íntima', desc: 'Eu escolho a cor da cueca e a roupa que você vai vestir hoje.', preco: 25000 },
+    { id: 't8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. A razão é toda minha.', preco: 30000 },
+    { id: 't9', emoji: '😈', nome: 'Nude Direto', desc: 'Quero receber uma foto visualização-única, sem censura, agora no WhatsApp.', preco: 40000 },
+    { id: 't10', emoji: '🎲', nome: 'Verdade ou Consequência +18', desc: 'Vamos jogar hoje à noite. Sem fugir das prendas na câmera.', preco: 50000 },
 
-    // 🔵 INCOMUNS (30% de chance no total - 6% cada)
-    { chance: 0.06, emoji: '🍦', nome: 'Pix do Açaí', desc: 'Caiu R$ 25 na sua conta para pedir um açaí gelado.' },
-    { chance: 0.06, emoji: '🎬', nome: 'Poder do Play', desc: 'Você tem a palavra final sobre qual filme veremos hoje.' },
-    { chance: 0.06, emoji: '👕', nome: 'Meu Guarda-Roupa', desc: 'Você monta o meu look amanhã.' },
-    { chance: 0.06, emoji: '💤', nome: 'História pra Dormir', desc: 'Call garantida com leitura ou papo suave até você pegar no sono.' },
-    { chance: 0.06, emoji: '🤫', nome: 'Última Palavra', desc: 'Você ganha um vale "eu tenho razão" pra usar na próxima mini-DR.' },
+    // 🥈 NÍVEL PRATA (Delivery & Exibicionismo Privado - Até 250k)
+    { id: 't11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Um docinho ou açaí enviado pelo iFood para a minha casa AGORA.', preco: 75000 },
+    { id: 't12', emoji: '🚿', nome: 'Gemido no Banho', desc: 'Quero um áudio seu no chuveiro narrando exatamente o que faria comigo lá dentro.', preco: 90000 },
+    { id: 't13', emoji: '💌', nome: 'Carta Física', desc: 'Escreva de próprio punho e me mande uma carta romântica pelos Correios.', preco: 110000 },
+    { id: 't14', emoji: '🚗', nome: 'Pix do Uber', desc: 'Você banca o meu Uber para eu voltar em segurança e conforto.', preco: 130000 },
+    { id: 't15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Minha pizza do iFood de hoje com borda recheada paga por você!', preco: 150000 },
+    { id: 't16', emoji: '🕺', nome: 'Show Particular na Cam', desc: 'Você vai fazer um strip-tease completo só pra mim na chamada de vídeo.', preco: 170000 },
+    { id: 't17', emoji: '🍔', nome: 'Lanchão Artesanal', desc: 'Aquele combo duplo maravilhoso de hambúrguer pago no meu iFood.', preco: 180000 },
+    { id: 't18', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera um surto ou ciuminho meu. Você tem que me dar razão e pedir desculpas.', preco: 200000 },
+    { id: 't19', emoji: '🎥', nome: 'Roleta do Desejo', desc: 'Eu vou te dar 3 ordens explícitas na câmera hoje à noite e você tem que obedecer.', preco: 220000 },
+    { id: 't20', emoji: '⛓️', nome: 'Escravo por 1 Dia', desc: 'No reencontro, você será o meu servo particular o dia inteiro. Tudo que eu pedir, você faz.', preco: 250000 },
 
-    // 🟣 RAROS (20% de chance no total - 4% cada)
-    { chance: 0.04, emoji: '☕', nome: 'Café de Domingo', desc: 'iFood de padaria garantido pro seu próximo domingo de manhã.' },
-    { chance: 0.04, emoji: '🍕', nome: 'Noite da Pizza', desc: 'A janta hoje é pizza paga por mim pelo iFood!' },
-    { chance: 0.04, emoji: '🚗', nome: 'Vale Uber', desc: 'Seu próximo Uber é por minha conta.' },
-    { chance: 0.04, emoji: '💐', nome: 'Flores Surpresa', desc: 'Pode esperar a campainha tocar, vai ter flor na sua porta!' },
-    { chance: 0.04, emoji: '🛒', nome: 'Cesto da Shopee', desc: 'Pago um presentinho surpresa na Shopee (até R$ 30).' },
+    // 🥇 NÍVEL OURO (Prêmios Pesados & Luxo - Até 900k)
+    { id: 't21', emoji: '💐', nome: 'Flores no Portão', desc: 'Quero um buquê luxuoso surpresa entregue diretamente na minha casa.', preco: 300000 },
+    { id: 't22', emoji: '💅', nome: 'Pix da Beleza (Unhas)', desc: 'Manda o Pix (R$ 50) para eu fazer as unhas e ficar linda (pra arranhar suas costas).', preco: 350000 },
+    { id: 't23', emoji: '👑', nome: 'A Chefona', desc: 'Por 1 hora na call de hoje, você tem que dizer "Sim" e fazer QUALQUER pedido meu na câmera.', preco: 400000 },
+    { id: 't24', emoji: '🫕', nome: 'Fondue Romântico', desc: 'Você banca um rodízio de Fondue ou Jantar Italiano maravilhoso pra mim hoje.', preco: 500000 },
+    { id: 't25', emoji: '💄', nome: 'Skincare e Make', desc: 'Pix generoso para eu repor os meus cremes e maquiagens.', preco: 600000 },
+    { id: 't26', emoji: '🍷', nome: 'Jantar de Gala Virtual', desc: 'Você banca a janta, a gente se arruma e comemos juntos em vídeo.', preco: 700000 },
+    { id: 't27', emoji: '💆‍♀️', nome: 'Massagem com Final Feliz', desc: 'No reencontro, você me deve 1 hora de massagem relaxante pelo corpo todo, com um final inesquecível.', preco: 800000 },
 
-    // 🟡 ÉPICOS (8% de chance no total - 2% cada)
-    { chance: 0.02, emoji: '🍣', nome: 'Jantar Japonês', desc: 'Rodízio ou combo de sushi na sua casa pago pelo João!' },
-    { chance: 0.02, emoji: '💅', nome: 'Unhas Feitas', desc: 'Pix de R$ 50 pra você ir na manicure amanhã.' },
-    { chance: 0.02, emoji: '📖', nome: 'Leitura Nova', desc: 'Escolha um livro que eu peço pra entregar pela Amazon.' },
-    { chance: 0.02, emoji: '🍷', nome: 'Gala Virtual', desc: 'A gente pede um jantar caro e come arrumados em vídeo.' },
-
-    // 🔴 LENDÁRIOS (2% de chance no total da categoria)
-    { chance: 0.01999, emoji: '👗', nome: 'Surto na Shein', desc: 'PIX DE R$ 150 DIRETO NA CONTA PRA COMPRAR BLUSINHAS!' },
-    { chance: 0.00001, emoji: '✈️', nome: 'O REENCONTRO', desc: 'O PRÊMIO MÁXIMO! Uma passagem aérea ou viagem bancada por mim.' }
+    // 💎 NÍVEL DIAMANTE (Metas Absolutas - 1 Milhão+)
+    { id: 't28', emoji: '👗', nome: 'Surto na Shein', desc: 'Pix de R$ 150 exclusivamente para eu renovar as minhas blusinhas e lingeries.', preco: 1000000 },
+    { id: 't29', emoji: '✨', nome: 'Dia de Princesa', desc: 'Pix generoso bancando um dia de salão de beleza completo pra mim.', preco: 2000000 },
+    { id: 't30', emoji: '✈️', nome: 'A Passagem Aérea', desc: 'O CUSTO ZERO! Você banca integralmente a passagem do nosso reencontro.', preco: 5000000 }
 ];
+
+
+// ==========================================
+// 2. O ESTOQUE DA LOOTBOX (CAIXAS MISTERIOSAS BIFURCADAS E CALIENTES)
+// ==========================================
+
+// 🎁 O QUE PODE SAIR NA CAIXA DO JOÃO (A Thamiris cumpre/paga)
+const LOOTBOX_JOAO = [
+    // 🟢 COMUNS (40% - 10% cada)
+    { chance: 0.10, emoji: '📸', nome: 'Selfie Imediata', desc: 'Ela tem que mandar uma selfie do que está fazendo agora.' },
+    { chance: 0.10, emoji: '🎵', nome: 'Música do Dia', desc: 'Ela tem que te mandar uma música romântica agora mesmo.' },
+    { chance: 0.10, emoji: '🗣️', nome: 'Áudio Espontâneo', desc: 'Ganhou um áudio de 1 minuto dela se declarando.' },
+    { chance: 0.10, emoji: '😈', nome: 'Foto Explícita', desc: 'Sorte Grande! Ela deve te mandar uma foto bem safada, como veio ao mundo, no WhatsApp.' },
+
+    // 🔵 INCOMUNS (30% - 6% cada)
+    { chance: 0.06, emoji: '🍦', nome: 'Pix do Açaí', desc: 'A Thamiris te deve R$ 25 pra você pedir um açaí!' },
+    { chance: 0.06, emoji: '🎬', nome: 'Poder do Play', desc: 'Você tem a palavra final sobre qual filme vão ver hoje.' },
+    { chance: 0.06, emoji: '👙', nome: 'Look Íntimo', desc: 'Ela tem que vestir exatamente a lingerie que você mandar pra call de hoje.' },
+    { chance: 0.06, emoji: '💤', nome: 'História pra Dormir', desc: 'Ela vai te contar histórias na call até você dormir.' },
+    { chance: 0.06, emoji: '🤫', nome: 'Última Palavra', desc: 'Você ganhou a razão absoluta na próxima pequena DR.' },
+
+    // 🟣 RAROS (20% - 4% cada)
+    { chance: 0.04, emoji: '☕', nome: 'Café de Domingo', desc: 'Ela te deve um café da manhã pago no iFood!' },
+    { chance: 0.04, emoji: '🍕', nome: 'Noite da Pizza', desc: 'A janta hoje é pizza Premium paga por ela.' },
+    { chance: 0.04, emoji: '🎲', nome: 'Jogo Erótico', desc: 'Vocês vão jogar um Verdade ou Consequência ardente na call.' },
+    { chance: 0.04, emoji: '🔥', nome: 'Comando Remoto', desc: 'Você dita exatamente o que ela deve fazer com as próprias mãos na câmera.' },
+    { chance: 0.04, emoji: '🛒', nome: 'Cesto da Shopee', desc: 'Ela banca uma bobeirinha na Shopee pra você (Até R$ 30).' },
+
+    // 🟡 ÉPICOS (8% - 2% cada)
+    { chance: 0.02, emoji: '🥩', nome: 'Churrasco Premium', desc: 'Jantar de churrascaria ou hambúrguer duplo pago por ela na sua casa!' },
+    { chance: 0.02, emoji: '🍷', nome: 'Gala Virtual', desc: 'Ela banca o jantar dos dois hoje e vocês comem em vídeo.' },
+    { chance: 0.02, emoji: '🎁', nome: 'Brinquedinho Surpresa', desc: 'Ela tem que comprar e usar um brinquedo/acessório novo escolhido por você.' },
+    { chance: 0.02, emoji: '👑', nome: 'Submissão Total', desc: 'Ela tem que dizer SIM pra TUDO e obedecer na call por 30 minutos.' },
+
+    // 🔴 LENDÁRIOS (2%)
+    { chance: 0.01999, emoji: '🎉', nome: 'Fim de Semana Pago', desc: 'A Thamiris banca o rolê e a comida do seu próximo final de semana inteiro!' },
+    { chance: 0.00001, emoji: '✈️', nome: 'O REENCONTRO', desc: 'O PRÊMIO MÁXIMO! Ela banca a sua passagem!' }
+];
+
+// 🎁 O QUE PODE SAIR NA CAIXA DA THAMIRIS (O João cumpre/paga)
+const LOOTBOX_THAMIRIS = [
+    // 🟢 COMUNS (40% - 10% cada)
+    { chance: 0.10, emoji: '📸', nome: 'Selfie Imediata', desc: 'O João tem que mandar uma selfie do que está fazendo agora.' },
+    { chance: 0.10, emoji: '🎵', nome: 'Música do Dia', desc: 'O João tem que te mandar uma música romântica agora mesmo.' },
+    { chance: 0.10, emoji: '🗣️', nome: 'Áudio Espontâneo', desc: 'Ganhou um áudio de 1 minuto do João se declarando.' },
+    { chance: 0.10, emoji: '😈', nome: 'Nude no Espelho', desc: 'Sorte Grande! O João tem que te mandar uma foto sem roupa no espelho, visualização única.' },
+
+    // 🔵 INCOMUNS (30% - 6% cada)
+    { chance: 0.06, emoji: '🍦', nome: 'Pix do Açaí', desc: 'O João te deve R$ 25 pra você pedir um açaí!' },
+    { chance: 0.06, emoji: '🎬', nome: 'Poder do Play', desc: 'Você escolhe o filme de hoje e ele tem que assistir calado.' },
+    { chance: 0.06, emoji: '🩲', nome: 'Look Íntimo', desc: 'Você escolhe a cor da cueca e a roupa que ele vai usar amanhã.' },
+    { chance: 0.06, emoji: '💤', nome: 'História pra Dormir', desc: 'O João vai narrar uma história de voz grossa até você pegar no sono.' },
+    { chance: 0.06, emoji: '🤫', nome: 'Última Palavra', desc: 'Você ganhou a razão absoluta na próxima DR. Acabou o assunto.' },
+
+    // 🟣 RAROS (20% - 4% cada)
+    { chance: 0.04, emoji: '☕', nome: 'Café de Domingo', desc: 'O João te deve um café da manhã pago no iFood!' },
+    { chance: 0.04, emoji: '🍕', nome: 'Noite da Pizza', desc: 'A sua janta hoje é pizza com borda recheada paga por ele.' },
+    { chance: 0.04, emoji: '🎲', nome: 'Jogo Erótico', desc: 'Vocês vão jogar um Verdade ou Consequência safado na call.' },
+    { chance: 0.04, emoji: '🚗', nome: 'Pix do Uber', desc: 'Seu próximo Uber é totalmente por conta dele.' },
+    { chance: 0.04, emoji: '🛒', nome: 'Carrinho da Shopee', desc: 'Ele banca as suas bobeirinhas no carrinho da Shopee (Até R$ 30).' },
+
+    // 🟡 ÉPICOS (8% - 2% cada)
+    { chance: 0.02, emoji: '🫕', nome: 'Jantar Premium', desc: 'Rodízio de Fondue ou Hambúrguer Artesanal na sua casa pago pelo João!' },
+    { chance: 0.02, emoji: '💐', nome: 'Flores no Portão', desc: 'Você acabou de ganhar um buquê de flores luxuoso surpresa!' },
+    { chance: 0.02, emoji: '💅', nome: 'Pix das Unhas', desc: 'Caiu R$ 50 na sua conta para você fazer a unha amanhã e arranhar ele depois.' },
+    { chance: 0.02, emoji: '👑', nome: 'Controle Mental', desc: 'O João tem que dizer SIM pra TUDO na call por 30 minutos. Você manda nele.' },
+
+    // 🔴 LENDÁRIOS (2%)
+    { chance: 0.01999, emoji: '👗', nome: 'Surto na Shein', desc: 'O João te deve um Pix de R$ 150 DIRETO na conta pras suas lingeries e blusinhas!' },
+    { chance: 0.00001, emoji: '✈️', nome: 'O REENCONTRO', desc: 'O PRÊMIO MÁXIMO! Ele banca integralmente a passagem!' }
+];
+
+// ==========================================
+// MOTOR DE ECONOMIA ESPELHADA (BOUTIQUE VIP)
+// ==========================================
+window.gastosBoutique = { 'João': 0, 'Thamiris': 0 };
+
+window.iniciarEconomiaBoutique = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    // Escuta em tempo real o que cada um já gastou na loja
+    onValue(ref(db, 'jogos/boutique_gastos'), (snapshot) => {
+        if (snapshot.exists()) {
+            window.gastosBoutique = snapshot.val();
+        } else {
+            window.gastosBoutique = { 'João': 0, 'Thamiris': 0 };
+        }
+        
+        // Se a loja estiver aberta na tela, atualiza o saldo na hora
+        const overlay = document.getElementById('overlay-boutique');
+        if(overlay && overlay.style.display === 'flex') {
+            if(typeof renderizarBoutique === 'function') renderizarBoutique();
+        }
+    });
+};
+
+// ==========================================
+// RENDERIZAÇÃO INTELIGENTE DA BOUTIQUE VIP
+// ==========================================
 
 window.abrirBoutique = function() {
     const overlay = document.getElementById('overlay-boutique');
     if (overlay) {
         overlay.classList.remove('escondido');
         overlay.style.display = 'flex';
-        renderizarBoutique();
+        
+        // Liga o rastreador de gastos do Firebase assim que abrir a loja
+        if(typeof iniciarEconomiaBoutique === 'function') iniciarEconomiaBoutique();
+        if(typeof renderizarBoutique === 'function') renderizarBoutique();
     }
 };
 
@@ -7417,162 +7527,182 @@ window.fecharBoutique = function() {
     if (overlay) overlay.style.display = 'none';
 };
 
-function renderizarBoutique() {
-    document.getElementById('boutique-moedas-visor').innerText = window.pontosDoCasal || 0;
-
+window.renderizarBoutique = function() { 
+    const visor = document.getElementById('boutique-moedas-visor');
     const divCatalogo = document.getElementById('boutique-catalogo');
+    if(!divCatalogo) return;
     divCatalogo.innerHTML = "";
-    
-    // Renderiza Itens Fixos com alturas e espaçamentos uniformes
-    BOUTIQUE_CATALOGO.forEach(item => {
-        let btnStatus = (window.pontosDoCasal >= item.preco) ? 
-            `<button class="btn-comprar-boutique" onclick="comprarItemBoutique('${item.id}')">${item.preco.toLocaleString('pt-BR')} 💰</button>` : 
-            `<button class="btn-comprar-boutique" style="background: #444; color: #888; box-shadow: none;" disabled>Pobre 💔</button>`;
 
+    // 🚨 CÁLCULO DA ECONOMIA ESPELHADA
+    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
+    const meusGastos = window.gastosBoutique[eu] || 0;
+    
+    // O Saldo Real = Todo o dinheiro que o casal já ganhou MENOS o que a pessoa já gastou
+    const meuSaldoIndividual = (window.pontosDoCasal || 0) - meusGastos;
+    
+    // Mostra o saldo individual no topo da loja
+    if(visor) visor.innerText = meuSaldoIndividual.toLocaleString('pt-BR');
+
+    const catalogoAtivo = (eu === 'João') ? BOUTIQUE_JOAO : BOUTIQUE_THAMIRIS;
+
+    catalogoAtivo.forEach(item => {
+        let btnStatus = (meuSaldoIndividual >= item.preco) ? 
+            `<button class="btn-comprar-boutique" onclick="comprarItemBoutique('${item.id}')">${item.preco.toLocaleString('pt-BR')} 💰</button>` : 
+            `<button class="btn-comprar-boutique" style="background: #444; color: #888; box-shadow: none;" disabled>Faltam Moedas 💔</button>`;
+        
         divCatalogo.innerHTML += `
-            <div class="cartao-boutique ${window.pontosDoCasal < item.preco ? 'esgotado' : ''}">
+            <div class="cartao-boutique ${meuSaldoIndividual < item.preco ? 'esgotado' : ''}">
                 <div style="font-size: 3.5rem; margin-bottom: 5px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));">${item.emoji}</div>
-                <h3>${item.nome}</h3>
-                <p>${item.desc}</p>
+                <h3 style="color: var(--cor-primaria); margin-bottom: 5px;">${item.nome}</h3>
+                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">${item.desc}</p>
                 ${btnStatus}
             </div>
         `;
     });
 
-    // Renderiza a Lootbox (Banner Central)
     const divLootbox = document.getElementById('boutique-lootboxes');
-    let precoLootbox = 20000; // Preço do baú misterioso inflacionado para 20.000!
+    if(!divLootbox) return;
     
-    let btnLootbox = (window.pontosDoCasal >= precoLootbox) ? 
-        `<button class="btn-comprar-boutique" onclick="comprarLootbox(${precoLootbox})">ABRIR A CAIXA (${precoLootbox.toLocaleString('pt-BR')} 💰)</button>` : 
-        `<button class="btn-comprar-boutique" style="background: #444; color: #888; box-shadow: none; animation: none;" disabled>Saldo Insuficiente</button>`;
-
+    let precoLootbox = 20000; 
+    let btnLootbox = (meuSaldoIndividual >= precoLootbox) ? 
+        `<button class="btn-comprar-boutique" onclick="comprarLootbox(${precoLootbox})">ABRIR A CAIXA (20K)</button>` : 
+        `<button class="btn-comprar-boutique" style="background: #444; color: #888;" disabled>Saldo Insuficiente</button>`;
+    
     divLootbox.innerHTML = `
-        <div class="cartao-boutique cartao-lootbox">
+        <div class="cartao-boutique cartao-lootbox" style="border: 1px solid #9b59b6;">
             <div style="font-size: 4.5rem; filter: drop-shadow(0 0 20px #9b59b6); margin-bottom: 10px;">🎁</div>
-            <h3>Caixa de Pandora do Amor</h3>
-            <p>Contém prêmios totalmente aleatórios. Pode vir um simples chocolate ou uma VIAGEM surpresa! Qual o tamanho da sua sorte?</p>
+            <h3 style="color: #9b59b6;">Caixa de Pandora</h3>
+            <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Sorteie prêmios aleatórios. O risco é seu, a recompensa é deliciosa!</p>
             ${btnLootbox}
         </div>
     `;
-}
-
-// ==========================================
-// LÓGICA DE COMPRA FIXA
-// ==========================================
-window.comprarItemBoutique = function(idItem) {
-    let item = BOUTIQUE_CATALOGO.find(i => i.id === idItem);
-    if (!item) return;
-
-    if (window.pontosDoCasal < item.preco) {
-        if(window.CassinoAudio) window.CassinoAudio.tocar('erro', 0.6);
-        if(window.Haptics) window.Haptics.erro();
-        return;
-    }
-
-    // Paga a conta
-    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-item.preco, `Compra: ${item.nome}`);
-    
-    if(window.CassinoAudio) window.CassinoAudio.tocar('fichaSub', 1.0); // Som de caixa registradora/moedas
-    if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37'], particleCount: 100});
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
-    
-    renderizarBoutique(); // Atualiza a tela
-
-    // 🚨 GERA A COBRANÇA NO WHATSAPP DO JOÃO!
-    let mensagem = `*RESGATE DE PRÊMIO - CASSINO DO AFETO* 🎰✨%0A%0AAmor, acabei de gastar minhas moedas suadas na Boutique e comprei:%0A%0A🎁 *${item.emoji} ${item.nome}*%0A📝 _${item.desc}_%0A💳 Custou: ${item.preco.toLocaleString('pt-BR')} moedas.%0A%0AQuando posso resgatar minha recompensa? 👀`;
-    
-    let seuNumero = "5541996419950"; // Seu número real aqui
-    
-    setTimeout(() => {
-        // 🚨 MUDANÇA PARA O iPHONE: Força a abertura nativa do aplicativo do WhatsApp
-        window.location.href = `https://wa.me/${seuNumero}?text=${mensagem}`;
-    }, 1000); 
 };
 
 // ==========================================
-// LÓGICA DE GACHA (LOOTBOX) ÉPICA
+// LÓGICA DE COMPRA E COBRANÇA CRUZADA VIA WHATSAPP
 // ==========================================
+
+window.comprarItemBoutique = function(idItem) {
+    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
+    const catalogoAtivo = (eu === 'João') ? BOUTIQUE_JOAO : BOUTIQUE_THAMIRIS;
+
+    let item = catalogoAtivo.find(i => i.id === idItem);
+    if (!item) return;
+
+    const meusGastos = window.gastosBoutique[eu] || 0;
+    const meuSaldoIndividual = (window.pontosDoCasal || 0) - meusGastos;
+
+    if (meuSaldoIndividual < item.preco) {
+        if(typeof mostrarToast === 'function') mostrarToast("Moedas insuficientes!", "❌");
+        return;
+    }
+
+    // 🚨 A MÁGICA: Registra o gasto apenas na carteira individual da pessoa no Firebase
+    if (window.SantuarioApp && window.SantuarioApp.modulos) {
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        set(ref(db, `jogos/boutique_gastos/${eu}`), meusGastos + item.preco);
+    }
+    
+    // Atualiza a tela imediatamente
+    if(typeof renderizarBoutique === 'function') renderizarBoutique();
+
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjWin', 1.0);
+    if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 150, spread: 100});
+
+    let mensagem = `*RESGATE DE PRÊMIO - BOUTIQUE VIP* 🛍️✨%0A%0AAmor, acabei de gastar as minhas moedas individuais e comprei um luxo pra mim:%0A%0A🎁 *${item.emoji} ${item.nome}*%0A📝 _${item.desc}_%0A💳 Custou: ${item.preco.toLocaleString('pt-BR')} moedas.%0A%0AEstou indo cobrar a minha recompensa agora mesmo! 👀🔥`;
+    
+    let numeroJoao = "5541996419950";
+    let numeroThamiris = "5562994838837"; // <-- COLOQUE O NÚMERO DELA AQUI!
+
+    let numeroDestino = (eu === 'João') ? numeroThamiris : numeroJoao;
+
+    setTimeout(() => {
+        window.location.href = `https://wa.me/${numeroDestino}?text=${mensagem}`;
+    }, 1500);
+};
+
 window.comprarLootbox = function(preco) {
-    if (window.pontosDoCasal < preco) return;
+    const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
+    const meusGastos = window.gastosBoutique[eu] || 0;
+    const meuSaldoIndividual = (window.pontosDoCasal || 0) - meusGastos;
 
-    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-preco, "Compra de Caixa Misteriosa");
-    renderizarBoutique();
+    if (meuSaldoIndividual < preco) {
+        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "❌");
+        return;
+    }
+    
+    // Deduz o valor apenas da carteira individual
+    if (window.SantuarioApp && window.SantuarioApp.modulos) {
+        const { db, ref, set } = window.SantuarioApp.modulos;
+        set(ref(db, `jogos/boutique_gastos/${eu}`), meusGastos + preco);
+    }
 
-    // Inicia a Tela Épica
+    if(typeof renderizarBoutique === 'function') renderizarBoutique();
+
     const tela = document.getElementById('tela-lootbox-abertura');
     const icone = document.getElementById('lootbox-icone');
     const textoAcao = document.getElementById('lootbox-texto-acao');
-    const painelPremio = document.getElementById('lootbox-premio-revelado');
-    const brilho = document.getElementById('lootbox-brilho');
+    const tituloResultado = document.getElementById('lootbox-resultado-titulo');
+    const descResultado = document.getElementById('lootbox-resultado-desc');
+    const painelResultado = document.getElementById('lootbox-painel-resultado');
 
+    if (!tela) return;
+
+    tela.classList.remove('escondido');
     tela.style.display = 'flex';
-    painelPremio.classList.add('escondido');
-    brilho.style.opacity = '0';
+    icone.className = "lootbox-caixa fechada";
     icone.innerText = "🎁";
-    icone.style.animation = "tremerLootbox 0.1s infinite"; // A caixa começa a sacudir violentamente
-    textoAcao.innerText = "Abrindo...";
-    textoAcao.style.display = 'block';
+    textoAcao.innerText = "Tocando os tambores do destino...";
+    painelResultado.classList.add('escondido');
 
-    // 🔊 SOM: Tambores de suspense (Vamos usar o som contínuo do dado girando)
-    if(window.CassinoAudio) window.CassinoAudio.tocar('roletaSpin', 1.0);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50, 50, 50, 50, 50, 50, 50]);
-                    }
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('roletaSpin', 1.0);
 
-    // O Sorteio Matemático com base no peso (chance)
-    let mathSorte = Math.random();
-    let premioGanho = LOOTBOX_PREMIOS[LOOTBOX_PREMIOS.length - 1]; // Fallback pro último
-    let probabilidadeAcumulada = 0;
-
-    for (let i = 0; i < LOOTBOX_PREMIOS.length; i++) {
-        probabilidadeAcumulada += LOOTBOX_PREMIOS[i].chance;
-        if (mathSorte <= probabilidadeAcumulada) {
-            premioGanho = LOOTBOX_PREMIOS[i];
-            break;
-        }
-    }
-
-    // O Clímax (Abre depois de 3 segundos de suspense)
     setTimeout(() => {
-        icone.style.animation = "none";
-        icone.innerText = "💥"; // Explosão visual rápida
-        brilho.style.opacity = '1';
-        
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([400, 100, 400]);
-                    }
+        icone.className = "lootbox-caixa abrindo";
+        if(window.Haptics && navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }, 2000);
 
-        setTimeout(() => {
-            icone.style.display = "none"; // Some com o baú
-            textoAcao.style.display = "none";
-            
-            // 🔊 SOM: ÉPICO DE VITÓRIA
-            if(window.CassinoAudio) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof confetti === 'function') confetti({colors: ['#9b59b6', '#fff'], particleCount: 300, spread: 100});
+    setTimeout(() => {
+        const premiosAtivos = (eu === 'João') ? LOOTBOX_JOAO : LOOTBOX_THAMIRIS;
 
-            // Mostra o prêmio
-            document.getElementById('lootbox-premio-emoji').innerText = premioGanho.emoji;
-            document.getElementById('lootbox-premio-nome').innerText = premioGanho.nome;
-            document.getElementById('lootbox-premio-desc').innerText = premioGanho.desc;
-            painelPremio.classList.remove('escondido');
+        let random = Math.random();
+        let premioSorteado = premiosAtivos[premiosAtivos.length - 1]; 
+        let acumulado = 0;
 
-            // Configura o botão do WhatsApp do prêmio misterioso
-            document.getElementById('btn-resgatar-lootbox').onclick = () => {
-                let mensagem = `*SORTEIO ÉPICO LOOTBOX - CASSINO DO AFETO* 🎁✨%0A%0AAmor, eu abri a Caixa de Pandora do Amor e tirei a sorte grande!!!%0A%0A🎉 *Eu ganhei: ${premioGanho.emoji} ${premioGanho.nome}*%0A📝 _${premioGanho.desc}_%0A%0AAh, e as regras do jogo dizem que você é obrigado a cumprir, tá? Hahaha Te amo! ❤️`;
-                let seuNumero = "5541996419950"; // COLOQUE SEU NÚMERO AQUI TAMBÉM
+        for (let item of premiosAtivos) {
+            acumulado += item.chance;
+            if (random <= acumulado) {
+                premioSorteado = item;
+                break;
+            }
+        }
+
+        icone.className = "lootbox-caixa aberta";
+        icone.innerText = premioSorteado.emoji;
+        textoAcao.innerText = "✨ A Caixa se Abriu! ✨";
+        tituloResultado.innerText = premioSorteado.nome;
+        descResultado.innerText = premioSorteado.desc;
+        painelResultado.classList.remove('escondido');
+
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjWin', 1.0);
+        if(typeof confetti === 'function') confetti({colors: ['#9b59b6', '#D4AF37', '#ffffff'], particleCount: 200, spread: 160});
+        if(window.Haptics && navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
+
+        const btnResgatar = document.getElementById('btn-resgatar-lootbox');
+        if (btnResgatar) {
+            btnResgatar.onclick = () => {
+                let numeroJoao = "5541996419950";
+                let numeroThamiris = "5562994838837"; // <-- NÚMERO DELA DE NOVO AQUI
+                let numeroDestino = (eu === 'João') ? numeroThamiris : numeroJoao;
+
+                let mensagem = `*CAIXA DE PANDORA ABERTA* 🎁✨%0A%0AAmor, gastei as minhas moedas na Caixa Misteriosa e tirei a sorte grande:%0A%0A✨ *${premioSorteado.emoji} ${premioSorteado.nome}*%0A📝 _${premioSorteado.desc}_%0A%0AEstou indo cobrar o meu prêmio agora mesmo! 👀🔥`;
                 
-                window.open(`https://wa.me/${seuNumero}?text=${mensagem}`, '_blank');
-                
-                // Fecha a tela da Lootbox depois de enviar
+                window.location.href = `https://wa.me/${numeroDestino}?text=${mensagem}`;
+                tela.classList.add('escondido');
                 tela.style.display = 'none';
-                icone.style.display = 'block'; // Reseta o baú pro futuro
             };
-
-        }, 300); // Meio segundo pra explosão
-    }, 3000); // 3 Segundos de tensão
+        }
+    }, 4500);
 };
 
 // ==========================================

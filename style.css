@@ -12437,31 +12437,38 @@ body > .container-palco {
     border-top: 1px solid rgba(255, 255, 255, 0.15) !important; /* Luz batendo em cima */
     
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
-    
     transform: none !important;
     will-change: auto !important;
-}
+} /* 🚨 A CHAVE QUE ESTAVA FALTANDO FOI COLOCADA AQUI! */
 
-/* 2. A ARMA SECRETA DO CHROME: CONTENT VISIBILITY */
-/* Essa propriedade diz ao seu Samsung: "Se este contêiner de jogo não estiver na tela agora, apague ele da memória RAM e não calcule seu CSS!" */
-.modo-android-desempenho [id^="container-"], 
-.modo-android-desempenho .tela {
-    content-visibility: auto;
-    contain-intrinsic-size: 1000px; /* Mantém a estrutura para a rolagem não bugar */
-    
-    /* O 'contain' isola os cálculos do CSS. Se algo mudar dentro do jogo da fazenda, o navegador não recalcula a tela inicial inteira. */
-    contain: strict; 
-}
-
-/* 3. SIMPLIFICAÇÃO INTELIGENTE DE PARTÍCULAS */
-.modo-android-desempenho .particulas {
+/* 2. MODO ULTRA DESEMPENHO: RIPPLE E SOMBRAS */
+/* Oculta as ondas de água pesadas geradas por JavaScript no Android */
+.modo-android-desempenho .ripple-onda {
     display: none !important;
 }
 
-/* 4. OTIMIZAÇÃO DO RIPPLE (Onda de Toque) */
-/* Animar largura/altura frita a CPU. No Android, animamos SÓ a escala e opacidade */
-.modo-android-desempenho .ripple-onda {
-    will-change: transform, opacity;
-    /* Garante que o efeito de clique na tela seja suave como seda no seu Samsung */
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-out; 
+/* Substitui por um efeito nativo e instantâneo da Placa de Vídeo */
+.modo-android-desempenho .item-menu:active, 
+.modo-android-desempenho button:active {
+    transform: scale(0.95) !important;
+    opacity: 0.8 !important;
+    transition: transform 0.1s, opacity 0.1s !important;
+}
+
+/* Remove completamente filtros de sombra brilhante (glow) que rodam em tempo real */
+.modo-android-desempenho * {
+    filter: none !important;
+}
+
+/* Reativa apenas nos textos onde é realmente necessário para leitura */
+.modo-android-desempenho h1, 
+.modo-android-desempenho h2, 
+.modo-android-desempenho h3 {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) !important;
+}
+
+
+/* 4. SIMPLIFICAÇÃO INTELIGENTE DE PARTÍCULAS */
+.modo-android-desempenho .particulas {
+    display: none !important;
 }

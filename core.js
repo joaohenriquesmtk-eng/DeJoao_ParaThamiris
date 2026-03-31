@@ -436,6 +436,7 @@ window.obterIdentificadorSemana = function(timestamp) {
 window.escutarPostits = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
+
     
     // 🚨 1. O OLHEIRO DE NOTIFICAÇÕES (Acende a luz verde no Pulso de Vida)
     const euId = window.souJoao ? 'joao' : 'thamiris';
@@ -455,6 +456,30 @@ window.escutarPostits = function() {
         } else {
             // Apaga a luz se a mensagem já foi lida
             if (notifEl) notifEl.classList.add('escondido');
+        }
+    });
+
+    // 🚨 1.5 OLHEIRO DE DIGITAÇÃO (TEMPO REAL)
+    const parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    const nomeParceiro = window.souJoao ? 'Thamiris' : 'João';
+    
+    onValue(ref(db, `typing_status/${parceiroId}`), (snapshot) => {
+        const status = snapshot.val();
+        const container = document.getElementById('typing-status-container');
+        const text = document.getElementById('typing-text');
+
+        // Verifica se o parceiro está digitando E se o sinal não é velho (Trava de segurança de 10s)
+        if (status && status.isTyping && (Date.now() - status.timestamp < 10000)) {
+            if (text) text.innerText = `${nomeParceiro} está escrevendo`;
+            if (container) {
+                container.classList.remove('escondido');
+                container.style.opacity = '1';
+            }
+        } else {
+            if (container) {
+                container.style.opacity = '0';
+                setTimeout(() => container.classList.add('escondido'), 400); // Espera o Fade-out terminar
+            }
         }
     });
 

@@ -190,6 +190,10 @@ window.iniciarMiniFazenda = function() {
     
     carregarFazenda(); 
     
+    // 🌍 LIGA O SATÉLITE ASSIM QUE A FAZENDA ABRIR
+    if(typeof buscarClimaRealFazenda === 'function') buscarClimaRealFazenda();
+
+    
     // 🚨 INVOCAÇÃO DA MÁQUINA DO TEMPO AQUI
     calcularProgressoOffline();
     
@@ -278,11 +282,10 @@ function motorAgronomico() {
     }
 
     const estacaoAtual = estacoesAno[fazenda.tempo.estacaoIndex];
-    const climaElemento = document.getElementById('fazenda-clima-texto');
-    let climaAPI = climaElemento ? climaElemento.innerText.toLowerCase() : '';
     
-    let estaChovendo = climaAPI.includes('chuva') || climaAPI.includes('tempestade');
-    let diaQuente = climaAPI.includes('sol') || climaAPI.includes('calor') || climaAPI.includes('quente');
+    // 🌍 CONEXÃO COM O MUNDO REAL: A Fazenda reage ao clima da sua cidade!
+    let estaChovendo = window.climaRealAtual ? window.climaRealAtual.isChovendo : false;
+    let diaQuente = window.climaRealAtual ? window.climaRealAtual.isQuente : false;
     
     const horaAtual = new Date().getHours();
     const deNoite = horaAtual >= 18 || horaAtual < 6;
@@ -816,3 +819,52 @@ window.abrirPainelBurocracia = function() {
 window.fecharPainelBurocracia = function() {
     document.getElementById('painel-burocracia').classList.add('escondido');
 };
+
+// ==========================================
+// 🌍 MOTOR DE CLIMA REAL (SATÉLITE OPEN-METEO)
+// ==========================================
+window.climaRealAtual = { isChovendo: false, isQuente: false, temp: 25, icone: '☀️', cidade: 'Santuário' };
+
+window.buscarClimaRealFazenda = async function() {
+    try {
+        // Mapeamento Geográfico: João (Colombo-PR) / Thamiris (Goiânia-GO)
+        const lat = window.souJoao ? -25.2917 : -16.6869;
+        const lon = window.souJoao ? -49.2242 : -49.2643;
+        const cidade = window.souJoao ? "Colombo" : "Goiânia";
+
+        // API Gratuita e ultra leve (Zero peso no Samsung)
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        const temp = Math.round(data.current_weather.temperature);
+        const codigoClima = data.current_weather.weathercode;
+        
+        // Códigos Oficiais: 51 a 99 indicam chuva, garoa ou tempestade
+        let isChovendo = (codigoClima >= 51 && codigoClima <= 99);
+        let isQuente = temp >= 28; // 28 graus ou mais = Calor forte
+        
+        let icone = '🌤️';
+        if (isChovendo) icone = '🌧️';
+        else if (isQuente) icone = '☀️';
+        else if (temp < 18) icone = '❄️';
+
+        // Salva na memória do jogo
+        window.climaRealAtual = { isChovendo, isQuente, temp, icone, cidade };
+
+        // Atualiza a Interface no topo da Fazenda
+        const visorClima = document.getElementById('fazenda-clima-texto');
+        if (visorClima) {
+            visorClima.innerHTML = `${icone} ${cidade} <b style="color:#D4AF37;">${temp}°C</b>`;
+        }
+        
+    } catch (erro) {
+        console.warn("Satélite meteorológico indisponível no momento.");
+    }
+};
+
+// Deixa o satélite atualizando sozinho a cada 30 minutos (Sem lag)
+setInterval(() => {
+    if (typeof buscarClimaRealFazenda === 'function') buscarClimaRealFazenda();
+}, 1800000);

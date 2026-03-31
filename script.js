@@ -1668,6 +1668,37 @@ window.enviarPostit = function() {
         curtidas: 0
     });
 
+    // ==========================================
+// MOTOR DE SINCRONIA DE DIGITAÇÃO (TRANSMISSOR)
+// ==========================================
+let timeoutDigitacao;
+const TEMPO_ESPERA_DIGITACAO = 2500; // Tempo até o app considerar que você parou de digitar
+
+window.avisarDigitando = function(estaDigitando) {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    
+    set(ref(db, `typing_status/${euId}`), {
+        isTyping: estaDigitando,
+        timestamp: Date.now()
+    });
+};
+
+    // Conecta o transmissor ao campo de texto assim que a tela carregar
+    window.addEventListener('DOMContentLoaded', () => {
+        const inputPostit = document.getElementById('input-postit');
+        if (inputPostit) {
+            inputPostit.addEventListener('input', () => {
+                window.avisarDigitando(true);
+                clearTimeout(timeoutDigitacao);
+                timeoutDigitacao = setTimeout(() => {
+                    window.avisarDigitando(false);
+                }, TEMPO_ESPERA_DIGITACAO);
+            });
+        }
+    });
+
     // 2. 🚨 A MÁGICA DA NOTIFICAÇÃO: Avisa a conta do parceiro que tem mensagem!
     const parceiroId = window.souJoao ? 'thamiris' : 'joao';
     set(ref(db, `notificacoes_postit/${parceiroId}`), {
@@ -4292,7 +4323,7 @@ function registrarBatida(e) {
     setTimeout(() => onda.remove(), 800);
 }
 
-window.pararEEnviarEco = function() {
+window.pararEEnviarEco = async function() {
     gravandoEco = false;
     const radar = document.getElementById('radar-tátil');
     radar.removeEventListener('touchstart', registrarBatida);
@@ -4305,10 +4336,9 @@ window.pararEEnviarEco = function() {
     }
 
     padraoVibracaoParaEnviar = [];
-    const duracaoToque = 50; 
-    
+    const duracaoToque = 50;
     for (let i = 0; i < temposBatidas.length; i++) {
-        padraoVibracaoParaEnviar.push(duracaoToque); 
+        padraoVibracaoParaEnviar.push(duracaoToque);
         if (i < temposBatidas.length - 1) {
             let pausa = temposBatidas[i+1] - temposBatidas[i] - duracaoToque;
             if (pausa < 0) pausa = 0;
@@ -4316,24 +4346,88 @@ window.pararEEnviarEco = function() {
         }
     }
 
-    if (window.SantuarioApp && window.SantuarioApp.modulos && window.NOME_PARCEIRO) {
-        const { db, ref, set } = window.SantuarioApp.modulos;
-        // Chave estrita e segura (minúscula e sem acento)
-        const chaveParceiro = window.souJoao ? 'thamiris' : 'joao';
-        const caminho = `eco_santuario/${chaveParceiro}`;
-        
-        const payload = {
-            autor: window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris'),
-            padrao: padraoVibracaoParaEnviar,
-            timestamp: Date.now()
-        };
+    if (!window.SantuarioApp || !window.NOME_PARCEIRO) return;
 
-        set(ref(db, caminho), payload).then(() => {
-            if(typeof mostrarToast === 'function') mostrarToast("Sinfonia tátil enviada!", "✈️");
-            window.fecharSalaEco();
-        });
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    const chaveParceiro = window.souJoao ? 'thamiris' : 'joao';
+    const caminho = `eco_santuario/${chaveParceiro}`;
+    
+    const payload = {
+        autor: window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris'),
+        padrao: padraoVibracaoParaEnviar,
+        timestamp: Date.now()
+    };
+
+    // 🚨 A MÁGICA DA OTIMIZAÇÃO DE RESILIÊNCIA
+    if (!navigator.onLine) {
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            // 🤖 ANDROID / EDGE / CHROME: Background Sync Nativo e Invisível
+            try {
+                const idb = await new Promise((resolve, reject) => {
+                    const req = indexedDB.open('SantuarioOfflineDB', 1);
+                    req.onupgradeneeded = e => {
+                        const banco = e.target.result;
+                        if (!banco.objectStoreNames.contains('fila_ecos')) {
+                            banco.createObjectStore('fila_ecos', { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+                    req.onsuccess = e => resolve(e.target.result);
+                    req.onerror = e => reject(e.target.error);
+                });
+
+                const tx = idb.transaction('fila_ecos', 'readwrite');
+                tx.objectStore('fila_ecos').add({ chaveParceiro, payload });
+
+                const swRegistration = await navigator.serviceWorker.ready;
+                await swRegistration.sync.register('sincronizar-ecos');
+
+                if(typeof mostrarToast === 'function') mostrarToast("Sem sinal! O Eco voará assim que a rede voltar.", "📡");
+            } catch (e) {
+                console.error("Background Sync falhou", e);
+            }
+        } else {
+            // 🍎 iPHONE / SAFARI: O "Fallback de Ouro"
+            localStorage.setItem('eco_pendente_offline', JSON.stringify({ chaveParceiro, payload }));
+            if(typeof mostrarToast === 'function') mostrarToast("Sem sinal! Eco blindado na memória do iPhone.", "📡");
+        }
+        
+        if (window.Haptics) window.Haptics.toqueForte();
+        window.fecharSalaEco();
+        return;
     }
+
+    // Fluxo Online Normal (Sinal 100%)
+    set(ref(db, caminho), payload).then(() => {
+        if(typeof mostrarToast === 'function') mostrarToast("Eco enviado pelo espaço-tempo!", "🚀");
+        if (window.Haptics) window.Haptics.sucesso();
+        window.fecharSalaEco();
+    }).catch(erro => {
+        if(typeof mostrarToast === 'function') mostrarToast("Falha na antena. Tente novamente.", "❌");
+    });
 };
+
+// ==========================================
+// 🍎 APPLE FALLBACK (RECUPERADOR DE ECOS PERDIDOS)
+// ==========================================
+window.addEventListener('load', () => {
+    // Dá 3 segundos para o Firebase conectar estabilizado antes de atirar
+    setTimeout(() => {
+        const ecoPendente = localStorage.getItem('eco_pendente_offline');
+        if (ecoPendente && navigator.onLine) {
+            try {
+                const dados = JSON.parse(ecoPendente);
+                if (window.SantuarioApp && window.SantuarioApp.modulos) {
+                    const { db, ref, set } = window.SantuarioApp.modulos;
+                    set(ref(db, `eco_santuario/${dados.chaveParceiro}`), dados.payload)
+                    .then(() => {
+                        localStorage.removeItem('eco_pendente_offline');
+                        if(typeof mostrarToast === 'function') mostrarToast("Um Eco atrasado acabou de encontrar o caminho!", "🚀");
+                    });
+                }
+            } catch (e) {}
+        }
+    }, 3000);
+});
 
 window.escutarEcosDoParceiro = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
@@ -12086,3 +12180,100 @@ async function processarRecompensaCraps() {
 }
 
 
+// ==========================================
+// MOTOR DE SINCRONIA DE DIGITAÇÃO (TYPING)
+// ==========================================
+let typingTimer;
+const TYPING_DELAY = 3000; // Tempo para sumir após parar de digitar
+
+window.avisarDigitando = function(estahDigitando) {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    set(ref(db, `typing_status/${euId}`), {
+        isTyping: estahDigitando,
+        timestamp: Date.now()
+    });
+};
+
+// Listener para o input do Mural de Recados
+const inputPostit = document.getElementById('input-postit');
+if (inputPostit) {
+    inputPostit.addEventListener('input', () => {
+        window.avisarDigitando(true);
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => window.avisarDigitando(false), TYPING_DELAY);
+    });
+}
+
+
+// ==========================================
+// 🏆 SISTEMA DE RELÍQUIAS ETERNAS (TROFÉUS)
+// ==========================================
+
+const RELIQUIAS_MARCOS = [
+    { marco: 10000,    emoji: '💌', nome: 'Carta Selada',       desc: '10k Moedas' },
+    { marco: 50000,    emoji: '🌹', nome: 'Rosa de Vidro',      desc: '50k Moedas' },
+    { marco: 100000,   emoji: '🍷', nome: 'Cálice da Paixão',   desc: '100k Moedas' },
+    { marco: 150000,   emoji: '🧸', nome: 'Urso de Ouro',       desc: '150k Moedas' },
+    { marco: 250000,   emoji: '🗝️', nome: 'Chave do Coração',   desc: '250k Moedas' },
+    { marco: 500000,   emoji: '✈️', nome: 'Asas de Prata',      desc: 'Meio Milhão' },
+    { marco: 750000,   emoji: '🔮', nome: 'Orbe da Confiança',  desc: '750k Moedas' },
+    { marco: 1000000,  emoji: '💍', nome: 'A Aliança',          desc: '1 Milhão de Moedas' },
+    { marco: 2500000,  emoji: '🏰', nome: 'Castelo de Cristal', desc: '2.5 Milhões' },
+    { marco: 5000000,  emoji: '👑', nome: 'Coroa do Amor',      desc: '5 Milhões' },
+    { marco: 7500000,  emoji: '🔥', nome: 'Chama Eterna',       desc: '7.5 Milhões' },
+    { marco: 10000000, emoji: '🌌', nome: 'O Universo Nosso',   desc: '10 Milhões' }
+];
+
+window.renderizarEstanteReliquias = function() {
+    const prateleira = document.getElementById('prateleira-trofeus');
+    const dica = document.getElementById('proxima-reliquia-dica');
+    if (!prateleira) return;
+
+    // Pega o High Score Oficial do Casal (Aquele que nunca diminui)
+    const moedasAtuais = window.pontosDoCasal || 0;
+    let htmlTrofeus = '';
+    let proxima = null;
+
+    RELIQUIAS_MARCOS.forEach(rel => {
+        if (moedasAtuais >= rel.marco) {
+            // Se já bateu a meta, desenha o troféu flutuando na estante!
+            htmlTrofeus += `
+                <div class="trofeu-desbloqueado" style="text-align: center; animation: flutuar 3s infinite ease-in-out; margin: 0 5px; transition: transform 0.3s;">
+                    <div style="font-size: 2.2rem; filter: drop-shadow(0 0 15px rgba(212,175,55,1)); margin-bottom: 2px;">${rel.emoji}</div>
+                    <div style="font-size: 0.55rem; color: #D4AF37; font-weight: bold; text-transform: uppercase; white-space: nowrap;">${rel.nome}</div>
+                </div>
+            `;
+        } else if (!proxima) {
+            // Salva a primeira meta que vocês ainda não bateram
+            proxima = rel;
+        }
+    });
+
+    if (htmlTrofeus === '') {
+        htmlTrofeus = '<div style="color: #666; font-size: 0.85rem; font-style: italic;">A estante está vazia. Joguem para materializar o primeiro tesouro!</div>';
+    }
+
+    prateleira.innerHTML = htmlTrofeus;
+
+    // Atualiza o rodapé dizendo quanto falta para o próximo troféu
+    if (proxima && dica) {
+        let faltam = proxima.marco - moedasAtuais;
+        dica.innerHTML = `Próximo Tesouro: <b style="color: #D4AF37;">${proxima.nome}</b> (Faltam ${faltam.toLocaleString('pt-BR')} 💰)`;
+    } else if (dica) {
+        dica.innerHTML = `🏆 Majestoso! Vocês materializaram todos os tesouros do Santuário!`;
+    }
+};
+
+// O "Guarda-Costas" Invisível: Fica de olho no saldo e atualiza a estante se o dinheiro subir
+let saldoAnteriorEstante = -1;
+setInterval(() => {
+    if (window.pontosDoCasal !== saldoAnteriorEstante) {
+        saldoAnteriorEstante = window.pontosDoCasal;
+        if(typeof window.renderizarEstanteReliquias === 'function') {
+            window.renderizarEstanteReliquias();
+        }
+    }
+}, 2000); // Checa a cada 2 segundos (Custo de bateria imperceptível)

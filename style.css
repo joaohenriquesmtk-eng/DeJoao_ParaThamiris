@@ -5778,9 +5778,38 @@ body.aura-ansiosa {
     pointer-events: none; z-index: 2; transition: opacity 2s ease;
 }
 
+/* ==========================================
+   EFEITO DE CHUVA NATIVO (100% CSS - ZERO LAG)
+========================================== */
 .clima-chuva {
-    background: url('https://media.giphy.com/media/tOvtKihX8qWc/giphy.gif') center/cover;
-    opacity: 0.15; mix-blend-mode: screen;
+    background: transparent;
+    opacity: 0.6;
+    mix-blend-mode: screen;
+    overflow: hidden;
+}
+
+/* A mágica da GPU: Cria as gotas de água (agulhas) sem carregar nenhuma imagem */
+.clima-chuva::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-image: 
+        radial-gradient(ellipse 1px 15px at 20% 20%, rgba(255, 255, 255, 0.7) 0%, transparent 100%),
+        radial-gradient(ellipse 1px 25px at 70% 60%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+        radial-gradient(ellipse 1px 10px at 40% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+        radial-gradient(ellipse 1px 20px at 85% 30%, rgba(255, 255, 255, 0.6) 0%, transparent 100%);
+    background-size: 60px 90px;
+    animation: chuvaCaindo 0.5s linear infinite;
+    pointer-events: none;
+}
+
+/* O motor que faz a água despencar */
+@keyframes chuvaCaindo {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50%); }
 }
 
 .clima-noite { background: rgba(0, 5, 20, 0.7); }
@@ -12410,6 +12439,37 @@ body > .container-palco {
 /* O Motor de Vídeo MP4: Garante que ele não cause engasgos no CSS */
 .video-fundo {
     will-change: transform, opacity !important;
+}
+
+/* =======================================================
+   ✍️ ANIMAÇÃO DE DIGITAÇÃO (REAL-TIME TYPING)
+======================================================= */
+.typing-indicator-container {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.85rem;
+    color: var(--cor-primaria);
+    font-style: italic;
+    margin-bottom: 8px;
+    margin-left: 5px;
+    opacity: 1;
+    transition: opacity 0.4s ease-out;
+}
+
+.typing-dot {
+    font-size: 1.2rem;
+    line-height: 0.5;
+    animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes typing-bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-3px); opacity: 1; text-shadow: 0 0 5px var(--cor-primaria); }
 }
 
 

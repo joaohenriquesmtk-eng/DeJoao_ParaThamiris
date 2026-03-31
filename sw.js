@@ -5,6 +5,7 @@
 
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js'); // 🚨 NOVO: Dá poder de enviar dados ao Service Worker!
 
 firebase.initializeApp({
     apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
@@ -129,3 +130,58 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
+// ==========================================
+// 🛰️ MOTOR DE BACKGROUND SYNC (RESILIÊNCIA OFFLINE)
+// ==========================================
+function abrirBancoOffline() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('SantuarioOfflineDB', 1);
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('fila_ecos')) {
+                db.createObjectStore('fila_ecos', { keyPath: 'id', autoIncrement: true });
+            }
+        };
+        request.onsuccess = event => resolve(event.target.result);
+        request.onerror = event => reject(event.target.error);
+    });
+}
+
+self.addEventListener('sync', (event) => {
+    if (event.tag === 'sincronizar-ecos') {
+        console.log('[Santuário SW] 4G Restaurado! Disparando ecos retidos no tempo...');
+        event.waitUntil(enviarEcosPendentes());
+    }
+});
+
+async function enviarEcosPendentes() {
+    const idb = await abrirBancoOffline();
+    return new Promise((resolve, reject) => {
+        const tx = idb.transaction('fila_ecos', 'readwrite');
+        const store = tx.objectStore('fila_ecos');
+        const request = store.getAll();
+
+        request.onsuccess = async () => {
+            const ecos = request.result;
+            if (ecos.length === 0) return resolve();
+
+            try {
+                // Puxa o motor do Firebase mesmo com o app fechado
+                const dbFirebase = firebase.database();
+                for (const eco of ecos) {
+                    await dbFirebase.ref(`eco_santuario/${eco.chaveParceiro}`).set(eco.payload);
+                    
+                    // Remove do banco de dados offline depois que a entrega foi confirmada
+                    const txDel = idb.transaction('fila_ecos', 'readwrite');
+                    txDel.objectStore('fila_ecos').delete(eco.id);
+                }
+                resolve();
+            } catch (erro) {
+                console.error('[Santuário SW] Erro ao disparar eco retido:', erro);
+                reject(erro);
+            }
+        };
+        request.onerror = () => reject();
+    });
+}

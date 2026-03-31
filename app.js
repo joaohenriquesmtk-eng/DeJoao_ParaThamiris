@@ -213,19 +213,19 @@ window.addEventListener('DOMContentLoaded', () => {
     const particulas = document.querySelector('.particulas');
     if (particulas) {
         let animacaoParallaxPendente = false;
-window.addEventListener('deviceorientation', (e) => {
-    if (animacaoParallaxPendente) return;
-    animacaoParallaxPendente = true;
-    requestAnimationFrame(() => {
-        const x = Math.min(Math.max(e.gamma, -30), 30);
-        const y = Math.min(Math.max(e.beta - 45, -30), 30);
-        if (particulas) {
-            // translate3d obriga a placa de vídeo a fazer o trabalho suavemente
-            particulas.style.transform = `translate3d(${x * 0.5}px, ${y * 0.5}px, 0)`;
-        }
-        animacaoParallaxPendente = false;
-    });
-});
+        window.addEventListener('deviceorientation', (e) => {
+            if (animacaoParallaxPendente) return;
+            animacaoParallaxPendente = true;
+            requestAnimationFrame(() => {
+                const x = Math.min(Math.max(e.gamma, -30), 30);
+                const y = Math.min(Math.max(e.beta - 45, -30), 30);
+                if (particulas) {
+                    // translate3d obriga a placa de vídeo a fazer o trabalho suavemente
+                    particulas.style.transform = `translate3d(${x * 0.5}px, ${y * 0.5}px, 0)`;
+                }
+                animacaoParallaxPendente = false;
+            });
+        });
 
         window.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 20;
@@ -593,7 +593,7 @@ window.injetarMotor3D = function() {
 };
 
 // ==========================================
-// 🚀 O ANIQUILADOR DE GARGALOS (UNMOUNTING & LAZY LOAD DEFINITIVO)
+// 🚀 O GERENCIADOR DE BATERIA (VERSÃO SEGURA E ESTÁVEL)
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
     const motorDeUnmount = new MutationObserver((mutations) => {
@@ -601,47 +601,34 @@ window.addEventListener('DOMContentLoaded', () => {
             if (mutation.attributeName === 'class') {
                 const elemento = mutation.target;
                 
-                // Verifica se a tela/jogo acabou de ser ocultada
                 const foiOcultado = elemento.classList.contains('escondido') || 
                                     elemento.classList.contains('takeover-escondido') ||
                                     (!elemento.classList.contains('ativo') && elemento.classList.contains('tela'));
+                                    
+                const ficouAtivo = (elemento.classList.contains('ativo') || !elemento.classList.contains('escondido')) && 
+                                   !elemento.classList.contains('takeover-escondido');
                 
                 if (foiOcultado) {
-                    // 1. LIBERAÇÃO DE PLACA DE VÍDEO (GPU): Destrói Canvas 3D perdidos
-                    const graficos3D = elemento.querySelectorAll('canvas');
-                    graficos3D.forEach(canvas => {
-                        const gl = canvas.getContext('webgl') || canvas.getContext('webgl2');
-                        if (gl) {
-                            const ext = gl.getExtension('WEBGL_lose_context');
-                            if (ext) ext.loseContext(); // Purga a RAM imediatamente
-                        }
-                        canvas.remove(); // Remove o esqueleto do DOM para ser recriado limpo no futuro
-                    });
-
-                    // 2. HIBERNAÇÃO MULTIMÍDIA: Para todos os vídeos ocultos (ex: galaxia.mp4, reencontro.mp4)
+                    // PAUSA INTELIGENTE: Apenas manda vídeos e áudios dormirem.
+                    // Os gráficos 3D (Canvas) não são mais destruídos, eles hibernam sozinhos!
+                    const midias = elemento.querySelectorAll('audio, video');
+                    midias.forEach(midia => midia.pause());
+                } 
+                else if (ficouAtivo) {
+                    // O DESPERTAR: Se a aba voltar, a música ou o vídeo de fundo volta a tocar
                     const videos = elemento.querySelectorAll('video');
-                    videos.forEach(v => v.pause());
-
-                    // 3. UNMOUNTING REAL (DESTRUIÇÃO DE DOM): Limpa as entranhas dos minigames
-                    // Protegemos os containers que você fez "hardcoded" direto no HTML (água, fantasma e paradoxo)
-                    const containersProtegidos = ['container-agua', 'container-fantasma', 'container-paradoxo', 'container-roleta'];
-                    
-                    if (elemento.id.startsWith('container-') && !containersProtegidos.includes(elemento.id)) {
-                        // Aguarda 300ms (tempo da animação visual de fechamento do jogo) antes de pulverizar o código
-                        setTimeout(() => { 
-                            if (elemento.classList.contains('escondido')) {
-                                elemento.innerHTML = ''; // 🔥 A MÁGICA: Apaga as mil linhas de HTML do jogo da memória!
-                            }
-                        }, 300);
-                    }
+                    videos.forEach(v => {
+                        if (v.hasAttribute('loop') || v.hasAttribute('autoplay') || v.className.includes('clima') || v.id.includes('clima')) {
+                            v.play().catch(e => console.log("Aguardando interação"));
+                        }
+                    });
                 }
             }
         });
     });
 
-    // Coloca o Motor para vigiar absolutamente TODAS as janelas pesadas do Santuário
-    const blocosPesados = document.querySelectorAll('.tela, [id^="container-"], [id^="mesa-"], [id^="overlay-"]');
+    const blocosPesados = document.querySelectorAll('.tela, [id^="container-"], [id^="mesa-"], [id^="overlay-"], .modal, .modal-overlay');
     blocosPesados.forEach(bloco => {
-        motorDeUnmount.observe(bloco, { attributes: true });
+        if(bloco) motorDeUnmount.observe(bloco, { attributes: true });
     });
 });

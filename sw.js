@@ -144,3 +144,45 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
+// ==========================================
+// 🚀 ARQUITETURA ENTERPRISE: CACHE E NETWORK INTERCEPTOR
+// ==========================================
+const CACHE_NAME_ENTERPRISE = 'santuario-cache-v1';
+
+// Interceptador de requisições de fábrica
+self.addEventListener('fetch', (event) => {
+    const requestUrl = new URL(event.request.url);
+
+    // Estratégia 1: Imagens, Músicas e Vídeos (Cache First - Otimização Extrema)
+    // Se o arquivo for mídia, busca no disco do celular primeiro. Se não tiver, baixa e salva para sempre.
+    if (requestUrl.pathname.match(/\.(mp3|mp4|png|jpg|jpeg|svg|gif)$/)) {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                if (cachedResponse) {
+                    return cachedResponse; // Retorna na velocidade da luz direto da memória do celular
+                }
+                return fetch(event.request).then((networkResponse) => {
+                    return caches.open(CACHE_NAME_ENTERPRISE).then((cache) => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                });
+            })
+        );
+        return;
+    }
+
+    // Estratégia 2: HTML, JS e CSS (Network First com Fallback para Cache)
+    // Garante que vocês sempre tenham o código mais atualizado do PWA, mas se a internet falhar, abre instantâneo.
+    event.respondWith(
+        fetch(event.request).then((networkResponse) => {
+            return caches.open(CACHE_NAME_ENTERPRISE).then((cache) => {
+                cache.put(event.request, networkResponse.clone());
+                return networkResponse;
+            });
+        }).catch(() => {
+            return caches.match(event.request);
+        })
+    );
+});

@@ -148,8 +148,9 @@ body {
     box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.02);
     
     animation: respiracaoSantuario 6s infinite alternate ease-in-out;
+content-visibility: auto;
+    contain-intrinsic-size: auto 250px;
 }
-
 /* ===== MENU INFERIOR ACRÍLICO ===== */
 .menu-inferior {
     display: flex;
@@ -10415,8 +10416,8 @@ body::before { display: none !important; }
     box-shadow: 0 20px 40px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
     
     /* Aceleração Direta de Hardware */
-    transform: translateZ(0) !important;
-    -webkit-transform: translateZ(0) !important;
+content-visibility: auto;
+    contain-intrinsic-size: auto 250px;
 }
 
 /* ============================================================================
@@ -12325,3 +12326,40 @@ body > .container-palco {
 .tela {
     -webkit-overflow-scrolling: touch;
 }
+
+/* ==========================================
+   🚀 OTIMIZAÇÃO DE HARDWARE E HIBERNAÇÃO
+========================================== */
+/* Trava qualquer animação (neon, pulso, brilho) se a tela ou o modal estiverem fechados */
+.escondido *, 
+.takeover-escondido *, 
+.modal-overlay.escondido *, 
+#splash-screen.oculto * {
+    animation-play-state: paused !important;
+    transition: none !important;
+}
+
+/* Otimiza a rolagem de todas as telas para o padrão nativo do iOS e Android */
+.tela {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain;
+}
+
+/* Força os elementos mais pesados a usarem a Placa de Vídeo Dedicada */
+.cartao-vidro, 
+.cartao-palco, 
+.menu-inferior, 
+.top-bar, 
+.painel-area,
+.video-fundo {
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+}
+
+/* O Motor de Vídeo MP4: Garante que ele não cause engasgos no CSS */
+.video-fundo {
+    will-change: transform, opacity !important;
+}
+

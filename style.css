@@ -12598,6 +12598,43 @@ body > .container-palco {
     }
 }
 
+/* =======================================================
+   🍏 A RÉGUA DEFINITIVA DA APPLE (iPhone 12 ao 15 Pro Max)
+======================================================= */
+
+/* 📱 GRUPO 1: Tamanho P (iPhone 12 Mini e 13 Mini) - 375x812px */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    .cartao-palco { padding: 8px 10px !important; justify-content: space-around !important; }
+    .cartao-palco h3 { font-size: 1.25rem !important; margin-bottom: 2px !important; margin-top: 0 !important; }
+    .recipiente-astrolabio { transform: scale(0.65) !important; margin-top: -30px !important; margin-bottom: -20px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 6px 4px !important; font-size: 0.7rem !important; flex-direction: row !important; gap: 4px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 0.9rem !important; margin-bottom: 0 !important; }
+    #contador-pulso { font-size: 0.7rem !important; padding: 4px 10px !important; margin-top: 0 !important; }
+}
+
+/* 📱 GRUPO 2: Tamanho M (iPhone 12/13/14/15 e versões Pro) - 390x844px a 393x852px */
+/* (Esta é a alfaiataria perfeita para o iPhone 13 Pro da Thamiris) */
+@media only screen and (min-device-width: 390px) and (max-device-width: 393px) and (min-device-height: 844px) and (max-device-height: 852px) {
+    .cartao-palco { padding: 10px 12px !important; justify-content: space-around !important; }
+    .cartao-palco h3 { font-size: 1.35rem !important; margin-top: 0px !important; margin-bottom: 2px !important; }
+    .recipiente-astrolabio { transform: scale(0.70) !important; margin-top: -25px !important; margin-bottom: -15px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] { gap: 6px !important; margin-bottom: 5px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 8px 4px !important; font-size: 0.75rem !important; border-radius: 12px !important; flex-direction: row !important; gap: 4px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1rem !important; margin-bottom: 0 !important; }
+    #contador-pulso { padding: 6px 15px !important; font-size: 0.75rem !important; margin-top: 0px !important; }
+}
+
+/* 📱 GRUPO 3: Tamanho G (iPhone 12/13/14/15 Pro Max e Plus) - 428x926px a 430x932px */
+@media only screen and (min-device-width: 428px) and (max-device-width: 430px) and (min-device-height: 926px) and (max-device-height: 932px) {
+    .cartao-palco { padding: 15px 18px !important; }
+    .cartao-palco h3 { font-size: 1.5rem !important; }
+    .recipiente-astrolabio { transform: scale(0.85) !important; margin-top: -10px !important; margin-bottom: -5px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] { gap: 10px !important; margin-bottom: 10px !important; }
+    /* Nas telas gigantes, tem espaço de sobra, então o layout original dos botões (emoji em cima do texto) volta a ficar lindo */
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 10px 5px !important; font-size: 0.85rem !important; flex-direction: column !important; } 
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1.2rem !important; }
+    #contador-pulso { padding: 8px 20px !important; font-size: 0.85rem !important; }
+}
 
 
 /* =======================================================
@@ -12657,4 +12694,42 @@ body > .container-palco {
 /* 4. SIMPLIFICAÇÃO INTELIGENTE DE PARTÍCULAS */
 .modo-android-desempenho .particulas {
     display: none !important;
+}
+
+/* =======================================================
+   🍏 A RÉGUA DEFINITIVA DA APPLE (iPhone 12 ao 15 Pro Max)
+======================================================= */
+
+/* 📱 GRUPO 1: Tamanho P (iPhone 12 Mini e 13 Mini) - 375x812px */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    .cartao-palco { padding: 8px 10px !important; justify-content: space-around !important; }
+    .cartao-palco h3 { font-size: 1.25rem !important; margin-bottom: 2px !important; margin-top: 0 !important; }
+    .recipiente-astrolabio { transform: scale(0.65) !important; margin-top: -30px !important; margin-bottom: -20px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 6px 4px !important; font-size: 0.7rem !important; flex-direction: row !important; gap: 4px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 0.9rem !important; margin-bottom: 0 !important; }
+    #contador-pulso { font-size: 0.7rem !important; padding: 4px 10px !important; margin-top: 0 !important; }
+}
+
+/* 📱 GRUPO 2: Tamanho M (iPhone 12/13/14/15 e versões Pro) - 390x844px a 393x852px */
+/* (Esta é a alfaiataria perfeita para o iPhone 13 Pro da Thamiris) */
+@media only screen and (min-device-width: 390px) and (max-device-width: 393px) and (min-device-height: 844px) and (max-device-height: 852px) {
+    .cartao-palco { padding: 10px 12px !important; justify-content: space-around !important; }
+    .cartao-palco h3 { font-size: 1.35rem !important; margin-top: 0px !important; margin-bottom: 2px !important; }
+    .recipiente-astrolabio { transform: scale(0.70) !important; margin-top: -25px !important; margin-bottom: -15px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] { gap: 6px !important; margin-bottom: 5px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 8px 4px !important; font-size: 0.75rem !important; border-radius: 12px !important; flex-direction: row !important; gap: 4px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1rem !important; margin-bottom: 0 !important; }
+    #contador-pulso { padding: 6px 15px !important; font-size: 0.75rem !important; margin-top: 0px !important; }
+}
+
+/* 📱 GRUPO 3: Tamanho G (iPhone 12/13/14/15 Pro Max e Plus) - 428x926px a 430x932px */
+@media only screen and (min-device-width: 428px) and (max-device-width: 430px) and (min-device-height: 926px) and (max-device-height: 932px) {
+    .cartao-palco { padding: 15px 18px !important; }
+    .cartao-palco h3 { font-size: 1.5rem !important; }
+    .recipiente-astrolabio { transform: scale(0.85) !important; margin-top: -10px !important; margin-bottom: -5px !important; }
+    .cartao-palco div[style*="justify-content: space-between"] { gap: 10px !important; margin-bottom: 10px !important; }
+    /* Nas telas gigantes, tem espaço de sobra, então o layout original dos botões (emoji em cima do texto) volta a ficar lindo */
+    .cartao-palco div[style*="justify-content: space-between"] button { padding: 10px 5px !important; font-size: 0.85rem !important; flex-direction: column !important; } 
+    .cartao-palco div[style*="justify-content: space-between"] button span { font-size: 1.2rem !important; }
+    #contador-pulso { padding: 8px 20px !important; font-size: 0.85rem !important; }
 }

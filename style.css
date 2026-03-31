@@ -1,4 +1,32 @@
 /* ==========================================
+   🛡️ BLINDAGEM MÁXIMA PARA iOS SAFARI
+========================================== */
+* {
+    /* Impede o "quadradão" cinza ou transparente de aparecer ao clicar na tela */
+    -webkit-tap-highlight-color: transparent !important;
+    
+    /* Impede que o iPhone ajuste o tamanho da fonte sozinho ao virar a tela */
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Retira o visual de botão nativo e feio do iOS de dentro dos seus formulários e botões */
+input, textarea, button, select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0; /* Você aplica o seu próprio border-radius depois */
+}
+
+/* Rolagem macia nativa em qualquer área que precise de scroll (como menus ou regras) */
+.area-com-scroll {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Proteção para os links não abrirem menus nativos de pré-visualização no iPhone */
+a {
+    -webkit-touch-callout: none;
+}
+
+/* ==========================================
    CONFIGURAÇÕES GLOBAIS
 ========================================== */
 :root {
@@ -103,6 +131,14 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%; /* TRAVA DE FONTE iOS */
+}
+
+/* BLINDAGEM DE BOTÕES E INPUTS DO iOS */
+input, textarea, button, select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
 }
 
 body {
@@ -126,7 +162,7 @@ body {
     flex-direction: column;
     /* CORREÇÃO: Usando a medida dinâmica */
     height: 100dvh; 
-    padding-top: env(safe-area-inset-top);
+    padding-top: calc(15px + env(safe-area-inset-top));
 }
 
 /* ==========================================
@@ -167,16 +203,15 @@ content-visibility: auto;
     width: 100%;
     z-index: 100;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
-    backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
 }
 
 /* BARRA SUPERIOR DOS JOGOS ACRÍLICO (COM PROTEÇÃO PARA O NOTCH DO IPHONE) */
 .top-bar {
     /* Altura da barra + o espaço físico da câmera do iPhone */
     height: calc(60px + env(safe-area-inset-top)) !important;
-    padding-top: env(safe-area-inset-top) !important;
-    
+    padding-top: calc(15px + env(safe-area-inset-top));    
     background: rgba(12, 12, 14, 0.95);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     box-shadow: 0 5px 20px rgba(0,0,0,0.8);
@@ -4518,7 +4553,7 @@ body {
     display: flex;
     align-items: center;
     padding: 15px 20px;
-    padding-top: max(15px, env(safe-area-inset-top)); /* Respeita o notch do iPhone/Android */
+    padding-top: calc(15px + env(safe-area-inset-top)); /* Respeita o notch do iPhone/Android */
     gap: 15px;
     transform: translateY(0);
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
@@ -7369,8 +7404,8 @@ body.modo-jogo-ativo .tela { padding-bottom: env(safe-area-inset-bottom); }
 }
 
 @keyframes respiracaoSantuario {
-    0% { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 0px rgba(212, 175, 55, 0); border-color: rgba(255, 255, 255, 0.1); }
-    100% { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.3); }
+    0% { filter: drop-shadow(0 0 0px rgba(212, 175, 55, 0)); border-color: rgba(255, 255, 255, 0.1); }
+    100% { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.15)); border-color: rgba(212, 175, 55, 0.3); }
 }
 
 /* O Reflexo Magnético do Acrílico */
@@ -7466,7 +7501,7 @@ body.modo-jogo-ativo .tela { padding-bottom: env(safe-area-inset-bottom); }
 .aviso-offline {
     position: fixed; top: 0; left: 0; width: 100%; background: rgba(10, 15, 26, 0.95);
     border-bottom: 1px solid rgba(212, 175, 55, 0.3); color: var(--cor-primaria); z-index: 10000;
-    display: flex; align-items: center; padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
+    display: flex; align-items: center; padding: 15px 20px; padding-top: calc(15px + env(safe-area-inset-top));
     gap: 15px; transform: translateY(0); transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 4px 30px rgba(0,0,0,0.6);
 }
 .aviso-offline.escondido { transform: translateY(-100%); }
@@ -12309,15 +12344,11 @@ body > .container-palco {
 /* ==========================================
    🚀 ACELERAÇÃO DE HARDWARE GLOBAL (ANTI-LAG)
 ========================================== */
-.cartao-vidro, .cartao-palco, .menu-inferior, .top-bar, .peca-julgamento {
-    /* Obriga o iOS e Android a alocarem GPU dedicada para estes itens */
+/* Deixe apenas os elementos de layout fixos */
+.cartao-palco, .menu-inferior, .top-bar {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    
-    /* Prepara o navegador para mudanças drásticas */
     will-change: transform, opacity;
-    
-    /* Remove artefatos de renderização durante a rolagem */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }

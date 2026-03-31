@@ -107,7 +107,9 @@ function digitarTexto(elemento, texto, velocidade = 40) {
                 if(e.type === 'touchstart') e.preventDefault();
                 tempoToque = setTimeout(() => {
                     elemento.classList.add('revelado');
-                    if (navigator.vibrate) navigator.vibrate([30]); 
+                    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
                 }, 1000);
             };
             
@@ -376,7 +378,9 @@ window.verificarPalavra = function() {
                     
                     quadrado.innerText = letraExibida; 
                     quadrado.style.color = "#000"; 
-                    if(window.Haptics) navigator.vibrate(30);
+                    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
                 }, 300);
             }
 
@@ -397,7 +401,9 @@ window.verificarPalavra = function() {
                     
                     if (acertos === 5) {
                         if(typeof mostrarToast === 'function') mostrarToast("O Oráculo revelou a verdade!", "✨");
-                        if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]);
+                        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100, 50, 200]);
+                    }
                         if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 150, spread: 100});
                         if(typeof finalizarVitoria === 'function') finalizarVitoria();
                         
@@ -1613,7 +1619,9 @@ function atualizarDinamicaHome() {
             window.animarTextoCinematografico(texto);
             // ----------------------------------------------
 
-            if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200]);
+                    }
             
             const audio = new Audio('assets/alerta.mp3'); 
             audio.play().catch(() => console.log("Áudio bloqueado"));
@@ -2395,7 +2403,9 @@ function iniciarMotorDoTempoFuturo() {
             } else if(boxAudio) { boxAudio.classList.add('escondido'); }
 
             if(painelLeitura) painelLeitura.classList.remove('escondido');
-            if(window.Haptics && diferenca > -2000) navigator.vibrate([100, 50, 100]); 
+            if (window.Haptics && navigator.vibrate && diferenca > -2000) {
+                navigator.vibrate([100, 50, 100]); 
+            }
         } else {
             const d = Math.floor(diferenca / (1000 * 60 * 60 * 24));
             const h = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -2485,7 +2495,9 @@ window.selarFuturo = async function() {
 
         // Sucesso Total
         if(typeof mostrarToast === 'function') mostrarToast("Cápsula selada e guardada com sucesso!", "🔒");
-        if(window.Haptics) navigator.vibrate([50, 100, 50]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 100, 50]);
+                    }
         
         // Limpeza visual
         document.getElementById('texto-futuro').value = "";
@@ -2814,7 +2826,9 @@ window.comprarEstrela = function() {
         autor: window.MEU_NOME
     }).then(() => {
         if(typeof mostrarToast === 'function') mostrarToast("Uma nova estrela nasceu no Santuário!", "🌌");
-        if(window.Haptics) navigator.vibrate([50, 100, 50]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 100, 50]);
+                    }
         window.cancelarCriacaoEstrela();
     });
 };
@@ -2830,7 +2844,9 @@ window.explodirSupernova = function(id) {
         dataRealizacao: Date.now()
     }).then(() => {
         if(typeof mostrarToast === 'function') mostrarToast("SUPERNOVA! Um sonho se tornou realidade!", "🌟");
-        if(window.Haptics) navigator.vibrate([100, 50, 200, 50, 300]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 200, 50, 300]);
+                    }
         if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37', '#ffffff'], particleCount: 200, spread: 180});
     });
 };
@@ -2850,10 +2866,9 @@ window.quebrarSeloDeCera = function(e) {
     envelope.classList.add('quebrado');
     
     // 2. Feedback Sensorial Bruto (Simula algo se partindo na mão dela)
-    if(window.Haptics) {
-        // Um solavanco forte, seguido de tremores menores simulando a cera caindo
-        navigator.vibrate([100, 30, 50, 20, 30]); 
-    }
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 30, 50, 20, 30]);
+                    }
     
     // 3. Explosão Visual da Cera (Usando a biblioteca de confetes, mas só com tons de vermelho escuro)
     if(typeof confetti === 'function') {
@@ -3032,7 +3047,9 @@ window.escutarEspelhoDaAlma = function() {
             // Efeito visual + Físico se for a primeira vez que quebra o vidro hoje
             if (cartaoEspelho && !cartaoEspelho.classList.contains('efeito-estilhaco')) {
                 cartaoEspelho.classList.add('efeito-estilhaco');
-                if (window.Haptics) navigator.vibrate([100, 50, 200, 50, 300]);
+                if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 200, 50, 300]);
+                    }
                 if (typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff', '#3498db'], particleCount: 150, spread: 120, zIndex: 1000});
             }
         } else if (minhaResposta && !respostaDela) {
@@ -3145,7 +3162,9 @@ window.comprarCombustivel = function() {
         // 4. Salva a nova distância na nuvem
         update(refRota, { km: novoKm }).then(() => {
             if(typeof mostrarToast === 'function') mostrarToast(`Motores acesos! +5km percorridos.`, "🚀");
-            if(window.Haptics) navigator.vibrate([30, 50, 30]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 50, 30]);
+                    }
         }).catch(err => {
             console.error("Erro ao atualizar Jornada:", err);
         });
@@ -3273,7 +3292,9 @@ window.inicializarEpicentro = function() {
             painelDesbloqueado.classList.remove('escondido');
             
             // O celular treme e explode em ouro
-            if (window.Haptics) navigator.vibrate([300, 100, 300, 100, 500, 200, 800]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300, 100, 500, 200, 800]);
+                    }
             if (typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 300, spread: 200, gravity: 1.5, zIndex: 10000});
             
             // Dá o Play no vídeo automaticamente
@@ -3334,7 +3355,9 @@ window.ativarSensorParadoxo = function() {
         
         if (progresso > 0.95 && !window.paradoxoRevelado) {
             window.paradoxoRevelado = true;
-            if(window.Haptics) navigator.vibrate([40, 60, 40]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([40, 60, 40]);
+                    }
         } else if (progresso < 0.5) {
             window.paradoxoRevelado = false;
         }
@@ -3500,7 +3523,9 @@ function atualizarCenaSono3D() {
         tela.classList.add('sincronia-perfeita-bg');
         txtGuia.innerHTML = "Nossas mentes estão conectadas no espaço.<br><span style='font-size:1.2rem; color:#cda8ff; text-shadow:0 0 15px rgba(205,168,255,0.8); display:block; margin-top:8px;'>Durma bem, meu amor.</span>";
         
-        if(window.Haptics) navigator.vibrate([30, 50, 30, 50, 100]); 
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 50, 30, 50, 100]);
+                    }
     } else {
         orbeDela.style.opacity = '0';
         orbeDela.classList.remove('anim-respirar');
@@ -4009,7 +4034,9 @@ function iniciarAquecimento(e) {
     // Vibração crescente simulando o calor
     let vibracao = 10;
     const intervaloVibracao = setInterval(() => {
-        if(navigator.vibrate) navigator.vibrate(vibracao);
+        if (window.Haptics && navigator.vibrate) {
+            navigator.vibrate([vibracao]);
+        }
         vibracao += 10;
     }, 500);
 
@@ -4104,7 +4131,9 @@ async function iniciarRadarDeSopro() {
 
 // 4. O Êxtase: A Carta é Revelada!
 function revelarCartaSecreta(stream) {
-    if (window.Haptics) navigator.vibrate([200, 100, 300]); // Vibração de quebra mágica
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 300]);
+                    } // Vibração de quebra mágica
 
     // Desliga o microfone para não gastar bateria da Thamiris
     if (stream) {
@@ -4298,7 +4327,9 @@ window.escutarEcosDoParceiro = function() {
             document.getElementById('controles-gravacao-eco').classList.add('escondido');
             document.getElementById('controles-reproducao-eco').classList.remove('escondido');
             
-            if (window.Haptics) navigator.vibrate([100, 200, 100]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100]);
+                    }
         }
     });
 };
@@ -4499,7 +4530,9 @@ window.revelarBlocoMines = function(index) {
     if (ehBomba) {
         // 🔊 SOM DE EXPLOSÃO! Quebra brutalmente a música.
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesBomba', 1.0);
-        if(window.Haptics) navigator.vibrate([200, 100, 400]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 400]);
+                    }
         
         bloco.classList.add('revelado-bomba');
         bloco.innerHTML = "💣";
@@ -4549,7 +4582,9 @@ window.sacarMines = function() {
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesSaque', 1.0);
     
-    if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 300]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100, 50, 300]);
+                    }
     if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 150});
     if(typeof mostrarToast === 'function') mostrarToast(`Saque brilhante! +${motorMines.lucroPotencial}💰`, "✨");
 
@@ -4718,7 +4753,9 @@ window.girarSlots = function() {
     }
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsStart', 0.8);
-    if(window.Haptics) navigator.vibrate([50, 50, 50]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 50, 50]);
+                    }
 
     const simbolosLocais = ['🍒', '🍋', '🍇', '🔔', '💎', '7️⃣'];
     const premiosLocais = { '🍒': 3, '🍋': 5, '🍇': 10, '🔔': 20, '💎': 50, '7️⃣': 100 };
@@ -4808,7 +4845,9 @@ window.girarSlots = function() {
                 roleta.style.boxShadow = "none"; // Remove o brilho dourado de tensão
             }
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsPlin', 0.9);
-            if(window.Haptics) navigator.vibrate(50);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
         }, tempoParada[i]);
     }
 
@@ -4825,7 +4864,9 @@ window.girarSlots = function() {
                 
                 if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
                 if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "JACKPOT no Caça-Níquel!");
-                if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
+                if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100, 200, 400]);
+                    }
                 if(typeof confetti === 'function') confetti({colors: ['#e74c3c', '#D4AF37'], particleCount: 200});
                 if(typeof mostrarToast === 'function') mostrarToast(`JACKPOT! ${mult}x (+${lucro}💰)`, "🎰");
                 
@@ -5073,7 +5114,9 @@ function sacarLucroCrash() {
     if(foguete) foguete.classList.remove('foguete-voando-aviator');
     
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('crashCashout', 1.0);
-    if(window.Haptics) navigator.vibrate([100, 200, 100, 200]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100, 200]);
+                    }
     if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#f1c40f'], particleCount: 100});
     if(typeof mostrarToast === 'function') mostrarToast(`Saque Perfeito! +${lucroFinal}💰`, "🚀");
 
@@ -5111,7 +5154,9 @@ function explodirFoguete() {
     }
     
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('crashBoom', 0.9);
-    if(window.Haptics) navigator.vibrate([300, 100, 500]); 
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 500]);
+                    }
     if(typeof mostrarToast === 'function') mostrarToast("CRASH! O foguete explodiu.", "💥");
 
     voltarBotaoApostarCrash();
@@ -5318,7 +5363,9 @@ window.iniciarRodadaBJ = function() {
     const mesa = document.getElementById('mesa-blackjack');
     if(mesa) mesa.style.boxShadow = "none"; // Reseta alarme visual
 
-    if(window.Haptics) navigator.vibrate([30, 50, 30]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 50, 30]);
+                    }
 
     setTimeout(() => { motorBJ.maoJogador.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7); }, 200);
     setTimeout(() => { motorBJ.maoDealer.push(sacarCartaAletoria()); atualizarMesaVisual(); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7); }, 600);
@@ -5329,7 +5376,9 @@ window.iniciarRodadaBJ = function() {
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7);
         
         if (calcularPontos(motorBJ.maoJogador) === 21) {
-            if(window.Haptics) navigator.vibrate([100, 200, 300]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 300]);
+                    }
             finalizarRodadaBJ("BLACKJACK");
         }
     }, 1400);
@@ -5355,7 +5404,9 @@ window.comprarCartaBJ = function() {
     if(window.Haptics) navigator.vibrate(30);
 
     if (calcularPontos(motorBJ.maoJogador) > 21) {
-        if(window.Haptics) navigator.vibrate([300, 100, 300]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300]);
+                    }
         finalizarRodadaBJ("ESTOUROU");
     }
 };
@@ -5381,7 +5432,9 @@ window.pararBJ = function() {
         atualizarMesaVisual(); 
         
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.8);
-        if(window.Haptics) navigator.vibrate(50);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
         
         // Loop recursivo para o dealer comprar cartas lentamente e com aumento de tensão
         function turnoDealer() {
@@ -5393,7 +5446,9 @@ window.pararBJ = function() {
                     atualizarMesaVisual();
                     
                     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.7);
-                    if(window.Haptics) navigator.vibrate(30);
+                    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
                     
                     // Acelera o coração a cada carta do dealer
                     motorBJ.taxaCoracao += 0.2;
@@ -5476,9 +5531,13 @@ function finalizarRodadaBJ(motivo) {
     if (lucro > 0) {
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, "Vitória no Blackjack");
         if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#ffffff'], particleCount: 150});
-        if(window.Haptics) navigator.vibrate([100, 100, 200, 200]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 100, 200, 200]);
+                    }
     } else if (lucro === 0 && pontosJ !== pontosD) {
-        if(window.Haptics) navigator.vibrate([200, 100, 200]); 
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200]);
+                    }
     }
 
     if(typeof mostrarToast === 'function') mostrarToast(msgToast, iconeToast);
@@ -5633,7 +5692,9 @@ window.apostarRoleta = function(corApostada) {
     disco.style.transition = 'transform 9s cubic-bezier(0.1, 0.95, 0.15, 1)';
     disco.style.transform = `rotate(${motorRoleta.anguloAtual}deg)`;
     
-    if(window.Haptics) navigator.vibrate([20, 50, 20, 50, 20, 50]); 
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([20, 50, 20, 50, 20, 50]);
+                    }
     if(typeof mostrarToast === 'function') mostrarToast("Rien ne va plus! (Apostas encerradas)", "🎲");
 
     // 🚨 A MÁGICA: O som da catraca desacelerando hiper-realista
@@ -5691,7 +5752,9 @@ function verificarVitoriaRoleta(corApostada, corCaiu, aposta) {
             icone = "💚";
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
             if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37', '#ffffff'], particleCount: 300, spread: 150});
-            if(window.Haptics) navigator.vibrate([300, 100, 300, 100, 500]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300, 100, 500]);
+                    }
             
         } else {
             lucro = aposta * 2;
@@ -5699,7 +5762,9 @@ function verificarVitoriaRoleta(corApostada, corCaiu, aposta) {
             icone = (corCaiu === "vermelho") ? "🔴" : "⚫";
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
             if(typeof confetti === 'function') confetti({colors: ['#f1c40f', (corCaiu==='vermelho'?'#e74c3c':'#2c3e50')], particleCount: 100});
-            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100, 200, 400]);
+                    }
         }
         
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Vitória na Roleta (${corCaiu.toUpperCase()})`);
@@ -5709,7 +5774,9 @@ function verificarVitoriaRoleta(corApostada, corCaiu, aposta) {
         icone = "💸";
         
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-        if(window.Haptics) navigator.vibrate([300, 100, 300]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300]);
+                    }
     }
 
     if(typeof mostrarToast === 'function') mostrarToast(msgToast, icone);
@@ -5925,7 +5992,9 @@ function pagarPlinko(bucketIndex, aposta) {
     if (lucro > aposta) {
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0); 
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucro, `Prêmio Plinko (${mult}x)`);
-        if(window.Haptics) navigator.vibrate([100, 100, 200]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 100, 200]);
+                    }
         if(mult >= 15 && typeof confetti === 'function') confetti({colors: ['#e74c3c', '#f1c40f'], particleCount: 100}); 
         if(typeof mostrarToast === 'function') mostrarToast(`PLINKO! ${mult}x (+${lucro}💰)`, "✨");
     } else {
@@ -6114,7 +6183,9 @@ window.comprarRaspadinha = function() {
     btn.style.pointerEvents = "none";
     
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
-    if(window.Haptics) navigator.vibrate([50, 50]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 50]);
+                    }
 };
 
 function configurarToqueRaspadinha() {
@@ -6220,12 +6291,16 @@ function revelarTudoRaspadinha() {
         if (motorRaspadinha.lucro > 0) {
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
             if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(motorRaspadinha.lucro, "Prêmio na Raspadinha!");
-            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100, 200, 500]);
+                    }
             if(typeof confetti === 'function') confetti({colors: ['#bdc3c7', '#D4AF37'], particleCount: 200});
             if(typeof mostrarToast === 'function') mostrarToast(`RASPOU E GANHOU! +${motorRaspadinha.lucro}💰`, "🎫");
         } else {
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(window.Haptics) navigator.vibrate([300, 100, 300]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300]);
+                    }
             if(typeof mostrarToast === 'function') mostrarToast("Não foi dessa vez. Tente novamente!", "💸");
         }
 
@@ -6369,7 +6444,9 @@ window.iniciarRodadaTowers = function() {
     ativarAndarTowers(0); // Começa pela base!
     
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesStart', 0.8);
-    if(window.Haptics) navigator.vibrate([100, 100]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 100]);
+                    }
 };
 
 function ativarAndarTowers(linha) {
@@ -6428,7 +6505,9 @@ function clicarBlocoTowers(linha, col) {
             window.CassinoAudio.tocar('minesBomba', 1.0);
             setTimeout(() => window.CassinoAudio.tocar('slotsLose', 0.8), 300); 
         }
-        if(window.Haptics) navigator.vibrate([300, 100, 400]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 400]);
+                    }
         
         encerrarTowers("derrota");
     } else {
@@ -6440,10 +6519,11 @@ function clicarBlocoTowers(linha, col) {
             somCristalTowers.play().catch(e=>{});
             
             motorTowers.frequenciaSomTowers += 0.15; // O tom sobe!
-            if (motorTowers.frequenciaSomTowers > 2.5) motorTowers.frequenciaSomTowers = 2.5; 
-        }
-
-        if(window.Haptics) navigator.vibrate(30 + (linha * 5)); // O "clique" físico fica mais forte no topo
+            if (motorTowers.frequenciaSomTowers > 2.5) motorTowers.frequenciaSomTowers = 2.5;
+}
+if (window.Haptics && navigator.vibrate) {
+    navigator.vibrate([30 + (linha * 5)]); // O "clique" físico fica mais forte no topo
+}
 
         blocoClicado.classList.add('towers-bloco-safe');
         blocoClicado.innerHTML = "💎";
@@ -6491,7 +6571,9 @@ window.sacarTowers = function() {
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesSaque', 1.0);
 
-    if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 400]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100, 50, 400]);
+                    }
     if(typeof confetti === 'function') confetti({colors: ['#00d4ff', '#D4AF37', '#ffffff'], particleCount: 250, spread: 120, origin: {y: 0.1}}); 
     if(typeof mostrarToast === 'function') mostrarToast(`Saque nas Alturas! +${motorTowers.lucroPotencial}💰`, "🗼");
 
@@ -6690,7 +6772,9 @@ window.iniciarRodadaHiLo = function() {
     }
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
-    if(window.Haptics) navigator.vibrate([100, 100]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 100]);
+                    }
 
     setTimeout(() => {
         motorHiLo.cartaAtual = gerarCartaAleatoria();
@@ -6740,7 +6824,9 @@ window.adivinharHiLo = function(escolha) {
         cartaFrente.style.boxShadow = "0 0 30px rgba(241, 196, 15, 0.5)"; // Brilho de expectativa
     }
     
-    if(window.Haptics) navigator.vibrate(30);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 
     // O Tempo do Medo (1.2 segundos de coração batendo antes de virar)
     setTimeout(() => {
@@ -6755,7 +6841,9 @@ window.adivinharHiLo = function(escolha) {
         }
         
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.8);
-        if(window.Haptics) navigator.vibrate(50);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 
         setTimeout(() => {
             motorHiLo.cartaAtual = novaCarta;
@@ -6786,7 +6874,9 @@ window.adivinharHiLo = function(escolha) {
                     if (motorHiLo.frequenciaSomAcerto > 2.5) motorHiLo.frequenciaSomAcerto = 2.5;
                 }
                 
-                if(window.Haptics) navigator.vibrate([50, 50, 100]);
+                if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 50, 100]);
+                    }
             } else {
                 if(cartaFrente) cartaFrente.classList.add('hilo-derrota-glow');
                 
@@ -6798,7 +6888,9 @@ window.adivinharHiLo = function(escolha) {
                 }
 
                 if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-                if(window.Haptics) navigator.vibrate([300, 100, 500]);
+                if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 500]);
+                    }
                 
                 encerrarRodadaHiLo("derrota");
             }
@@ -6815,7 +6907,9 @@ window.sacarHiLo = function() {
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('minesSaque', 1.0);
 
-    if(window.Haptics) navigator.vibrate([100, 50, 100, 50, 400]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100, 50, 400]);
+                    }
     if(typeof confetti === 'function') confetti({colors: ['#e67e22', '#D4AF37'], particleCount: 200});
     if(typeof mostrarToast === 'function') mostrarToast(`Lucro Perfeito! +${motorHiLo.lucroPotencial}💰`, "↕️");
 
@@ -7061,7 +7155,9 @@ function finalizarRolagemDice(resultado, aposta) {
                 window.CassinoAudio.tocar('slotsWin', 1.0);
                 setTimeout(()=> window.CassinoAudio.tocar('slotsWin', 1.0), 300); // Toca dobrado!
             }
-            if(window.Haptics) navigator.vibrate([200, 100, 300, 100, 500, 200, 500]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 300, 100, 500, 200, 500]);
+                    }
             if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#e67e22', '#ffffff'], particleCount: 300, spread: 160});
             if(typeof mostrarToast === 'function') mostrarToast(`🔥 MEGA JACKPOT EXTREMO! +${lucro}💰`, "👑");
             
@@ -7074,7 +7170,9 @@ function finalizarRolagemDice(resultado, aposta) {
             }
             
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 500]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100, 200, 500]);
+                    }
             if(typeof confetti === 'function') confetti({colors: ['#00f2fe', '#2ecc71'], particleCount: 150});
             if(typeof mostrarToast === 'function') mostrarToast(`Golpe de Mestre! +${lucro}💰`, "🎲");
         }
@@ -7089,7 +7187,9 @@ function finalizarRolagemDice(resultado, aposta) {
         }
         
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-        if(window.Haptics) navigator.vibrate([300, 100, 400]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 400]);
+                    }
         if(typeof mostrarToast === 'function') mostrarToast("Queimou os circuitos! A casa venceu.", "🔥");
     }
 
@@ -7375,7 +7475,9 @@ window.comprarItemBoutique = function(idItem) {
     
     if(window.CassinoAudio) window.CassinoAudio.tocar('fichaSub', 1.0); // Som de caixa registradora/moedas
     if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37'], particleCount: 100});
-    if(window.Haptics) navigator.vibrate([100, 50, 100]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
     
     renderizarBoutique(); // Atualiza a tela
 
@@ -7416,7 +7518,9 @@ window.comprarLootbox = function(preco) {
 
     // 🔊 SOM: Tambores de suspense (Vamos usar o som contínuo do dado girando)
     if(window.CassinoAudio) window.CassinoAudio.tocar('roletaSpin', 1.0);
-    if(window.Haptics) navigator.vibrate([50, 50, 50, 50, 50, 50, 50]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 50, 50, 50, 50, 50, 50]);
+                    }
 
     // O Sorteio Matemático com base no peso (chance)
     let mathSorte = Math.random();
@@ -7437,7 +7541,9 @@ window.comprarLootbox = function(preco) {
         icone.innerText = "💥"; // Explosão visual rápida
         brilho.style.opacity = '1';
         
-        if(window.Haptics) navigator.vibrate([400, 100, 400]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([400, 100, 400]);
+                    }
 
         setTimeout(() => {
             icone.style.display = "none"; // Some com o baú
@@ -7504,7 +7610,9 @@ window.forcarAtualizacao = function() {
         btn.innerText = "Baixando Nova Versão... ⏳";
         btn.style.opacity = "0.7";
         btn.style.pointerEvents = "none"; // Impede duplo clique
-        if(window.Haptics) navigator.vibrate([50, 50, 50]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50, 50, 50]);
+                    }
     }
 
     // 1. Limpa TODOS os caches antigos salvos no celular dela
@@ -7689,7 +7797,9 @@ function iniciarModoCartaSorte() {
 
     // 🔊 SOM DE TENSÃO SUPREMA!
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('roleta', 1.0); // Som tenso longo
-    if(window.Haptics) navigator.vibrate([300, 100, 300, 100, 500]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300, 100, 500]);
+                    }
     if(typeof mostrarToast === 'function') mostrarToast(`O Tigre escolheu ${motorTigrinho.simboloSorte}! Giros Grátis!`, "🐯");
 
     setTimeout(() => {
@@ -7825,18 +7935,24 @@ function encerrarGiroTigrinho(lucro, venceu, telaCheia) {
         if (telaCheia) {
             // O MEGA PAGAMENTO DA CARTA DA SORTE
             if(window.CassinoAudio && !window.SantuarioSomPausado) setTimeout(()=> window.CassinoAudio.tocar('slotsWin', 1.0), 500);
-            if(window.Haptics) navigator.vibrate([200, 100, 300, 100, 500, 200, 500]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 300, 100, 500, 200, 500]);
+                    }
             if(typeof confetti === 'function') confetti({colors: ['#e74c3c', '#f1c40f', '#ffffff'], particleCount: 300, spread: 160});
             if(typeof mostrarToast === 'function') mostrarToast(`TELA CHEIA! MEGA BIG WIN! +${lucro}💰`, "🐯");
         } else {
             // Pagamento normal de linha
-            if(window.Haptics) navigator.vibrate([100, 200, 100, 200, 400]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 200, 100, 200, 400]);
+                    }
             if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#d35400'], particleCount: 100});
             if(typeof mostrarToast === 'function') mostrarToast(`BIG WIN! +${lucro}💰`, "🎉");
         }
     } else {
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-        if(window.Haptics) navigator.vibrate([300, 100, 300]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300]);
+                    }
     }
 
     setTimeout(() => {
@@ -8038,7 +8154,9 @@ window.ajustarApostaBridge = function(delta) {
     window.motorBridge.apostaAnte = novoValor;
     const visor = document.getElementById('bridge-valor-aposta');
     if (visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.iniciarRodadaBridge = async function() {
@@ -8105,7 +8223,9 @@ window.iniciarRodadaBridge = async function() {
     } else {
         await update(bridgeRef, { prontos: prontos, apostaAnte: ante });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando Aliado pagar Pedágio...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -8314,7 +8434,9 @@ function renderMesaBridge() {
                 setTimeout(()=> { 
                     passo.innerHTML = criarDivCartaBridge(cb.cartas.passo, 0.1);
                     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
-                    if(window.Haptics) navigator.vibrate([100, 50, 100]);
+                    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
                     
                     // Avalia na tela o resultado
                     let v1 = getValorNumericoBridge(cb.cartas.pilar1.valor);
@@ -8423,7 +8545,9 @@ window.ajustarFichaWheel = function(delta) {
     window.motorWheel.valorFicha = novoValor;
     const visor = document.getElementById('wheel-ficha-valor');
     if(visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.apostarWheel = async function(tipo) {
@@ -8456,7 +8580,9 @@ window.apostarWheel = async function(tipo) {
     });
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if(window.Haptics) navigator.vibrate(50);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 };
 
 window.limparApostasWheel = async function() {
@@ -8482,7 +8608,9 @@ window.limparApostasWheel = async function() {
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     await set(ref(db, `cassino/wheel_royale/apostas`), null);
-    if(window.Haptics) navigator.vibrate([30,30,30]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
 };
 
 function renderMesaWheel() {
@@ -8552,7 +8680,9 @@ window.girarWheelCoop = async function() {
     } else {
         await update(wheelRef, { prontos: prontos });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando confirmação...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -8813,7 +8943,9 @@ window.ajustarApostaPaiGow = function(delta) {
     window.motorPaiGow.apostaAnte = novoValor;
     const visor = document.getElementById('paigow-valor-aposta');
     if (visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.iniciarRodadaPaiGow = async function() {
@@ -8866,7 +8998,9 @@ window.iniciarRodadaPaiGow = async function() {
     } else {
         await update(pgRef, { prontos: prontos, apostaAnte: ante });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando Aliado...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -9162,7 +9296,9 @@ window.ajustarApostaCarib = function(delta) {
     window.motorCarib.apostaAnte = novoValor;
     const visor = document.getElementById('carib-valor-aposta');
     if (visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 // 🚨 FASE 1: PAGAR ANTE (Sincronia Dupla)
@@ -9207,7 +9343,9 @@ window.iniciarRodadaCarib = async function() {
     } else {
         await update(caribRef, { prontos: prontos, apostaAnte: ante });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando Parceiro pagar Ante...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -9533,7 +9671,9 @@ window.ajustarFichaBaccarat = function(delta) {
     window.motorBac.valorFicha = novoValor;
     const visor = document.getElementById('bac-ficha-valor');
     if(visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.apostarBaccarat = async function(tipo) {
@@ -9566,7 +9706,9 @@ window.apostarBaccarat = async function(tipo) {
     });
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if(window.Haptics) navigator.vibrate(50);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 };
 
 window.limparApostasBaccarat = async function() {
@@ -9589,7 +9731,9 @@ window.limparApostasBaccarat = async function() {
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     await set(ref(db, `cassino/baccarat_royale/apostas`), null);
-    if(window.Haptics) navigator.vibrate([30,30,30]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
 };
 
 function renderMesaBaccarat() {
@@ -9673,7 +9817,9 @@ window.distribuirBaccarat = async function() {
     } else {
         await update(bacRef, { prontos: prontos });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando confirmação...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -9699,13 +9845,17 @@ function animarCartasBaccarat() {
     setTimeout(() => {
         arrJ.forEach((c, i) => divJ.innerHTML += criarDivCartaBac(c, i*0.2));
         ptsJ.innerText = calcularPontosBac(arrJ);
-        if(window.Haptics) navigator.vibrate(50);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
     }, 500);
 
     setTimeout(() => {
         arrB.forEach((c, i) => divB.innerHTML += criarDivCartaBac(c, i*0.2));
         ptsB.innerText = calcularPontosBac(arrB);
-        if(window.Haptics) navigator.vibrate(50);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
         
         // Finaliza o Jogo
         if (window.motorBac.roladoPor === window.motorBac.meuId) {
@@ -9829,7 +9979,9 @@ window.ajustarFichaSicBo = function(delta) {
     window.motorSicBo.valorFicha = novoValor;
     const visor = document.getElementById('sicbo-ficha-valor');
     if(visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.apostarSicBo = async function(tipo) {
@@ -9862,7 +10014,9 @@ window.apostarSicBo = async function(tipo) {
     });
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if(window.Haptics) navigator.vibrate(50);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 };
 
 window.limparApostasSicBo = async function() {
@@ -9888,7 +10042,9 @@ window.limparApostasSicBo = async function() {
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     await set(ref(db, `cassino/sicbo_royale/apostas`), null);
-    if(window.Haptics) navigator.vibrate([30,30,30]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
 };
 
 function renderMesaSicBo() {
@@ -9960,7 +10116,9 @@ window.lancarDadosSicBo = async function() {
     } else {
         await update(sicboRef, { prontos: prontos });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando a confirmação do outro lado...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -9999,7 +10157,9 @@ function animarRolagemSicBo() {
         somCargaSicBo.pause();
         
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-        if(window.Haptics) navigator.vibrate([100, 50, 200]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 200]);
+                    }
 
         const resArray = window.motorSicBo.resultado;
         d1El.innerText = arrayFaces[resArray[0]];
@@ -10167,7 +10327,9 @@ window.ajustarApostaBjCoop = function(delta) {
     window.motorBjCoop.apostaAtual = novoValor;
     const visor = document.getElementById('bj-coop-valor-aposta');
     if (visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.iniciarRodadaBjCoop = async function() {
@@ -10252,7 +10414,9 @@ window.acaoBjCoop = async function(acao) {
         let pts = calcularPontosBjCoop(minhaMao);
         if (pts > 21) {
             meuStatus = 'estourou';
-            if(window.Haptics) navigator.vibrate([100, 50, 200]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 200]);
+                    }
         } else if (pts === 21) {
             meuStatus = 'parou';
         } else {
@@ -10517,7 +10681,9 @@ window.ajustarFichaRoleta = function(delta) {
     
     const visor = document.getElementById('roleta-multi-ficha-valor');
     if(visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 // --- APOSTA CO-OP COM SANITIZAÇÃO TOTAL DO COFRE ---
@@ -10556,7 +10722,9 @@ window.apostarRoletaMulti = async function(tipo) {
     });
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if(window.Haptics) navigator.vibrate(50);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 };
 
 // --- LIMPEZA DE MESA COM REEMBOLSO (BLINDADA) ---
@@ -10582,7 +10750,9 @@ window.limparApostasRoleta = async function() {
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     await set(ref(db, `cassino/roleta_royale/apostas`), null);
-    if(window.Haptics) navigator.vibrate([30,30,30]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
 };
 
 // --- RENDERIZAÇÃO VISUAL ---
@@ -10856,7 +11026,9 @@ function renderizarMesaPoker() {
     const painelAcao = document.getElementById('poker-painel-acao');
     if (painelAcao && motorPoker.turno === motorPoker.meuId && !motorPoker.vencedor) {
         painelAcao.classList.remove('escondido');
-        if(window.Haptics) navigator.vibrate([30, 50]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 50]);
+                    }
         
         const btnCall = document.getElementById('btn-poker-check-call');
         const diff = motorPoker.apostaAtual - eu.aposta;
@@ -10982,7 +11154,9 @@ window.iniciarMaoPoker = async function() {
     });
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    if(window.Haptics) navigator.vibrate([100, 50, 100]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
 };
 
 // ============================================================================
@@ -11057,7 +11231,9 @@ window.iniciarOuvinteUno = function() {
         if (data.ataquePendente && data.ataquePendente.alvo === motorUno.meuId) {
             if(typeof mostrarToast === 'function') mostrarToast(`ATAQUE RECEBIDO: +${data.ataquePendente.qtd} CARTAS!`, "🔥");
             if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
-            if(window.Haptics) navigator.vibrate([300, 100, 400]);
+            if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([300, 100, 400]);
+                    }
             
             for(let i = 0; i < data.ataquePendente.qtd; i++) {
                 motorUno.minhaMao.push(gerarCartaUnoAleatoria());
@@ -11149,7 +11325,9 @@ function renderizarMesaUno() {
                 if (podeJogar) jogarCartaNoFirebase(carta, index);
                 else if (motorUno.turno === motorUno.meuId) {
                     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6);
-                    if(window.Haptics) navigator.vibrate(50);
+                    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
                 }
             };
             minhaMaoDiv.appendChild(c);
@@ -11226,7 +11404,9 @@ async function processarJogada(carta, index, corFinal) {
     }
 
     await update(ref(db), updates);
-    if(window.Haptics) navigator.vibrate(50);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 }
 
 window.gritarUnoAction = function() {
@@ -11298,7 +11478,9 @@ window.iniciarDueloUno = async function() {
     });
     
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    if(window.Haptics) navigator.vibrate([100, 50, 100]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
 };
 
 
@@ -11368,7 +11550,9 @@ window.ajustarFichaCraps = function(delta) {
     window.motorCraps.valorFicha = novoValor;
     const visor = document.getElementById('craps-ficha-valor');
     if(visor) visor.innerText = novoValor;
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
 };
 
 window.apostarCraps = async function(tipo) {
@@ -11402,7 +11586,9 @@ window.apostarCraps = async function(tipo) {
     });
 
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if(window.Haptics) navigator.vibrate(50);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([50]);
+                    }
 };
 
 window.limparApostasCraps = async function() {
@@ -11428,7 +11614,9 @@ window.limparApostasCraps = async function() {
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     await set(ref(db, `cassino/craps_royale/apostas`), null);
-    if(window.Haptics) navigator.vibrate([30,30,30]);
+    if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
 };
 
 function renderMesaCraps() {
@@ -11504,7 +11692,9 @@ window.lancarDadosCraps = async function() {
         // 🛑 O PARCEIRO AINDA NÃO CLICOU. Atualiza só o botão.
         await update(crapsRef, { prontos: prontos });
         if(typeof mostrarToast === 'function') mostrarToast("Aguardando confirmação da equipe...", "⏳");
-        if(window.Haptics) navigator.vibrate(20);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([30]);
+                    }
     }
 };
 
@@ -11536,7 +11726,9 @@ function animarRolagemCraps() {
         somRolagemDados.pause();
         
         if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-        if(window.Haptics) navigator.vibrate([100, 50, 200]);
+        if (window.Haptics && navigator.vibrate) {
+                        navigator.vibrate([100, 50, 200]);
+                    }
 
         const resArray = window.motorCraps.resultado;
         d1El.innerText = facesDado[resArray[0]];

@@ -1,6 +1,6 @@
 // ==========================================
 // MOTOR OFFLINE & NOTIFICAÇÕES (PWA SANTUÁRIO)
-// Versão: 3.0.0 (Revisão de Ouro - Network-First)
+// Versão: 4.0.0 (Blindagem Ouro - iOS e Android)
 // ==========================================
 
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
@@ -64,21 +64,12 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 // ==========================================
-// ESTRATÉGIA DE CACHE INTELIGENTE
+// ESTRATÉGIA DE CACHE INTELIGENTE UNIFICADA
 // ==========================================
-const CACHE_NAME = 'santuario-cache-ouro-v4.0'; // Atualizado para forçar o reset global
-
-// Apenas os arquivos vitais para a tela carregar se estiver offline
-const ASSETS_TO_CACHE = [
-    '/', 
-    '/index.html', 
-    '/style.css', 
-    '/core.js'
-];
+const CACHE_NAME = 'santuario-cache-ouro-v5.0'; // Atualizado para forçar o reset da versão bugada
 
 self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Força a instalação imediata e expulsa a versão antiga
-    event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)));
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -86,7 +77,6 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    // Se o nome do cache não for o "v3-ouro", deleta sem piedade.
                     if (cacheName !== CACHE_NAME) {
                         console.log('[Santuário SW] Limpando cache antigo:', cacheName);
                         return caches.delete(cacheName);
@@ -95,92 +85,45 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    self.clients.claim(); // Assume o controle da página imediatamente
+    self.clients.claim();
 });
 
+// 🚨 O NOVO CÉREBRO INTERCEPTADOR (Um único 'fetch' perfeito)
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
-
     const url = new URL(event.request.url);
     
-    // 1. Ignora requisições do Firebase e APIs externas
+    // 1. IGNORA FIREBASE (Nunca faz cache do banco de dados ao vivo)
     if (url.hostname.includes('googleapis.com') || url.hostname.includes('firebase')) {
         return; 
     }
 
-    // 2. NETWORK-FIRST PARA CÓDIGO FONTE (Garante atualizações instantâneas)
-    // Se for HTML, CSS ou JavaScript, tenta baixar do servidor primeiro.
-    if (event.request.headers.get('accept').includes('text/html') || 
-        url.pathname.endsWith('.js') || 
-        url.pathname.endsWith('.css')) {
-        
-        event.respondWith(
-            fetch(event.request)
-                .then((networkResponse) => {
-                    // Deu certo! Atualiza o cache silenciosamente e devolve o arquivo novo
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-                    return networkResponse;
-                })
-                .catch(() => {
-                    // Sem internet! Tira do cache para o aplicativo não quebrar
-                    return caches.match(event.request);
-                })
-        );
-        return; // Encerra aqui para esse tipo de arquivo
-    }
-
-    // 3. CACHE-FIRST PARA MÍDIAS (Áudios, Imagens, Fontes)
-    // Coisas pesadas que não mudam. Pega do cache primeiro para não gastar dados.
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || fetch(event.request).then((networkResponse) => {
-                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-                }
-                return networkResponse;
-            }).catch(() => {});
-        })
-    );
-});
-
-// ==========================================
-// 🚀 ARQUITETURA ENTERPRISE: CACHE E NETWORK INTERCEPTOR
-// ==========================================
-const CACHE_NAME_ENTERPRISE = 'santuario-cache-v1';
-
-// Interceptador de requisições de fábrica
-self.addEventListener('fetch', (event) => {
-    const requestUrl = new URL(event.request.url);
-
-    // Estratégia 1: Imagens, Músicas e Vídeos (Cache First - Otimização Extrema)
-    // Se o arquivo for mídia, busca no disco do celular primeiro. Se não tiver, baixa e salva para sempre.
-    if (requestUrl.pathname.match(/\.(mp3|mp4|png|jpg|jpeg|svg|gif)$/)) {
+    // 2. ESTRATÉGIA CACHE-FIRST (Para Imagens, Áudios e Lotties)
+    if (url.pathname.match(/\.(mp3|mp4|png|jpg|jpeg|svg|gif|woff|woff2)$/)) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
-                if (cachedResponse) {
-                    return cachedResponse; // Retorna na velocidade da luz direto da memória do celular
-                }
+                if (cachedResponse) return cachedResponse;
                 return fetch(event.request).then((networkResponse) => {
-                    return caches.open(CACHE_NAME_ENTERPRISE).then((cache) => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
-                    });
-                });
+                    if (networkResponse && networkResponse.status === 200) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+                    }
+                    return networkResponse;
+                }).catch(() => {});
             })
         );
         return;
     }
 
-    // Estratégia 2: HTML, JS e CSS (Network First com Fallback para Cache)
-    // Garante que vocês sempre tenham o código mais atualizado do PWA, mas se a internet falhar, abre instantâneo.
+    // 3. ESTRATÉGIA NETWORK-FIRST (Para HTML, JS e CSS)
+    // Garante que o código do jogo esteja sempre na última versão, mas funciona offline se a net cair.
     event.respondWith(
         fetch(event.request).then((networkResponse) => {
-            return caches.open(CACHE_NAME_ENTERPRISE).then((cache) => {
-                cache.put(event.request, networkResponse.clone());
-                return networkResponse;
-            });
+            if (networkResponse && networkResponse.status === 200) {
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+            }
+            return networkResponse;
         }).catch(() => {
             return caches.match(event.request);
         })

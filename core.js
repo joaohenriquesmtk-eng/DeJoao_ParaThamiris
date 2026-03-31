@@ -13,6 +13,33 @@ window.MEU_NOME = "";
 window.NOME_PARCEIRO = "";
 
 // ==========================================
+// 🛡️ ESCUDO SAFARI GLOBAL (Proteção contra travamentos no iOS)
+// ==========================================
+
+// 1. Blindagem de Vibração: Finge que vibrou para o Safari não entrar em pânico
+const vibracaoOriginal = navigator.vibrate;
+navigator.vibrate = function(padrao) {
+    if (typeof vibracaoOriginal === 'function') {
+        try {
+            return vibracaoOriginal.apply(navigator, [padrao]);
+        } catch (erro) {
+            return false; // Morre silenciosamente sem travar o código
+        }
+    }
+    return false;
+};
+
+// 2. Blindagem de Armazenamento: Protege contra o limite de 5MB da Apple
+const setItemOriginal = Storage.prototype.setItem;
+Storage.prototype.setItem = function(chave, valor) {
+    try {
+        setItemOriginal.apply(this, arguments);
+    } catch (erro) {
+        console.warn(`O Safari bloqueou o salvamento da chave "${chave}". A tela não vai congelar.`);
+    }
+};
+
+// ==========================================
 // MÁQUINA ENIGMA (CRIPTOGRAFIA DE PONTA-A-PONTA)
 // ==========================================
 window.SantuarioCrypto = {
@@ -651,7 +678,7 @@ window.alternarMutarSantuario = function() {
     if (window.Haptics) window.Haptics.toqueLeve();
 };
 
-// 🚨 A MÁGICA SÊNIOR: INTERCEPTAÇÃO COM FILTRO DE ORIGEM
+// 🚨 A MÁGICA SÊNIOR: INTERCEPTAÇÃO COM FILTRO DE ORIGEM + ESCUDO SAFARI
 const playOriginalAudio = HTMLMediaElement.prototype.play;
 HTMLMediaElement.prototype.play = function() {
     if (window.SantuarioSomPausado) {
@@ -665,6 +692,16 @@ HTMLMediaElement.prototype.play = function() {
             return Promise.resolve(); 
         }
     }
-    // Se for mensagem de voz, ou se o app não estiver mutado, deixa tocar.
-    return playOriginalAudio.apply(this, arguments);
+    
+    // 🛡️ ESCUDO SAFARI DE ÁUDIO AQUI:
+    // Capturamos a Promessa que o navegador retorna ao tentar tocar a música
+    const promessaAudio = playOriginalAudio.apply(this, arguments);
+    
+    if (promessaAudio !== undefined) {
+        return promessaAudio.catch(erro => {
+            // Se o iPhone bloquear o "autoplay" da música, o erro cai aqui.
+            // O jogo engole o erro e continua rodando liso!
+            console.log("Áudio bloqueado pelo iOS, mas o Santuário segue blindado.");
+        });
+    }
 };

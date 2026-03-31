@@ -632,3 +632,12 @@ window.addEventListener('DOMContentLoaded', () => {
         if(bloco) motorDeUnmount.observe(bloco, { attributes: true });
     });
 });
+
+// 🚨 FORÇA O iPHONE A DESCER A TELA QUANDO O TECLADO FECHA
+document.addEventListener('focusout', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        setTimeout(function() {
+            window.scrollTo(document.body.scrollLeft, document.body.scrollTop);
+        }, 100);
+    }
+});

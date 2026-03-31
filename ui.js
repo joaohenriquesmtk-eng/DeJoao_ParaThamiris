@@ -20,18 +20,6 @@ window.Haptics = {
     erro: () => vibrarSeguro([40, 50, 40, 50, 60]) // Tum-Tum grave
 };
 
-// Sobrescrevemos o navigator.vibrate globalmente para proteger TODOS os scripts de uma vez!
-if (typeof navigator !== 'undefined') {
-    const vibrateOriginal = navigator.vibrate;
-    navigator.vibrate = function(padrao) {
-        if (vibrateOriginal) {
-            try {
-                vibrateOriginal.call(navigator, padrao);
-            } catch(e) {}
-        }
-    };
-}
-
 // Aplicando magicamente a todos os botões do aplicativo de uma vez:
 window.addEventListener('load', () => {
     document.querySelectorAll('button, .item-menu, .item-cofre').forEach(btn => {

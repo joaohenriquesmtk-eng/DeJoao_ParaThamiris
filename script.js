@@ -4567,7 +4567,7 @@ window.renderizarBoutique = function() {
     
     let precoLootbox = 120000; 
     let btnLootbox = (meuSaldoIndividual >= precoLootbox) ? 
-        `<button class="btn-comprar-boutique" onclick="comprarLootbox(${precoLootbox})">ABRIR A CAIXA (20K)</button>` : 
+        `<button class="btn-comprar-boutique" onclick="comprarLootbox(${precoLootbox})">ABRIR A CAIXA (120K)</button>` : 
         `<button class="btn-comprar-boutique" style="background: #444; color: #888;" disabled>Saldo Insuficiente</button>`;
     
     divLootbox.innerHTML = `

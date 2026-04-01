@@ -63,6 +63,11 @@ function salvarFazenda() {
     // 🚨 CARIMBO DO TEMPO: Salva o momento exato em que a fazenda foi fechada
     fazenda.ultimaAtualizacao = Date.now();
     localStorage.setItem('estado_minifazenda_ultimate', JSON.stringify(fazenda));
+    
+    // ☁️ BACKUP NA NUVEM: Salva no Firebase instantaneamente!
+    if (typeof window.salvarProgressoJogo === 'function') {
+        window.salvarProgressoJogo('minifazenda', fazenda);
+    }
 }
 
 function carregarFazenda() {
@@ -184,17 +189,40 @@ function calcularProgressoOffline() {
     salvarFazenda();
 }
 
-// 3. INICIALIZAÇÃO APRIMORADA (AGORA COM PROGRESSO OFFLINE)
+// 3. INICIALIZAÇÃO APRIMORADA (AGORA COM NUVEM E PROGRESSO OFFLINE)
 window.iniciarMiniFazenda = function() {
     if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO NA HORA
     
-    carregarFazenda(); 
-    
+    // ☁️ TENTA BUSCAR DA NUVEM PRIMEIRO (O SAVE DEFINITIVO)
+    if (typeof window.carregarProgressoJogo === 'function') {
+        window.carregarProgressoJogo('minifazenda', (progressoNuvem) => {
+            if (progressoNuvem) {
+                // Sucesso! Baixou da nuvem. Restaura as variáveis.
+                fazenda = { ...fazenda, ...progressoNuvem };
+                if (!fazenda.maquinas) fazenda.maquinas = { tratorComprado: false, aspersorComprado: false };
+                if (!fazenda.tempo) fazenda.tempo = { estacaoIndex: 0, diasPassados: 0, ticks: 0 };
+                if (!fazenda.ultimaAtualizacao) fazenda.ultimaAtualizacao = Date.now();
+                
+                continuarInicializacaoFazenda(); // Segue o jogo
+            } else {
+                // Se a nuvem estiver vazia, tenta o save local como plano B
+                carregarFazenda(); 
+                continuarInicializacaoFazenda();
+            }
+        });
+    } else {
+        // Fallback caso ocorra algum erro no script
+        carregarFazenda();
+        continuarInicializacaoFazenda();
+    }
+};
+
+// 🚨 Função auxiliar que desenha a tela SOMENTE APÓS o carregamento da nuvem concluir
+function continuarInicializacaoFazenda() {
     // 🌍 LIGA O SATÉLITE ASSIM QUE A FAZENDA ABRIR
     if(typeof buscarClimaRealFazenda === 'function') buscarClimaRealFazenda();
-
     
-    // 🚨 INVOCAÇÃO DA MÁQUINA DO TEMPO AQUI
+    // 🚨 INVOCAÇÃO DA MÁQUINA DO TEMPO AQUI (Calcula o AFK)
     calcularProgressoOffline();
     
     document.getElementById('fazenda-capital').innerText = window.pontosDoCasal;
@@ -209,7 +237,7 @@ window.iniciarMiniFazenda = function() {
     
     if (loopSimulador) clearInterval(loopSimulador);
     loopSimulador = setInterval(motorAgronomico, 1000); 
-};
+}
 
 function injetarPainelEstacoes() {
     let painel = document.getElementById('painel-estacoes-pro');

@@ -45,16 +45,51 @@
 
     let startX = 0, startY = 0;
 
+    // ==========================================
+    // 💾 MOTOR DE COMUNICAÇÃO COM A NUVEM
+    // ==========================================
+    function salvarEstadoNaNuvem() {
+        if (typeof window.salvarProgressoJogo === 'function') {
+            window.salvarProgressoJogo('julgamento', {
+                nivel: nivel,
+                pontuacao: pontuacao,
+                metaNivel: metaNivel,
+                movimentosRestantes: movimentosRestantes
+            });
+        }
+    }
+
     window.iniciarJulgamento = function() {
         if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); 
         
-        nivel = 1;
-        metaNivel = 500; 
-        iniciarNovoNivel();
-        
+        // ☁️ TENTA BUSCAR O SAVE DA NUVEM PRIMEIRO
+        if (typeof window.carregarProgressoJogo === 'function') {
+            window.carregarProgressoJogo('julgamento', (progresso) => {
+                if (progresso) {
+                    nivel = progresso.nivel || 1;
+                    pontuacao = progresso.pontuacao || 0;
+                    metaNivel = progresso.metaNivel || 500;
+                    movimentosRestantes = progresso.movimentosRestantes || 30 + (nivel * 3);
+                } else {
+                    nivel = 1; pontuacao = 0; metaNivel = 500; movimentosRestantes = 33;
+                }
+                continuarInicializacao();
+            });
+        } else {
+            // Plano B (Offline)
+            nivel = 1; pontuacao = 0; metaNivel = 500; movimentosRestantes = 33;
+            continuarInicializacao();
+        }
+
         const btnNovo = document.getElementById('julgamento-btn-novo');
         if(btnNovo) btnNovo.onclick = () => { iniciarNovoNivel(true); };
     };
+
+    function continuarInicializacao() {
+        processandoCascata = false;
+        gerarGradeInicial();
+        atualizarPlacarUI();
+    }
 
     function iniciarNovoNivel(resetarTudo = false) {
         if(resetarTudo) { pontuacao = 0; nivel = 1; metaNivel = 500; }
@@ -63,6 +98,7 @@
         
         gerarGradeInicial();
         atualizarPlacarUI();
+        salvarEstadoNaNuvem(); // 💾 Salva o reset/novo nível na nuvem
     }
 
     function gerarGradeInicial() {
@@ -227,14 +263,19 @@
             await processarMatchesComArray(matches, false);
         } else {
             if(typeof mostrarToast === 'function') mostrarToast("Movimento inválido!", "⚠️");
-            if(navigator.vibrate) navigator.vibrate(50); // 🚨 TRAVA DO iOS AQUI
+            if(navigator.vibrate) navigator.vibrate(50); 
             
+            // Destroca as joias
             temp = grade[l1][c1];
             grade[l1][c1] = grade[l2][c2];
             grade[l2][c2] = temp;
             
+            // 🚨 CORREÇÃO: Devolve o movimento que havia sido gasto injustamente
+            movimentosRestantes++; 
+            
             atualizarVisualDaGrade();
             processandoCascata = false;
+            atualizarPlacarUI();
         }
 
         if (movimentosRestantes <= 0 && !processandoCascata) {
@@ -476,6 +517,8 @@
     }
 
     function verificarFimDeTurno() {
+        salvarEstadoNaNuvem(); // 💾 Salva o progresso no Firebase ao fim de qualquer movimento válido!
+
         if (pontuacao >= metaNivel) {
             subirDeNivel();
         } else if (movimentosRestantes <= 0) {
@@ -489,6 +532,8 @@
         pontuacao = 0;
         metaNivel = Math.floor(metaNivel * 1.5); 
         movimentosRestantes = 30 + (nivel * 3); 
+        
+        salvarEstadoNaNuvem(); // 💾 Salva imediatamente a conquista do novo nível!
         
         playAudioSeguro(AudioMatch.subirNivel);
         mostrarTextoFlutuante(`NÍVEL ${nivel}! +150💰`);

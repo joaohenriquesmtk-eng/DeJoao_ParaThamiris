@@ -7453,86 +7453,90 @@ window.CassinoAudio.carregarTudo();
 // 1. O ESTOQUE DA LOJA (CATÁLOGOS EXCLUSIVOS E 🔥 PICANTES 🔥)
 // ==========================================
 
+// ==========================================
+// 1. A BOUTIQUE VIP (ECONOMIA INFLACIONADA 10X)
+// ==========================================
+
 // 🛒 O QUE O JOÃO PODE COMPRAR (A Thamiris cumpre/paga)
 const BOUTIQUE_JOAO = [
-    // 🥉 NÍVEL BRONZE (Carinhos & Provocações Iniciais - Até 50k)
-    { id: 'j1', emoji: '🎬', nome: 'Controle Remoto', desc: 'Direito de escolher o filme/série da call hoje sem que você possa dar um pio.', preco: 5000 },
-    { id: 'j2', emoji: '📸', nome: 'Selfie Provocante', desc: 'Pare o que está fazendo e me mande uma foto só de calcinha/sutiã agora mesmo.', preco: 7500 },
-    { id: 'j3', emoji: '🎵', nome: 'DJ da Call', desc: 'Você vai escutar as minhas músicas hoje enquanto conversamos.', preco: 10000 },
-    { id: 'j4', emoji: '🗣️', nome: 'Áudio Ofegante', desc: 'Quero um áudio seu de 2 minutos narrando exatamente o que você quer que eu te faça.', preco: 12000 },
-    { id: 'j5', emoji: '🎮', nome: 'Player 2 Submissa', desc: 'Você vai jogar o meu jogo favorito comigo, no meu ritmo, por 2 horas.', preco: 15000 },
-    { id: 'j6', emoji: '🔥', nome: 'Confissão Obscena', desc: 'Vou te fazer uma pergunta extremamente íntima e você TEM que responder com detalhes.', preco: 20000 },
-    { id: 'j7', emoji: '👙', nome: 'Lingerie do Dia', desc: 'Eu escolho a lingerie exata que você vai vestir por baixo da roupa hoje.', preco: 25000 },
-    { id: 'j8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. Eu ganho a razão e um pedido de desculpas.', preco: 30000 },
-    { id: 'j9', emoji: '😈', nome: 'Nude de 5 Segundos', desc: 'Uma foto visualização-única no WhatsApp, sem censura, agora.', preco: 40000 },
-    { id: 'j10', emoji: '🎲', nome: 'Verdade ou Consequência +18', desc: 'Vamos jogar na call hoje. E as prendas serão pagas na câmera.', preco: 50000 },
+    // 🥉 NÍVEL BRONZE (Carinhos & Provocações Iniciais - Até 500k)
+    { id: 'j1', emoji: '🍿', nome: 'Sessão Pipoca Interativa', desc: 'Eu escolho o filme. A cada susto (ou beijo) na tela, você tira uma peça de roupa ou paga uma prenda na cam.', preco: 50000 },
+    { id: 'j2', emoji: '📸', nome: 'Selfie Provocante', desc: 'Pare o que está fazendo e me mande uma foto só de calcinha/sutiã agora mesmo.', preco: 75000 },
+    { id: 'j3', emoji: '🎤', nome: 'Karaokê da Punição', desc: 'Você vai ter que cantar o refrão de 3 músicas embaraçosas que eu escolher, olhando bem pra câmera.', preco: 100000 },
+    { id: 'j4', emoji: '🗣️', nome: 'Áudio Ofegante', desc: 'Quero um áudio seu de 2 minutos narrando exatamente o que você quer que eu te faça.', preco: 120000 },
+    { id: 'j5', emoji: '🎯', nome: 'Aposta Gamer +18', desc: 'Vamos jogar uma partida online (ex: Ludo/Uno). Se eu ganhar, te dou uma ordem e você obedece na hora.', preco: 150000 },
+    { id: 'j6', emoji: '🔥', nome: 'Confissão Obscena', desc: 'Vou te fazer uma pergunta extremamente íntima e você TEM que responder com detalhes.', preco: 200000 },
+    { id: 'j7', emoji: '👙', nome: 'Lingerie do Dia', desc: 'Eu escolho a lingerie exata que você vai vestir por baixo da roupa hoje.', preco: 250000 },
+    { id: 'j8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. Eu ganho a razão e um pedido de desculpas.', preco: 300000 },
+    { id: 'j9', emoji: '😈', nome: 'Nude de 5 Segundos', desc: 'Uma foto visualização-única no WhatsApp, sem censura, agora.', preco: 400000 },
+    { id: 'j10', emoji: '🎲', nome: 'Verdade ou Consequência +18', desc: 'Vamos jogar na call hoje. E as prendas serão pagas na câmera.', preco: 500000 },
 
-    // 🥈 NÍVEL PRATA (Delivery & Exibicionismo Privado - Até 250k)
-    { id: 'j11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Você banca um docinho ou açaí no meu iFood AGORA.', preco: 75000 },
-    { id: 'j12', emoji: '🚿', nome: 'Áudio no Chuveiro', desc: 'Quero ouvir o barulho da água e seus gemidos enquanto você toma banho pensando em mim.', preco: 90000 },
-    { id: 'j13', emoji: '💌', nome: 'Carta Física', desc: 'Escreva e me mande uma carta de amor com seu perfume (e uma marca de batom) pelos Correios.', preco: 110000 },
-    { id: 'j14', emoji: '🍻', nome: 'Pix da Gelada', desc: 'Você banca o Pix da minha cervejinha/drink do final de semana.', preco: 130000 },
-    { id: 'j15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Noite de pizza pelo iFood paga por você!', preco: 150000 },
-    { id: 'j16', emoji: '💃', nome: 'Strip-Tease Particular', desc: 'Você vai colocar uma música e dançar tirando a roupa pra mim na call de vídeo.', preco: 170000 },
-    { id: 'j17', emoji: '🍔', nome: 'Combo Artesanal Monstro', desc: 'Aquele combo de hambúrguer artesanal absurdo pago por você.', preco: 180000 },
-    { id: 'j18', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera o placar de um vacilo meu. Paz absoluta restaurada.', preco: 200000 },
-    { id: 'j19', emoji: '🎥', nome: 'Strip-Poker Virtual', desc: 'Quem perde a mão do jogo, tira uma peça de roupa. Vamos jogar na cam.', preco: 220000 },
-    { id: 'j20', emoji: '👅', nome: 'Realização de Fantasia', desc: 'Você vai me confessar um fetiche oculto seu e nós vamos planejar como realizar.', preco: 250000 },
+    // 🥈 NÍVEL PRATA (Delivery & Exibicionismo Privado - Até 2.5M)
+    { id: 'j11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Você banca um docinho ou açaí no meu iFood AGORA.', preco: 750000 },
+    { id: 'j12', emoji: '🚿', nome: 'Áudio no Chuveiro', desc: 'Quero ouvir o barulho da água e seus gemidos enquanto você toma banho pensando em mim.', preco: 900000 },
+    { id: 'j13', emoji: '💌', nome: 'Carta Física', desc: 'Escreva e me mande uma carta de amor com seu perfume (e uma marca de batom) pelos Correios.', preco: 1100000 },
+    { id: 'j14', emoji: '📦', nome: 'Delivery Cego', desc: 'Eu faço um pedido surpresa no iFood pra entregar na sua casa, e VOCÊ paga o Pix sem saber o que é!', preco: 1300000 },
+    { id: 'j15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Noite de pizza pelo iFood paga por você!', preco: 1500000 },
+    { id: 'j16', emoji: '💃', nome: 'Strip-Tease Particular', desc: 'Você vai colocar uma música e dançar tirando a roupa pra mim na call de vídeo.', preco: 1700000 },
+    { id: 'j17', emoji: '🍔', nome: 'Combo Artesanal Monstro', desc: 'Aquele combo de hambúrguer artesanal absurdo pago por você.', preco: 1800000 },
+    { id: 'j18', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera o placar de um vacilo meu. Paz absoluta restaurada.', preco: 2000000 },
+    { id: 'j19', emoji: '🎥', nome: 'Strip-Poker Virtual', desc: 'Quem perde a mão do jogo, tira uma peça de roupa. Vamos jogar na cam.', preco: 2200000 },
+    { id: 'j20', emoji: '👅', nome: 'Realização de Fantasia', desc: 'Você vai me confessar um fetiche oculto seu e nós vamos planejar como realizar.', preco: 2500000 },
 
-    // 🥇 NÍVEL OURO (Prêmios Pesados & Luxo - Até 900k)
-    { id: 'j21', emoji: '🛒', nome: 'Carrinho da Shopee', desc: 'Você vai pagar aquele carrinho meu que tá parado (Até R$ 50).', preco: 300000 },
-    { id: 'j22', emoji: '🧸', nome: 'Pelúcia com seu Cheiro', desc: 'Me mande uma pelúcia gigante borrifada com o seu perfume pra eu dormir agarrado.', preco: 350000 },
-    { id: 'j23', emoji: '⛓️', nome: 'Submissão Total', desc: 'Por 1 hora na call de hoje, você é minha e tem que obedecer QUALQUER comando meu na câmera.', preco: 400000 },
-    { id: 'j24', emoji: '🥩', nome: 'Rodízio de Carnes', desc: 'Você banca um jantar de churrascaria/carnes premium pra mim hoje!', preco: 500000 },
-    { id: 'j25', emoji: '🔥', nome: 'Conjunto Erótico', desc: 'EU escolho a lingerie/brinquedo online, VOCÊ compra e usa pra mim na nossa próxima call.', preco: 600000 },
-    { id: 'j26', emoji: '🍷', nome: 'Jantar de Gala Virtual', desc: 'Você planeja o date, a gente se arruma e jantamos "juntos" em vídeo.', preco: 700000 },
-    { id: 'j27', emoji: '📸', nome: 'Ensaio Sensual Completo', desc: 'Um pack de fotos e vídeos explícitos, feitos no seu quarto, única e exclusivamente para mim.', preco: 800000 },
+    // 🥇 NÍVEL OURO (Prêmios Pesados & Luxo - Até 9M)
+    { id: 'j21', emoji: '🛒', nome: 'Carrinho da Shopee', desc: 'Você vai pagar aquele carrinho meu que tá parado (Até R$ 50).', preco: 3000000 },
+    { id: 'j22', emoji: '🧸', nome: 'Pelúcia com seu Cheiro', desc: 'Me mande uma pelúcia gigante borrifada com o seu perfume pra eu dormir agarrado.', preco: 3500000 },
+    { id: 'j23', emoji: '⛓️', nome: 'Submissão Total', desc: 'Por 1 hora na call de hoje, você é minha e tem que obedecer QUALQUER comando meu na câmera.', preco: 4000000 },
+    { id: 'j24', emoji: '🥩', nome: 'Rodízio de Carnes', desc: 'Você banca um jantar de churrascaria/carnes premium pra mim hoje!', preco: 5000000 },
+    { id: 'j25', emoji: '🔥', nome: 'Conjunto Erótico', desc: 'EU escolho a lingerie/brinquedo online, VOCÊ compra e usa pra mim na nossa próxima call.', preco: 6000000 },
+    { id: 'j26', emoji: '🍷', nome: 'Jantar de Gala Virtual', desc: 'Você planeja o date, a gente se arruma e jantamos "juntos" em vídeo.', preco: 7000000 },
+    { id: 'j27', emoji: '📸', nome: 'Ensaio Sensual Completo', desc: 'Um pack de fotos e vídeos explícitos, feitos no seu quarto, única e exclusivamente para mim.', preco: 8000000 },
 
-    // 💎 NÍVEL DIAMANTE (Metas Absolutas - 1 Milhão+)
-    { id: 'j28', emoji: '👑', nome: 'Mestre do Quarto', desc: 'Na nossa primeira noite juntos no reencontro, EU dito todas as regras. Você apenas obedece.', preco: 1000000 },
-    { id: 'j29', emoji: '🥂', nome: 'O Primeiro Brinde', desc: 'No nosso reencontro, você banca a nossa primeira refeição juntos (pode ser um lanche na chegada ou um jantarzinho).', preco: 2000000 },
-    { id: 'j30', emoji: '🎁', nome: 'Recepção VIP', desc: 'Você vai me receber no dia do reencontro com um presentinho físico surpresa e um abraço de urso.', preco: 5000000 }
+    // 💎 NÍVEL DIAMANTE (Metas Absolutas - 10 Milhões+)
+    { id: 'j28', emoji: '👑', nome: 'Mestre do Quarto', desc: 'Na nossa primeira noite juntos no reencontro, EU dito todas as regras. Você apenas obedece.', preco: 10000000 },
+    { id: 'j29', emoji: '🥂', nome: 'O Primeiro Brinde', desc: 'No nosso reencontro, você banca a nossa primeira refeição juntos (pode ser um lanche na chegada ou um jantarzinho).', preco: 20000000 },
+    { id: 'j30', emoji: '🎁', nome: 'Recepção VIP', desc: 'Você vai me receber no dia do reencontro com um presentinho físico surpresa e um abraço de urso.', preco: 50000000 }
 ];
 
 // 🛒 O QUE A THAMIRIS PODE COMPRAR (O João cumpre/paga)
 const BOUTIQUE_THAMIRIS = [
-    // 🥉 NÍVEL BRONZE (Carinhos & Provocações Iniciais - Até 50k)
-    { id: 't1', emoji: '🎬', nome: 'Controle Remoto', desc: 'Direito de escolher o filme/série da call hoje sem que você reclame.', preco: 5000 },
-    { id: 't2', emoji: '📸', nome: 'Selfie Pós-Banho', desc: 'Quero uma foto sua só de toalha ou sem camisa, no espelho, agora.', preco: 7500 },
-    { id: 't3', emoji: '🎵', nome: 'DJ da Call', desc: 'Você vai ser obrigado a escutar a minha playlist hoje.', preco: 10000 },
-    { id: 't4', emoji: '🗣️', nome: 'Voz Grossa de Bom Dia', desc: 'Quero um áudio de voz de sono, bem grossa, dizendo o que quer fazer comigo amanhã.', preco: 12000 },
-    { id: 't5', emoji: '🎮', nome: 'Player 2 Submisso', desc: 'Você vai assistir o meu programa/jogar meu jogo favorito sem reclamar.', preco: 15000 },
-    { id: 't6', emoji: '🔥', nome: 'Segredo Sujo', desc: 'Vou fazer uma pergunta bem safada e você TEM que responder a verdade absoluta.', preco: 20000 },
-    { id: 't7', emoji: '🩲', nome: 'Estilista Íntima', desc: 'Eu escolho a cor da cueca e a roupa que você vai vestir hoje.', preco: 25000 },
-    { id: 't8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. A razão é toda minha.', preco: 30000 },
-    { id: 't9', emoji: '😈', nome: 'Nude Direto', desc: 'Quero receber uma foto visualização-única, sem censura, agora no WhatsApp.', preco: 40000 },
-    { id: 't10', emoji: '🎲', nome: 'Verdade ou Consequência +18', desc: 'Vamos jogar hoje à noite. Sem fugir das prendas na câmera.', preco: 50000 },
+    // 🥉 NÍVEL BRONZE (Carinhos & Provocações Iniciais - Até 500k)
+    { id: 't1', emoji: '🍿', nome: 'Sessão Pipoca Interativa', desc: 'Eu escolho o filme. A cada susto (ou beijo) na tela, você tira uma peça de roupa ou paga uma prenda na cam.', preco: 50000 },
+    { id: 't2', emoji: '📸', nome: 'Selfie Pós-Banho', desc: 'Quero uma foto sua só de toalha ou sem camisa, no espelho, agora.', preco: 75000 },
+    { id: 't3', emoji: '🎤', nome: 'Karaokê da Punição', desc: 'Você vai ter que cantar o refrão de 3 músicas embaraçosas que eu escolher, olhando bem pra câmera.', preco: 100000 },
+    { id: 't4', emoji: '🗣️', nome: 'Voz Grossa de Bom Dia', desc: 'Quero um áudio de voz de sono, bem grossa, dizendo o que quer fazer comigo amanhã.', preco: 120000 },
+    { id: 't5', emoji: '🎯', nome: 'Aposta Gamer +18', desc: 'Vamos jogar uma partida online. Se eu ganhar, te dou uma ordem e você obedece na hora.', preco: 150000 },
+    { id: 't6', emoji: '🔥', nome: 'Segredo Sujo', desc: 'Vou fazer uma pergunta bem safada e você TEM que responder a verdade absoluta.', preco: 200000 },
+    { id: 't7', emoji: '🩲', nome: 'Estilista Íntima', desc: 'Eu escolho a cor da cueca e a roupa que você vai vestir hoje.', preco: 250000 },
+    { id: 't8', emoji: '🤫', nome: 'Cartão do Silêncio', desc: 'Encerra um debate bobo imediatamente. A razão é toda minha.', preco: 300000 },
+    { id: 't9', emoji: '😈', nome: 'Nude Direto', desc: 'Quero receber uma foto visualização-única, sem censura, agora no WhatsApp.', preco: 400000 },
+    { id: 't10', emoji: '🎲', nome: 'Verdade ou Consequência +18', desc: 'Vamos jogar hoje à noite. Sem fugir das prendas na câmera.', preco: 500000 },
 
-    // 🥈 NÍVEL PRATA (Delivery & Exibicionismo Privado - Até 250k)
-    { id: 't11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Um docinho ou açaí enviado pelo iFood para a minha casa AGORA.', preco: 75000 },
-    { id: 't12', emoji: '🚿', nome: 'Gemido no Banho', desc: 'Quero um áudio seu no chuveiro narrando exatamente o que faria comigo lá dentro.', preco: 90000 },
-    { id: 't13', emoji: '💌', nome: 'Carta Física', desc: 'Escreva de próprio punho e me mande uma carta romântica pelos Correios.', preco: 110000 },
-    { id: 't14', emoji: '🚗', nome: 'Pix do Uber', desc: 'Você banca o meu Uber para eu voltar em segurança e conforto.', preco: 130000 },
-    { id: 't15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Minha pizza do iFood de hoje com borda recheada paga por você!', preco: 150000 },
-    { id: 't16', emoji: '🕺', nome: 'Show Particular na Cam', desc: 'Você vai fazer um strip-tease completo só pra mim na chamada de vídeo.', preco: 170000 },
-    { id: 't17', emoji: '🍔', nome: 'Lanchão Artesanal', desc: 'Aquele combo duplo maravilhoso de hambúrguer pago no meu iFood.', preco: 180000 },
-    { id: 't18', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera um surto ou ciuminho meu. Você tem que me dar razão e pedir desculpas.', preco: 200000 },
-    { id: 't19', emoji: '🎥', nome: 'Roleta do Desejo', desc: 'Eu vou te dar 3 ordens explícitas na câmera hoje à noite e você tem que obedecer.', preco: 220000 },
-    { id: 't20', emoji: '⛓️', nome: 'Escravo por 1 Dia', desc: 'No reencontro, você será o meu servo particular o dia inteiro. Tudo que eu pedir, você faz.', preco: 250000 },
+    // 🥈 NÍVEL PRATA (Delivery & Exibicionismo Privado - Até 2.5M)
+    { id: 't11', emoji: '🍩', nome: 'Glicose de Emergência', desc: 'Um docinho ou açaí enviado pelo iFood para a minha casa AGORA.', preco: 750000 },
+    { id: 't12', emoji: '🚿', nome: 'Gemido no Banho', desc: 'Quero um áudio seu no chuveiro narrando exatamente o que faria comigo lá dentro.', preco: 900000 },
+    { id: 't13', emoji: '💌', nome: 'Carta Física', desc: 'Escreva de próprio punho e me mande uma carta romântica pelos Correios.', preco: 1100000 },
+    { id: 't14', emoji: '🚗', nome: 'Pix do Uber', desc: 'Você banca o meu Uber para eu voltar em segurança e conforto.', preco: 1300000 },
+    { id: 't15', emoji: '🍕', nome: 'Sexta da Pizza', desc: 'Minha pizza do iFood de hoje com borda recheada paga por você!', preco: 1500000 },
+    { id: 't16', emoji: '🪞', nome: 'Provador VIP', desc: 'Você vai montar 3 looks diferentes (ou sem look), vestir e desfilar na cam. Eu serei a jurada.', preco: 1700000 },
+    { id: 't17', emoji: '🍔', nome: 'Lanchão Artesanal', desc: 'Aquele combo duplo maravilhoso de hambúrguer pago no meu iFood.', preco: 1800000 },
+    { id: 't18', emoji: '🚫', nome: 'Cartão do Perdão', desc: 'Zera um surto ou ciuminho meu. Você tem que me dar razão e pedir desculpas.', preco: 2000000 },
+    { id: 't19', emoji: '🎥', nome: 'Roleta do Desejo', desc: 'Eu vou te dar 3 ordens explícitas na câmera hoje à noite e você tem que obedecer.', preco: 2200000 },
+    { id: 't20', emoji: '⛓️', nome: 'Escravo por 1 Dia', desc: 'No reencontro, você será o meu servo particular o dia inteiro. Tudo que eu pedir, você faz.', preco: 2500000 },
 
-    // 🥇 NÍVEL OURO (Prêmios Pesados & Luxo - Até 900k)
-    { id: 't21', emoji: '💐', nome: 'Flores no Portão', desc: 'Quero um buquê luxuoso surpresa entregue diretamente na minha casa.', preco: 300000 },
-    { id: 't22', emoji: '💅', nome: 'Pix da Beleza (Unhas)', desc: 'Manda o Pix (R$ 50) para eu fazer as unhas e ficar linda (pra arranhar suas costas).', preco: 350000 },
-    { id: 't23', emoji: '👑', nome: 'A Chefona', desc: 'Por 1 hora na call de hoje, você tem que dizer "Sim" e fazer QUALQUER pedido meu na câmera.', preco: 400000 },
-    { id: 't24', emoji: '🫕', nome: 'Fondue Romântico', desc: 'Você banca um rodízio de Fondue ou Jantar Italiano maravilhoso pra mim hoje.', preco: 500000 },
-    { id: 't25', emoji: '💄', nome: 'Skincare e Make', desc: 'Pix generoso para eu repor os meus cremes e maquiagens.', preco: 600000 },
-    { id: 't26', emoji: '🍷', nome: 'Jantar de Gala Virtual', desc: 'Você banca a janta, a gente se arruma e comemos juntos em vídeo.', preco: 700000 },
-    { id: 't27', emoji: '💆‍♀️', nome: 'Massagem com Final Feliz', desc: 'No reencontro, você me deve 1 hora de massagem relaxante pelo corpo todo, com um final inesquecível.', preco: 800000 },
+    // 🥇 NÍVEL OURO (Prêmios Pesados & Luxo - Até 9M)
+    { id: 't21', emoji: '💐', nome: 'Flores no Portão', desc: 'Quero um buquê luxuoso surpresa entregue diretamente na minha casa.', preco: 3000000 },
+    { id: 't22', emoji: '💅', nome: 'Pix da Beleza (Unhas)', desc: 'Manda o Pix (R$ 50) para eu fazer as unhas e ficar linda (pra arranhar suas costas).', preco: 3500000 },
+    { id: 't23', emoji: '👑', nome: 'A Chefona', desc: 'Por 1 hora na call de hoje, você tem que dizer "Sim" e fazer QUALQUER pedido meu na câmera.', preco: 4000000 },
+    { id: 't24', emoji: '🫕', nome: 'Fondue Romântico', desc: 'Você banca um rodízio de Fondue ou Jantar Italiano maravilhoso pra mim hoje.', preco: 5000000 },
+    { id: 't25', emoji: '💄', nome: 'Skincare e Make', desc: 'Pix generoso para eu repor os meus cremes e maquiagens.', preco: 6000000 },
+    { id: 't26', emoji: '🍷', nome: 'Jantar de Gala Virtual', desc: 'Você banca a janta, a gente se arruma e comemos juntos em vídeo.', preco: 7000000 },
+    { id: 't27', emoji: '💆‍♀️', nome: 'Massagem com Final Feliz', desc: 'No reencontro, você me deve 1 hora de massagem relaxante pelo corpo todo, com um final inesquecível.', preco: 8000000 },
 
-    // 💎 NÍVEL DIAMANTE (Metas Absolutas - 1 Milhão+)
-    { id: 't28', emoji: '👗', nome: 'Surto na Shein', desc: 'Pix de R$ 150 exclusivamente para eu renovar as minhas blusinhas e lingeries.', preco: 1000000 },
-    { id: 't29', emoji: '✨', nome: 'Dia de Princesa', desc: 'Pix generoso bancando um dia de salão de beleza completo pra mim.', preco: 2000000 },
-    { id: 't30', emoji: '🍷', nome: 'O Primeiro Jantar', desc: 'No nosso reencontro, o nosso primeiro jantar romântico para comemorarmos a distância vencida é totalmente por sua conta!', preco: 5000000 }
+    // 💎 NÍVEL DIAMANTE (Metas Absolutas - 10 Milhões+)
+    { id: 't28', emoji: '👗', nome: 'Surto na Shein', desc: 'Pix de R$ 150 exclusivamente para eu renovar as minhas blusinhas e lingeries.', preco: 10000000 },
+    { id: 't29', emoji: '✨', nome: 'Dia de Princesa', desc: 'Pix generoso bancando um dia de salão de beleza completo pra mim.', preco: 20000000 },
+    { id: 't30', emoji: '🍷', nome: 'O Primeiro Jantar', desc: 'No nosso reencontro, o nosso primeiro jantar romântico para comemorarmos a distância vencida é totalmente por sua conta!', preco: 50000000 }
 ];
 
 
@@ -7544,15 +7548,15 @@ const BOUTIQUE_THAMIRIS = [
 const LOOTBOX_JOAO = [
     // 🟢 COMUNS (40% - 10% cada)
     { chance: 0.10, emoji: '📸', nome: 'Selfie Imediata', desc: 'Ela tem que mandar uma selfie do que está fazendo agora.' },
-    { chance: 0.10, emoji: '🎵', nome: 'Música do Dia', desc: 'Ela tem que te mandar uma música romântica agora mesmo.' },
+    { chance: 0.10, emoji: '🎙️', nome: 'Serenata em Áudio', desc: 'Ela tem que te mandar um áudio cantando um trechinho da música de vocês.' },
     { chance: 0.10, emoji: '🗣️', nome: 'Áudio Espontâneo', desc: 'Ganhou um áudio de 1 minuto dela se declarando.' },
     { chance: 0.10, emoji: '😈', nome: 'Foto Explícita', desc: 'Sorte Grande! Ela deve te mandar uma foto bem safada, como veio ao mundo, no WhatsApp.' },
 
     // 🔵 INCOMUNS (30% - 6% cada)
-    { chance: 0.06, emoji: '🍦', nome: 'Pix do Açaí', desc: 'A Thamiris te deve R$ 25 pra você pedir um açaí!' },
+    { chance: 0.06, emoji: '🍫', nome: 'Socorro Glicêmico', desc: 'A Thamiris te deve um Pix de R$ 30 pra você devorar uma sobremesa agora!' },
     { chance: 0.06, emoji: '🎬', nome: 'Poder do Play', desc: 'Você tem a palavra final sobre qual filme vão ver hoje.' },
     { chance: 0.06, emoji: '👙', nome: 'Look Íntimo', desc: 'Ela tem que vestir exatamente a lingerie que você mandar pra call de hoje.' },
-    { chance: 0.06, emoji: '💤', nome: 'História pra Dormir', desc: 'Ela vai te contar histórias na call até você dormir.' },
+    { chance: 0.06, emoji: '🌌', nome: 'ASMR Particular', desc: 'Ela vai sussurrar coisas provocantes (ou românticas) no microfone até você pegar no sono.' },
     { chance: 0.06, emoji: '🤫', nome: 'Última Palavra', desc: 'Você ganhou a razão absoluta na próxima pequena DR.' },
 
     // 🟣 RAROS (20% - 4% cada)
@@ -7577,12 +7581,12 @@ const LOOTBOX_JOAO = [
 const LOOTBOX_THAMIRIS = [
     // 🟢 COMUNS (40% - 10% cada)
     { chance: 0.10, emoji: '📸', nome: 'Selfie Imediata', desc: 'O João tem que mandar uma selfie do que está fazendo agora.' },
-    { chance: 0.10, emoji: '🎵', nome: 'Música do Dia', desc: 'O João tem que te mandar uma música romântica agora mesmo.' },
+    { chance: 0.10, emoji: '🎸', nome: 'Serenata em Áudio', desc: 'O João tem que te mandar um áudio cantando o refrão da música de vocês.' },
     { chance: 0.10, emoji: '🗣️', nome: 'Áudio Espontâneo', desc: 'Ganhou um áudio de 1 minuto do João se declarando.' },
     { chance: 0.10, emoji: '😈', nome: 'Nude no Espelho', desc: 'Sorte Grande! O João tem que te mandar uma foto sem roupa no espelho, visualização única.' },
 
     // 🔵 INCOMUNS (30% - 6% cada)
-    { chance: 0.06, emoji: '🍦', nome: 'Pix do Açaí', desc: 'O João te deve R$ 25 pra você pedir um açaí!' },
+    { chance: 0.06, emoji: '🍓', nome: 'Socorro Glicêmico', desc: 'O João te deve um Pix de R$ 30 pra você pedir aquele doce que você ama!' },
     { chance: 0.06, emoji: '🎬', nome: 'Poder do Play', desc: 'Você escolhe o filme de hoje e ele tem que assistir calado.' },
     { chance: 0.06, emoji: '🩲', nome: 'Look Íntimo', desc: 'Você escolhe a cor da cueca e a roupa que ele vai usar amanhã.' },
     { chance: 0.06, emoji: '💤', nome: 'História pra Dormir', desc: 'O João vai narrar uma história de voz grossa até você pegar no sono.' },
@@ -7689,7 +7693,7 @@ window.renderizarBoutique = function() {
     const divLootbox = document.getElementById('boutique-lootboxes');
     if(!divLootbox) return;
     
-    let precoLootbox = 70000; 
+    let precoLootbox = 120000; 
     let btnLootbox = (meuSaldoIndividual >= precoLootbox) ? 
         `<button class="btn-comprar-boutique" onclick="comprarLootbox(${precoLootbox})">ABRIR A CAIXA (20K)</button>` : 
         `<button class="btn-comprar-boutique" style="background: #444; color: #888;" disabled>Saldo Insuficiente</button>`;
@@ -8096,6 +8100,55 @@ let motorTigrinho = {
     ]
 };
 
+// =======================================================
+// 🤫 ALGORITMO CRIPTOGRAFADO: O BUG DO TIGRINHO PAGANTE
+// =======================================================
+window.verificarHorarioPaganteTigrinho = function() {
+    const agora = new Date();
+    const dia = agora.getDate();
+    const hora = agora.getHours();
+    const minutoAtual = agora.getMinutes();
+
+    // Cria uma "Semente Matemática" única para esta hora específica deste dia
+    const semente = (dia * 73) + (hora * 13);
+    
+    // Gera 3 "Minutos Mágicos" usando a semente embaralhada
+    const minutoMagico1 = (semente * 3) % 60;
+    const minutoMagico2 = (semente * 7) % 60;
+    const minutoMagico3 = (semente * 11) % 60;
+
+    // Se o relógio do celular bater com um dos 3 minutos, o BUG ESTÁ ATIVO!
+    const bugAtivado = (minutoAtual === minutoMagico1 || minutoAtual === minutoMagico2 || minutoAtual === minutoMagico3);
+    
+    // 👁️ O SPOILER VISUAL DISCRETO
+    const visorAposta = document.getElementById('tigrinho-aposta-input');
+    const mascote = document.getElementById('tigrinho-mascote');
+    
+    if (visorAposta && mascote) {
+        if (bugAtivado) {
+            // Brilho dourado sutil no número da aposta e pulso no mascote
+            visorAposta.style.textShadow = "0 0 10px rgba(212, 175, 55, 0.8), 0 0 20px rgba(241, 196, 15, 0.5)";
+            visorAposta.style.color = "#fff7d6";
+            mascote.style.filter = "drop-shadow(0 0 15px rgba(212, 175, 55, 0.4))";
+        } else {
+            // Volta ao visual padrão de forma imperceptível
+            visorAposta.style.textShadow = "none";
+            visorAposta.style.color = "white";
+            mascote.style.filter = "none";
+        }
+    }
+
+    return bugAtivado;
+};
+
+// Deixa um espião rodando a cada 5 segundos para ligar/desligar o spoiler visual na tela
+setInterval(() => {
+    const mesa = document.getElementById('mesa-tigrinho');
+    if (mesa && mesa.style.display === 'flex') {
+        window.verificarHorarioPaganteTigrinho();
+    }
+}, 5000);
+
 window.ajustarApostaTigrinho = function(valor) {
     if (motorTigrinho.girando || motorTigrinho.modoAuto) return;
     const visor = document.getElementById('tigrinho-aposta-input');
@@ -8164,8 +8217,14 @@ window.girarTigrinho = function() {
     
     limparVitoriasTigrinho();
 
-    // 🚨 A MÁGICA: Sorteio do Modo Carta da Sorte (10% de chance num giro normal)
-    if (!motorTigrinho.modoCartaSorte && Math.random() < 0.10) {
+    // 🚨 A MÁGICA HACKEADA: Lê o Bug Cósmico
+    const bugAtivado = window.verificarHorarioPaganteTigrinho();
+    
+    // Se o bug estiver ativo, a chance de ele soltar a Carta da Sorte sobe de 10% para 50%!
+    const chanceCartaSorte = bugAtivado ? 0.50 : 0.10;
+
+    // Sorteio do Modo Carta da Sorte 
+    if (!motorTigrinho.modoCartaSorte && Math.random() < chanceCartaSorte) {
         iniciarModoCartaSorte();
         return; // Interrompe o giro normal, o modo carta sorte assume
     }
@@ -8209,7 +8268,15 @@ function executarAnimacaoRolosTigrinho(aposta) {
     if(window.Haptics) window.Haptics.toqueForte();
 
     let novoGrid = [];
+    
+    // 🚨 A MÁGICA HACKEADA 2: Altera a matemática dos rolos!
+    const bugAtivado = window.verificarHorarioPaganteTigrinho();
     let chanceDerrota = motorTigrinho.modoCartaSorte ? 0.35 : 0.70;
+    
+    // Se o bug estiver ativo no giro normal, a chance de derrota despenca de 70% para 20%!
+    if (bugAtivado && !motorTigrinho.modoCartaSorte) {
+        chanceDerrota = 0.20; 
+    }
 
     for (let i = 0; i < 9; i++) {
         if (motorTigrinho.modoCartaSorte && motorTigrinho.gridAtual[i] === motorTigrinho.simboloSorte) {
@@ -12472,3 +12539,45 @@ window.addEventListener('loginSucesso', () => {
 if (window.usuarioLogado) {
     setTimeout(() => { if(typeof window.iniciarRadarGeofencing === 'function') window.iniciarRadarGeofencing(); }, 5000);
 }
+
+// =======================================================
+// 💾 MOTOR UNIVERSAL DE AUTO-SAVE (PROGRESSO NA NUVEM)
+// =======================================================
+
+// 1. Função que SALVA o jogo na nuvem no exato milissegundo em que você passa de nível
+window.salvarProgressoJogo = function(nomeDoJogo, dadosDoProgresso) {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    
+    // Descobre se é o João ou a Thamiris jogando
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    
+    // Grava no Firebase em um cofre específico para aquele jogo
+    set(ref(db, `progresso_jogos/${euId}/${nomeDoJogo}`), dadosDoProgresso)
+        .catch(erro => console.error(`Erro ao salvar o jogo ${nomeDoJogo}:`, erro));
+};
+
+// 2. Função que CARREGA o jogo da nuvem assim que a tela é aberta
+window.carregarProgressoJogo = function(nomeDoJogo, callback) {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) {
+        callback(null); // Se o banco não conectou, devolve vazio
+        return;
+    }
+    
+    const { db, ref, get } = window.SantuarioApp.modulos;
+    const euId = window.souJoao ? 'joao' : 'thamiris';
+    
+    const jogoRef = ref(db, `progresso_jogos/${euId}/${nomeDoJogo}`);
+    
+    // Busca a informação no banco de dados
+    get(jogoRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            callback(snapshot.val()); // Devolve o nível e os pontos salvos!
+        } else {
+            callback(null); // Nunca jogou, pode começar do nível 1
+        }
+    }).catch(erro => {
+        console.error(`Erro ao carregar o jogo ${nomeDoJogo}:`, erro);
+        callback(null);
+    });
+};

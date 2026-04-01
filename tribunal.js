@@ -136,13 +136,41 @@ const bancoTestemunhas = [
     { nome: "A Bateria nos 1%", icone: "🪫", regra: "menor15", msg: "O celular vai desligar! Só use cartas MENORES que 15." }
 ];
 
-// INICIALIZAÇÃO
+// ==========================================
+// 💾 MOTOR DE COMUNICAÇÃO COM A NUVEM
+// ==========================================
+function salvarEstadoNaNuvemTribunal() {
+    if (typeof window.salvarProgressoJogo === 'function') {
+        window.salvarProgressoJogo('tribunal', {
+            nivel: tribunal.nivel,
+            estrelas: tribunal.estrelas
+        });
+    }
+}
+
+// INICIALIZAÇÃO BLINDADA
 window.iniciarTribunal = function() {
     if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO DO BANCO CENTRAL NA HORA
     
-    tribunal.nivel = 1;
-    tribunal.estrelas = 3;
-    iniciarNovoCaso();
+    // ☁️ TENTA BUSCAR O SAVE DA NUVEM PRIMEIRO
+    if (typeof window.carregarProgressoJogo === 'function') {
+        window.carregarProgressoJogo('tribunal', (progresso) => {
+            if (progresso) {
+                // Restaura o nível e as estrelas de onde ela parou
+                tribunal.nivel = progresso.nivel || 1;
+                tribunal.estrelas = progresso.estrelas !== undefined ? progresso.estrelas : 3;
+            } else {
+                tribunal.nivel = 1;
+                tribunal.estrelas = 3;
+            }
+            iniciarNovoCaso();
+        });
+    } else {
+        // Plano B (Offline)
+        tribunal.nivel = 1;
+        tribunal.estrelas = 3;
+        iniciarNovoCaso();
+    }
 };
 
 function iniciarNovoCaso() {
@@ -470,23 +498,36 @@ window.baterMarteloVisual = function() {
 
 function julgarCaso() {
     if (tribunal.somaAtual === tribunal.metaAtual) {
-        mostrarToast("Veredito Aceito! +200💰", "⚖️"); // 🚨 ATUALIZADO
+        mostrarToast("Veredito Aceito! +200💰", "⚖️"); 
         estatisticasTribunal.ganhos++; salvarEstatisticas();
         
-        // 🚨 INFLAÇÃO DO BEM: +200 Moedas por causa ganha!
         if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(200, "Caso Ganho no Tribunal");
         
         tribunal.nivel++;
         document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
+        
+        // 🚨 A MÁGICA: Salva a conquista do novo nível na nuvem!
+        salvarEstadoNaNuvemTribunal(); 
+        
         setTimeout(iniciarNovoCaso, 1500);
     } else {
         tribunal.estrelas--;
         document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
+        
         if (tribunal.estrelas <= 0) {
             mostrarToast("Justiça falhou! Tribunal encerrado.", "💔");
             estatisticasTribunal.perdidos++; salvarEstatisticas();
+            
+            // 🚨 GAME OVER: Limpa o save da nuvem para ela recomeçar do Nível 1 na próxima
+            if (typeof window.salvarProgressoJogo === 'function') {
+                window.salvarProgressoJogo('tribunal', { nivel: 1, estrelas: 3 });
+            }
+            
             setTimeout(voltarMenuJogos, 2000);
         } else {
+            // 🚨 A MÁGICA: Salva a perda da estrela (Para evitar que ela feche o app para não perder a vida)
+            salvarEstadoNaNuvemTribunal(); 
+            
             let diferenca = Math.abs(tribunal.metaAtual - tribunal.somaAtual);
             mostrarToast(`Errou por ${diferenca}! Vidas: ${tribunal.estrelas}`, "❌");
             tribunal.somaAtual = 0;

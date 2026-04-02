@@ -5277,7 +5277,7 @@ window.gerenciarMusicaVegas = function(acao) {
 // ============================================================================
 window.abrirBoutique = function() {
     // 🚨 CADEADO: FECHANDO A BOUTIQUE TEMPORARIAMENTE
-    if(typeof mostrarToast === 'function') mostrarToast("Boutique fechada para reabastecimento. Volte em breve!", "🚧");
+    if(typeof mostrarToast === 'function') mostrarToast("Função desabilitada!", "🚧");
     return; // Esse comando expulsa o usuário daqui e impede a tela de abrir!
 
     // ==========================================

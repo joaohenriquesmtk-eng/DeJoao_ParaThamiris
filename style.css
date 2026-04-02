@@ -12934,3 +12934,42 @@ body > .container-palco {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-4px); }
 }
+
+/* ============================================================================
+   🛡️ BLINDAGEM DE INTERFACE (ANTI-SELEÇÃO E ANTI-GHOST DRAG)
+============================================================================ */
+
+/* Aplica a não-seleção em todo o corpo do app para parecer nativo */
+html, body {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Padrão */
+    
+    /* Impede o pulo de borracha do iOS ao arrastar a tela pro fim */
+    overscroll-behavior-y: none;
+    
+    /* Desativa menus de contexto nativos ao segurar o dedo na tela (MUITO IMPORTANTE NO iOS) */
+    -webkit-touch-callout: none; 
+}
+
+/* 🚨 Exceção: Permite que vocês copiem/colem textos dentro de inputs, textareas ou áreas específicas */
+input, textarea, .area-selecionavel {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Impede que as imagens ou emojis virem "fantasmas" grudados no dedo ao arrastar */
+img, svg, .trofeu-icone, .emoji-grande {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none; /* Faz o clique atravessar o emoji e ir pro botão real */
+}
+
+/* Força os botões e áreas de jogo a responderem a cliques sem delay de duplo-toque */
+button, .cartao-pvp, .slot, .botao-jogo {
+    touch-action: manipulation; 
+}

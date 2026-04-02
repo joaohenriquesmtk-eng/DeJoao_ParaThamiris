@@ -105,13 +105,45 @@ window.SantuarioApp.conectar = function() {
         if(typeof window.atualizarContadorInterface === 'function') window.atualizarContadorInterface(contador);
     });
 
+    // 🌳 MÓDULO DO JARDIM (CURA DO BUG DOS 16% E MOTOR DE REGRESSÃO)
     const refJardim = ref(db, 'jardim_global');
     onValue(refJardim, (snapshot) => {
         if (snapshot.exists()) {
-            window.statusPlanta = snapshot.val();
+            let dados = snapshot.val();
+            
+            // 🚨 A VACINA DO BUG: Desfaz a "pasta fantasma" que travou os 16%
+            if (dados.status) {
+                dados = dados.status;
+            }
+            
+            window.statusPlanta = dados;
+
+            // 🚨 O MOTOR DE REGRESSÃO (A Planta Murcha se Esquecida)
+            const agora = Date.now();
+            const ultimaVez = window.statusPlanta.ultimaRegada || agora;
+            const horasPassadas = (agora - ultimaVez) / (1000 * 60 * 60);
+
+            // Se passou mais de 24 horas sem cuidado, perde 2% de vida por hora de abandono
+            if (horasPassadas > 24) {
+                const perda = Math.floor(horasPassadas - 24) * 2; 
+                if (perda > 0) {
+                    window.statusPlanta.nivel -= perda;
+                    if (window.statusPlanta.nivel < 0) window.statusPlanta.nivel = 0;
+                    
+                    // Atualiza o relógio para ela não murchar infinitamente num piscar de olhos
+                    window.statusPlanta.ultimaRegada = agora; 
+                    
+                    // O app salva a perda na nuvem silenciosamente
+                    if (window.SantuarioApp && window.SantuarioApp.modulos) {
+                        window.SantuarioApp.modulos.set(ref(db, 'jardim_global'), window.statusPlanta).catch(e=>e);
+                    }
+                }
+            }
+            
         } else {
-            window.statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
+            window.statusPlanta = { nivel: 0, ultimaRegada: Date.now(), diaUltimaRegada: "", sequencia: 0, ciclos: 0 };
         }
+        
         if(typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
     });
 
@@ -326,68 +358,81 @@ window.renderizarPlanta = function() {
     }
 };
 
-// 2. AÇÃO DE NUTRIR (A integração de esforços)
+// 2. AÇÃO DE NUTRIR (Com Trava Diária e Inflação Corrigida)
 window.nutrirPlanta = function(tipoAcao) {
-    // A. Verifica se tem saldo no Banco Central do Casal
+    // 🚨 1. TRAVA DE TEMPO (DAILY LIMIT): Verifica se já cuidaram da planta hoje
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const dataUltimoCuidado = new Date(window.statusPlanta.ultimaRegada || 0).toLocaleDateString('pt-BR');
+
+    if (dataUltimoCuidado === hoje && window.statusPlanta.ultimaRegada !== 0) {
+        if (typeof mostrarToast === 'function') mostrarToast("A Árvore já foi nutrida hoje. Deixe-a absorver a energia até amanhã!", "⏳");
+        if (window.Haptics) window.Haptics.erro();
+        return; // Bloqueia a ação
+    }
+
+    // A. Verifica se tem saldo no Banco Central do Casal (PREÇOS REAJUSTADOS)
     const saldoAtual = window.pontosDoCasal || 0;
     let custo = 0;
     let ganhoXP = 0;
     let nomeAcao = "";
     let somAcao = null;
 
-    if (tipoAcao === 'agua') { custo = 10; ganhoXP = 2; nomeAcao = "Orvalho"; somAcao = new Audio('assets/sons/mf/regar.mp3'); }
-    if (tipoAcao === 'luz') { custo = 25; ganhoXP = 6; nomeAcao = "Luz Solar"; somAcao = new Audio('assets/sons/acerto.mp3'); }
-    if (tipoAcao === 'magia') { custo = 50; ganhoXP = 15; nomeAcao = "Pó de Estrela"; somAcao = new Audio('assets/sons/nivel.mp3'); }
+    // A nova economia de luxo da Árvore da Vida
+    if (tipoAcao === 'agua') { custo = 500; ganhoXP = 2; nomeAcao = "Orvalho"; somAcao = new Audio('assets/sons/mf/regar.mp3'); }
+    if (tipoAcao === 'luz') { custo = 1500; ganhoXP = 6; nomeAcao = "Luz Solar"; somAcao = new Audio('assets/sons/acerto.mp3'); }
+    if (tipoAcao === 'magia') { custo = 3000; ganhoXP = 15; nomeAcao = "Pó de Estrela"; somAcao = new Audio('assets/sons/nivel.mp3'); }
 
     if (saldoAtual < custo) {
-        if (typeof mostrarToast === 'function') mostrarToast(`Vocês precisam de ${custo}💰! Vençam jogos juntos.`, "⚠️");
+        if (typeof mostrarToast === 'function') mostrarToast(`Vocês precisam de ${custo}💰! Vençam mais jogos no Cassino.`, "⚠️");
         if (window.Haptics) window.Haptics.erro();
-        return; // Bloqueia a ação
+        return; // Bloqueia por falta de saldo
     }
 
-    // B. Gasta o dinheiro (O suor das outras fazendas)
-    if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-custo, `Comprou ${nomeAcao} para a Árvore`);
+    // B. Gasta o dinheiro na conta conjunta
+    if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-custo, `Enviou ${nomeAcao} para a Árvore`);
     
-    // Atualiza visualmente na mesma hora
     const capitalUI = document.getElementById('jardim-moedas');
     if (capitalUI) capitalUI.innerText = window.pontosDoCasal;
 
-    // C. Aplica o crescimento
-    window.statusPlanta.nivel += ganhoXP;
+    // C. Aplica o crescimento e GRAVA A DATA/HORA DO CUIDADO
+    if (isNaN(window.statusPlanta.nivel)) window.statusPlanta.nivel = 0; 
     
-    const quemAgiu = window.MEU_NOME || "Um coração anônimo";
+    window.statusPlanta.nivel += ganhoXP;
+    window.statusPlanta.ultimaRegada = Date.now(); // 🚨 Registra o momento exato para o motor de regressão e a trava diária
+    
+    const quemAgiu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
     window.statusPlanta.diaUltimaRegada = `${quemAgiu} enviou ${nomeAcao} hoje.`;
 
-    // Efeitos sensoriais
-    if (somAcao) { somAcao.volume = 0.2; somAcao.play(); }
+    if (somAcao) { somAcao.volume = 0.2; somAcao.play().catch(e=>e); }
     if (window.Haptics) window.Haptics.sucesso();
-    if (typeof mostrarToast === 'function') mostrarToast(`${nomeAcao} enviada para a Árvore! +${ganhoXP}%`, "🌿");
+    if (typeof mostrarToast === 'function') mostrarToast(`${nomeAcao} enviada! A planta está satisfeita por hoje. +${ganhoXP}%`, "🌿");
 
     // D. O GRANDE MOMENTO: Chegou a 100%?
     if (window.statusPlanta.nivel >= 100) {
-        window.statusPlanta.ciclos += 1; // Guarda na memória que completaram um ciclo
-        window.statusPlanta.nivel = 0; // Renasce (Prestige)
+        window.statusPlanta.ciclos = (window.statusPlanta.ciclos || 0) + 1; 
+        window.statusPlanta.nivel = 0; 
         
         if (typeof mostrarToast === 'function') mostrarToast("A Árvore da Vida completou um ciclo! Renascendo mais forte...", "🌟");
-        if (window.Haptics) navigator.vibrate([100, 50, 100, 50, 200]);
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
         if (typeof confetti === 'function') confetti({colors: ['#2ecc71', '#f1c40f', '#fff'], particleCount: 200, spread: 160});
         
-        // Pode dar um prêmio em dinheiro ao resetar o ciclo
-        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(200, `Recompensa de Florescimento!`);
+        // Prêmio ajustado para a nova economia!
+        if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(10000, `Recompensa de Florescimento!`); 
     }
 
-    // E. Salva as mudanças direto na Nuvem!
+    // E. Salva as mudanças direto na Nuvem
     salvarProgressoPlantaFirebase();
     
-    // Atualiza a tela
-    renderizarPlanta();
+    // Atualiza a tela visualmente
+    if (typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
 };
 
 function salvarProgressoPlantaFirebase() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, set } = window.SantuarioApp.modulos;
     
-    const refPlanta = ref(db, 'jardim_global/status');
+    // 🚨 A CURA DEFINITIVA: Salva direto no "jardim_global", acabando com as pastas fantasmas!
+    const refPlanta = ref(db, 'jardim_global');
     set(refPlanta, window.statusPlanta).catch(erro => {
         console.error("Erro ao enraizar dados na nuvem:", erro);
     });

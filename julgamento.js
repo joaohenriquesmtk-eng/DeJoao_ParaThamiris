@@ -328,8 +328,18 @@
 
         const matchesUnicos = matches.filter((v, i, a) => a.findIndex(t => (t.l === v.l && t.c === v.c)) === i);
 
-        const recompensa = matchesUnicos.length * (isBombAttack ? 25 : 15);
+        // 🚨 A MÁGICA: Multiplicador Dinâmico de Safra
+        // Aumenta o valor de cada pedra quebrada em 25% por nível!
+        const multiplicadorSafra = 1 + ((nivel - 1) * 0.25);
+        const pontosBase = matchesUnicos.length * (isBombAttack ? 25 : 15);
+        
+        const recompensa = Math.floor(pontosBase * multiplicadorSafra);
         pontuacao += recompensa;
+        
+        // Opcional: Feedback visual de pontuação massiva em níveis mais altos
+        if (multiplicadorSafra >= 2.0 && !isBombAttack) {
+            mostrarTextoFlutuante(`COMBO LENDÁRIO! +${recompensa}`);
+        }
         
         if (typeof atualizarPontosCasal === 'function') {
             atualizarPontosCasal(matchesUnicos.length, "Pedras Quebradas na Safra");

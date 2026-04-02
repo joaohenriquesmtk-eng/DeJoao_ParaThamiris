@@ -5276,6 +5276,13 @@ window.gerenciarMusicaVegas = function(acao) {
 // 💎 BOUTIQUE VIP E MESAS DE CASSINO (As 3 Portas de Entrada)
 // ============================================================================
 window.abrirBoutique = function() {
+    // 🚨 CADEADO: FECHANDO A BOUTIQUE TEMPORARIAMENTE
+    if(typeof mostrarToast === 'function') mostrarToast("Boutique fechada para reabastecimento. Volte em breve!", "🚧");
+    return; // Esse comando expulsa o usuário daqui e impede a tela de abrir!
+
+    // ==========================================
+    // SEU CÓDIGO ORIGINAL CONTINUA INTACTO ABAIXO
+    // ==========================================
     const overlay = document.getElementById('overlay-boutique');
     if (overlay) {
         overlay.classList.remove('escondido');
@@ -5283,7 +5290,7 @@ window.abrirBoutique = function() {
         if (typeof iniciarEconomiaBoutique === 'function') iniciarEconomiaBoutique();
         if (typeof renderizarBoutique === 'function') renderizarBoutique();
     }
-    window.gerenciarMusicaVegas('play');
+    window.gerenciarMusicaVegas('play'); 
 };
 
 window.fecharBoutique = function() {

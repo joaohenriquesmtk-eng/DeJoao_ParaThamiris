@@ -4945,33 +4945,36 @@ window.renderizarEstanteReliquias = function() {
     const dica = document.getElementById('proxima-reliquia-dica');
     if (!prateleira) return;
 
-    // Pega o High Score Oficial do Casal (Aquele que nunca diminui)
+    // Pega o High Score Oficial do Casal
     const moedasAtuais = window.pontosDoCasal || 0;
     let htmlTrofeus = '';
     let proxima = null;
 
+    // 🚨 A MÁGICA: Renderizamos TODOS os marcos, criando a estante completa!
     RELIQUIAS_MARCOS.forEach(rel => {
         if (moedasAtuais >= rel.marco) {
-            // Se já bateu a meta, desenha o troféu flutuando na estante!
+            // TROFÉU DESBLOQUEADO (Dourado, flutuando, nome exposto)
             htmlTrofeus += `
-                <div class="trofeu-desbloqueado" style="text-align: center; animation: flutuar 3s infinite ease-in-out; margin: 0 5px; transition: transform 0.3s;">
-                    <div style="font-size: 2.2rem; filter: drop-shadow(0 0 15px rgba(212,175,55,1)); margin-bottom: 2px;">${rel.emoji}</div>
-                    <div style="font-size: 0.55rem; color: #D4AF37; font-weight: bold; text-transform: uppercase; white-space: nowrap;">${rel.nome}</div>
+                <div class="trofeu-pedestal desbloqueado">
+                    <div class="trofeu-icone">${rel.emoji}</div>
+                    <div class="trofeu-nome">${rel.nome}</div>
                 </div>
             `;
-        } else if (!proxima) {
-            // Salva a primeira meta que vocês ainda não bateram
-            proxima = rel;
+        } else {
+            // TROFÉU BLOQUEADO (Cinza, misterioso, com cadeado)
+            if (!proxima) proxima = rel; // Salva o primeiro bloqueado para dar a dica embaixo
+            htmlTrofeus += `
+                <div class="trofeu-pedestal bloqueado">
+                    <div class="trofeu-icone">${rel.emoji}</div>
+                    <div class="trofeu-nome">MISTÉRIO</div>
+                </div>
+            `;
         }
     });
 
-    if (htmlTrofeus === '') {
-        htmlTrofeus = '<div style="color: #666; font-size: 0.85rem; font-style: italic;">A estante está vazia. Joguem para materializar o primeiro tesouro!</div>';
-    }
-
     prateleira.innerHTML = htmlTrofeus;
 
-    // Atualiza o rodapé dizendo quanto falta para o próximo troféu
+    // Atualiza o rodapé dizendo quanto falta para destrancar a próxima
     if (proxima && dica) {
         let faltam = proxima.marco - moedasAtuais;
         dica.innerHTML = `Próximo Tesouro: <b style="color: #D4AF37;">${proxima.nome}</b> (Faltam ${faltam.toLocaleString('pt-BR')} 💰)`;
@@ -4980,7 +4983,7 @@ window.renderizarEstanteReliquias = function() {
     }
 };
 
-// O "Guarda-Costas" Invisível: Fica de olho no saldo e atualiza a estante se o dinheiro subir
+// O "Guarda-Costas" Invisível do Saldo
 let saldoAnteriorEstante = -1;
 setInterval(() => {
     if (window.pontosDoCasal !== saldoAnteriorEstante) {
@@ -4989,7 +4992,7 @@ setInterval(() => {
             window.renderizarEstanteReliquias();
         }
     }
-}, 2000); // Checa a cada 2 segundos (Custo de bateria imperceptível)
+}, 2000);
 
 
 // ==========================================

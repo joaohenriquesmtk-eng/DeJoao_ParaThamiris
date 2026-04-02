@@ -12811,3 +12811,126 @@ body > .container-palco {
     z-index: 1000 !important;
 }
 
+/* ============================================================================
+   💎 ESTANTE DE TESOUROS - PADRÃO "ACRÍLICO PREMIUM" DO SANTUÁRIO
+============================================================================ */
+
+/* A ESTANTE (Fundo suave para mesclar com o cartão de vidro do aplicativo) */
+.prateleira-3d {
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    column-gap: 6px; 
+    row-gap: 20px; 
+    padding: 15px 5px;
+    background: rgba(0, 0, 0, 0.3); /* 🚨 Fundo translúcido que respeita o vídeo da galáxia */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+    
+    max-height: 360px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    -webkit-overflow-scrolling: touch; 
+    scrollbar-width: none; 
+}
+.prateleira-3d::-webkit-scrollbar { display: none; }
+
+/* O Pedestal (Ficou 10px mais alto para caber 2 linhas de texto com folga) */
+.trofeu-pedestal {
+    width: 100%; 
+    height: 95px; /* 🚨 Altura expandida para acomodar quebra de linha */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    border-radius: 8px 8px 4px 4px; 
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 3px solid rgba(212, 175, 55, 0.2); 
+    transition: all 0.4s ease;
+    padding: 4px; /* Respiro interno para o texto não colar nas bordas */
+    box-sizing: border-box;
+}
+
+/* Troféu Conquistado (Dourado) */
+.trofeu-pedestal.desbloqueado {
+    background: linear-gradient(145deg, rgba(212,175,55,0.15) 0%, rgba(0,0,0,0) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-bottom: 3px solid rgba(212, 175, 55, 0.8); 
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1), inset 0 0 10px rgba(255,255,255,0.02);
+}
+
+/* Troféu Bloqueado (Misterioso) */
+.trofeu-pedestal.bloqueado {
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.05); 
+}
+
+/* O Ícone (Agora com Bounding Box que força padronização) */
+.trofeu-icone {
+    font-size: 1.5rem; /* Ajustado milimetricamente */
+    line-height: 1; /* Arranca a margem fantasma do iOS/Android */
+    height: 32px; /* 🚨 CAIXA FIXA: Todos os emojis terão o mesmo tamanho exato */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.trofeu-pedestal.desbloqueado .trofeu-icone {
+    filter: drop-shadow(0 0 10px rgba(212,175,55,0.8));
+    animation: flutuar-trofeu 3s infinite ease-in-out;
+}
+
+.trofeu-pedestal.bloqueado .trofeu-icone {
+    filter: grayscale(100%) brightness(30%);
+}
+
+.trofeu-pedestal.bloqueado .trofeu-icone::after {
+    content: '🔒'; 
+    position: absolute; 
+    font-size: 1rem;
+    bottom: -2px; 
+    right: -8px; 
+    opacity: 0.6;
+    filter: none;
+}
+
+/* O Texto (Adeus pontinhos "...", olá 2 linhas elegantes) */
+.trofeu-nome {
+    font-size: 0.50rem; /* Um microponto menor para fluir melhor */
+    font-weight: bold; 
+    text-transform: uppercase; 
+    text-align: center;
+    width: 100%; 
+    line-height: 1.2; /* Espaço entre a primeira e segunda linha */
+    letter-spacing: 0px; /* Retirado o espaçamento extra para caber mais letras */
+    
+    /* 🚨 A MÁGICA DA QUEBRA INTELIGENTE */
+    white-space: normal; /* Permite que o texto quebre */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limita a no MÁXIMO 2 linhas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.trofeu-pedestal.desbloqueado .trofeu-nome { color: #D4AF37; }
+.trofeu-pedestal.bloqueado .trofeu-nome { color: #666; font-style: italic; }
+
+.dica-estante {
+    font-size: 0.85rem; 
+    color: #aaa; 
+    margin-top: 15px; 
+    font-style: italic;
+    background: rgba(0,0,0,0.3);
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+@keyframes flutuar-trofeu {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}

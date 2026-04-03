@@ -4091,7 +4091,7 @@ function revelarCartaSecreta(stream) {
 // ============================================================================
 
 // 🚨 1. A NOVA MÁGICA: ÁUDIO GRAVE E FLASH DE LUZ (PARA ENGANAR O iPHONE)
-const somCoracaoGrave = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
+const somCoracaoGrave = new Audio('./assets/sons/coracao.mp3');
 somCoracaoGrave.volume = 1.0; 
 
 window.dispararEfeitoCoracao = function(elementoCoracao) {
@@ -5279,9 +5279,7 @@ window.gerenciarMusicaVegas = function(acao) {
 // 💎 BOUTIQUE VIP E MESAS DE CASSINO (As 3 Portas de Entrada)
 // ============================================================================
 window.abrirBoutique = function() {
-    // 🚨 CADEADO: FECHANDO A BOUTIQUE TEMPORARIAMENTE
-    if(typeof mostrarToast === 'function') mostrarToast("Função desabilitada!", "🚧");
-    return; // Esse comando expulsa o usuário daqui e impede a tela de abrir!
+
 
     // ==========================================
     // SEU CÓDIGO ORIGINAL CONTINUA INTACTO ABAIXO

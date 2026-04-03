@@ -139,13 +139,13 @@ window.cuidarDoPet = function(tipo) {
     
     if (tipo === 'fome') {
         custo = 10; incremento = 30; 
-        sfx = 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'; 
+        sfx = './assets/sons/pet/cat.mp3'; 
     } else if (tipo === 'sede') {
         custo = 0; incremento = 40;
-        sfx = 'https://assets.mixkit.co/active_storage/sfx/2405/2405-preview.mp3'; 
+        sfx = './assets/sons/pet/cat.mp3'; 
     } else if (tipo === 'afeto') {
         custo = 0; incremento = 25;
-        sfx = 'https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3'; 
+        sfx = './assets/sons/pet/cat.mp3'; 
     }
 
     const moedasAtuais = window.pontosDoCasal || 0;

@@ -4,12 +4,12 @@
 
 // 1. ÁUDIOS DE ALTA QUALIDADE (Engine Sonora)
 const AudioTribunal = {
-    carta: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
-    impacto: new Audio('https://assets.mixkit.co/active_storage/sfx/2771/2771-preview.mp3'),
-    vidro: new Audio('https://assets.mixkit.co/active_storage/sfx/2686/2686-preview.mp3'),
-    erro: new Audio('https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3'),
-    vitoria: new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3'),
-    dica: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3')
+    carta: new Audio('./assets/sons/tribunal/carta.mp3'),
+    impacto: new Audio('./assets/sons/tribunal/impacto.mp3'),
+    vidro: new Audio('./assets/sons/tribunal/vidro.mp3'),
+    erro: new Audio('./assets/sons/tribunal/erro.mp3'),
+    vitoria: new Audio('./assets/sons/tribunal/vitoria.mp3'),
+    dica: new Audio('./assets/sons/tribunal/dica.mp3')
 };
 
 Object.values(AudioTribunal).forEach(som => som.volume = 0.6);
@@ -381,13 +381,31 @@ function gerarCartasMesa() {
 
 window.usarDicaTribunal = function() {
     const moedasCasal = window.pontosDoCasal || 0; 
-    if (moedasCasal < 15) { mostrarToast("Precisa de 15💰 na Fazenda!", "🔒"); AudioTribunal.erro.play(); return; }
+    if (moedasCasal < 15) { 
+        mostrarToast("Precisa de 15💰 na Fazenda!", "🔒"); 
+        if (AudioTribunal.erro) {
+            AudioTribunal.erro.currentTime = 0;
+            AudioTribunal.erro.play().catch(e=>e);
+        }
+        return; 
+    }
+    
     const cartaParaRevelar = tribunal.cartasGarantidasParaDica.find(c => !c.elemento.classList.contains('selecionada'));
     if (cartaParaRevelar) {
         if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-15, "Dica Tribunal");
         cartaParaRevelar.elemento.classList.add('carta-revelada-dica');
+        
+        // A carta vira e emite o som normal de virar...
         selecionarCarta(cartaParaRevelar.elemento, cartaParaRevelar.valor);
-        AudioTribunal.dica.play();
+        
+        // 🚨 CONEXÃO FEITA: Esperamos 150 milissegundos para o som da Dica 
+        // brilhar sozinho, impedindo que o iOS da Thamiris corte o áudio!
+        setTimeout(() => {
+            if (AudioTribunal.dica) {
+                AudioTribunal.dica.currentTime = 0;
+                AudioTribunal.dica.play().catch(e=>e);
+            }
+        }, 150); 
     }
 };
 
@@ -479,10 +497,21 @@ window.baterMarteloVisual = function() {
     setTimeout(() => {
         luz.style.animation = 'explodirLuzMartelo 0.8s ease-out forwards';
         
-        if (AudioTribunal.impacto) AudioTribunal.impacto.play();
+        // Toca o impacto com tratamento anti-erro
+        if (AudioTribunal.impacto) {
+            AudioTribunal.impacto.currentTime = 0;
+            AudioTribunal.impacto.play().catch(e=>e);
+        }
+        
         if (window.navigator.vibrate) navigator.vibrate([100, 50, 200]);
 
         if (!acerto) {
+            // 🚨 CONEXÃO FEITA: Faltava mandar o vidro quebrar!
+            if (AudioTribunal.vidro) {
+                AudioTribunal.vidro.currentTime = 0;
+                AudioTribunal.vidro.play().catch(e=>e);
+            }
+            
             const crack = document.createElement('div');
             crack.className = 'efeito-tela-quebrada';
             document.body.appendChild(crack);
@@ -498,6 +527,13 @@ window.baterMarteloVisual = function() {
 
 function julgarCaso() {
     if (tribunal.somaAtual === tribunal.metaAtual) {
+        
+        // 🚨 CONEXÃO FEITA: Dispara a Fanfarra de Vitória!
+        if (AudioTribunal.vitoria) {
+            AudioTribunal.vitoria.currentTime = 0;
+            AudioTribunal.vitoria.play().catch(e=>e);
+        }
+        
         mostrarToast("Veredito Aceito! +200💰", "⚖️"); 
         estatisticasTribunal.ganhos++; salvarEstatisticas();
         
@@ -506,7 +542,6 @@ function julgarCaso() {
         tribunal.nivel++;
         document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
         
-        // 🚨 A MÁGICA: Salva a conquista do novo nível na nuvem!
         salvarEstadoNaNuvemTribunal(); 
         
         setTimeout(iniciarNovoCaso, 1500);
@@ -515,17 +550,22 @@ function julgarCaso() {
         document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
         
         if (tribunal.estrelas <= 0) {
+            
+            // 🚨 CONEXÃO FEITA: Dispara o som de Game Over (Erro)
+            if (AudioTribunal.erro) {
+                AudioTribunal.erro.currentTime = 0;
+                AudioTribunal.erro.play().catch(e=>e);
+            }
+            
             mostrarToast("Justiça falhou! Tribunal encerrado.", "💔");
             estatisticasTribunal.perdidos++; salvarEstatisticas();
             
-            // 🚨 GAME OVER: Limpa o save da nuvem para ela recomeçar do Nível 1 na próxima
             if (typeof window.salvarProgressoJogo === 'function') {
                 window.salvarProgressoJogo('tribunal', { nivel: 1, estrelas: 3 });
             }
             
             setTimeout(voltarMenuJogos, 2000);
         } else {
-            // 🚨 A MÁGICA: Salva a perda da estrela (Para evitar que ela feche o app para não perder a vida)
             salvarEstadoNaNuvemTribunal(); 
             
             let diferenca = Math.abs(tribunal.metaAtual - tribunal.somaAtual);

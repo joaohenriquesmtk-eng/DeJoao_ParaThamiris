@@ -3224,8 +3224,8 @@ function limparVitoriasTigrinho() {
     });
 }
 
-// ============================================================================
-// 🚪 ROTEADOR GERAL: ARENA CONEXÃO (ATUALIZADO: CASINO BRIDGE)
+// // ============================================================================
+// 🚪 ROTEADOR GERAL: ARENA CONEXÃO (CORRIGIDO PARA A NOVA ERA)
 // ============================================================================
 if (typeof window.roteadorCapturado === 'undefined') {
     window.originalAbrirMesa = window.abrirMesaCassino;
@@ -3233,6 +3233,7 @@ if (typeof window.roteadorCapturado === 'undefined') {
 }
 
 window.abrirMesaCassino = function(nomeDoJogo) {
+    // 1. Esconde todas as mesas abertas
     document.querySelectorAll('[id^="mesa-"]').forEach(m => { 
         m.classList.add('escondido'); m.style.display = 'none'; 
     });
@@ -3246,22 +3247,31 @@ window.abrirMesaCassino = function(nomeDoJogo) {
     }
 
     let idMesa = nomeDoJogo.toLowerCase();
-    if (idMesa.includes('roleta')) idMesa = 'roleta-multi';
+    
+    // 🚨 AQUI ESTAVA O VILÃO! 
+    // Removemos a regra antiga que confundia "dadosmentiroso" com o "craps".
+    // Agora as rotas são precisas e não sequestram palavras semelhantes.
+    
+    if (idMesa.includes('roleta') && !idMesa.includes('multi')) idMesa = 'roleta-multi';
     if (idMesa.includes('poker') && !idMesa.includes('carib')) idMesa = 'poker';
-    if (idMesa.includes('craps') || idMesa.includes('dados')) idMesa = 'craps';
+    if (idMesa === 'craps') idMesa = 'craps'; // Rota exata, sem "includes('dados')"
     if (idMesa.includes('sic') || idMesa.includes('trindade')) idMesa = 'sicbo';
     if (idMesa.includes('baccarat') || idMesa.includes('bacara')) idMesa = 'baccarat';
     if (idMesa.includes('carib')) idMesa = 'carib';
     if (idMesa.includes('paigow') || idMesa.includes('pai')) idMesa = 'paigow';
     if (idMesa.includes('wheel') || idMesa.includes('fortuna')) idMesa = 'wheel';
-    // 🚨 ADICIONADO RECONHECIMENTO DO CASINO BRIDGE
     if (idMesa.includes('bridge') || idMesa.includes('ponte')) idMesa = 'bridge';
 
+    // 2. Abre a mesa correta
     const mesa = document.getElementById('mesa-' + idMesa);
-    if(mesa) { mesa.classList.remove('escondido'); mesa.style.display = 'flex'; }
+    if(mesa) { 
+        mesa.classList.remove('escondido'); 
+        mesa.style.display = 'flex'; 
+    }
     
     if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
 
+    // 3. Dá a ignição no motor multiplayer correto
     if (idMesa === 'uno' && typeof iniciarOuvinteUno === 'function') iniciarOuvinteUno();
     else if (idMesa === 'poker' && typeof iniciarOuvintePoker === 'function') iniciarOuvintePoker();
     else if (idMesa === 'roleta-multi' && typeof iniciarOuvinteRoletaMulti === 'function') iniciarOuvinteRoletaMulti();
@@ -3271,3127 +3281,89 @@ window.abrirMesaCassino = function(nomeDoJogo) {
     else if (idMesa === 'carib' && typeof iniciarOuvinteCarib === 'function') iniciarOuvinteCarib();
     else if (idMesa === 'paigow' && typeof iniciarOuvintePaiGow === 'function') iniciarOuvintePaiGow();
     else if (idMesa === 'wheel' && typeof iniciarOuvinteWheel === 'function') iniciarOuvinteWheel();
-    // 🚨 IGNICÃO DO BRIDGE
     else if (idMesa === 'bridge' && typeof iniciarOuvinteBridge === 'function') iniciarOuvinteBridge();
+    else if (idMesa === 'duelo21' && typeof iniciarOuvinteDuelo21 === 'function') iniciarOuvinteDuelo21();
+    else if (idMesa === 'dadosmentiroso' && typeof iniciarOuvinteDadosMentiroso === 'function') iniciarOuvinteDadosMentiroso();
     
     else if (typeof window.originalAbrirMesa === 'function') window.originalAbrirMesa(nomeDoJogo);
 };
 
-// ============================================================================
-// 🌉 MOTOR REAL-TIME: CASINO BRIDGE ROYALE (RED DOG CO-OP)
-// ============================================================================
+// ==========================================
+// 🧭 NAVEGAÇÃO EXCLUSIVA DO CASSINO A DOIS
+// ==========================================
 
-window.motorBridge = {
-    meuId: '', parceiroId: '', status: 'apostando', apostaAnte: 50,
-    vitoriaComemorada: false, quemFinalizou: '', spread: 0,
-    prontos: { joao: false, thamiris: false },
-    cartas: { pilar1: null, pilar2: null, passo: null },
-    acaoEquipe: '' // 'atravessar', 'recuar' ou 'auto'
+window.fecharMesaCassinoDois = function(idMesa) {
+    const mesa = document.getElementById('mesa-' + idMesa);
+    if (mesa) {
+        mesa.style.display = 'none';
+        mesa.classList.add('escondido');
+    }
+    const vitrine = document.getElementById('overlay-cassino-dois');
+    if (vitrine) {
+        vitrine.style.display = 'flex';
+        vitrine.classList.remove('escondido');
+    }
 };
 
-window.fecharMesaBridge = function() {
-    const mesa = document.getElementById('mesa-bridge');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
+window.fecharCassinoDois = function() {
+    const vitrine = document.getElementById('overlay-cassino-dois');
+    if (vitrine) {
+        vitrine.style.display = 'none';
+        vitrine.classList.add('escondido');
+    }
 };
 
-function safeParseBridge(val) {
-    if (typeof val === 'object' && val !== null) return val;
-    if (typeof val === 'string' && val.trim() !== '') {
-        try { return JSON.parse(val); } catch(e) { return null; }
-    }
-    return null;
+// O Roteador Global que protege e abre as 3 únicas mesas do Cassino a Dois
+if (typeof window.roteadorCapturado === 'undefined') {
+    window.originalAbrirMesa = window.abrirMesaCassino;
+    window.roteadorCapturado = true;
 }
 
-function gerarBaralhoBridge() {
-    const naipes = ['♥️', '♦️', '♣️', '♠️'];
-    const valores = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-    let baralho = [];
-    for(let n of naipes) {
-        for(let v of valores) {
-            baralho.push({ naipe: n, valor: v, cor: (n==='♥️'||n==='♦️') ? 'poker-red' : 'poker-black' });
-        }
-    }
-    return baralho.sort(() => Math.random() - 0.5);
-}
-
-function criarDivCartaBridge(carta, delay) {
-    if (!carta) return '';
-    return `<div class="poker-card animacao-distribuir ${carta.cor}" style="animation-delay: ${delay}s; width: 70px; height: 100px; font-size: 1.1em;">
-        <div class="poker-val-topo">${carta.valor}</div>
-        <div class="poker-naipe-centro" style="font-size: 2.2rem;">${carta.naipe}</div>
-        <div class="poker-val-base">${carta.valor}</div>
-    </div>`;
-}
-
-function getValorNumericoBridge(valStr) {
-    const mapa = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
-    return mapa[valStr] || 0;
-}
-
-window.iniciarOuvinteBridge = function() {
-    window.motorBridge.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorBridge.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/bridge_royale`), (snapshot) => {
-        try {
-            const data = snapshot.val() || {};
-
-            window.motorBridge.status = data.status || 'apostando';
-            window.motorBridge.quemFinalizou = data.quemFinalizou || '';
-            window.motorBridge.apostaAnte = Number(data.apostaAnte) || 50;
-            window.motorBridge.prontos = data.prontos || { joao: false, thamiris: false };
-            window.motorBridge.spread = data.spread || 0;
-            window.motorBridge.acaoEquipe = data.acaoEquipe || '';
-            
-            const cData = data.cartas || {};
-            window.motorBridge.cartas = {
-                pilar1: safeParseBridge(cData.pilar1),
-                pilar2: safeParseBridge(cData.pilar2),
-                passo: safeParseBridge(cData.passo)
-            };
-
-            renderMesaBridge();
-
-            if (window.motorBridge.status === 'resultado' && !window.motorBridge.vitoriaComemorada) {
-                window.motorBridge.vitoriaComemorada = true;
-                processarFimBridge();
-            }
-        } catch (e) {
-            console.error("Erro na leitura do Bridge:", e);
-        }
+window.abrirMesaCassino = function(nomeDoJogo) {
+    document.querySelectorAll('[id^="mesa-"]').forEach(m => { 
+        m.classList.add('escondido'); m.style.display = 'none'; 
     });
 
-    const visor = document.getElementById('bridge-valor-aposta');
-    if (visor) visor.innerText = window.motorBridge.apostaAnte;
-};
-
-window.ajustarApostaBridge = function(delta) {
-    if (window.motorBridge.status !== 'apostando') return;
-    if (window.motorBridge.prontos[window.motorBridge.meuId]) return;
+    let idMesa = nomeDoJogo.toLowerCase();
     
-    let atual = Number(window.motorBridge.apostaAnte) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    const maxAposta = Math.floor(saldo / 6); // Limite de segurança porque a aposta pode dobrar
-    if (novoValor > maxAposta) novoValor = maxAposta;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorBridge.apostaAnte = novoValor;
-    const visor = document.getElementById('bridge-valor-aposta');
-    if (visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-window.iniciarRodadaBridge = async function() {
-    if (window.motorBridge.status !== 'apostando') return;
-    if (window.motorBridge.prontos[window.motorBridge.meuId]) return;
-
-    let ante = Number(window.motorBridge.apostaAnte);
-    if (isNaN(ante) || ante <= 0) return;
-
-    let custoTotal = ante * 2; // Um ante do João, um da Thamiris
-    if (Number(window.pontosDoCasal) < custoTotal) {
-        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente no Cofre!", "💸");
-        return;
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const bridgeRef = ref(db, `cassino/bridge_royale`);
-
-    const snap = await get(bridgeRef);
-    let prontos = (snap.val() || {}).prontos || { joao: false, thamiris: false };
-    prontos[window.motorBridge.meuId] = true;
-
-    if (prontos[window.motorBridge.parceiroId] === true) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(-custoTotal, `Casino Bridge (Pedágio)`);
-        }
-
-        let baralho = gerarBaralhoBridge(); 
-        let c1 = baralho.pop();
-        let c2 = baralho.pop();
-        let c3 = baralho.pop(); // A carta do destino (escondida no Firebase)
-
-        // Organiza Pilar1 para ser sempre o menor
-        let v1 = getValorNumericoBridge(c1.valor);
-        let v2 = getValorNumericoBridge(c2.valor);
-        if (v1 > v2) {
-            let temp = c1; c1 = c2; c2 = temp;
-            let tempV = v1; v1 = v2; v2 = tempV;
-        }
-
-        let spread = v2 - v1 - 1;
-        let novoStatus = 'atravessando';
-        let quemFim = '';
-        let acaoAuto = '';
-
-        // 🧠 AUTOMAÇÃO: Se for Par ou Consecutivo, resolve na hora!
-        if (spread <= 0) {
-            novoStatus = 'resultado';
-            quemFim = window.motorBridge.meuId;
-            acaoAuto = 'auto';
-        }
-
-        await update(bridgeRef, {
-            status: novoStatus,
-            apostaAnte: ante,
-            quemFinalizou: quemFim,
-            spread: spread,
-            acaoEquipe: acaoAuto,
-            cartas: { pilar1: JSON.stringify(c1), pilar2: JSON.stringify(c2), passo: JSON.stringify(c3) },
-            prontos: { joao: false, thamiris: false } 
-        });
-
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    } else {
-        await update(bridgeRef, { prontos: prontos, apostaAnte: ante });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando Aliado pagar Pedágio...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-    }
-};
-
-window.acaoBridge = async function(escolha) {
-    if (window.motorBridge.status !== 'atravessando') return;
-    if (window.motorBridge.prontos[window.motorBridge.meuId]) return;
-
-    const ante = Number(window.motorBridge.apostaAnte);
-    const custoTravessia = ante * 2; // O "Call" (Cross) custa o mesmo que o Ante pago. Então 2x de débito na conta.
-
-    if (escolha === 'atravessar') {
-        const saldo = Number(window.pontosDoCasal);
-        if (saldo < custoTravessia) {
-            if(typeof mostrarToast === 'function') mostrarToast("Fichas insuficientes para Atravessar!", "💸");
-            return;
-        }
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(-custoTravessia, `Casino Bridge (Travessia)`);
-        }
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const bridgeRef = ref(db, `cassino/bridge_royale`);
-
-    const snap = await get(bridgeRef);
-    let dataAtual = snap.val() || {};
-    let prontos = dataAtual.prontos || { joao: false, thamiris: false };
-    
-    prontos[window.motorBridge.meuId] = true;
-    let up = { prontos: prontos };
-
-    // Se um decidir recuar, a equipe toda recua (Decisão drástica Co-op)
-    let acaoDefinitiva = (dataAtual.acaoEquipe === 'recuar' || escolha === 'recuar') ? 'recuar' : 'atravessar';
-    up.acaoEquipe = acaoDefinitiva;
-
-    if (prontos[window.motorBridge.parceiroId] === true) {
-        up.status = 'resultado';
-        up.quemFinalizou = window.motorBridge.meuId; 
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast("Decisão tomada. Aguardando parceiro...", "🔒");
-    }
-
-    await update(bridgeRef, up);
-};
-
-async function processarFimBridge() {
-    const ante = Number(window.motorBridge.apostaAnte);
-    const cb = window.motorBridge.cartas;
-    const spread = window.motorBridge.spread;
-    const acao = window.motorBridge.acaoEquipe;
-    let ganhoTotal = 0;
-
-    let v1 = getValorNumericoBridge(cb.pilar1.valor);
-    let v2 = getValorNumericoBridge(cb.pilar2.valor);
-    let v3 = getValorNumericoBridge(cb.passo.valor);
-
-    // 🧠 A MATEMÁTICA CRUEL DA PONTE
-    if (acao === 'recuar') {
-        // Fugiram. O Ante foi perdido. Volta Zero.
-        ganhoTotal = 0;
-    } 
-    else if (spread === -1) {
-        // Os Pilares são um PAR.
-        if (v3 === v1) {
-            // Trinca! Paga 11:1 no Ante. 
-            ganhoTotal = (ante * 2) + ((ante * 2) * 11);
-        } else {
-            // Empate. Devolve o Ante.
-            ganhoTotal = ante * 2;
-        }
-    } 
-    else if (spread === 0) {
-        // Consecutivos (Não há ponte). Empate. Devolve o Ante.
-        ganhoTotal = ante * 2;
-    } 
-    else if (acao === 'atravessar' || acao === 'auto') {
-        // Decidiram cruzar a ponte! O custo total na mesa agora é Ante + Travessia = 4x Ante.
-        const custoTotalPago = ante * 4;
-        
-        if (v3 > v1 && v3 < v2) {
-            // Sucesso! Bateu dentro do Spread.
-            let mult = 1;
-            if (spread === 1) mult = 5;
-            else if (spread === 2) mult = 4;
-            else if (spread === 3) mult = 2;
-            
-            // O Ante paga 1:1, a Travessia paga o Multiplicador
-            ganhoTotal = custoTotalPago + ((ante * 2) * mult);
-        } else {
-            // Caiu fora da ponte ou bateu na trave (empate com pilar perde).
-            ganhoTotal = 0;
-        }
-    }
-
-    // 1️⃣ FESTA VISUAL PARA OS DOIS
-    setTimeout(() => {
-        if (ganhoTotal > (ante * 4)) {
-            if(typeof confetti === 'function') confetti({colors: ['#00d2d3', '#f1c40f'], particleCount: 300});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`TRAVESSIA ÉPICA! +${ganhoTotal} 💰!`, "🌉");
-        } else if (ganhoTotal > 0) {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`SALVOS! +${ganhoTotal} devolvidos.`, "🤝");
-        } else {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A Ponte quebrou... 💀`, "💸");
-        }
-    }, 1500);
-
-    // 2️⃣ TRANSAÇÃO SEGURA E RESET
-    if (window.motorBridge.quemFinalizou === window.motorBridge.meuId) {
-        setTimeout(async () => {
-            if (ganhoTotal > 0) {
-                if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Casino Bridge`);
-            }
-            const { db, ref, set } = window.SantuarioApp.modulos;
-            await set(ref(db, `cassino/bridge_royale`), {
-                status: 'apostando', apostaAnte: window.motorBridge.apostaAnte, quemFinalizou: '', prontos: {joao: false, thamiris: false}, acaoEquipe: '', spread: 0
-            });
-        }, 1600);
-    }
-}
-
-function renderMesaBridge() {
-    const cb = window.motorBridge;
-    const painelAposta = document.getElementById('bridge-painel-aposta');
-    const painelAcao = document.getElementById('bridge-painel-acao');
-    const btnNovaMao = document.getElementById('btn-bridge-novamao');
-    const pilar1 = document.getElementById('bridge-pilar1');
-    const pilar2 = document.getElementById('bridge-pilar2');
-    const passo = document.getElementById('bridge-passo');
-    const infoSpread = document.getElementById('bridge-info-spread');
-    const infoRes = document.getElementById('bridge-resultado-jogador');
-
-    if (!painelAposta) return;
-
-    if (cb.status === 'apostando') {
-        painelAposta.style.display = 'flex';
-        painelAcao.classList.add('escondido');
-        btnNovaMao.classList.add('escondido');
-        
-        pilar1.innerHTML = ''; pilar1.style.border = "2px dashed rgba(255,255,255,0.2)";
-        pilar2.innerHTML = ''; pilar2.style.border = "2px dashed rgba(255,255,255,0.2)";
-        passo.innerHTML = ''; passo.style.border = "2px solid #f1c40f";
-        
-        infoSpread.innerText = 'Distância: ?';
-        infoRes.innerText = 'AGUARDANDO PEDÁGIO';
-        infoRes.style.color = '#f1c40f';
-
-        const btnInic = document.getElementById('btn-iniciar-bridge');
-        if (cb.prontos[cb.meuId]) {
-            btnInic.innerText = "AGUARDANDO... ⏳"; btnInic.style.background = "#555";
-        } else {
-            btnInic.innerText = "ERGUER PILARES 🏛️"; btnInic.style.background = "linear-gradient(145deg, #00d2d3, #01a3a4)";
-        }
-        return; 
-    }
-
-    painelAposta.style.display = 'none';
-
-    // Renderiza Pilares
-    if (cb.cartas.pilar1 && pilar1.innerHTML === '') {
-        pilar1.style.border = "none";
-        pilar1.innerHTML = criarDivCartaBridge(cb.cartas.pilar1, 0.1);
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.5);
-    }
-    if (cb.cartas.pilar2 && pilar2.innerHTML === '') {
-        pilar2.style.border = "none";
-        setTimeout(()=> { 
-            pilar2.innerHTML = criarDivCartaBridge(cb.cartas.pilar2, 0.1); 
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.5);
-        }, 300);
-    }
-
-    // Textos Intermediários
-    if (cb.spread === -1) infoSpread.innerText = '⚠️ OS PILARES SÃO IGUAIS (PAR)';
-    else if (cb.spread === 0) infoSpread.innerText = '⚠️ SEM ESPAÇO (CONSECUTIVAS)';
-    else infoSpread.innerText = `Distância: ${cb.spread} Cartas`;
-
-    if (cb.status === 'atravessando') {
-        painelAcao.classList.remove('escondido');
-        infoRes.innerText = `VÃO ATRAVESSAR A PONTE?`;
-        
-        const btnCruzar = document.getElementById('btn-bridge-cruzar');
-        const btnRecuar = document.getElementById('btn-bridge-recuar');
-        if (cb.prontos[cb.meuId]) {
-            btnCruzar.innerText = "AGUARDANDO... ⏳"; btnCruzar.style.background = "#555";
-            btnRecuar.innerText = "⏳"; btnRecuar.style.background = "#555";
-        } else {
-            btnCruzar.innerText = `ATRAVESSAR (+${cb.apostaAnte * 2}💰)`; btnCruzar.style.background = "linear-gradient(145deg, #f1c40f, #f39c12)";
-            btnRecuar.innerText = "RECUAR"; btnRecuar.style.background = "linear-gradient(145deg, #e74c3c, #c0392b)";
-        }
-    } 
-    else if (cb.status === 'resultado') {
-        painelAcao.classList.add('escondido');
-        btnNovaMao.classList.remove('escondido');
-
-        if (cb.acaoEquipe === 'recuar') {
-            infoRes.innerText = `A EQUIPE RECUOU (FOLD)`;
-            infoRes.style.color = '#e74c3c';
-        } else {
-            // Revela a carta destino com suspense
-            if (cb.cartas.passo && passo.innerHTML === '') {
-                passo.style.border = "none";
-                setTimeout(()=> { 
-                    passo.innerHTML = criarDivCartaBridge(cb.cartas.passo, 0.1);
-                    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 0.8);
-                    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
-                    
-                    // Avalia na tela o resultado
-                    let v1 = getValorNumericoBridge(cb.cartas.pilar1.valor);
-                    let v2 = getValorNumericoBridge(cb.cartas.pilar2.valor);
-                    let v3 = getValorNumericoBridge(cb.cartas.passo.valor);
-                    
-                    if (cb.spread === -1 && v3 === v1) { infoRes.innerText = `🔥 TRINCA JACKPOT!`; infoRes.style.color = '#00d2d3'; }
-                    else if (cb.spread <= 0) { infoRes.innerText = `EMPATE SEGURO!`; infoRes.style.color = '#bdc3c7'; }
-                    else if (v3 > v1 && v3 < v2) { infoRes.innerText = `TRAVESSIA CONCLUÍDA!`; infoRes.style.color = '#2ecc71'; }
-                    else { infoRes.innerText = `A PONTE QUEBROU!`; infoRes.style.color = '#e74c3c'; }
-                }, 800);
-            }
-        }
-    }
-}
-
-// 🚨 A FUNÇÃO QUE FALTAVA: Reseta a mesa para a próxima rodada
-window.resetarMesaBridge = async function() {
-    window.motorBridge.vitoriaComemorada = false;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    
-    // Limpa as cartas e zera a mesa na nuvem
-    await set(ref(db, `cassino/bridge_royale`), {
-        status: 'apostando', 
-        apostaAnte: window.motorBridge.apostaAnte, 
-        quemFinalizou: '', 
-        prontos: {joao: false, thamiris: false}, 
-        acaoEquipe: '', 
-        spread: 0,
-        cartas: { pilar1: null, pilar2: null, passo: null }
-    });
-};
-
-// ============================================================================
-// 🎡 MOTOR REAL-TIME: WHEEL OF FORTUNE (SINCRONIA E FÍSICA ACUMULATIVA)
-// ============================================================================
-
-// A roda tem 12 fatias exatas na ordem do nosso gradiente CSS (Sentido Horário)
-const fatiasWheel = ['1', '2', '1', '5', '1', '2', '10', '1', '2', '5', '20', 'jackpot'];
-window.anguloGlobalWheel = 0; // Essencial para a roda nunca voltar para trás
-
-window.motorWheel = {
-    meuId: '', parceiroId: '',
-    status: 'apostando',
-    apostas: {},
-    resultadoSorteado: null,
-    quemFinalizou: '',
-    valorFicha: 50,
-    prontos: { joao: false, thamiris: false } 
-};
-
-// Áudio mecânico da roleta (reciclado)
-const somCatracaWheel = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
-
-window.fecharMesaWheel = function() {
-    const mesa = document.getElementById('mesa-wheel');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-    if (!somCatracaWheel.paused) somCatracaWheel.pause();
-};
-
-window.iniciarOuvinteWheel = function() {
-    window.motorWheel.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorWheel.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/wheel_royale`), (snapshot) => {
-        try {
-            const data = snapshot.val() || { status: 'apostando', apostas: {} };
-            
-            // Gatilho de Física: Se o status mudou para girando AGORA, roda a animação
-            if (data.status === 'girando' && window.motorWheel.status !== 'girando') {
-                window.motorWheel.resultadoSorteado = data.resultadoSorteado;
-                window.motorWheel.quemFinalizou = data.quemFinalizou;
-                window.motorWheel.status = 'girando';
-                animarGiroWheel();
-            }
-
-            window.motorWheel.status = data.status || 'apostando';
-            window.motorWheel.apostas = data.apostas || {};
-            window.motorWheel.resultadoSorteado = data.resultadoSorteado || null;
-            window.motorWheel.quemFinalizou = data.quemFinalizou || '';
-            window.motorWheel.prontos = data.prontos || { joao: false, thamiris: false };
-
-            renderMesaWheel();
-        } catch (e) {
-            console.error("Erro no ouvinte da Wheel:", e);
-        }
-    });
-
-    const visor = document.getElementById('wheel-ficha-valor');
-    if (visor) visor.innerText = window.motorWheel.valorFicha;
-};
-
-window.ajustarFichaWheel = function(delta) {
-    if (window.motorWheel.status !== 'apostando') return;
-    if (window.motorWheel.prontos[window.motorWheel.meuId]) return;
-    
-    let atual = Number(window.motorWheel.valorFicha) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    if (novoValor > saldo) novoValor = saldo;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorWheel.valorFicha = novoValor;
-    const visor = document.getElementById('wheel-ficha-valor');
-    if(visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-window.apostarWheel = async function(tipo) {
-    if (window.motorWheel.status !== 'apostando') return;
-    
-    if (window.motorWheel.prontos[window.motorWheel.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Você já confirmou sua aposta!", "⏳");
-        return;
-    }
-    
-    const valorParaApostar = Number(window.motorWheel.valorFicha);
-    const saldoDisponivel = Number(window.pontosDoCasal);
-
-    if (isNaN(valorParaApostar) || valorParaApostar <= 0) return;
-
-    if (saldoDisponivel < valorParaApostar) {
-        if(typeof mostrarToast === 'function') mostrarToast("Cofre insuficiente!", "💸");
-        return;
-    }
-
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-valorParaApostar, `Aposta Wheel: ${tipo.toUpperCase()}`);
-    }
-
-    const { db, ref, push } = window.SantuarioApp.modulos;
-    await push(ref(db, `cassino/wheel_royale/apostas`), {
-        tipo: tipo,
-        valor: valorParaApostar,
-        autor: window.motorWheel.meuId
-    });
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-};
-
-window.limparApostasWheel = async function() {
-    if (window.motorWheel.status !== 'apostando') return;
-    if (window.motorWheel.prontos[window.motorWheel.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Apostas travadas. Aguarde o giro!", "🔒");
-        return;
-    }
-
-    let totalDevolvido = 0;
-    Object.values(window.motorWheel.apostas).forEach(ap => {
-        if (ap.autor === window.motorWheel.meuId) {
-            let v = Number(ap.valor);
-            if (!isNaN(v)) totalDevolvido += v;
-        }
-    });
-
-    if (totalDevolvido > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(totalDevolvido, "Reembolso Wheel");
-        }
-    }
-
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/wheel_royale/apostas`), null);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30, 30, 30]);
-                    }
-};
-
-function renderMesaWheel() {
-    const statusTxt = document.getElementById('wheel-status-mesa');
-    if (statusTxt) {
-        statusTxt.innerText = window.motorWheel.status === 'girando' ? "A SORTE ESTÁ LANÇADA..." : "FAÇAM SUAS APOSTAS";
-        statusTxt.style.color = window.motorWheel.status === 'girando' ? "#f1c40f" : "#9b59b6";
-    }
-
-    document.querySelectorAll('#wheel-tabuleiro .container-fichas').forEach(el => el.innerHTML = '');
-    Object.values(window.motorWheel.apostas).forEach((ap, idx) => {
-        const zona = document.getElementById(`zona-wheel-${ap.tipo}`);
-        if (zona) {
-            const corBorda = ap.autor === 'joao' ? '#3498db' : '#e84393';
-            const x = (idx * 6) % 30;
-            zona.innerHTML += `<div class="ficha-cassino" style="border-color: ${corBorda}; transform: translate(${x}px, ${x}px);">${ap.valor}</div>`;
-        }
-    });
-
-    const btnLancar = document.getElementById('btn-girar-wheel');
-    if (btnLancar) {
-        if (window.motorWheel.prontos[window.motorWheel.meuId]) {
-            btnLancar.innerText = "AGUARDANDO PARCEIRO ⏳";
-            btnLancar.style.background = "#555";
-            btnLancar.style.boxShadow = "none";
-            btnLancar.style.animation = "none";
-            btnLancar.style.color = "#ccc";
-        } else {
-            btnLancar.innerText = "GIRAR RODA 🎡";
-            btnLancar.style.background = "linear-gradient(145deg, #9b59b6, #8e44ad)";
-            btnLancar.style.boxShadow = "0 5px 20px rgba(155, 89, 182, 0.5)";
-            btnLancar.style.animation = "btnNeonPulse 1.5s infinite";
-            btnLancar.style.color = "#fff";
-        }
-    }
-}
-
-// 🚨 O SORTEIO DE SINCRONIA DUPLA
-window.girarWheelCoop = async function() {
-    if (window.motorWheel.status !== 'apostando') return;
-    if (window.motorWheel.prontos[window.motorWheel.meuId]) return;
-
-    if (Object.keys(window.motorWheel.apostas).length === 0) {
-        if(typeof mostrarToast === 'function') mostrarToast("A roda precisa de fichas para girar!", "⚠️");
-        return;
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const wheelRef = ref(db, `cassino/wheel_royale`);
-
-    const snap = await get(wheelRef);
-    const data = snap.val() || {};
-    let prontos = data.prontos || { joao: false, thamiris: false };
-
-    prontos[window.motorWheel.meuId] = true;
-
-    if (prontos[window.motorWheel.parceiroId] === true) {
-        // O Cassino Sorteia um índice de 0 a 11 (As 12 Fatias)
-        const indSorteado = Math.floor(Math.random() * 12);
-
-        await update(wheelRef, {
-            status: 'girando',
-            resultadoSorteado: indSorteado,
-            quemFinalizou: window.motorWheel.meuId,
-            prontos: { joao: false, thamiris: false } 
-        });
-    } else {
-        await update(wheelRef, { prontos: prontos });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando confirmação...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-    }
-};
-
-function animarGiroWheel() {
-    const disco = document.getElementById('wheel-disco');
-    const resVisor = document.getElementById('wheel-resultado-visor');
-    if (!disco || !resVisor || window.motorWheel.resultadoSorteado === null) return;
-
-    resVisor.classList.add('escondido');
-    
-    if(!window.SantuarioSomPausado) {
-        somCatracaWheel.currentTime = 0;
-        somCatracaWheel.play().catch(()=>{});
-    }
-
-    // 🚨 MATEMÁTICA CSS ACUMULATIVA:
-    // A Roda tem 12 fatias de 30 graus. O meio da fatia '0' fica aos 15 graus.
-    // Para a fatia sorteada ficar no topo, giramos no mínimo 10 voltas (3600 graus) + o ajuste da fatia.
-    window.anguloGlobalWheel += 3600; 
-    
-    const indice = window.motorWheel.resultadoSorteado;
-    const ajuste = (indice * 30) + 15;
-    const anguloFinal = window.anguloGlobalWheel + (360 - ajuste);
-
-    disco.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
-    disco.style.transform = `rotate(${anguloFinal}deg)`;
-
-    // Após 5 segundos de giro de tirar o fôlego...
-    setTimeout(() => {
-        somCatracaWheel.pause();
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-        
-        const valorFatia = fatiasWheel[indice];
-        document.getElementById('wheel-res-texto').innerText = valorFatia === 'jackpot' ? '⭐' : `${valorFatia}x`;
-        resVisor.classList.remove('escondido');
-
-        processarRecompensaWheel();
-    }, 5100);
-}
-
-// 🚨 O POP-UP APARECE PARA OS DOIS, MAS O COFRE SÓ É PROCESSADO POR UM
-async function processarRecompensaWheel() {
-    const indice = window.motorWheel.resultadoSorteado;
-    const resultTipo = fatiasWheel[indice];
-    
-    let ganhoTotal = 0;
-    
-    // Tabela de Pagamentos Padrão (Pays "To One")
-    // Apostar 50 no 10x, retorna 50 + 500 = 550. Multiplicador total = 11.
-    const pagamentos = {
-        '1': 2,
-        '2': 3,
-        '5': 6,
-        '10': 11,
-        '20': 21,
-        'jackpot': 41
-    };
-
-    const multFinal = pagamentos[resultTipo];
-
-    Object.values(window.motorWheel.apostas).forEach(ap => {
-        if (ap.tipo === resultTipo) {
-            ganhoTotal += (Number(ap.valor) * multFinal);
-        }
-    });
-
-    // 1️⃣ A FESTA VISUAL PARA OS DOIS
-    setTimeout(() => {
-        if (ganhoTotal > 0) {
-            if(typeof confetti === 'function') confetti({colors: ['#9b59b6', '#f1c40f'], particleCount: 300});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`A RODA PAGOU +${ganhoTotal} 💰!`, "🎡");
-        } else {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A Banca engoliu as fichas... 💀`, "💸");
-        }
-    }, 100);
-
-    // 2️⃣ A TRANSAÇÃO FINANCEIRA (Só roda no celular do Último a Clicar)
-    if (window.motorWheel.quemFinalizou === window.motorWheel.meuId) {
-        setTimeout(async () => {
-            if (ganhoTotal > 0) {
-                if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Wheel of Fortune (${resultTipo})`);
-            }
-            
-            const { db, ref, set } = window.SantuarioApp.modulos;
-            await set(ref(db, `cassino/wheel_royale`), { 
-                status: 'apostando', apostas: {}, resultadoSorteado: null, quemFinalizou: '', prontos: {joao: false, thamiris: false} 
-            });
-            
-            document.getElementById('wheel-resultado-visor').classList.add('escondido');
-        }, 3000); // Reseta a mesa após 3 segundos do pop-up
-    }
-}
-
-// ============================================================================
-// 🀄 MOTOR REAL-TIME: PAI GOW TILES (BLINDADO CONTRA JSON ERRORS)
-// ============================================================================
-
-window.motorPaiGow = {
-    meuId: '', parceiroId: '', status: 'apostando', apostaAnte: 50,
-    vitoriaComemorada: false, quemFinalizou: '',
-    prontos: { joao: false, thamiris: false },
-    dealer: { high: [], low: [], scoreHigh: 0, scoreLow: 0 },
-    jogadores: { 
-        joao: { high: [], low: [], scoreHigh: 0, scoreLow: 0 }, 
-        thamiris: { high: [], low: [], scoreHigh: 0, scoreLow: 0 } 
-    }
-};
-
-window.fecharMesaPaiGow = function() {
-    const mesa = document.getElementById('mesa-paigow');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-};
-
-function gerarPecasPaiGow() {
-    let tiles = [];
-    for(let i=1; i<=6; i++) {
-        for(let j=i; j<=6; j++) {
-            tiles.push({v1: i, v2: j});
-            tiles.push({v1: i, v2: j}); 
-        }
-    }
-    return tiles.sort(() => Math.random() - 0.5);
-}
-
-function criarDivPaiGow(peca, delay) {
-    if (!peca) return '';
-    return `<div class="paigow-tile animacao-distribuir" style="animation-delay: ${delay}s">
-        <div class="pt-top">${peca.v1}</div>
-        <div class="pt-divisor"></div>
-        <div class="pt-bot">${peca.v2}</div>
-    </div>`;
-}
-
-function calcPtsPaiGow(t1, t2) {
-    if (!t1 || !t2) return 0;
-    let isPair = (t1.v1 === t2.v1 && t1.v2 === t2.v2) || (t1.v1 === t2.v2 && t1.v2 === t2.v1);
-    let score = (t1.v1 + t1.v2 + t2.v1 + t2.v2) % 10;
-    if (isPair) score += 100;
-    return score;
-}
-
-function stringScore(pts) {
-    if (pts >= 100) return `PAR`;
-    return `${pts}`;
-}
-
-function otimizarPaiGow(mao) {
-    if (!mao || mao.length < 4) return { high: [], low: [], scoreHigh: 0, scoreLow: 0 };
-    
-    let splits = [
-        {h1: mao[0], h2: mao[1], l1: mao[2], l2: mao[3]},
-        {h1: mao[0], h2: mao[2], l1: mao[1], l2: mao[3]},
-        {h1: mao[0], h2: mao[3], l1: mao[1], l2: mao[2]}
-    ];
-    let bestSplit = null;
-    let bestScore = -1;
-
-    splits.forEach(s => {
-        let s1 = calcPtsPaiGow(s.h1, s.h2);
-        let s2 = calcPtsPaiGow(s.l1, s.l2);
-        let high = Math.max(s1, s2);
-        let low = Math.min(s1, s2);
-        
-        let score = (low * 10) + high; 
-        if (score > bestScore) {
-            bestScore = score;
-            bestSplit = {
-                high: s1 === high ? [s.h1, s.h2] : [s.l1, s.l2],
-                low: s1 === high ? [s.l1, s.l2] : [s.h1, s.h2],
-                scoreHigh: high,
-                scoreLow: low
-            };
-        }
-    });
-    return bestSplit;
-}
-
-// 🛡️ O SANITIZADOR DE ARRAYS (Adeus erro de JSON!)
-function safeParsePG(val) {
-    if (Array.isArray(val)) return val;
-    if (typeof val === 'string' && val.trim() !== '') {
-        try { return JSON.parse(val); } catch(e) { return []; }
-    }
-    return [];
-}
-
-window.iniciarOuvintePaiGow = function() {
-    window.motorPaiGow.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorPaiGow.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/paigow_royale`), (snapshot) => {
-        try {
-            const data = snapshot.val() || {};
-
-            window.motorPaiGow.status = data.status || 'apostando';
-            window.motorPaiGow.quemFinalizou = data.quemFinalizou || '';
-            window.motorPaiGow.apostaAnte = Number(data.apostaAnte) || 50;
-            window.motorPaiGow.prontos = data.prontos || { joao: false, thamiris: false };
-            
-            const dData = data.dealer || {};
-            let jInfo = data.jogadores?.joao || {};
-            let tInfo = data.jogadores?.thamiris || {};
-
-            // Limpeza cirúrgica dos Arrays
-            window.motorPaiGow.dealer = {
-                high: safeParsePG(dData.high),
-                low: safeParsePG(dData.low),
-                scoreHigh: dData.scoreHigh || 0,
-                scoreLow: dData.scoreLow || 0
-            };
-
-            window.motorPaiGow.jogadores = {
-                joao: { 
-                    high: safeParsePG(jInfo.high), 
-                    low: safeParsePG(jInfo.low), 
-                    scoreHigh: jInfo.scoreHigh || 0, 
-                    scoreLow: jInfo.scoreLow || 0 
-                },
-                thamiris: { 
-                    high: safeParsePG(tInfo.high), 
-                    low: safeParsePG(tInfo.low), 
-                    scoreHigh: tInfo.scoreHigh || 0, 
-                    scoreLow: tInfo.scoreLow || 0 
-                }
-            };
-
-            renderMesaPaiGow();
-
-            if (window.motorPaiGow.status === 'resultado' && !window.motorPaiGow.vitoriaComemorada) {
-                window.motorPaiGow.vitoriaComemorada = true;
-                processarFimPaiGow();
-            }
-        } catch (e) {
-            console.error("Erro na leitura do Pai Gow:", e);
-        }
-    });
-
-    const visor = document.getElementById('paigow-valor-aposta');
-    if (visor) visor.innerText = window.motorPaiGow.apostaAnte;
-};
-
-window.ajustarApostaPaiGow = function(delta) {
-    if (window.motorPaiGow.status !== 'apostando') return;
-    if (window.motorPaiGow.prontos[window.motorPaiGow.meuId]) return;
-    
-    let atual = Number(window.motorPaiGow.apostaAnte) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    const maxAposta = Math.floor(saldo / 2); 
-    if (novoValor > maxAposta) novoValor = maxAposta;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorPaiGow.apostaAnte = novoValor;
-    const visor = document.getElementById('paigow-valor-aposta');
-    if (visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-window.iniciarRodadaPaiGow = async function() {
-    if (window.motorPaiGow.status !== 'apostando') return;
-    if (window.motorPaiGow.prontos[window.motorPaiGow.meuId]) return;
-
-    let ante = Number(window.motorPaiGow.apostaAnte);
-    if (isNaN(ante) || ante <= 0) return;
-
-    let custoTotal = ante * 2;
-    if (Number(window.pontosDoCasal) < custoTotal) {
-        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💸");
-        return;
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const pgRef = ref(db, `cassino/paigow_royale`);
-
-    const snap = await get(pgRef);
-    let prontos = (snap.val() || {}).prontos || { joao: false, thamiris: false };
-    prontos[window.motorPaiGow.meuId] = true;
-
-    if (prontos[window.motorPaiGow.parceiroId] === true) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(-custoTotal, `Pai Gow Tiles (Aposta)`);
-        }
-
-        let saco = gerarPecasPaiGow(); 
-        let dMao = [saco.pop(), saco.pop(), saco.pop(), saco.pop()];
-        let jMao = [saco.pop(), saco.pop(), saco.pop(), saco.pop()];
-        let tMao = [saco.pop(), saco.pop(), saco.pop(), saco.pop()];
-
-        let dOpt = otimizarPaiGow(dMao);
-        let jOpt = otimizarPaiGow(jMao);
-        let tOpt = otimizarPaiGow(tMao);
-
-        await update(pgRef, {
-            status: 'resultado', 
-            apostaAnte: ante,
-            quemFinalizou: window.motorPaiGow.meuId,
-            dealer: { high: JSON.stringify(dOpt.high), low: JSON.stringify(dOpt.low), scoreHigh: dOpt.scoreHigh, scoreLow: dOpt.scoreLow },
-            jogadores: {
-                joao: { high: JSON.stringify(jOpt.high), low: JSON.stringify(jOpt.low), scoreHigh: jOpt.scoreHigh, scoreLow: jOpt.scoreLow },
-                thamiris: { high: JSON.stringify(tOpt.high), low: JSON.stringify(tOpt.low), scoreHigh: tOpt.scoreHigh, scoreLow: tOpt.scoreLow }
-            },
-            prontos: { joao: false, thamiris: false } 
-        });
-
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    } else {
-        await update(pgRef, { prontos: prontos, apostaAnte: ante });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando Aliado...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-    }
-};
-
-// 🚨 MÁGICA DA UX: Pop-up para todos, dinheiro apenas uma vez!
-async function processarFimPaiGow() {
-    const d = window.motorPaiGow.dealer;
-    const ante = Number(window.motorPaiGow.apostaAnte);
-    let ganhoTotal = 0;
-
-    const avaliarMao = (p) => {
-        let wonHigh = p.scoreHigh > d.scoreHigh;
-        let wonLow = p.scoreLow > d.scoreLow;
-        
-        if (wonHigh && wonLow) return ante * 2; 
-        if (wonHigh || wonLow) return ante;     
-        return 0;                               
-    };
-
-    const jJoao = window.motorPaiGow.jogadores.joao;
-    const jThamiris = window.motorPaiGow.jogadores.thamiris;
-    
-    ganhoTotal += avaliarMao(jJoao);
-    ganhoTotal += avaliarMao(jThamiris);
-
-    // 1️⃣ A FESTA VISUAL (Roda no celular dos dois simultaneamente)
-    setTimeout(() => {
-        if (ganhoTotal > (ante * 2)) {
-            if(typeof confetti === 'function') confetti({colors: ['#e74c3c', '#fdfbf7'], particleCount: 300});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`A EQUIPE DOMINOU! +${ganhoTotal} 💰!`, "🀄");
-        } else if (ganhoTotal > 0) {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`EMPATE! +${ganhoTotal} devolvidos.`, "🤝");
-        } else {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`O Imperador levou tudo... 💀`, "💸");
-        }
-        
-        renderMesaPaiGow(); // Atualiza os textos de "Derrota/Vitória" nas cartas
-    }, 1500);
-
-    // 2️⃣ A TRANSAÇÃO FINANCEIRA E RESET DA MESA (Roda APENAS no celular de quem deu o último clique)
-    if (window.motorPaiGow.quemFinalizou === window.motorPaiGow.meuId) {
-        setTimeout(async () => {
-            // Paga o prêmio real no cofre
-            if (ganhoTotal > (ante * 2)) {
-                if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Pai Gow Tiles`);
-            } else if (ganhoTotal > 0) {
-                if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Push Pai Gow Tiles`);
-            }
-
-            // Reseta a mesa na nuvem
-            const { db, ref, set } = window.SantuarioApp.modulos;
-            await set(ref(db, `cassino/paigow_royale`), {
-                status: 'apostando', apostaAnte: window.motorPaiGow.apostaAnte, quemFinalizou: '', prontos: {joao: false, thamiris: false}
-            });
-        }, 1600); // 100ms após o pop-up aparecer
-    }
-}
-
-function renderMesaPaiGow() {
-    const pg = window.motorPaiGow;
-    const painelAnte = document.getElementById('paigow-painel-aposta');
-    const btnNovaMao = document.getElementById('btn-paigow-novamao');
-    const btnInic = document.getElementById('btn-iniciar-paigow');
-
-    if (!painelAnte) return;
-
-    if (pg.status === 'apostando') {
-        painelAnte.style.display = 'flex';
-        btnNovaMao.classList.add('escondido');
-        
-        document.getElementById('paigow-dealer-high').innerHTML = '';
-        document.getElementById('paigow-dealer-low').innerHTML = '';
-        document.getElementById('paigow-oponente-high').innerHTML = '';
-        document.getElementById('paigow-oponente-low').innerHTML = '';
-        document.getElementById('paigow-jogador-high').innerHTML = '';
-        document.getElementById('paigow-jogador-low').innerHTML = '';
-        
-        document.getElementById('paigow-pts-high').innerText = '';
-        document.getElementById('paigow-pts-low').innerText = '';
-        document.getElementById('paigow-resultado-jogador').innerText = '';
-        document.getElementById('paigow-resultado-oponente').innerText = '';
-        document.getElementById('paigow-info-dealer').innerText = '';
-
-        if (pg.prontos[pg.meuId]) {
-            btnInic.innerText = "AGUARDANDO... ⏳";
-            btnInic.style.background = "#555";
-            btnInic.style.boxShadow = "none";
-        } else {
-            btnInic.innerText = "REVELAR O DESTINO 🀄";
-            btnInic.style.background = "linear-gradient(145deg, #c0392b, #8e44ad)";
-            btnInic.style.boxShadow = "0 5px 20px rgba(192, 57, 43, 0.4)";
-        }
-        return; 
-    }
-
-    painelAnte.style.display = 'none';
-
-    const desenhar = (divId, arrPecas) => {
-        let h = document.getElementById(divId);
-        h.innerHTML = '';
-        if (Array.isArray(arrPecas)) {
-            arrPecas.forEach((p, idx) => h.innerHTML += criarDivPaiGow(p, idx * 0.15));
-        }
-    };
-
-    // Renderiza limpo, os arrays agora já foram sanitizados!
-    desenhar('paigow-dealer-low', pg.dealer.low);
-    desenhar('paigow-dealer-high', pg.dealer.high);
-
-    if (pg.status === 'resultado') {
-        document.getElementById('paigow-info-dealer').innerText = `Baixa: ${stringScore(pg.dealer.scoreLow)} | Alta: ${stringScore(pg.dealer.scoreHigh)}`;
-    }
-
-    const dHigh = pg.dealer.scoreHigh;
-    const dLow = pg.dealer.scoreLow;
-
-    const renderJogador = (idJog, pfix) => {
-        const j = pg.jogadores[idJog];
-        if (!j) return;
-        
-        desenhar(`paigow-${pfix}-low`, j.low);
-        desenhar(`paigow-${pfix}-high`, j.high);
-        
-        if (idJog === pg.meuId) {
-            document.getElementById('paigow-pts-low').innerText = stringScore(j.scoreLow);
-            document.getElementById('paigow-pts-high').innerText = stringScore(j.scoreHigh);
-        }
-
-        if (pg.status === 'resultado') {
-            let winH = j.scoreHigh > dHigh;
-            let winL = j.scoreLow > dLow;
-            let resT = document.getElementById(`paigow-resultado-${pfix}`);
-            
-            if (winH && winL) { resT.innerText = '🏆 VITÓRIA (2/2)'; resT.style.color = '#f1c40f'; }
-            else if (winH || winL) { resT.innerText = '🤝 EMPATE PUSH (1/2)'; resT.style.color = '#bdc3c7'; }
-            else { resT.innerText = '💀 DERROTA (0/2)'; resT.style.color = '#e74c3c'; }
-        }
-    };
-
-    renderJogador(pg.parceiroId, 'oponente');
-    renderJogador(pg.meuId, 'jogador');
-
-    if (pg.status === 'resultado') {
-        btnNovaMao.classList.remove('escondido');
-    }
-}
-
-window.resetarMesaPaiGow = async function() {
-    window.motorPaiGow.vitoriaComemorada = false;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/paigow_royale`), {
-        status: 'apostando', apostaAnte: window.motorPaiGow.apostaAnte, quemFinalizou: '', prontos: {joao: false, thamiris: false}
-    });
-};
-
-// ============================================================================
-// 🌴 MOTOR REAL-TIME: CARIBBEAN POKER (AVALIADOR DE MÃOS E SINCRONIA DUPLA)
-// ============================================================================
-
-window.motorCarib = {
-    meuId: '', parceiroId: '', status: 'apostando', apostaAnte: 50,
-    baralho: [], dealer: { mao: [] }, vitoriaComemorada: false, quemFinalizou: '',
-    prontos: { joao: false, thamiris: false },
-    jogadores: { joao: { mao: [], acao: '' }, thamiris: { mao: [], acao: '' } }
-};
-
-window.fecharMesaCarib = function() {
-    const mesa = document.getElementById('mesa-carib');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-};
-
-function gerarBaralhoCarib() {
-    const naipes = ['♥️', '♦️', '♣️', '♠️'];
-    const valores = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-    let baralho = [];
-    for(let n of naipes) {
-        for(let v of valores) {
-            baralho.push({ naipe: n, valor: v, cor: (n==='♥️'||n==='♦️') ? 'poker-red' : 'poker-black' });
-        }
-    }
-    return baralho.sort(() => Math.random() - 0.5);
-}
-
-function criarDivCartaCarib(carta, delay) {
-    if (!carta) return '';
-    return `<div class="poker-card animacao-distribuir ${carta.cor}" style="animation-delay: ${delay}s; width: 55px; height: 80px; font-size: 0.9em;">
-        <div class="poker-val-topo">${carta.valor}</div>
-        <div class="poker-naipe-centro" style="font-size: 1.8rem;">${carta.naipe}</div>
-        <div class="poker-val-base">${carta.valor}</div>
-    </div>`;
-}
-
-// 🧠 A Inteligência Artificial de Avaliação do Poker (Robusta)
-function avaliarMaoCarib(mao) {
-    if (!mao || mao.length !== 5) return { rank: 0, str: "Erro", score: 0, mult: 1, qualifica: false };
-    
-    const valMap = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
-    let nums = mao.map(c => valMap[c.valor]).sort((a,b) => b - a);
-    let naipes = mao.map(c => c.naipe);
-    
-    let isFlush = naipes.every(n => n === naipes[0]);
-    let isStraight = false;
-    
-    if (nums[0] === 14 && nums[1] === 5 && nums[2] === 4 && nums[3] === 3 && nums[4] === 2) {
-        isStraight = true; nums = [5,4,3,2,1]; 
-    } else {
-        isStraight = nums.every((v, i) => i === 0 || v === nums[i-1] - 1);
-    }
-
-    let counts = {};
-    nums.forEach(v => counts[v] = (counts[v] || 0) + 1);
-    let freqs = Object.entries(counts).map(e => ({v: parseInt(e[0]), c: e[1]})).sort((a,b) => b.c - a.c || b.v - a.v);
-    
-    let rank = 1, str = "Carta Alta", mult = 1;
-    if (isStraight && isFlush && nums[0] === 14) { rank = 10; str = "Royal Flush"; mult = 100; }
-    else if (isStraight && isFlush) { rank = 9; str = "Straight Flush"; mult = 50; }
-    else if (freqs[0].c === 4) { rank = 8; str = "Quadra"; mult = 20; }
-    else if (freqs[0].c === 3 && freqs[1].c === 2) { rank = 7; str = "Full House"; mult = 7; }
-    else if (isFlush) { rank = 6; str = "Flush"; mult = 5; }
-    else if (isStraight) { rank = 5; str = "Sequência"; mult = 4; }
-    else if (freqs[0].c === 3) { rank = 4; str = "Trinca"; mult = 3; }
-    else if (freqs[0].c === 2 && freqs[1].c === 2) { rank = 3; str = "Dois Pares"; mult = 2; }
-    else if (freqs[0].c === 2) { rank = 2; str = "Par"; mult = 1; }
-
-    // Calcula um score preciso para desempate
-    let score = rank * 1000000 + freqs[0].v * 10000;
-    if (freqs.length > 1) score += freqs[1].v * 100;
-    if (freqs.length > 2) score += freqs[2].v;
-
-    // Regra Global do Casino: Qualifica se tiver Par+ ou A-K
-    let qualifica = rank > 1 || (nums.includes(14) && nums.includes(13));
-
-    return { rank, str, mult, score, qualifica };
-}
-
-window.iniciarOuvinteCarib = function() {
-    window.motorCarib.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorCarib.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/caribbean_royale`), (snapshot) => {
-        try {
-            const data = snapshot.val() || {};
-
-            window.motorCarib.status = data.status || 'apostando';
-            window.motorCarib.quemFinalizou = data.quemFinalizou || '';
-            window.motorCarib.apostaAnte = Number(data.apostaAnte) || 50;
-            window.motorCarib.prontos = data.prontos || { joao: false, thamiris: false };
-            
-            window.motorCarib.baralho = JSON.parse(data.baralho || "[]");
-            window.motorCarib.dealer = { mao: JSON.parse(data.dealer?.mao || "[]") };
-
-            let jInfo = data.jogadores?.joao || {};
-            let tInfo = data.jogadores?.thamiris || {};
-
-            window.motorCarib.jogadores = {
-                joao: { acao: jInfo.acao || '', mao: JSON.parse(jInfo.mao || "[]") },
-                thamiris: { acao: tInfo.acao || '', mao: JSON.parse(tInfo.mao || "[]") }
-            };
-
-            renderMesaCarib();
-
-            if (window.motorCarib.status === 'resultado' && !window.motorCarib.vitoriaComemorada) {
-                window.motorCarib.vitoriaComemorada = true;
-                processarFimCarib();
-            }
-        } catch (e) {
-            console.error("Erro na leitura do Caribbean:", e);
-        }
-    });
-
-    const visor = document.getElementById('carib-valor-aposta');
-    if (visor) visor.innerText = window.motorCarib.apostaAnte;
-};
-
-window.ajustarApostaCarib = function(delta) {
-    if (window.motorCarib.status !== 'apostando') return;
-    if (window.motorCarib.prontos[window.motorCarib.meuId]) return;
-    
-    let atual = Number(window.motorCarib.apostaAnte) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    // O custo potencial total (Ante + Call) por jogador é 3x a aposta escolhida. 
-    // Como são 2 jogadores, custo máximo potencial = 6x a aposta. Protegemos o cofre:
-    const maxAposta = Math.floor(saldo / 6); 
-    if (novoValor > maxAposta) novoValor = maxAposta;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorCarib.apostaAnte = novoValor;
-    const visor = document.getElementById('carib-valor-aposta');
-    if (visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-// 🚨 FASE 1: PAGAR ANTE (Sincronia Dupla)
-window.iniciarRodadaCarib = async function() {
-    if (window.motorCarib.status !== 'apostando') return;
-    if (window.motorCarib.prontos[window.motorCarib.meuId]) return;
-
-    let ante = Number(window.motorCarib.apostaAnte);
-    if (isNaN(ante) || ante <= 0) return;
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const caribRef = ref(db, `cassino/caribbean_royale`);
-
-    const snap = await get(caribRef);
-    let prontos = (snap.val() || {}).prontos || { joao: false, thamiris: false };
-    prontos[window.motorCarib.meuId] = true;
-
-    if (prontos[window.motorCarib.parceiroId] === true) {
-        // Ambos prontos: Cobra 2x Ante (uma de cada) e dá as cartas
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(-(ante * 2), `Caribbean Poker (Ante Co-op)`);
-        }
-
-        let baralho = gerarBaralhoCarib(); 
-        let mDealer = [baralho.pop(), baralho.pop(), baralho.pop(), baralho.pop(), baralho.pop()];
-        let mJoao = [baralho.pop(), baralho.pop(), baralho.pop(), baralho.pop(), baralho.pop()];
-        let mThamiris = [baralho.pop(), baralho.pop(), baralho.pop(), baralho.pop(), baralho.pop()];
-
-        await update(caribRef, {
-            status: 'jogando',
-            apostaAnte: ante,
-            baralho: JSON.stringify(baralho),
-            dealer: { mao: JSON.stringify(mDealer) },
-            jogadores: {
-                joao: { mao: JSON.stringify(mJoao), acao: '' },
-                thamiris: { mao: JSON.stringify(mThamiris), acao: '' }
-            },
-            prontos: { joao: false, thamiris: false } // Reseta para a fase 2 (Call/Fold)
-        });
-
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    } else {
-        await update(caribRef, { prontos: prontos, apostaAnte: ante });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando Parceiro pagar Ante...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-    }
-};
-
-// 🚨 FASE 2: CALL OU FOLD (Sincronia Dupla)
-window.acaoCarib = async function(escolha) {
-    if (window.motorCarib.status !== 'jogando') return;
-    if (window.motorCarib.prontos[window.motorCarib.meuId]) return;
-
-    const ante = Number(window.motorCarib.apostaAnte);
-    const custoCall = ante * 2;
-
-    if (escolha === 'call') {
-        const saldo = Number(window.pontosDoCasal);
-        if (saldo < custoCall) {
-            if(typeof mostrarToast === 'function') mostrarToast("Fichas insuficientes para o Call!", "💸");
-            return;
-        }
-        // Cobra o Call imediatamente na sua jogada
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(-custoCall, `Caribbean Poker (Call - ${window.motorCarib.meuId})`);
-        }
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    } else {
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.8);
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const caribRef = ref(db, `cassino/caribbean_royale`);
-
-    const snap = await get(caribRef);
-    let dataAtual = snap.val() || {};
-    let prontos = dataAtual.prontos || { joao: false, thamiris: false };
-    
-    prontos[window.motorCarib.meuId] = true;
-
-    let up = { prontos: prontos };
-    up[`jogadores/${window.motorCarib.meuId}/acao`] = escolha;
-
-    if (prontos[window.motorCarib.parceiroId] === true) {
-        // Os dois decidiram. Vai para o Showdown!
-        up.status = 'resultado';
-        up.quemFinalizou = window.motorCarib.meuId; // Quem clicou por último resolve a matemática
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast("Decisão travada. Aguardando a Equipe...", "🔒");
-    }
-
-    await update(caribRef, up);
-};
-
-// 🚨 FASE 3: SHOWDOWN DA INTELIGÊNCIA ARTIFICIAL
-async function processarFimCarib() {
-    if (window.motorCarib.quemFinalizou !== window.motorCarib.meuId) {
-        renderMesaCarib(); 
-        return; 
-    }
-
-    const mDealer = window.motorCarib.dealer.mao;
-    const avalDealer = avaliarMaoCarib(mDealer);
-    const ante = Number(window.motorCarib.apostaAnte);
-    const apostaCall = ante * 2;
-    
-    let ganhoTotal = 0;
-
-    const resolverJogador = (jInfo) => {
-        if (jInfo.acao === 'fold') return 0; // Perdeu a Ante. Call não foi pago. Recupera zero.
-        
-        let avalJ = avaliarMaoCarib(jInfo.mao);
-        
-        if (!avalDealer.qualifica) {
-            // Dealer não qualificou. Ante paga 1:1. Call Empata (Push).
-            // Retorno = (Ante original + Prêmio da Ante) + Call devolvido = (2x Ante) + Call
-            return (ante * 2) + apostaCall; 
-        } else {
-            // Dealer qualificou. Briga de Mãos!
-            if (avalJ.score > avalDealer.score) {
-                // Vitória! Ante paga 1:1. Call paga o multiplicador.
-                return (ante * 2) + apostaCall + (apostaCall * avalJ.mult);
-            } else if (avalJ.score === avalDealer.score) {
-                // Empate absoluto. Push em tudo.
-                return ante + apostaCall;
-            } else {
-                // Derrota. A casa leva tudo.
-                return 0;
-            }
-        }
-    };
-
-    const jJoao = window.motorCarib.jogadores.joao;
-    const jThamiris = window.motorCarib.jogadores.thamiris;
-    
-    ganhoTotal += resolverJogador(jJoao);
-    ganhoTotal += resolverJogador(jThamiris);
-
-    if (ganhoTotal > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Caribbean Poker`);
-        setTimeout(() => {
-            if(typeof confetti === 'function') confetti({colors: ['#1abc9c', '#D4AF37'], particleCount: 300});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`A EQUIPE LEVOU +${ganhoTotal} 💰!`, "🎰");
-        }, 1500);
-    } else {
-        setTimeout(() => {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A Banca engoliu as apostas... 💀`, "💸");
-        }, 1500);
-    }
-}
-
-function renderMesaCarib() {
-    const cb = window.motorCarib;
-    const painelAnte = document.getElementById('carib-painel-aposta');
-    const painelAcao = document.getElementById('carib-painel-acao');
-    const btnNovaMao = document.getElementById('btn-carib-novamao');
-    const btnInic = document.getElementById('btn-iniciar-carib');
-    const btnFold = document.getElementById('btn-carib-fold');
-    const btnCall = document.getElementById('btn-carib-call');
-
-    if (!painelAnte) return;
-
-    if (cb.status === 'apostando') {
-        painelAnte.style.display = 'flex';
-        painelAcao.classList.add('escondido');
-        btnNovaMao.classList.add('escondido');
-        
-        document.getElementById('carib-mao-dealer').innerHTML = '';
-        document.getElementById('carib-mao-oponente').innerHTML = '';
-        document.getElementById('carib-mao-jogador').innerHTML = '';
-        document.getElementById('carib-resultado-jogador').innerText = '';
-        document.getElementById('carib-resultado-oponente').innerText = '';
-        document.getElementById('carib-info-dealer').innerText = '';
-
-        if (cb.prontos[cb.meuId]) {
-            btnInic.innerText = "AGUARDANDO... ⏳";
-            btnInic.style.background = "#555";
-        } else {
-            btnInic.innerText = "PAGAR ANTE ♠️";
-            btnInic.style.background = "linear-gradient(145deg, #1abc9c, #16a085)";
-        }
-        return; 
-    }
-
-    painelAnte.style.display = 'none';
-
-    // RENDERIZA DEALER
-    const divDealer = document.getElementById('carib-mao-dealer');
-    divDealer.innerHTML = '';
-    cb.dealer.mao.forEach((c, idx) => {
-        if (idx > 0 && cb.status === 'jogando') {
-            // Esconde 4 cartas do Dealer durante o jogo
-            divDealer.innerHTML += `<div class="poker-card-back animacao-distribuir" style="width: 55px; height: 80px;"></div>`;
-        } else {
-            divDealer.innerHTML += criarDivCartaCarib(c, idx * 0.1);
-        }
-    });
-
-    if (cb.status === 'resultado') {
-        let avalD = avaliarMaoCarib(cb.dealer.mao);
-        document.getElementById('carib-info-dealer').innerText = avalD.qualifica ? `QUALIFICOU: ${avalD.str}` : `NÃO QUALIFICOU (${avalD.str})`;
-        document.getElementById('carib-info-dealer').style.color = avalD.qualifica ? '#e74c3c' : '#bdc3c7';
-    }
-
-    // RENDERIZA JOGADORES
-    const renderJogador = (idJog, divMao, divRes) => {
-        const j = cb.jogadores[idJog];
-        const maoH = document.getElementById(divMao);
-        if (!maoH || !j) return;
-        
-        maoH.innerHTML = '';
-        j.mao.forEach((c, i) => maoH.innerHTML += criarDivCartaCarib(c, i * 0.1));
-        
-        let avalJ = avaliarMaoCarib(j.mao);
-        let resT = document.getElementById(divRes);
-        
-        if (j.acao === 'fold') {
-            resT.innerText = 'FUGIU (FOLD)';
-            resT.style.color = '#e74c3c';
-            maoH.style.opacity = '0.5';
-        } else if (cb.status === 'resultado') {
-            maoH.style.opacity = '1';
-            let avalD = avaliarMaoCarib(cb.dealer.mao);
-            if (!avalD.qualifica) {
-                resT.innerText = `WIN: ${avalJ.str} (+Ante)`;
-                resT.style.color = '#2ecc71';
-            } else {
-                if (avalJ.score > avalD.score) { resT.innerText = `WIN: ${avalJ.str}`; resT.style.color = '#f1c40f'; }
-                else if (avalJ.score < avalD.score) { resT.innerText = `LOSE: ${avalJ.str}`; resT.style.color = '#e74c3c'; }
-                else { resT.innerText = `PUSH (Empate)`; resT.style.color = '#bdc3c7'; }
-            }
-        } else if (j.acao === 'call') {
-            resT.innerText = `APOSTOU: ${avalJ.str}`;
-            resT.style.color = '#f1c40f';
-        } else {
-            resT.innerText = `Sua vez! Você tem um(a) ${avalJ.str}`;
-            resT.style.color = '#1abc9c';
-        }
-    };
-
-    renderJogador(cb.parceiroId, 'carib-mao-oponente', 'carib-resultado-oponente');
-    renderJogador(cb.meuId, 'carib-mao-jogador', 'carib-resultado-jogador');
-
-    // UI DE AÇÃO E BOTÕES
-    if (cb.status === 'jogando') {
-        painelAcao.classList.remove('escondido');
-        if (cb.prontos[cb.meuId]) {
-            btnFold.innerText = "AGUARDANDO... ⏳"; btnFold.style.background = "#555";
-            btnCall.innerText = "AGUARDANDO... ⏳"; btnCall.style.background = "#555";
-        } else {
-            btnFold.innerText = "FUGIR (FOLD)"; btnFold.style.background = "linear-gradient(145deg, #e74c3c, #c0392b)";
-            btnCall.innerText = `APOSTAR (${cb.apostaAnte * 2}💰)`; btnCall.style.background = "linear-gradient(145deg, #f1c40f, #f39c12)";
-        }
-    } else if (cb.status === 'resultado') {
-        painelAcao.classList.add('escondido');
-        btnNovaMao.classList.remove('escondido');
-    }
-}
-
-window.resetarMesaCarib = async function() {
-    window.motorCarib.vitoriaComemorada = false;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/caribbean_royale`), {
-        status: 'apostando', apostaAnte: window.motorCarib.apostaAnte, quemFinalizou: '', prontos: {joao: false, thamiris: false}
-    });
-};
-
-// ============================================================================
-// 👑 MOTOR REAL-TIME: BACCARAT ROYALE (SISTEMA DE SINCRONIA E ANTI-NAN)
-// ============================================================================
-
-window.motorBac = {
-    meuId: '', parceiroId: '',
-    status: 'apostando', // 'apostando', 'rolando', 'resultado'
-    apostas: {},
-    maoJogador: [],
-    maoBanca: [],
-    roladoPor: '',
-    valorFicha: 50,
-    prontos: { joao: false, thamiris: false } 
-};
-
-window.fecharMesaBaccarat = function() {
-    const mesa = document.getElementById('mesa-baccarat');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-};
-
-function gerarBaralhoBac() {
-    const naipes = ['♥️', '♦️', '♣️', '♠️'];
-    const valores = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-    let baralho = [];
-    for(let i=0; i<4; i++) { // Baccarat usa múltiplos baralhos, simulando 4 para evitar fim
-        for(let n of naipes) {
-            for(let v of valores) {
-                baralho.push({ naipe: n, valor: v, cor: (n==='♥️'||n==='♦️') ? 'poker-red' : 'poker-black' });
-            }
-        }
-    }
-    return baralho.sort(() => Math.random() - 0.5);
-}
-
-function criarDivCartaBac(carta, delay) {
-    if (!carta) return '';
-    return `<div class="poker-card animacao-distribuir ${carta.cor}" style="animation-delay: ${delay}s">
-        <div class="poker-val-topo">${carta.valor}</div>
-        <div class="poker-naipe-centro">${carta.naipe}</div>
-        <div class="poker-val-base">${carta.valor}</div>
-    </div>`;
-}
-
-// O cálculo de Baccarat retorna sempre um dígito (0-9)
-function calcularPontosBac(mao) {
-    if (!mao || !Array.isArray(mao)) return 0;
-    let soma = 0;
-    mao.forEach(c => {
-        if (['10', 'J', 'Q', 'K'].includes(c.valor)) { soma += 0; }
-        else if (c.valor === 'A') { soma += 1; }
-        else { soma += parseInt(c.valor) || 0; }
-    });
-    return soma % 10;
-}
-
-window.iniciarOuvinteBaccarat = function() {
-    window.motorBac.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorBac.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/baccarat_royale`), (snapshot) => {
-        try {
-            const data = snapshot.val() || { status: 'apostando', apostas: {} };
-            
-            window.motorBac.status = data.status || 'apostando';
-            window.motorBac.apostas = data.apostas || {};
-            window.motorBac.roladoPor = data.roladoPor || '';
-            window.motorBac.prontos = data.prontos || { joao: false, thamiris: false };
-            
-            window.motorBac.maoJogador = JSON.parse(data.maoJogador || "[]");
-            window.motorBac.maoBanca = JSON.parse(data.maoBanca || "[]");
-
-            renderMesaBaccarat();
-
-            if (window.motorBac.status === 'rolando') {
-                animarCartasBaccarat();
-            }
-        } catch (e) {
-            console.error("Erro no ouvinte de Baccarat:", e);
-        }
-    });
-
-    const visor = document.getElementById('bac-ficha-valor');
-    if (visor) visor.innerText = window.motorBac.valorFicha;
-};
-
-window.ajustarFichaBaccarat = function(delta) {
-    if (window.motorBac.status !== 'apostando') return;
-    if (window.motorBac.prontos[window.motorBac.meuId]) return;
-    
-    let atual = Number(window.motorBac.valorFicha) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    if (novoValor > saldo) novoValor = saldo;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorBac.valorFicha = novoValor;
-    const visor = document.getElementById('bac-ficha-valor');
-    if(visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-window.apostarBaccarat = async function(tipo) {
-    if (window.motorBac.status !== 'apostando') return;
-    
-    if (window.motorBac.prontos[window.motorBac.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Aguarde a distribuição!", "⏳");
-        return;
-    }
-    
-    const valorParaApostar = Number(window.motorBac.valorFicha);
-    const saldoDisponivel = Number(window.pontosDoCasal);
-
-    if (isNaN(valorParaApostar) || valorParaApostar <= 0) return;
-
-    if (saldoDisponivel < valorParaApostar) {
-        if(typeof mostrarToast === 'function') mostrarToast("Cofre insuficiente!", "💸");
-        return;
-    }
-
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-valorParaApostar, `Aposta Baccarat: ${tipo.toUpperCase()}`);
-    }
-
-    const { db, ref, push } = window.SantuarioApp.modulos;
-    await push(ref(db, `cassino/baccarat_royale/apostas`), {
-        tipo: tipo,
-        valor: valorParaApostar,
-        autor: window.motorBac.meuId
-    });
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-};
-
-window.limparApostasBaccarat = async function() {
-    if (window.motorBac.status !== 'apostando') return;
-    if (window.motorBac.prontos[window.motorBac.meuId]) return;
-
-    let totalDevolvido = 0;
-    Object.values(window.motorBac.apostas).forEach(ap => {
-        if (ap.autor === window.motorBac.meuId) {
-            let v = Number(ap.valor);
-            if (!isNaN(v)) totalDevolvido += v;
-        }
-    });
-
-    if (totalDevolvido > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(totalDevolvido, "Reembolso Baccarat");
-        }
-    }
-
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/baccarat_royale/apostas`), null);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30, 30, 30]);
-                    }
-};
-
-function renderMesaBaccarat() {
-    const statusTxt = document.getElementById('bac-status-mesa');
-    if (statusTxt) {
-        statusTxt.innerText = window.motorBac.status === 'rolando' ? "CARTAS NA MESA..." : "FAÇAM SUAS APOSTAS";
-        statusTxt.style.color = window.motorBac.status === 'rolando' ? "#D4AF37" : "#D4AF37";
-    }
-
-    document.querySelectorAll('#bac-tabuleiro .container-fichas').forEach(el => el.innerHTML = '');
-    Object.values(window.motorBac.apostas).forEach((ap, idx) => {
-        const zona = document.getElementById(`zona-bac-${ap.tipo}`);
-        if (zona) {
-            const corBorda = ap.autor === 'joao' ? '#3498db' : '#e84393';
-            const x = (idx * 6) % 30;
-            zona.innerHTML += `<div class="ficha-cassino" style="border-color: ${corBorda}; transform: translate(${x}px, ${x}px);">${ap.valor}</div>`;
-        }
-    });
-
-    const btnLancar = document.getElementById('btn-lancar-bac');
-    if (btnLancar) {
-        if (window.motorBac.prontos[window.motorBac.meuId]) {
-            btnLancar.innerText = "ESPERANDO PARCEIRO ⏳";
-            btnLancar.style.background = "#555";
-            btnLancar.style.boxShadow = "none";
-            btnLancar.style.animation = "none";
-            btnLancar.style.color = "#ccc";
-        } else {
-            btnLancar.innerText = "DISTRIBUIR 🃏";
-            btnLancar.style.background = "linear-gradient(145deg, #D4AF37, #b38b22)";
-            btnLancar.style.boxShadow = "0 5px 20px rgba(212, 175, 55, 0.5)";
-            btnLancar.style.animation = "btnNeonPulse 1.5s infinite";
-            btnLancar.style.color = "#000";
-        }
-    }
-}
-
-// 🚨 O SORTEIO DA INTELIGÊNCIA ARTIFICIAL
-window.distribuirBaccarat = async function() {
-    if (window.motorBac.status !== 'apostando') return;
-    if (window.motorBac.prontos[window.motorBac.meuId]) return;
-
-    if (Object.keys(window.motorBac.apostas).length === 0) {
-        if(typeof mostrarToast === 'function') mostrarToast("A mesa precisa de fichas!", "⚠️");
-        return;
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const bacRef = ref(db, `cassino/baccarat_royale`);
-
-    const snap = await get(bacRef);
-    const data = snap.val() || {};
-    let prontos = data.prontos || { joao: false, thamiris: false };
-
-    prontos[window.motorBac.meuId] = true;
-
-    if (prontos[window.motorBac.parceiroId] === true) {
-        // O Crupiê tira as cartas
-        let baralho = gerarBaralhoBac();
-        let maoJ = [baralho.pop(), baralho.pop()];
-        let maoB = [baralho.pop(), baralho.pop()];
-
-        // Regra Simplificada de 3ª Carta do Baccarat
-        let ptsJ = calcularPontosBac(maoJ);
-        let ptsB = calcularPontosBac(maoB);
-        
-        // Se nenhum tem um "Natural" (8 ou 9), tiram mais cartas
-        if (ptsJ < 8 && ptsB < 8) {
-            if (ptsJ <= 5) maoJ.push(baralho.pop());
-            // Para simplificar a regra brutal da banca, ela compra se <= 5 
-            if (ptsB <= 5) maoB.push(baralho.pop()); 
-        }
-
-        await update(bacRef, {
-            status: 'rolando',
-            maoJogador: JSON.stringify(maoJ),
-            maoBanca: JSON.stringify(maoB),
-            roladoPor: window.motorBac.meuId,
-            prontos: { joao: false, thamiris: false } 
-        });
-    } else {
-        await update(bacRef, { prontos: prontos });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando confirmação...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-    }
-};
-
-function animarCartasBaccarat() {
-    const divJ = document.getElementById('bac-mao-jogador');
-    const divB = document.getElementById('bac-mao-banca');
-    const ptsJ = document.getElementById('bac-pontuacao-jogador');
-    const ptsB = document.getElementById('bac-pontuacao-banca');
-    
-    if (!divJ || !divB) return;
-
-    divJ.innerHTML = '';
-    divB.innerHTML = '';
-    ptsJ.innerText = '0';
-    ptsB.innerText = '0';
-
-    const arrJ = window.motorBac.maoJogador;
-    const arrB = window.motorBac.maoBanca;
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-
-    // Revela com delay dramático
-    setTimeout(() => {
-        arrJ.forEach((c, i) => divJ.innerHTML += criarDivCartaBac(c, i*0.2));
-        ptsJ.innerText = calcularPontosBac(arrJ);
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-    }, 500);
-
-    setTimeout(() => {
-        arrB.forEach((c, i) => divB.innerHTML += criarDivCartaBac(c, i*0.2));
-        ptsB.innerText = calcularPontosBac(arrB);
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-        
-        // Finaliza o Jogo
-        if (window.motorBac.roladoPor === window.motorBac.meuId) {
-            processarRecompensaBaccarat();
-        }
-    }, 1500); 
-}
-
-async function processarRecompensaBaccarat() {
-    let ganhoTotal = 0;
-    
-    const ptsJ = calcularPontosBac(window.motorBac.maoJogador);
-    const ptsB = calcularPontosBac(window.motorBac.maoBanca);
-    
-    let vencedor = '';
-    if (ptsJ > ptsB) vencedor = 'jogador';
-    else if (ptsB > ptsJ) vencedor = 'banca';
-    else vencedor = 'empate';
-    
-    Object.values(window.motorBac.apostas).forEach(ap => {
-        let valorAposta = Number(ap.valor);
-        
-        if (ap.tipo === vencedor) {
-            // Vitória
-            if (vencedor === 'jogador') ganhoTotal += (valorAposta * 2);
-            if (vencedor === 'banca') ganhoTotal += (valorAposta * 2); 
-            if (vencedor === 'empate') ganhoTotal += (valorAposta * 8); // Empate paga OITO pra um!
-        } else if (vencedor === 'empate' && (ap.tipo === 'jogador' || ap.tipo === 'banca')) {
-            // Regra Clássica: Se der empate, as apostas no jogador e na banca são DEVOLVIDAS
-            ganhoTotal += valorAposta;
-        }
-    });
-
-    if (ganhoTotal > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Baccarat (${vencedor.toUpperCase()})`);
-        setTimeout(() => {
-            if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 200});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`O BANCO PAGOU +${ganhoTotal} 💰!`, "👑");
-        }, 800);
-    } else {
-        setTimeout(() => {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A Casa levou... 💀`, "💸");
-        }, 800);
-    }
-
-    setTimeout(async () => {
-        const { db, ref, set } = window.SantuarioApp.modulos;
-        await set(ref(db, `cassino/baccarat_royale`), { status: 'apostando', apostas: {}, maoJogador: "[]", maoBanca: "[]", roladoPor: '', prontos: {joao: false, thamiris: false} });
-        document.getElementById('bac-mao-jogador').innerHTML = '';
-        document.getElementById('bac-mao-banca').innerHTML = '';
-        document.getElementById('bac-pontuacao-jogador').innerText = '0';
-        document.getElementById('bac-pontuacao-banca').innerText = '0';
-    }, 4500);
-}
-
-// ============================================================================
-// 🐉 MOTOR REAL-TIME: SIC BO TRINDADE (CO-OP COM SINCRONIA PERFEITA)
-// ============================================================================
-
-window.motorSicBo = {
-    meuId: '', parceiroId: '',
-    status: 'apostando', // 'apostando', 'rolando', 'resultado'
-    apostas: {},
-    resultado: [6, 6, 6],
-    roladoPor: '',
-    valorFicha: 50,
-    prontos: { joao: false, thamiris: false } 
-};
-
-// Reutilizamos a física e o som dos dados já em cache
-const somCargaSicBo = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3'); 
-
-window.fecharMesaSicBo = function() {
-    const mesa = document.getElementById('mesa-sicbo');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-};
-
-window.iniciarOuvinteSicBo = function() {
-    window.motorSicBo.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorSicBo.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/sicbo_royale`), (snapshot) => {
-        try {
-            const data = snapshot.val() || { status: 'apostando', apostas: {} };
-            
-            window.motorSicBo.status = data.status || 'apostando';
-            window.motorSicBo.apostas = data.apostas || {};
-            window.motorSicBo.resultado = data.resultado || [6, 6, 6];
-            window.motorSicBo.roladoPor = data.roladoPor || '';
-            window.motorSicBo.prontos = data.prontos || { joao: false, thamiris: false };
-
-            renderMesaSicBo();
-
-            if (window.motorSicBo.status === 'rolando') {
-                animarRolagemSicBo();
-            }
-        } catch (e) {
-            console.error("Erro no ouvinte de Sic Bo:", e);
-        }
-    });
-
-    const visor = document.getElementById('sicbo-ficha-valor');
-    if (visor) visor.innerText = window.motorSicBo.valorFicha;
-};
-
-window.ajustarFichaSicBo = function(delta) {
-    if (window.motorSicBo.status !== 'apostando') return;
-    if (window.motorSicBo.prontos[window.motorSicBo.meuId]) return; // Trava de Segurança
-    
-    let atual = Number(window.motorSicBo.valorFicha) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    if (novoValor > saldo) novoValor = saldo;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorSicBo.valorFicha = novoValor;
-    const visor = document.getElementById('sicbo-ficha-valor');
-    if(visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-window.apostarSicBo = async function(tipo) {
-    if (window.motorSicBo.status !== 'apostando') return;
-    
-    if (window.motorSicBo.prontos[window.motorSicBo.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Aguarde a Trindade agir!", "⏳");
-        return;
-    }
-    
-    const valorParaApostar = Number(window.motorSicBo.valorFicha);
-    const saldoDisponivel = Number(window.pontosDoCasal);
-
-    if (isNaN(valorParaApostar) || valorParaApostar <= 0) return;
-
-    if (saldoDisponivel < valorParaApostar) {
-        if(typeof mostrarToast === 'function') mostrarToast("Cofre insuficiente!", "💸");
-        return;
-    }
-
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-valorParaApostar, `Aposta SicBo: ${tipo}`);
-    }
-
-    const { db, ref, push } = window.SantuarioApp.modulos;
-    await push(ref(db, `cassino/sicbo_royale/apostas`), {
-        tipo: tipo,
-        valor: valorParaApostar,
-        autor: window.motorSicBo.meuId
-    });
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-};
-
-window.limparApostasSicBo = async function() {
-    if (window.motorSicBo.status !== 'apostando') return;
-    if (window.motorSicBo.prontos[window.motorSicBo.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Fichas seladas na cúpula!", "🔒");
-        return;
-    }
-
-    let totalDevolvido = 0;
-    Object.values(window.motorSicBo.apostas).forEach(ap => {
-        if (ap.autor === window.motorSicBo.meuId) {
-            let v = Number(ap.valor);
-            if (!isNaN(v)) totalDevolvido += v;
-        }
-    });
-
-    if (totalDevolvido > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(totalDevolvido, "Reembolso Sic Bo");
-        }
-    }
-
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/sicbo_royale/apostas`), null);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30, 30, 30]);
-                    }
-};
-
-function renderMesaSicBo() {
-    const statusTxt = document.getElementById('sicbo-status-mesa');
-    if (statusTxt) {
-        statusTxt.innerText = window.motorSicBo.status === 'rolando' ? "A CÚPULA TREME..." : "A TRINDADE AGUARDA";
-        statusTxt.style.color = window.motorSicBo.status === 'rolando' ? "#e74c3c" : "#f1c40f";
-    }
-
-    document.querySelectorAll('#sicbo-tabuleiro .container-fichas').forEach(el => el.innerHTML = '');
-    Object.values(window.motorSicBo.apostas).forEach((ap, idx) => {
-        const zona = document.getElementById(`zona-${ap.tipo}`);
-        if (zona) {
-            const corBorda = ap.autor === 'joao' ? '#3498db' : '#e84393';
-            const x = (idx * 6) % 30;
-            zona.innerHTML += `<div class="ficha-cassino" style="border-color: ${corBorda}; transform: translate(${x}px, ${x}px);">${ap.valor}</div>`;
-        }
-    });
-
-    const btnLancar = document.getElementById('btn-lancar-sicbo');
-    if (btnLancar) {
-        if (window.motorSicBo.prontos[window.motorSicBo.meuId]) {
-            btnLancar.innerText = "ESPERANDO PARCEIRO ⏳";
-            btnLancar.style.background = "#555";
-            btnLancar.style.boxShadow = "none";
-            btnLancar.style.animation = "none";
-            btnLancar.style.color = "#ccc";
-        } else {
-            btnLancar.innerText = "AGITAR CÚPULA 🥢";
-            btnLancar.style.background = "linear-gradient(145deg, #f1c40f, #e67e22)";
-            btnLancar.style.boxShadow = "0 5px 20px rgba(241, 196, 15, 0.5)";
-            btnLancar.style.animation = "btnNeonPulse 1.5s infinite";
-            btnLancar.style.color = "#000";
-        }
-    }
-}
-
-// 🚨 SINCRONIA CO-OP: Exatamente como no Craps, blindado.
-window.lancarDadosSicBo = async function() {
-    if (window.motorSicBo.status !== 'apostando') return;
-    if (window.motorSicBo.prontos[window.motorSicBo.meuId]) return;
-
-    if (Object.keys(window.motorSicBo.apostas).length === 0) {
-        if(typeof mostrarToast === 'function') mostrarToast("Honrem os deuses com fichas!", "⚠️");
-        return;
-    }
-
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const sicboRef = ref(db, `cassino/sicbo_royale`);
-
-    const snap = await get(sicboRef);
-    const data = snap.val() || {};
-    let prontos = data.prontos || { joao: false, thamiris: false };
-
-    prontos[window.motorSicBo.meuId] = true;
-
-    if (prontos[window.motorSicBo.parceiroId] === true) {
-        // Gera 3 dados de 1 a 6
-        const d1 = Math.floor(Math.random() * 6) + 1;
-        const d2 = Math.floor(Math.random() * 6) + 1;
-        const d3 = Math.floor(Math.random() * 6) + 1;
-
-        await update(sicboRef, {
-            status: 'rolando',
-            resultado: [d1, d2, d3],
-            roladoPor: window.motorSicBo.meuId,
-            prontos: { joao: false, thamiris: false } 
-        });
-    } else {
-        await update(sicboRef, { prontos: prontos });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando a confirmação do outro lado...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-    }
-};
-
-function animarRolagemSicBo() {
-    // Reutiliza a matriz facesDado do Craps, se estiver declarada
-    const arrayFaces = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-    
-    const d1El = document.getElementById('sicbo-dado1');
-    const d2El = document.getElementById('sicbo-dado2');
-    const d3El = document.getElementById('sicbo-dado3');
-    const resVisor = document.getElementById('sicbo-resultado-texto');
-    
-    if (!d1El || !d2El || !d3El) return;
-
-    resVisor.classList.add('escondido');
-    d1El.classList.add('rolando-dado');
-    d2El.classList.add('rolando-dado');
-    d3El.classList.add('rolando-dado');
-    
-    if(!window.SantuarioSomPausado) {
-        somCargaSicBo.currentTime = 0;
-        somCargaSicBo.play().catch(()=>{});
-    }
-
-    let interval = setInterval(() => {
-        d1El.innerText = arrayFaces[Math.floor(Math.random() * 6) + 1];
-        d2El.innerText = arrayFaces[Math.floor(Math.random() * 6) + 1];
-        d3El.innerText = arrayFaces[Math.floor(Math.random() * 6) + 1];
-    }, 100);
-
-    setTimeout(() => {
-        clearInterval(interval);
-        d1El.classList.remove('rolando-dado');
-        d2El.classList.remove('rolando-dado');
-        d3El.classList.remove('rolando-dado');
-        somCargaSicBo.pause();
-        
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 200]);
-                    }
-
-        const resArray = window.motorSicBo.resultado;
-        d1El.innerText = arrayFaces[resArray[0]];
-        d2El.innerText = arrayFaces[resArray[1]];
-        d3El.innerText = arrayFaces[resArray[2]];
-        
-        const soma = resArray[0] + resArray[1] + resArray[2];
-        resVisor.innerText = soma;
-        resVisor.classList.remove('escondido');
-
-        if (window.motorSicBo.roladoPor === window.motorSicBo.meuId) {
-            processarRecompensaSicBo();
-        }
-    }, 2800); // Dá um tempinho extra de tensão por serem 3 dados
-}
-
-async function processarRecompensaSicBo() {
-    let ganhoTotal = 0;
-    const res = window.motorSicBo.resultado;
-    const soma = res[0] + res[1] + res[2];
-    
-    // Regras Core do Sic Bo
-    const ehTriplo = (res[0] === res[1] && res[1] === res[2]);
-    const ehDuplo = (res[0] === res[1] || res[1] === res[2] || res[0] === res[2]);
-    
-    Object.values(window.motorSicBo.apostas).forEach(ap => {
-        let acertou = false;
-        let mult = 0;
-
-        // Small/Big pagam 1:1 (dobram o valor). MAS perdem se der Triplo!
-        if (ap.tipo === 'pequeno' && soma >= 4 && soma <= 10 && !ehTriplo) { acertou = true; mult = 2; }
-        if (ap.tipo === 'grande' && soma >= 11 && soma <= 17 && !ehTriplo) { acertou = true; mult = 2; }
-        
-        // Duplos e Triplos Jackpot
-        if (ap.tipo === 'duplo' && ehDuplo) { acertou = true; mult = 10; }
-        if (ap.tipo === 'triplo' && ehTriplo) { acertou = true; mult = 30; }
-        
-        // Zona Mística
-        if (ap.tipo === 'soma_mistica' && (soma === 10 || soma === 11)) { acertou = true; mult = 6; }
-
-        if (acertou) ganhoTotal += (Number(ap.valor) * mult);
-    });
-
-    if (ganhoTotal > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Sic Bo (${soma})`);
-        setTimeout(() => {
-            if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#e74c3c'], particleCount: 200});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`OS DEUSES PAGARAM +${ganhoTotal} 💰!`, "🐉");
-        }, 500);
-    } else {
-        setTimeout(() => {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A cúpula levou as fichas... 💀`, "💸");
-        }, 500);
-    }
-
-    setTimeout(async () => {
-        const { db, ref, set } = window.SantuarioApp.modulos;
-        await set(ref(db, `cassino/sicbo_royale`), { status: 'apostando', apostas: {}, resultado: [6,6,6], roladoPor: '', prontos: {joao: false, thamiris: false} });
-        document.getElementById('sicbo-resultado-texto').classList.add('escondido');
-    }, 4000);
-}
-
-// ============================================================================
-// ♠️ MOTOR REAL-TIME: BLACKJACK TEAM (TOTALMENTE ISOLADO)
-// ============================================================================
-
-window.motorBjCoop = {
-    meuId: '', parceiroId: '', status: 'apostando', turno: '', apostaAtual: 50,
-    baralho: [], dealer: { mao: [] }, vitoriaComemorada: false, quemFinalizou: '',
-    jogadores: { joao: { mao: [], status: 'jogando' }, thamiris: { mao: [], status: 'jogando' } }
-};
-
-window.fecharMesaBjCoop = function() {
-    const mesa = document.getElementById('mesa-bj-coop');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-};
-
-function gerarBaralhoBjCoop() {
-    const naipes = ['♥️', '♦️', '♣️', '♠️'];
-    const valores = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-    let baralho = [];
-    for(let n of naipes) {
-        for(let v of valores) {
-            baralho.push({ naipe: n, valor: v, cor: (n==='♥️'||n==='♦️') ? 'poker-red' : 'poker-black' });
-        }
-    }
-    return baralho.sort(() => Math.random() - 0.5);
-}
-
-function criarDivCartaBjCoop(carta, delay) {
-    if (!carta) return '';
-    return `<div class="poker-card animacao-distribuir ${carta.cor}" style="animation-delay: ${delay}s">
-        <div class="poker-val-topo">${carta.valor}</div>
-        <div class="poker-naipe-centro">${carta.naipe}</div>
-        <div class="poker-val-base">${carta.valor}</div>
-    </div>`;
-}
-
-function calcularPontosBjCoop(mao) {
-    if (!mao || !Array.isArray(mao)) return 0;
-    let soma = 0; let ases = 0;
-    mao.forEach(c => {
-        if (c && c.valor === 'A') { soma += 11; ases += 1; }
-        else if (c && ['J', 'Q', 'K'].includes(c.valor)) { soma += 10; }
-        else if (c && c.valor) { soma += parseInt(c.valor) || 0; }
-    });
-    while (soma > 21 && ases > 0) { soma -= 10; ases -= 1; }
-    return soma;
-}
-
-window.iniciarOuvinteBlackjack = function() {
-    window.motorBjCoop.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorBjCoop.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/blackjack_team`), (snapshot) => {
-        try {
-            const data = snapshot.val() || {};
-
-            window.motorBjCoop.status = data.status || 'apostando';
-            window.motorBjCoop.turno = data.turno || '';
-            window.motorBjCoop.quemFinalizou = data.quemFinalizou || '';
-            window.motorBjCoop.apostaAtual = Number(data.apostaAtual) || 50;
-            
-            window.motorBjCoop.baralho = JSON.parse(data.baralho || "[]");
-            window.motorBjCoop.dealer = { mao: JSON.parse(data.dealer?.mao || "[]") };
-
-            let jInfo = data.jogadores?.joao || {};
-            let tInfo = data.jogadores?.thamiris || {};
-
-            window.motorBjCoop.jogadores = {
-                joao: { status: jInfo.status || 'jogando', mao: JSON.parse(jInfo.mao || "[]") },
-                thamiris: { status: tInfo.status || 'jogando', mao: JSON.parse(tInfo.mao || "[]") }
-            };
-
-            renderMesaBjCoop();
-
-            if (window.motorBjCoop.status === 'resultado' && !window.motorBjCoop.vitoriaComemorada) {
-                window.motorBjCoop.vitoriaComemorada = true;
-                processarFimBjCoop();
-            }
-        } catch (e) {
-            console.error("Erro na leitura do Blackjack Co-op:", e);
-        }
-    });
-
-    const visor = document.getElementById('bj-coop-valor-aposta');
-    if (visor) visor.innerText = window.motorBjCoop.apostaAtual;
-};
-
-window.ajustarApostaBjCoop = function(delta) {
-    if (window.motorBjCoop.status !== 'apostando') return;
-    
-    let atual = Number(window.motorBjCoop.apostaAtual) || 50;
-    let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    const maxApostaCasal = Math.floor(saldo / 2); 
-    if (novoValor > maxApostaCasal) novoValor = maxApostaCasal;
-    if (novoValor < 10) novoValor = 10;
-    
-    window.motorBjCoop.apostaAtual = novoValor;
-    const visor = document.getElementById('bj-coop-valor-aposta');
-    if (visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-window.iniciarRodadaBjCoop = async function() {
-    if (window.motorBjCoop.status !== 'apostando') return;
-
-    let apostaBase = Number(window.motorBjCoop.apostaAtual);
-    if (isNaN(apostaBase) || apostaBase <= 0) return;
-
-    let custoTotal = apostaBase * 2;
-    const saldo = Number(window.pontosDoCasal) || 0;
-    
-    if (saldo < custoTotal) {
-        if(typeof mostrarToast === 'function') mostrarToast("Saldo insuficiente!", "💸");
-        return;
-    }
-
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-custoTotal, `Aposta: Blackjack Team`);
-    }
-
-    if(typeof mostrarToast === 'function') mostrarToast("Distribuindo...", "🃏");
-
-    try {
-        let baralho = gerarBaralhoBjCoop(); 
-        
-        let maoDealer = [baralho.pop(), baralho.pop()];
-        let maoJoao = [baralho.pop(), baralho.pop()];
-        let maoThamiris = [baralho.pop(), baralho.pop()];
-
-        let stJoao = calcularPontosBjCoop(maoJoao) === 21 ? 'blackjack' : 'jogando';
-        let stThamiris = calcularPontosBjCoop(maoThamiris) === 21 ? 'blackjack' : 'jogando';
-
-        let meuId = window.motorBjCoop.meuId;
-        let parceiroId = window.motorBjCoop.parceiroId;
-        let stEu = meuId === 'joao' ? stJoao : stThamiris;
-        let stParceiro = parceiroId === 'joao' ? stJoao : stThamiris;
-
-        let primTurno = meuId;
-        if (stEu !== 'jogando') primTurno = parceiroId;
-        
-        let quemFim = '';
-        if (stEu !== 'jogando' && stParceiro !== 'jogando') {
-            primTurno = 'dealer';
-            quemFim = meuId; 
-        }
-
-        const { db, ref, update } = window.SantuarioApp.modulos;
-        await update(ref(db, `cassino/blackjack_team`), {
-            status: primTurno === 'dealer' ? 'resultado' : 'jogando',
-            turno: primTurno,
-            quemFinalizou: quemFim,
-            apostaAtual: apostaBase,
-            baralho: JSON.stringify(baralho),
-            dealer: { mao: JSON.stringify(maoDealer) },
-            jogadores: {
-                joao: { mao: JSON.stringify(maoJoao), status: stJoao },
-                thamiris: { mao: JSON.stringify(maoThamiris), status: stThamiris }
-            }
-        });
-
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    } catch (e) {
-        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(custoTotal, `Estorno BJ Team`);
-    }
-};
-
-window.acaoBjCoop = async function(acao) {
-    if (window.motorBjCoop.turno !== window.motorBjCoop.meuId) return;
-
-    const { db, ref, update } = window.SantuarioApp.modulos;
-    let up = {};
-    
-    let minhaMao = [...(window.motorBjCoop.jogadores[window.motorBjCoop.meuId].mao || [])];
-    let baralho = [...(window.motorBjCoop.baralho || [])];
-    let meuStatus = window.motorBjCoop.jogadores[window.motorBjCoop.meuId].status;
-    let proxTurno = window.motorBjCoop.parceiroId;
-
-    if (acao === 'comprar' && baralho.length > 0) {
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.8);
-        minhaMao.push(baralho.pop());
-        
-        let pts = calcularPontosBjCoop(minhaMao);
-        if (pts > 21) {
-            meuStatus = 'estourou';
-            if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 200]);
-                    }
-        } else if (pts === 21) {
-            meuStatus = 'parou';
-        } else {
-            proxTurno = window.motorBjCoop.meuId; 
-        }
-    } else if (acao === 'parar') {
-        meuStatus = 'parou';
-    }
-
-    if (proxTurno === window.motorBjCoop.parceiroId) {
-        let statusParceiro = window.motorBjCoop.jogadores[window.motorBjCoop.parceiroId]?.status;
-        if (statusParceiro !== 'jogando') {
-            proxTurno = 'dealer'; 
-        }
-    }
-
-    up[`cassino/blackjack_team/jogadores/${window.motorBjCoop.meuId}/mao`] = JSON.stringify(minhaMao);
-    up[`cassino/blackjack_team/jogadores/${window.motorBjCoop.meuId}/status`] = meuStatus;
-    up[`cassino/blackjack_team/baralho`] = JSON.stringify(baralho);
-    up[`cassino/blackjack_team/turno`] = proxTurno;
-    
-    if (proxTurno === 'dealer') {
-        up[`cassino/blackjack_team/status`] = 'resultado';
-        up[`cassino/blackjack_team/quemFinalizou`] = window.motorBjCoop.meuId; 
-    }
-
-    await update(ref(db), up);
-};
-
-async function processarFimBjCoop() {
-    if (window.motorBjCoop.quemFinalizou !== window.motorBjCoop.meuId) {
-        renderMesaBjCoop(); 
-        return; 
-    }
-
-    let baralho = [...(window.motorBjCoop.baralho || [])];
-    let maoDealer = [...(window.motorBjCoop.dealer.mao || [])];
-    
-    let ptsDealer = calcularPontosBjCoop(maoDealer);
-    while (ptsDealer < 17 && baralho.length > 0) {
-        maoDealer.push(baralho.pop());
-        ptsDealer = calcularPontosBjCoop(maoDealer);
-    }
-
-    const { db, ref, update } = window.SantuarioApp.modulos;
-    
-    await update(ref(db, `cassino/blackjack_team`), {
-        'dealer/mao': JSON.stringify(maoDealer),
-        'baralho': JSON.stringify(baralho)
-    });
-
-    let ganhoTotal = 0;
-    const aposta = Number(window.motorBjCoop.apostaAtual) || 0;
-    const jJoao = window.motorBjCoop.jogadores.joao;
-    const jThamiris = window.motorBjCoop.jogadores.thamiris;
-    const ptsJoao = calcularPontosBjCoop(jJoao.mao);
-    const ptsThamiris = calcularPontosBjCoop(jThamiris.mao);
-
-    if (jJoao.status === 'blackjack' && ptsDealer !== 21) ganhoTotal += (aposta * 2.5); 
-    else if (jJoao.status !== 'estourou' && (ptsDealer > 21 || ptsJoao > ptsDealer)) ganhoTotal += (aposta * 2); 
-    else if (jJoao.status !== 'estourou' && ptsJoao === ptsDealer) ganhoTotal += aposta; 
-
-    if (jThamiris.status === 'blackjack' && ptsDealer !== 21) ganhoTotal += (aposta * 2.5);
-    else if (jThamiris.status !== 'estourou' && (ptsDealer > 21 || ptsThamiris > ptsDealer)) ganhoTotal += (aposta * 2);
-    else if (jThamiris.status !== 'estourou' && ptsThamiris === ptsDealer) ganhoTotal += aposta;
-
-    if (ganhoTotal > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Blackjack Team`);
-        setTimeout(() => {
-            if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#3498db'], particleCount: 200});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`A EQUIPE GANHOU +${ganhoTotal} 💰!`, "🎰");
-        }, 1000);
-    } else {
-        setTimeout(() => {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A banca venceu... 💀`, "💸");
-        }, 1000);
-    }
-}
-
-function renderMesaBjCoop() {
-    const bj = window.motorBjCoop;
-    const painelAposta = document.getElementById('bj-coop-painel-aposta');
-    const painelAcao = document.getElementById('bj-coop-painel-acao');
-    const avisoTurno = document.getElementById('bj-coop-aviso-turno');
-    const btnNovaMao = document.getElementById('btn-bj-coop-novamao');
-
-    if (!painelAposta) return;
-
-    if (bj.status === 'apostando') {
-        painelAposta.style.display = 'flex';
-        painelAcao.classList.add('escondido');
-        avisoTurno.classList.add('escondido');
-        btnNovaMao.classList.add('escondido');
-        document.getElementById('bj-coop-mao-dealer').innerHTML = '';
-        document.getElementById('bj-coop-mao-oponente').innerHTML = '';
-        document.getElementById('bj-coop-mao-jogador').innerHTML = '';
-        document.getElementById('bj-coop-resultado-jogador').innerText = '';
-        document.getElementById('bj-coop-resultado-oponente').innerText = '';
-        return; 
-    }
-
-    painelAposta.style.display = 'none';
-
-    const maoDealerDiv = document.getElementById('bj-coop-mao-dealer');
-    if (maoDealerDiv) {
-        maoDealerDiv.innerHTML = '';
-        bj.dealer.mao.forEach((c, index) => {
-            if (index === 1 && bj.status === 'jogando') {
-                maoDealerDiv.innerHTML += `<div class="poker-card-back animacao-distribuir" style="width: 55px; height: 80px;"></div>`;
-            } else {
-                maoDealerDiv.innerHTML += criarDivCartaBjCoop(c, index * 0.1);
-            }
-        });
-    }
-
-    if (bj.status === 'resultado') {
-        document.getElementById('bj-coop-pontuacao-dealer').innerText = calcularPontosBjCoop(bj.dealer.mao);
-    } else if (bj.dealer.mao.length > 0) {
-        document.getElementById('bj-coop-pontuacao-dealer').innerText = calcularPontosBjCoop([bj.dealer.mao[0]]);
-    }
-
-    const renderJogador = (idJogador, divMao, divPts, divRes) => {
-        const j = bj.jogadores[idJogador];
-        if (!j) return;
-        const maoHtml = document.getElementById(divMao);
-        if (!maoHtml) return;
-        
-        maoHtml.innerHTML = '';
-        j.mao.forEach((c, i) => maoHtml.innerHTML += criarDivCartaBjCoop(c, i * 0.1));
-        
-        let pts = calcularPontosBjCoop(j.mao);
-        const divPontos = document.getElementById(divPts);
-        if(divPontos) divPontos.innerText = pts;
-
-        let resTxt = '';
-        if (j.status === 'estourou') resTxt = '💥 BUSTED';
-        else if (j.status === 'blackjack') resTxt = '⭐ BLACKJACK!';
-        else if (j.status === 'parou') resTxt = '🛑 Parou';
-        
-        if (bj.status === 'resultado') {
-            let ptsDealer = calcularPontosBjCoop(bj.dealer.mao);
-            if (j.status === 'estourou') resTxt = '💀 BUSTED';
-            else if (ptsDealer > 21 || pts > ptsDealer) resTxt = '🏆 WIN!';
-            else if (pts === ptsDealer) resTxt = '🤝 PUSH';
-            else resTxt = '💸 LOSE';
-        }
-        const divResultado = document.getElementById(divRes);
-        if (divResultado) divResultado.innerText = resTxt;
-    };
-
-    renderJogador(bj.parceiroId, 'bj-coop-mao-oponente', 'bj-coop-pontuacao-oponente', 'bj-coop-resultado-oponente');
-    renderJogador(bj.meuId, 'bj-coop-mao-jogador', 'bj-coop-pontuacao-jogador', 'bj-coop-resultado-jogador');
-
-    if (bj.status === 'jogando') {
-        if (bj.turno === bj.meuId) {
-            painelAcao.classList.remove('escondido');
-            avisoTurno.classList.add('escondido');
-        } else {
-            painelAcao.classList.add('escondido');
-            avisoTurno.classList.remove('escondido');
-            avisoTurno.innerText = `Aguardando Equipe...`;
-        }
-    } else if (bj.status === 'resultado') {
-        painelAcao.classList.add('escondido');
-        avisoTurno.classList.add('escondido');
-        btnNovaMao.classList.remove('escondido');
-    }
-}
-
-window.resetarMesaBjCoop = async function() {
-    window.motorBjCoop.vitoriaComemorada = false;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/blackjack_team`), {
-        status: 'apostando', turno: '', apostaAtual: window.motorBjCoop.apostaAtual, quemFinalizou: ''
-    });
-};
-
-// ============================================================================
-// 🎡 MOTOR REAL-TIME: ROLETA COMPARTILHADA (CO-OP GIGANTE) - BLINDADO
-// ============================================================================
-
-// 🚨 HASTEAMENTO GLOBAL EXPLICÍTO: Blindagem total contra ReferenceError no Console
-// 🚨 Função de Fechar a Mesa Corrigida (Sem recarregar o app!)
-window.fecharMesaRoletaMulti = function() {
-    const mesa = document.getElementById('mesa-roleta-multi');
+    // 🚨 Vacina contra colisão de nomes:
+    if (idMesa.includes('russa') || idMesa === 'roletarussa') idMesa = 'roletarussa';
+    else if (idMesa.includes('roleta') && !idMesa.includes('multi')) idMesa = 'roleta-multi';
+
+    const mesa = document.getElementById('mesa-' + idMesa);
     if(mesa) { 
-        mesa.classList.add('escondido'); 
-        mesa.style.display = 'none'; 
+        mesa.classList.remove('escondido'); 
+        mesa.style.display = 'flex'; 
     }
     
-    // Se a roleta estiver tocando som e a pessoa sair, nós pausamos o áudio
-    if (typeof somCatracaRoleta !== 'undefined' && !somCatracaRoleta.paused) {
-        somCatracaRoleta.pause();
-        somCatracaRoleta.currentTime = 0;
-    }
-};
+    if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
 
-window.motorRoletaMulti = {
-    meuId: '',
-    status: 'apostando', // 'apostando', 'girando', 'resultado'
-    apostas: {}, 
-    resultado: null,
-    giradoPor: '',
-    valorFicha: 50 // Garantido como número puro
-};
-
-// Som mecânico de roleta (Opcional, gera muita dopamina)
-const somCatracaRoleta = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
-
-// Variável persistente para acumular as voltas da roleta
-window.anguloGlobalRoleta = 0;
-
-window.iniciarOuvinteRoletaMulti = function() {
-    window.motorRoletaMulti.meuId = window.souJoao ? 'joao' : 'thamiris';
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/roleta_royale`), (snapshot) => {
-        const data = snapshot.val() || { status: 'apostando' };
-        
-        // Se o status mudou para girando agora, disparar a física
-        if (data.status === 'girando' && window.motorRoletaMulti.status !== 'girando') {
-            window.motorRoletaMulti.resultado = data.resultado;
-            window.motorRoletaMulti.giradoPor = data.giradoPor;
-            window.motorRoletaMulti.status = 'girando'; // Sincroniza estado antes de animar
-            animarGiroRoletaMulti();
-        }
-
-        window.motorRoletaMulti.status = data.status || 'apostando';
-        window.motorRoletaMulti.apostas = data.apostas || {};
-        window.motorRoletaMulti.resultado = data.resultado || null;
-        window.motorRoletaMulti.giradoPor = data.giradoPor || '';
-
-        renderizarMesaRoletaMulti();
-    });
-
-    const visor = document.getElementById('roleta-multi-ficha-valor');
-    if (visor) visor.innerText = window.motorRoletaMulti.valorFicha;
-};
-
-// --- AJUSTE DE FICHA COM TRAVA DE SEGURANÇA E TIPAGEM ---
-window.ajustarFichaRoleta = function(delta) {
-    if (window.motorRoletaMulti.status !== 'apostando') return;
-    
-    // Garante que o valor atual seja um número antes de somar
-    let atual = Number(window.motorRoletaMulti.valorFicha) || 50;
-    let novoValor = atual + delta;
-    
-    // Regras de limites
-    if (novoValor < 10) novoValor = 10;
-    
-    // Sanitização total do visor contra NaN
-    if(isNaN(window.pontosDoCasal)) {
-        window.location.reload(); return; // Falha catastrófica de rede/auth
-    }
-    
-    if (novoValor > window.pontosDoCasal) novoValor = window.pontosDoCasal;
-    if (novoValor < 10) novoValor = 10; // Teto de segurança pós-salvamento
-    
-    window.motorRoletaMulti.valorFicha = novoValor;
-    
-    const visor = document.getElementById('roleta-multi-ficha-valor');
-    if(visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
-};
-
-// --- APOSTA CO-OP COM SANITIZAÇÃO TOTAL DO COFRE ---
-window.apostarRoletaMulti = async function(tipo) {
-    if (window.motorRoletaMulti.status !== 'apostando') {
-        if(typeof mostrarToast === 'function') mostrarToast("Roda girando, aguarde!", "⏳");
-        return;
-    }
-    
-    // 🛡️ BLINDAGEM FINANCEIRA TOTAL: Impede que NaN chegue ao banco_central
-    const valorParaApostar = Number(window.motorRoletaMulti.valorFicha);
-    const saldoDisponivel = Number(window.pontosDoCasal);
-
-    if (isNaN(valorParaApostar) || valorParaApostar <= 0) {
-        window.motorRoletaMulti.valorFicha = 50; // Auto-reset de visor corrompido
-        return;
-    }
-
-    if (saldoDisponivel < valorParaApostar) {
-        if(typeof mostrarToast === 'function') mostrarToast("Cofre insuficiente!", "💸");
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6);
-        return;
-    }
-
-    // Processa o débito na conta conjunta no core.js (NÚMERO LIMPO)
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-valorParaApostar, `Roleta Co-op: ${tipo}`);
-    }
-
-    // Salva a ficha física na mesa sincronizada
-    const { db, ref, push } = window.SantuarioApp.modulos;
-    await push(ref(db, `cassino/roleta_royale/apostas`), {
-        tipo: tipo,
-        valor: valorParaApostar,
-        autor: window.motorRoletaMulti.meuId
-    });
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-};
-
-// --- LIMPEZA DE MESA COM REEMBOLSO (BLINDADA) ---
-window.limparApostasRoleta = async function() {
-    if (window.motorRoletaMulti.status !== 'apostando') return;
-
-    let totalDevolvido = 0;
-    // Percorre as apostas garantindo tipagem Numérica
-    Object.values(window.motorRoletaMulti.apostas).forEach(ap => {
-        if (ap.autor === window.motorRoletaMulti.meuId) {
-            let v = Number(ap.valor);
-            if (!isNaN(v)) totalDevolvido += v;
-        }
-    });
-
-    if (totalDevolvido > 0) {
-        // Envia apenas números limpos para o core.js
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(totalDevolvido, "Reembolso Roleta");
-        }
-        if(typeof mostrarToast === 'function') mostrarToast(`+${totalDevolvido} devolvidos.`, "♻️");
-    }
-
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/roleta_royale/apostas`), null);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30, 30, 30]);
-                    }
-};
-
-// --- RENDERIZAÇÃO VISUAL ---
-function renderizarMesaRoletaMulti() {
-    const statusTxt = document.getElementById('roleta-multi-status-mesa');
-    if (!statusTxt) return;
-
-    statusTxt.innerText = window.motorRoletaMulti.status === 'girando' ? "SORTEANDO..." : "FAÇAM SUAS APOSTAS";
-    statusTxt.style.color = window.motorRoletaMulti.status === 'girando' ? "#f1c40f" : "#2ecc71";
-
-    // Limpa containers visualmente
-    document.querySelectorAll('.container-fichas').forEach(el => el.innerHTML = '');
-
-    const listaApostas = window.motorRoletaMulti.apostas || {};
-    Object.values(listaApostas).forEach((ap, idx) => {
-        const zona = document.getElementById(`zona-${ap.tipo}`);
-        if (zona) {
-            const corBorda = ap.autor === 'joao' ? '#3498db' : '#e84393';
-            zona.innerHTML += `<div class="ficha-cassino" style="border-color: ${corBorda};">${ap.valor}</div>`;
-        }
-    });
-}
-
-// --- O GIRO (MATEMÁTICA E SORTEIO) ---
-window.girarRoletaMulti = async function() {
-    if (window.motorRoletaMulti.status !== 'apostando') return;
-    if (Object.keys(window.motorRoletaMulti.apostas).length === 0) {
-        if(typeof mostrarToast === 'function') mostrarToast("Coloquem ao menos uma ficha!", "⚠️");
-        return;
-    }
-
-    // O Cassino Sorteia
-    const num = Math.floor(Math.random() * 37); // 0 a 36
-    const cor = num === 0 ? 'verde' : (num % 2 === 0 ? 'preto' : 'vermelho');
-
-    const { db, ref, update } = window.SantuarioApp.modulos;
-    
-    // Trava a mesa e revela quem girou
-    await update(ref(db, `cassino/roleta_royale`), {
-        status: 'girando',
-        resultado: { numero: num, cor: cor },
-        giradoPor: window.motorRoletaMulti.meuId
-    });
-};
-
-function animarGiroRoletaMulti() {
-    const disco = document.getElementById('roleta-multi-disco');
-    const resVisor = document.getElementById('roleta-multi-resultado');
-    if (!disco || !resVisor || !window.motorRoletaMulti.resultado) return;
-
-    resVisor.classList.add('escondido');
-    disco.classList.add('efeito-blur-giro');
-    
-    if(!window.SantuarioSomPausado) {
-        somCatracaRoleta.currentTime = 0;
-        somCatracaRoleta.play().catch(()=>{});
-    }
-
-    // 🚨 A MÁGICA DA FÍSICA:
-    // 1. Adicionamos no mínimo 5 voltas completas (1800deg) ao ângulo atual
-    window.anguloGlobalRoleta += 1800; 
-    
-    // 2. Calculamos a posição exata do número (Cada fatia tem ~9.72 graus)
-    // Subtraímos para o disco girar no sentido horário corretamente
-    const ajusteNumero = (window.motorRoletaMulti.resultado.numero * 9.72);
-    const anguloFinal = window.anguloGlobalRoleta + (360 - ajusteNumero);
-
-    disco.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
-    disco.style.transform = `rotate(${anguloFinal}deg)`;
-
-    setTimeout(() => {
-        disco.classList.remove('efeito-blur-giro');
-        somCatracaRoleta.pause();
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-        
-        document.getElementById('roleta-multi-res-num').innerText = window.motorRoletaMulti.resultado.numero;
-        const rCor = document.getElementById('roleta-multi-res-cor');
-        rCor.innerText = window.motorRoletaMulti.resultado.cor;
-        rCor.style.color = window.motorRoletaMulti.resultado.cor === 'vermelho' ? '#e74c3c' : (window.motorRoletaMulti.resultado.cor === 'preto' ? '#fff' : '#2ecc71');
-        
-        resVisor.classList.remove('escondido');
-
-        if (window.motorRoletaMulti.giradoPor === window.motorRoletaMulti.meuId) {
-            processarRecompensaRoleta();
-        }
-    }, 4100);
-}
-
-async function processarRecompensaRoleta() {
-    let ganho = 0;
-    const res = window.motorRoletaMulti.resultado;
-    
-    Object.values(window.motorRoletaMulti.apostas).forEach(ap => {
-        let acertou = false;
-        let mult = 2;
-
-        if (ap.tipo === 'vermelho' && res.cor === 'vermelho') acertou = true;
-        if (ap.tipo === 'preto' && res.cor === 'preto') acertou = true;
-        if (ap.tipo === 'par' && res.numero > 0 && res.numero % 2 === 0) acertou = true;
-        if (ap.tipo === 'impar' && res.numero > 0 && res.numero % 2 !== 0) acertou = true;
-        if (ap.tipo === 'menor' && res.numero >= 1 && res.numero <= 18) acertou = true;
-        if (ap.tipo === 'maior' && res.numero >= 19 && res.numero <= 36) acertou = true;
-        if (ap.tipo === 'verde' && res.numero === 0) { acertou = true; mult = 14; } // O Jackpot do Zero!
-
-        if (acertou) ganho += (Number(ap.valor) * mult);
-    });
-
-    // Paga apenas números limpos pro core.js
-    if (ganho > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(ganho, `Vitória Roleta: ${res.numero}`);
-        }
-        if(typeof mostrarToast === 'function') mostrarToast(`+${ganho} para o cofre conjunto!`, "🎰");
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast(`A mesa levou as fichas.`, "💸");
-    }
-
-    // Reseta a mesa para a próxima rodada após 3 segundos
-    setTimeout(async () => {
-        const { db, ref, set } = window.SantuarioApp.modulos;
-        await set(ref(db, `cassino/roleta_royale`), { status: 'apostando', apostas: {}, resultado: null, giradoPor: '' });
-        document.getElementById('roleta-multi-resultado').classList.add('escondido');
-    }, 4000);
-}
-
-// ============================================================================
-// ♠️ MOTOR REAL-TIME: TEXAS HOLD'EM POKER (BLINDADO ANTI-CRASH)
-// ============================================================================
-
-let motorPoker = {
-    meuId: '', parceiroId: '', estado: 'aguardando', turno: '', pote: 0, apostaAtual: 0,
-    mesaCartas: [], baralho: [], vencedor: null, vitoriaComemorada: false,
-    jogadores: {}
-};
-
-window.fecharMesaPoker = function() {
-    const mesa = document.getElementById('mesa-poker');
-    if(mesa) mesa.style.display = 'none';
+    // Redirecionamento blindado para os jogos
+    if (idMesa === 'uno' && typeof iniciarOuvinteUno === 'function') iniciarOuvinteUno();
+    else if (idMesa === 'duelo21' && typeof iniciarOuvinteDuelo21 === 'function') iniciarOuvinteDuelo21();
+    else if (idMesa === 'dadosmentiroso' && typeof iniciarOuvinteDadosMentiroso === 'function') iniciarOuvinteDadosMentiroso();
+    else if (idMesa === 'roletarussa' && typeof iniciarOuvinteRoletaRussa === 'function') iniciarOuvinteRoletaRussa();
+    else if (idMesa === 'pontevidro' && typeof iniciarOuvintePonteVidro === 'function') iniciarOuvintePonteVidro();
+    else if (idMesa === 'corrida' && typeof iniciarOuvinteCorrida === 'function') iniciarOuvinteCorrida();
+    else if (idMesa === 'desarmebomba' && typeof iniciarOuvinteDesarmeBomba === 'function') iniciarOuvinteDesarmeBomba();
+    // 🚨 IGNIÇÃO DO COLISEU DOS ELEMENTOS
+    else if (idMesa === 'elementos' && typeof iniciarOuvinteElementos === 'function') iniciarOuvinteElementos();
+    // 🚨 IGNIÇÃO DO CAÇA AO DIAMANTE
+    else if (idMesa === 'cacadiamante' && typeof iniciarOuvinteCacaDiamante === 'function') iniciarOuvinteCacaDiamante();
+    // 🚨 A IGNIÇÃO DO CHEFÃO FINAL
+    else if (idMesa === 'sincroniacofre' && typeof iniciarOuvinteSincroniaCofre === 'function') iniciarOuvinteSincroniaCofre();
+    // 🚨 A IGNIÇÃO DO NOVO CO-OP
+    else if (idMesa === 'campominado' && typeof iniciarOuvinteCampoMinado === 'function') iniciarOuvinteCampoMinado();
+    else if (idMesa === 'transmissao' && typeof iniciarOuvinteTransmissao === 'function') iniciarOuvinteTransmissao();
+    else if (idMesa === 'reator' && typeof iniciarOuvinteReator === 'function') iniciarOuvinteReator();
+    // Se for jogo Solo, passa o controle de volta
+    else if (typeof window.originalAbrirMesa === 'function') window.originalAbrirMesa(nomeDoJogo);
 };
 
 // ============================================================================
-// 1. O OUVINTE DO POKER (COM PAGAMENTO BLINDADO)
+// 🎴 MOTOR REAL-TIME: UNO CLASSIC ROYALE
 // ============================================================================
-window.iniciarOuvintePoker = function() {
-    motorPoker.meuId = window.souJoao ? 'joao' : 'thamiris';
-    motorPoker.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, `cassino/poker_royale`), async (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
-
-        motorPoker.estado = data.estado;
-        motorPoker.turno = data.turno;
-        motorPoker.pote = data.pote;
-        motorPoker.apostaAtual = data.apostaAtual;
-        motorPoker.vencedor = data.vencedor === "null" ? null : data.vencedor;
-        
-        motorPoker.baralho = JSON.parse(data.baralho || "[]");
-        motorPoker.mesaCartas = JSON.parse(data.mesaCartas || "[]");
-
-        let eu = data.jogadores[motorPoker.meuId] || {};
-        let op = data.jogadores[motorPoker.parceiroId] || {};
-
-        motorPoker.jogadores = {
-            [motorPoker.meuId]: { ...eu, mao: JSON.parse(eu.mao || "[]") },
-            [motorPoker.parceiroId]: { ...op, mao: JSON.parse(op.mao || "[]") }
-        };
-
-        // 🚨 FIM DE JOGO E TRANSFERÊNCIA BANCÁRIA
-        if (motorPoker.vencedor && !motorPoker.vitoriaComemorada) {
-            motorPoker.vitoriaComemorada = true;
-            renderizarMesaPoker();
-            
-            // Lógica de Pagamento
-            if (motorPoker.vencedor === motorPoker.meuId) {
-                // Vitória sua: Seu celular faz o depósito
-                if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(100, `Prêmio: Poker (Vitória)`);
-                if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71'], particleCount: 200});
-                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-                if(typeof mostrarToast === 'function') mostrarToast("VOCÊ VENCEU! +100💰", "🏆");
-                
-            } else if (motorPoker.vencedor === 'empate') {
-                // Empate: Apenas o celular do João processa o dinheiro para não duplicar na conta conjunta!
-                if (motorPoker.meuId === 'joao') {
-                    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(100, `Prêmio: Poker (Split Pot)`);
-                }
-                if(typeof confetti === 'function') confetti({colors: ['#3498db', '#ffffff'], particleCount: 100});
-                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-                if(typeof mostrarToast === 'function') mostrarToast("EMPATE! O prêmio foi dividido.", "🤝");
-                
-            } else {
-                // Derrota
-                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-                if(typeof mostrarToast === 'function') mostrarToast("VOCÊ FOLDOU OU PERDEU! 💀", "🔥");
-            }
-            return;
-        }
-
-        renderizarMesaPoker();
-    });
-};
-
-function gerarBaralhoPoker() {
-    const naipes = ['♥️', '♦️', '♣️', '♠️'];
-    const valores = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-    let baralho = [];
-    for(let n of naipes) {
-        for(let v of valores) {
-            baralho.push({ naipe: n, valor: v, cor: (n==='♥️'||n==='♦️') ? 'poker-red' : 'poker-black' });
-        }
-    }
-    return baralho.sort(() => Math.random() - 0.5);
-}
-
-function criarDivCartaPoker(carta, delay) {
-    return `<div class="poker-card animacao-distribuir ${carta.cor}" style="animation-delay: ${delay}s">
-        <div class="poker-val-topo">${carta.valor}</div>
-        <div class="poker-naipe-centro">${carta.naipe}</div>
-        <div class="poker-val-base">${carta.valor}</div>
-    </div>`;
-}
-
-function renderizarMesaPoker() {
-    if (!motorPoker.jogadores[motorPoker.meuId]) return;
-    
-    const eu = motorPoker.jogadores[motorPoker.meuId];
-    const op = motorPoker.jogadores[motorPoker.parceiroId];
-
-    document.getElementById('poker-pote-valor').innerText = motorPoker.pote;
-    document.getElementById('poker-fichas-jogador').innerText = eu.fichas;
-    document.getElementById('poker-fichas-oponente').innerText = op.fichas;
-    
-    document.getElementById('poker-aposta-jogador').innerText = eu.aposta > 0 ? `Apostou: ${eu.aposta}` : '';
-    document.getElementById('poker-aposta-oponente').innerText = op.aposta > 0 ? `Apostou: ${op.aposta}` : '';
-
-    const aviso = document.getElementById('poker-estado-aviso');
-    if (motorPoker.vencedor) {
-        aviso.innerText = motorPoker.vencedor === 'empate' ? "EMPATE (SPLIT POT)" : (motorPoker.vencedor === motorPoker.meuId ? "🏆 VOCÊ VENCEU" : "💀 OPONENTE VENCEU");
-        aviso.style.color = motorPoker.vencedor === motorPoker.meuId ? "#2ecc71" : "#e74c3c";
-    } else {
-        aviso.innerText = motorPoker.estado === 'aguardando' ? "" : motorPoker.estado;
-        aviso.style.color = "#f1c40f";
-    }
-
-    const maoOponente = document.getElementById('poker-mao-oponente');
-    if (maoOponente) {
-        maoOponente.innerHTML = "";
-        if (motorPoker.estado !== 'aguardando') {
-            if (motorPoker.estado === 'showdown' || motorPoker.vencedor) {
-                op.mao.forEach(c => maoOponente.innerHTML += criarDivCartaPoker(c, 0));
-            } else {
-                maoOponente.innerHTML = `<div class="poker-card-back"></div><div class="poker-card-back"></div>`;
-            }
-        }
-    }
-
-    const minhaMao = document.getElementById('poker-minha-mao');
-    if (minhaMao) {
-        minhaMao.innerHTML = "";
-        if (eu.mao) eu.mao.forEach((c, i) => minhaMao.innerHTML += criarDivCartaPoker(c, i*0.2));
-    }
-
-    const board = document.getElementById('poker-mesa-cartas');
-    if (board) {
-        board.innerHTML = "";
-        if (motorPoker.mesaCartas) motorPoker.mesaCartas.forEach((c, i) => board.innerHTML += criarDivCartaPoker(c, i*0.1));
-    }
-
-    const painelAcao = document.getElementById('poker-painel-acao');
-    if (painelAcao && motorPoker.turno === motorPoker.meuId && !motorPoker.vencedor) {
-        painelAcao.classList.remove('escondido');
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30, 50]);
-                    }
-        
-        const btnCall = document.getElementById('btn-poker-check-call');
-        const diff = motorPoker.apostaAtual - eu.aposta;
-        btnCall.innerText = diff > 0 ? `PAGAR (${diff})` : `CHECK`;
-        
-        const slider = document.getElementById('poker-raise-slider');
-        slider.min = motorPoker.apostaAtual + 20;
-        slider.max = eu.fichas;
-        slider.value = slider.min;
-        document.getElementById('poker-raise-visor').innerText = slider.value;
-    } else if (painelAcao) {
-        painelAcao.classList.add('escondido');
-        document.getElementById('poker-painel-raise').classList.add('escondido');
-    }
-}
-
-window.acaoPoker = async function(acao, valorRaise = 0) {
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    document.getElementById('poker-painel-raise').classList.add('escondido');
-    document.getElementById('poker-painel-acao').classList.add('escondido');
-
-    const { db, ref, update } = window.SantuarioApp.modulos;
-    let eu = motorPoker.jogadores[motorPoker.meuId];
-    let up = {};
-
-    if (acao === 'fold') {
-        up['cassino/poker_royale/vencedor'] = motorPoker.parceiroId;
-        await update(ref(db), up);
-        return;
-    }
-
-    let diff = motorPoker.apostaAtual - eu.aposta;
-    if (acao === 'call') {
-        up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/fichas`] = eu.fichas - diff;
-        up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/aposta`] = eu.aposta + diff;
-        up[`cassino/poker_royale/pote`] = motorPoker.pote + diff;
-        eu.acao = 'call';
-    } else if (acao === 'raise') {
-        let amt = parseInt(valorRaise);
-        let custoReal = amt - eu.aposta; 
-        up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/fichas`] = eu.fichas - custoReal;
-        up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/aposta`] = amt;
-        up[`cassino/poker_royale/pote`] = motorPoker.pote + custoReal;
-        up[`cassino/poker_royale/apostaAtual`] = amt;
-        eu.acao = 'raise';
-    }
-
-    up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/acao`] = eu.acao;
-    
-    let op = motorPoker.jogadores[motorPoker.parceiroId];
-    
-    // Regras de Avanço do Poker
-    if ((eu.acao === 'call' && op.acao !== '') || (eu.acao === 'check' && op.acao === 'check')) {
-        up = avancarEstadoPoker(up);
-    } else {
-        up[`cassino/poker_royale/turno`] = motorPoker.parceiroId;
-    }
-
-    await update(ref(db), up);
-};
-
-function avancarEstadoPoker(up) {
-    up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/aposta`] = 0;
-    up[`cassino/poker_royale/jogadores/${motorPoker.parceiroId}/aposta`] = 0;
-    up[`cassino/poker_royale/jogadores/${motorPoker.meuId}/acao`] = '';
-    up[`cassino/poker_royale/jogadores/${motorPoker.parceiroId}/acao`] = '';
-    up[`cassino/poker_royale/apostaAtual`] = 0;
-    up[`cassino/poker_royale/turno`] = motorPoker.parceiroId; 
-
-    let baralho = [...motorPoker.baralho]; 
-    let mesa = [...motorPoker.mesaCartas]; 
-
-    if (motorPoker.estado === 'preflop') {
-        up['cassino/poker_royale/estado'] = 'flop';
-        mesa.push(baralho.pop(), baralho.pop(), baralho.pop());
-    } else if (motorPoker.estado === 'flop') {
-        up['cassino/poker_royale/estado'] = 'turn';
-        mesa.push(baralho.pop());
-    } else if (motorPoker.estado === 'turn') {
-        up['cassino/poker_royale/estado'] = 'river';
-        mesa.push(baralho.pop());
-    } else if (motorPoker.estado === 'river') {
-        up['cassino/poker_royale/estado'] = 'showdown';
-        up['cassino/poker_royale/vencedor'] = 'empate'; 
-    }
-
-    // 🚨 A MÁGICA: Salva tudo como String invisível para proteger o seu App!
-    up['cassino/poker_royale/mesaCartas'] = JSON.stringify(mesa);
-    up['cassino/poker_royale/baralho'] = JSON.stringify(baralho);
-    return up;
-}
-
-// ============================================================================
-// 2. O BOTÃO DE NOVA MÃO (RESETANDO A MEMÓRIA DA MESA)
-// ============================================================================
-window.iniciarMaoPoker = async function() {
-    // Cobra a taxa do casal
-    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-20, "Taxa: Poker Heads-Up");
-    if(typeof mostrarToast === 'function') mostrarToast("Dando as cartas...", "🃏");
-
-    // 🚨 A CORREÇÃO: Limpa o estado da rodada anterior para permitir novos pagamentos
-    motorPoker.vitoriaComemorada = false;
-    motorPoker.vencedor = null;
-
-    let baralho = gerarBaralhoPoker();
-    let maoJoao = [baralho.pop(), baralho.pop()];
-    let maoThamiris = [baralho.pop(), baralho.pop()];
-
-    const meuId = window.souJoao ? 'joao' : 'thamiris';
-    
-    const { db, ref, update } = window.SantuarioApp.modulos;
-    
-    // Inicia a mesa limpa e segura
-    await update(ref(db), {
-        'cassino/poker_royale': {
-            estado: 'preflop', turno: meuId, pote: 0, apostaAtual: 0,
-            mesaCartas: "[]", baralho: JSON.stringify(baralho), vencedor: "null",
-            jogadores: {
-                joao: { mao: JSON.stringify(maoJoao), fichas: 1000, aposta: 0, acao: '' },
-                thamiris: { mao: JSON.stringify(maoThamiris), fichas: 1000, aposta: 0, acao: '' }
-            }
-        }
-    });
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
-};
-
-// ============================================================================
-// 🎴 MOTOR REAL-TIME: UNO CLASSIC ROYALE (BLINDADO E JUICY)
-// ============================================================================
-
-let motorUno = {
+window.motorUno = {
     jogando: false, meuId: '', parceiroId: '', turno: '', minhaMao: [],
     cartasOponente: 0, cartaDescarte: null, corAtual: '', pote: 0,
     indexPendente: null, cartaPendente: null, vencedor: null, vitoriaComemorada: false
@@ -6400,76 +3372,44 @@ let motorUno = {
 const somHeartbeatUno = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
 somHeartbeatUno.loop = true;
 
-window.fecharMesaUno = function() {
-    somHeartbeatUno.pause();
-    const mesa = document.getElementById('mesa-uno');
-    if(mesa) mesa.style.display = 'none';
-};
-
-// ============================================================================
-// 2. O PAGAMENTO DO PRÊMIO AO VENCEDOR
-// ============================================================================
 window.iniciarOuvinteUno = function() {
-    motorUno.meuId = window.souJoao ? 'joao' : 'thamiris';
-    motorUno.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-
+    window.motorUno.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorUno.parceiroId = window.souJoao ? 'thamiris' : 'joao';
     const { db, ref, onValue, update } = window.SantuarioApp.modulos;
-    const unoRef = ref(db, `cassino/uno_royale`);
-
-    onValue(unoRef, async (snapshot) => {
+    
+    onValue(ref(db, `cassino/uno_royale`), async (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
-        motorUno.jogando = true;
-        motorUno.turno = data.turno;
-        motorUno.cartaDescarte = data.descarte;
-        motorUno.corAtual = data.corAtual;
-        motorUno.pote = data.pote || 0;
-        motorUno.vencedor = data.vencedor || null;
-        
-        motorUno.minhaMao = data.jogadores[motorUno.meuId]?.mao || [];
-        motorUno.cartasOponente = data.jogadores[motorUno.parceiroId]?.qtdCartas || 0;
+        window.motorUno.jogando = true;
+        window.motorUno.turno = data.turno;
+        window.motorUno.cartaDescarte = data.descarte;
+        window.motorUno.corAtual = data.corAtual;
+        window.motorUno.pote = data.pote || 0;
+        window.motorUno.vencedor = data.vencedor || null;
+        window.motorUno.minhaMao = data.jogadores[window.motorUno.meuId]?.mao || [];
+        window.motorUno.cartasOponente = data.jogadores[window.motorUno.parceiroId]?.qtdCartas || 0;
 
-        // 🚨 FIM DE JOGO E PAGAMENTO
-        if (motorUno.vencedor) {
+        if (window.motorUno.vencedor) {
             renderizarMesaUno();
             somHeartbeatUno.pause();
-            
-            if (motorUno.vencedor === motorUno.meuId && !motorUno.vitoriaComemorada) {
-                motorUno.vitoriaComemorada = true;
-                
-                // 💰 TRANSFERE O POTE PARA A CONTA CONJUNTA
-                if(typeof window.atualizarPontosCasal === 'function') {
-                    window.atualizarPontosCasal(motorUno.pote, `Prêmio: Vitória no UNO (${motorUno.meuId.toUpperCase()})`);
-                }
-
-                if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 300, spread: 160});
+            if (window.motorUno.vencedor === window.motorUno.meuId && !window.motorUno.vitoriaComemorada) {
+                window.motorUno.vitoriaComemorada = true;
+                if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(window.motorUno.pote, `Vitória no UNO`);
+                if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 300});
                 if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-                if(typeof mostrarToast === 'function') mostrarToast(`VITÓRIA! +${motorUno.pote} 💰 PARA O COFRE!`, "✨");
-                
-            } else if (motorUno.vencedor !== motorUno.meuId && !motorUno.vitoriaComemorada) {
-                motorUno.vitoriaComemorada = true;
-                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-                if(typeof mostrarToast === 'function') mostrarToast("VOCÊ FOI DERROTADO! 💀", "🔥");
             }
             return; 
         }
 
-        // Defesa contra Ataques
-        if (data.ataquePendente && data.ataquePendente.alvo === motorUno.meuId) {
-            if(typeof mostrarToast === 'function') mostrarToast(`ATAQUE RECEBIDO: +${data.ataquePendente.qtd} CARTAS!`, "🔥");
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
-            if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([300, 100, 400]);
-                    }
-            
+        if (data.ataquePendente && data.ataquePendente.alvo === window.motorUno.meuId) {
             for(let i = 0; i < data.ataquePendente.qtd; i++) {
-                motorUno.minhaMao.push(gerarCartaUnoAleatoria());
+                window.motorUno.minhaMao.push(gerarCartaUnoAleatoria());
             }
-            
+            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
             const up = {};
-            up[`cassino/uno_royale/jogadores/${motorUno.meuId}/mao`] = motorUno.minhaMao;
-            up[`cassino/uno_royale/jogadores/${motorUno.meuId}/qtdCartas`] = motorUno.minhaMao.length;
+            up[`cassino/uno_royale/jogadores/${window.motorUno.meuId}/mao`] = window.motorUno.minhaMao;
+            up[`cassino/uno_royale/jogadores/${window.motorUno.meuId}/qtdCartas`] = window.motorUno.minhaMao.length;
             up[`cassino/uno_royale/ataquePendente`] = null; 
             await update(ref(db), up);
             return; 
@@ -6496,76 +3436,62 @@ function renderizarMesaUno() {
     const topoOponente = document.getElementById('uno-status-oponente');
     const visorPote = document.getElementById('uno-pote-valor');
     
-    if (visorPote) visorPote.innerText = motorUno.pote;
+    if (visorPote) visorPote.innerText = window.motorUno.pote;
 
     if (indTurno && topoOponente) {
-        if (motorUno.vencedor) {
-            indTurno.innerText = motorUno.vencedor === motorUno.meuId ? "VITÓRIA 🏆" : "DERROTA 💀";
-            indTurno.style.color = motorUno.vencedor === motorUno.meuId ? "rgba(212, 175, 55, 0.15)" : "rgba(235, 77, 75, 0.15)";
-            topoOponente.innerText = motorUno.vencedor === motorUno.meuId ? "Você aniquilou o adversário!" : "O oponente levou tudo...";
-        } else if (motorUno.turno === motorUno.meuId) {
+        if (window.motorUno.vencedor) {
+            indTurno.innerText = window.motorUno.vencedor === window.motorUno.meuId ? "VITÓRIA 🏆" : "DERROTA 💀";
+            indTurno.style.color = window.motorUno.vencedor === window.motorUno.meuId ? "rgba(212, 175, 55, 0.15)" : "rgba(235, 77, 75, 0.15)";
+        } else if (window.motorUno.turno === window.motorUno.meuId) {
             indTurno.innerText = "SUA VEZ";
             indTurno.style.color = "rgba(46, 204, 113, 0.08)";
-            topoOponente.innerText = "Aguardando Oponente...";
         } else {
             indTurno.innerText = "OPONENTE";
             indTurno.style.color = "rgba(235, 77, 75, 0.08)";
-            topoOponente.innerText = "Adversário Jogando ⏳";
         }
     }
 
     const descarte = document.getElementById('uno-descarte');
-    if (descarte && motorUno.cartaDescarte) {
-        descarte.className = `uno-card uno-${motorUno.corAtual} animacao-descarte`;
-        descarte.innerHTML = criarElementoCarta(formatarSimboloUno(motorUno.cartaDescarte.valor));
-        setTimeout(() => descarte.classList.remove('animacao-descarte'), 300);
+    if (descarte && window.motorUno.cartaDescarte) {
+        descarte.className = `uno-card uno-${window.motorUno.corAtual} animacao-descarte`;
+        descarte.innerHTML = criarElementoCarta(formatarSimboloUno(window.motorUno.cartaDescarte.valor));
     }
 
     const oponenteDiv = document.getElementById('uno-mao-oponente');
     if (oponenteDiv) {
         oponenteDiv.innerHTML = "";
-        for (let i = 0; i < motorUno.cartasOponente; i++) {
-            let back = document.createElement('div');
-            back.className = 'uno-card-op';
-            back.innerHTML = '<div class="uno-oval-op"></div>';
-            oponenteDiv.appendChild(back);
+        for (let i = 0; i < window.motorUno.cartasOponente; i++) {
+            oponenteDiv.innerHTML += `<div class="uno-card-op"><div class="uno-oval-op"></div></div>`;
         }
     }
 
     const minhaMaoDiv = document.getElementById('uno-minha-mao');
     if (minhaMaoDiv) {
         minhaMaoDiv.innerHTML = "";
-        motorUno.minhaMao.forEach((carta, index) => {
+        window.motorUno.minhaMao.forEach((carta, index) => {
             let c = document.createElement('div');
             c.className = `uno-card uno-${carta.cor}`;
             c.innerHTML = criarElementoCarta(formatarSimboloUno(carta.valor));
 
             let podeJogar = false;
-            if (motorUno.turno === motorUno.meuId && !motorUno.vencedor) {
-                if (carta.cor === 'preto' || carta.cor === motorUno.corAtual || carta.valor === motorUno.cartaDescarte?.valor) {
+            if (window.motorUno.turno === window.motorUno.meuId && !window.motorUno.vencedor) {
+                if (carta.cor === 'preto' || carta.cor === window.motorUno.corAtual || carta.valor === window.motorUno.cartaDescarte?.valor) {
                     podeJogar = true;
                     c.classList.add('uno-jogavel');
                 }
             }
 
             c.onclick = () => {
-                if (motorUno.vencedor) return;
-                if (podeJogar) jogarCartaNoFirebase(carta, index);
-                else if (motorUno.turno === motorUno.meuId) {
-                    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.6);
-                    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
-                }
+                if (window.motorUno.vencedor) return;
+                if (podeJogar) window.jogarCartaNoFirebase(carta, index);
             };
             minhaMaoDiv.appendChild(c);
         });
     }
 
-    // 🚨 REVELAÇÃO DO BOTÃO UNO BLINDADA
     const btnGritar = document.getElementById('btn-uno-gritar');
     if (btnGritar) {
-        if (motorUno.minhaMao.length === 1 && !motorUno.vencedor) {
+        if (window.motorUno.minhaMao.length === 1 && !window.motorUno.vencedor) {
             btnGritar.classList.remove('escondido');
             btnGritar.style.display = 'block';
         } else {
@@ -6576,11 +3502,8 @@ function renderizarMesaUno() {
 }
 
 function avaliarTensaoUno() {
-    if (motorUno.vencedor) {
-        somHeartbeatUno.pause();
-        return;
-    }
-    if (motorUno.cartasOponente === 1 || motorUno.minhaMao.length === 1) {
+    if (window.motorUno.vencedor) { somHeartbeatUno.pause(); return; }
+    if (window.motorUno.cartasOponente === 1 || window.motorUno.minhaMao.length === 1) {
         if (!window.SantuarioSomPausado && somHeartbeatUno.paused) somHeartbeatUno.play().catch(e=>{});
     } else {
         somHeartbeatUno.pause();
@@ -6588,12 +3511,12 @@ function avaliarTensaoUno() {
 }
 
 window.jogarCartaNoFirebase = function(carta, index) {
-    if (motorUno.vencedor) return;
+    if (window.motorUno.vencedor) return;
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjCard', 0.9);
     
     if (carta.cor === 'preto') {
-        motorUno.indexPendente = index;
-        motorUno.cartaPendente = carta;
+        window.motorUno.indexPendente = index;
+        window.motorUno.cartaPendente = carta;
         document.getElementById('uno-seletor-cor').classList.remove('escondido');
         return; 
     }
@@ -6602,47 +3525,40 @@ window.jogarCartaNoFirebase = function(carta, index) {
 
 window.escolherCorUno = function(corEscolhida) {
     document.getElementById('uno-seletor-cor').classList.add('escondido');
-    processarJogada(motorUno.cartaPendente, motorUno.indexPendente, corEscolhida);
+    processarJogada(window.motorUno.cartaPendente, window.motorUno.indexPendente, corEscolhida);
 };
 
 async function processarJogada(carta, index, corFinal) {
     const { db, ref, update } = window.SantuarioApp.modulos;
     
-    let novaMao = [...motorUno.minhaMao];
+    let novaMao = [...window.motorUno.minhaMao];
     novaMao.splice(index, 1);
 
-    let proximoTurno = motorUno.parceiroId;
+    let proximoTurno = window.motorUno.parceiroId;
     if (carta.valor === 'bloqueio' || carta.valor === 'inverte' || carta.valor === '+2' || carta.valor === '+4') {
-        proximoTurno = motorUno.meuId;
+        proximoTurno = window.motorUno.meuId;
     }
 
     const updates = {};
-    updates[`cassino/uno_royale/jogadores/${motorUno.meuId}/mao`] = novaMao;
-    updates[`cassino/uno_royale/jogadores/${motorUno.meuId}/qtdCartas`] = novaMao.length;
+    updates[`cassino/uno_royale/jogadores/${window.motorUno.meuId}/mao`] = novaMao;
+    updates[`cassino/uno_royale/jogadores/${window.motorUno.meuId}/qtdCartas`] = novaMao.length;
     updates[`cassino/uno_royale/descarte`] = carta;
     updates[`cassino/uno_royale/corAtual`] = corFinal;
     updates[`cassino/uno_royale/turno`] = proximoTurno;
 
     if (carta.valor === '+2' || carta.valor === '+4') {
-        updates[`cassino/uno_royale/ataquePendente`] = { alvo: motorUno.parceiroId, qtd: carta.valor === '+4' ? 4 : 2 };
+        updates[`cassino/uno_royale/ataquePendente`] = { alvo: window.motorUno.parceiroId, qtd: carta.valor === '+4' ? 4 : 2 };
     }
 
-    if (novaMao.length === 0) {
-        updates[`cassino/uno_royale/vencedor`] = motorUno.meuId;
-    }
+    if (novaMao.length === 0) updates[`cassino/uno_royale/vencedor`] = window.motorUno.meuId;
 
     await update(ref(db), updates);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
 }
 
 window.gritarUnoAction = function() {
-    document.getElementById('btn-uno-gritar').classList.add('escondido');
     document.getElementById('btn-uno-gritar').style.display = 'none';
     if(typeof confetti === 'function') confetti({colors: ['#eb4d4b', '#f1c40f'], particleCount: 150});
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 0.8);
-    if(typeof mostrarToast === 'function') mostrarToast("UNO GRITADO COM SUCESSO!", "📢");
 };
 
 function gerarCartaUnoAleatoria() {
@@ -6654,362 +3570,3452 @@ function gerarCartaUnoAleatoria() {
 }
 
 window.comprarCartaUno = async function() {
-    if (motorUno.vencedor || motorUno.turno !== motorUno.meuId) return;
-    
-    motorUno.minhaMao.push(gerarCartaUnoAleatoria());
+    if (window.motorUno.vencedor || window.motorUno.turno !== window.motorUno.meuId) return;
+    window.motorUno.minhaMao.push(gerarCartaUnoAleatoria());
     
     const { db, ref, update } = window.SantuarioApp.modulos;
     const updates = {};
-    updates[`cassino/uno_royale/jogadores/${motorUno.meuId}/mao`] = motorUno.minhaMao;
-    updates[`cassino/uno_royale/jogadores/${motorUno.meuId}/qtdCartas`] = motorUno.minhaMao.length;
-    updates[`cassino/uno_royale/turno`] = motorUno.parceiroId; 
+    updates[`cassino/uno_royale/jogadores/${window.motorUno.meuId}/mao`] = window.motorUno.minhaMao;
+    updates[`cassino/uno_royale/jogadores/${window.motorUno.meuId}/qtdCartas`] = window.motorUno.minhaMao.length;
+    updates[`cassino/uno_royale/turno`] = window.motorUno.parceiroId; 
 
     await update(ref(db), updates);
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
 };
 
-// ============================================================================
-// 1. A COBRANÇA DA TAXA E CRIAÇÃO DA MESA
-// ============================================================================
 window.iniciarDueloUno = async function() {
-    // 🚨 COBRA A INSCRIÇÃO DA CONTA CONJUNTA
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-100, "Inscrição: Duelo UNO Royale");
-    }
-
-    if(typeof mostrarToast === 'function') mostrarToast("Inscrição paga. Embaralhando...", "🎴");
+    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-100, "Inscrição: Duelo UNO Royale");
     
-    motorUno.meuId = window.souJoao ? 'joao' : 'thamiris';
-    motorUno.parceiroId = window.souJoao ? 'thamiris' : 'joao';
-    motorUno.vitoriaComemorada = false; 
-    motorUno.vencedor = null; 
+    window.motorUno.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorUno.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    window.motorUno.vitoriaComemorada = false; 
 
     const { db, ref, update } = window.SantuarioApp.modulos;
     
-    let maoJoao = [];
-    let maoThamiris = [];
-    for(let i = 0; i < 7; i++) { 
-        maoJoao.push(gerarCartaUnoAleatoria()); 
-        maoThamiris.push(gerarCartaUnoAleatoria()); 
-    }
+    let maoJoao = []; let maoThamiris = [];
+    for(let i = 0; i < 7; i++) { maoJoao.push(gerarCartaUnoAleatoria()); maoThamiris.push(gerarCartaUnoAleatoria()); }
 
     let prim = gerarCartaUnoAleatoria();
     while(prim.cor === 'preto') prim = gerarCartaUnoAleatoria();
 
-    // 🚨 O CASSINO GERA O POTE DE RECOMPENSA (500)
     await update(ref(db), {
         'cassino/uno_royale': {
-            turno: motorUno.meuId,
+            turno: window.motorUno.meuId,
             descarte: prim, corAtual: prim.cor, pote: 500, ataquePendente: null, vencedor: null,
             jogadores: { joao: { mao: maoJoao, qtdCartas: 7 }, thamiris: { mao: maoThamiris, qtdCartas: 7 } }
         }
     });
-    
     if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
 };
 
-
-// ============================================================================
-// 🎲 MOTOR REAL-TIME: CRAPS VEGAS DICE (COM SISTEMA DE PRONTIDÃO CO-OP)
-// ============================================================================
-
-window.motorCraps = {
-    meuId: '', parceiroId: '',
-    status: 'apostando', // 'apostando', 'rolando', 'resultado'
-    apostas: {},
-    resultado: [6, 6],
-    roladoPor: '',
-    valorFicha: 50,
-    prontos: { joao: false, thamiris: false } // 🚨 NOVO: Controle de Sincronia
+// ==========================================
+// 🩸 MOTOR REAL-TIME: DUELO DE 21
+// ==========================================
+window.motorDuelo21 = {
+    meuId: '', parceiroId: '', status: 'apostando', turno: '', pote: 0, vencedor: null, vitoriaComemorada: false, quemFinalizou: '',
+    prontos: { joao: false, thamiris: false },
+    apostas: { joao: 0, thamiris: 0 },
+    baralho: [],
+    jogadores: { joao: { mao: [], status: 'jogando' }, thamiris: { mao: [], status: 'jogando' } }
 };
 
-const facesDado = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-const somRolagemDados = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3'); 
-
-window.fecharMesaCraps = function() {
-    const mesa = document.getElementById('mesa-craps');
-    if(mesa) { mesa.classList.add('escondido'); mesa.style.display = 'none'; }
-};
-
-window.iniciarOuvinteCraps = function() {
-    window.motorCraps.meuId = window.souJoao ? 'joao' : 'thamiris';
-    window.motorCraps.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+window.iniciarOuvinteDuelo21 = function() {
+    window.motorDuelo21.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorDuelo21.parceiroId = window.souJoao ? 'thamiris' : 'joao';
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    onValue(ref(db, `cassino/craps_royale`), (snapshot) => {
+    onValue(ref(db, `cassino/duelo21_royale`), (snapshot) => {
         try {
-            const data = snapshot.val() || { status: 'apostando', apostas: {} };
-            
-            window.motorCraps.status = data.status || 'apostando';
-            window.motorCraps.apostas = data.apostas || {};
-            window.motorCraps.resultado = data.resultado || [6, 6];
-            window.motorCraps.roladoPor = data.roladoPor || '';
-            window.motorCraps.prontos = data.prontos || { joao: false, thamiris: false };
+            const data = snapshot.val() || {};
 
-            renderMesaCraps();
+            window.motorDuelo21.status = data.status || 'apostando';
+            window.motorDuelo21.turno = data.turno || '';
+            window.motorDuelo21.pote = Number(data.pote) || 0;
+            window.motorDuelo21.vencedor = data.vencedor || null;
+            window.motorDuelo21.quemFinalizou = data.quemFinalizou || '';
+            window.motorDuelo21.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorDuelo21.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            window.motorDuelo21.baralho = JSON.parse(data.baralho || "[]");
 
-            if (window.motorCraps.status === 'rolando') {
-                animarRolagemCraps();
+            let jInfo = data.jogadores?.joao || {};
+            let tInfo = data.jogadores?.thamiris || {};
+
+            window.motorDuelo21.jogadores = {
+                joao: { status: jInfo.status || 'jogando', mao: JSON.parse(jInfo.mao || "[]") },
+                thamiris: { status: tInfo.status || 'jogando', mao: JSON.parse(tInfo.mao || "[]") }
+            };
+
+            renderizarMesaDuelo21();
+
+            if (window.motorDuelo21.status === 'resultado' && !window.motorDuelo21.vitoriaComemorada) {
+                window.motorDuelo21.vitoriaComemorada = true;
+                processarFimDuelo21();
             }
-        } catch (e) {
-            console.error("Erro no ouvinte de Craps:", e);
-        }
+        } catch (e) { }
     });
-
-    const visor = document.getElementById('craps-ficha-valor');
-    if (visor) visor.innerText = window.motorCraps.valorFicha;
 };
 
-window.ajustarFichaCraps = function(delta) {
-    if (window.motorCraps.status !== 'apostando') return;
-    if (window.motorCraps.prontos[window.motorCraps.meuId]) return; // 🚨 Trava se já confirmou
+function calcularPontosDuelo21(mao) {
+    if (!mao || !Array.isArray(mao)) return 0;
+    let soma = 0; let ases = 0;
+    mao.forEach(c => {
+        if (c && c.valor === 'A') { soma += 11; ases += 1; }
+        else if (c && ['J', 'Q', 'K'].includes(c.valor)) { soma += 10; }
+        else if (c && c.valor) { soma += parseInt(c.valor) || 0; }
+    });
+    while (soma > 21 && ases > 0) { soma -= 10; ases -= 1; }
+    return soma;
+}
+
+function criarBaralhoDuelo21() {
+    const naipes = ['♥️', '♦️', '♣️', '♠️'];
+    const valores = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+    let baralho = [];
+    for(let n of naipes) {
+        for(let v of valores) {
+            baralho.push({ naipe: n, valor: v, cor: (n==='♥️'||n==='♦️') ? 'poker-red' : 'poker-black' });
+        }
+    }
+    return baralho.sort(() => Math.random() - 0.5);
+}
+
+function criarDivCartaDuelo21(carta, oculta = false) {
+    if (oculta) return `<div class="poker-card-back animacao-distribuir" style="width: 55px; height: 80px;"></div>`;
+    return `<div class="poker-card animacao-distribuir ${carta.cor}" style="width: 55px; height: 80px; font-size: 0.9em;">
+        <div class="poker-val-topo">${carta.valor}</div>
+        <div class="poker-naipe-centro" style="font-size: 1.8rem;">${carta.naipe}</div>
+        <div class="poker-val-base">${carta.valor}</div>
+    </div>`;
+}
+
+window.ajustarApostaDuelo21 = function(delta) {
+    if (window.motorDuelo21.status !== 'apostando') return;
+    if (window.motorDuelo21.prontos[window.motorDuelo21.meuId]) return; 
     
-    let atual = Number(window.motorCraps.valorFicha) || 50;
+    let visor = document.getElementById('duelo21-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
     let novoValor = atual + delta;
-    
-    const saldo = Number(window.pontosDoCasal) || 0;
-    if (novoValor > saldo) novoValor = saldo;
     if (novoValor < 10) novoValor = 10;
     
-    window.motorCraps.valorFicha = novoValor;
-    const visor = document.getElementById('craps-ficha-valor');
-    if(visor) visor.innerText = novoValor;
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
+    visor.innerText = novoValor;
+    let apostaOponente = window.motorDuelo21.apostas[window.motorDuelo21.parceiroId] || 0;
+    document.getElementById('duelo21-pote-valor').innerText = novoValor + apostaOponente;
+
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
 };
 
-window.apostarCraps = async function(tipo) {
-    if (window.motorCraps.status !== 'apostando') return;
-    
-    // 🚨 Trava de Ação: Se você já apertou Lançar, não pode mais mexer nas fichas!
-    if (window.motorCraps.prontos[window.motorCraps.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Você já confirmou! Aguarde o parceiro.", "⏳");
-        return;
+window.iniciarDuelo21 = async function() {
+    if (window.motorDuelo21.status !== 'apostando') return;
+    if (window.motorDuelo21.prontos[window.motorDuelo21.meuId]) return;
+
+    let minhaAposta = Number(document.getElementById('duelo21-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const dueloRef = ref(db, `cassino/duelo21_royale`);
+
+    let meusProntos = { ...window.motorDuelo21.prontos };
+    meusProntos[window.motorDuelo21.meuId] = true;
+
+    let minhasApostas = { ...window.motorDuelo21.apostas };
+    minhasApostas[window.motorDuelo21.meuId] = minhaAposta;
+
+    if (meusProntos[window.motorDuelo21.parceiroId] === true) {
+        let poteTotal = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteTotal, `Pote do Duelo 21`);
+
+        let baralho = criarBaralhoDuelo21(); 
+        let maoJoao = [baralho.pop(), baralho.pop()];
+        let maoThamiris = [baralho.pop(), baralho.pop()];
+
+        let stJoao = calcularPontosDuelo21(maoJoao) === 21 ? 'blackjack' : 'jogando';
+        let stThamiris = calcularPontosDuelo21(maoThamiris) === 21 ? 'blackjack' : 'jogando';
+        let quemComeca = Math.random() > 0.5 ? 'joao' : 'thamiris';
+        
+        let statusGeral = 'jogando';
+        let quemFim = '';
+        if (stJoao === 'blackjack' || stThamiris === 'blackjack') {
+            statusGeral = 'resultado';
+            quemFim = window.motorDuelo21.meuId;
+        }
+
+        await update(dueloRef, {
+            status: statusGeral, turno: quemComeca, apostas: minhasApostas, pote: poteTotal,
+            vencedor: null, quemFinalizou: quemFim, baralho: JSON.stringify(baralho),
+            jogadores: {
+                joao: { mao: JSON.stringify(maoJoao), status: stJoao },
+                thamiris: { mao: JSON.stringify(maoThamiris), status: stThamiris }
+            },
+            prontos: { joao: false, thamiris: false }
+        });
+        
+        window.motorDuelo21.status = statusGeral;
+        renderizarMesaDuelo21();
+    } else {
+        await update(dueloRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+        window.motorDuelo21.prontos = meusProntos;
+        renderizarMesaDuelo21();
     }
-    
-    const valorParaApostar = Number(window.motorCraps.valorFicha);
-    const saldoDisponivel = Number(window.pontosDoCasal);
-
-    if (isNaN(valorParaApostar) || valorParaApostar <= 0) return;
-
-    if (saldoDisponivel < valorParaApostar) {
-        if(typeof mostrarToast === 'function') mostrarToast("Cofre insuficiente!", "💸");
-        return;
-    }
-
-    if(typeof window.atualizarPontosCasal === 'function') {
-        window.atualizarPontosCasal(-valorParaApostar, `Aposta Craps: ${tipo}`);
-    }
-
-    const { db, ref, push } = window.SantuarioApp.modulos;
-    await push(ref(db, `cassino/craps_royale/apostas`), {
-        tipo: tipo,
-        valor: valorParaApostar,
-        autor: window.motorCraps.meuId
-    });
-
-    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([50]);
-                    }
 };
 
-window.limparApostasCraps = async function() {
-    if (window.motorCraps.status !== 'apostando') return;
-    if (window.motorCraps.prontos[window.motorCraps.meuId]) {
-        if(typeof mostrarToast === 'function') mostrarToast("Fichas travadas. Você já confirmou!", "🔒");
-        return;
+window.acaoDuelo21 = async function(acao) {
+    if (window.motorDuelo21.status !== 'jogando') return;
+    if (window.motorDuelo21.turno !== window.motorDuelo21.meuId) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    
+    let eu = window.motorDuelo21.jogadores[window.motorDuelo21.meuId];
+    let minhaMao = [...(eu.mao || [])];
+    let baralho = [...(window.motorDuelo21.baralho || [])];
+    let meuStatus = eu.status;
+    let proxTurno = window.motorDuelo21.parceiroId;
+
+    if (acao === 'comprar' && baralho.length > 0) {
+        minhaMao.push(baralho.pop());
+        let pts = calcularPontosDuelo21(minhaMao);
+        if (pts > 21) meuStatus = 'estourou';
+        else if (pts === 21) meuStatus = 'parou';
+        else proxTurno = window.motorDuelo21.meuId; 
+    } else if (acao === 'parar') {
+        meuStatus = 'parou';
     }
 
-    let totalDevolvido = 0;
-    Object.values(window.motorCraps.apostas).forEach(ap => {
-        if (ap.autor === window.motorCraps.meuId) {
-            let v = Number(ap.valor);
-            if (!isNaN(v)) totalDevolvido += v;
-        }
-    });
-
-    if (totalDevolvido > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') {
-            window.atualizarPontosCasal(totalDevolvido, "Reembolso Craps");
-        }
+    let opStatus = window.motorDuelo21.jogadores[window.motorDuelo21.parceiroId].status;
+    if (opStatus !== 'jogando' && proxTurno === window.motorDuelo21.parceiroId) {
+        proxTurno = 'fim'; 
     }
+
+    up[`cassino/duelo21_royale/jogadores/${window.motorDuelo21.meuId}/mao`] = JSON.stringify(minhaMao);
+    up[`cassino/duelo21_royale/jogadores/${window.motorDuelo21.meuId}/status`] = meuStatus;
+    up[`cassino/duelo21_royale/baralho`] = JSON.stringify(baralho);
+    
+    if (proxTurno === 'fim' || meuStatus === 'estourou') {
+        up[`cassino/duelo21_royale/status`] = 'resultado';
+        up[`cassino/duelo21_royale/quemFinalizou`] = window.motorDuelo21.meuId;
+    } else {
+        up[`cassino/duelo21_royale/turno`] = proxTurno;
+    }
+
+    await update(ref(db), up);
+};
+
+window.processarFimDuelo21 = async function() {
+    if (window.motorDuelo21.quemFinalizou !== window.motorDuelo21.meuId) return; 
 
     const { db, ref, set } = window.SantuarioApp.modulos;
-    await set(ref(db, `cassino/craps_royale/apostas`), null);
-    if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30, 30, 30]);
-                    }
+    const jJoao = window.motorDuelo21.jogadores.joao;
+    const jThamiris = window.motorDuelo21.jogadores.thamiris;
+    const ptsJoao = calcularPontosDuelo21(jJoao.mao);
+    const ptsThamiris = calcularPontosDuelo21(jThamiris.mao);
+
+    let vencedor = 'empate';
+    if (jJoao.status === 'estourou' && jThamiris.status !== 'estourou') vencedor = 'thamiris';
+    else if (jThamiris.status === 'estourou' && jJoao.status !== 'estourou') vencedor = 'joao';
+    else if (jJoao.status === 'estourou' && jThamiris.status === 'estourou') vencedor = 'empate'; 
+    else if (ptsJoao > ptsThamiris) vencedor = 'joao';
+    else if (ptsThamiris > ptsJoao) vencedor = 'thamiris';
+    
+    await set(ref(db, `cassino/duelo21_royale/vencedor`), vencedor);
 };
 
-function renderMesaCraps() {
-    const statusTxt = document.getElementById('craps-status-mesa');
-    if (statusTxt) {
-        statusTxt.innerText = window.motorCraps.status === 'rolando' ? "DADOS VOANDO..." : "A MESA ESTÁ QUENTE";
-        statusTxt.style.color = window.motorCraps.status === 'rolando' ? "#f1c40f" : "#e67e22";
+window.renderizarMesaDuelo21 = function() {
+    const duel = window.motorDuelo21;
+    const painelAposta = document.getElementById('duelo21-painel-aposta');
+    const painelAcao = document.getElementById('duelo21-painel-acao');
+    const painelResultado = document.getElementById('duelo21-painel-resultado'); 
+    const avisoCentro = document.getElementById('duelo21-aviso-centro');
+
+    const eu = duel.jogadores[duel.meuId];
+    const op = duel.jogadores[duel.parceiroId];
+
+    // 🚨 Cálculo Dinâmico do Pote na Interface
+    let minhaAposta = Number(document.getElementById('duelo21-valor-aposta').innerText) || 50;
+    let apostaParceiro = duel.apostas[duel.parceiroId] || 0;
+    document.getElementById('duelo21-pote-valor').innerText = duel.status === 'apostando' ? (minhaAposta + apostaParceiro) : duel.pote;
+
+    if (duel.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelResultado) painelResultado.classList.add('escondido');
+
+        if(avisoCentro) { avisoCentro.innerText = "Aguardando Desafio..."; avisoCentro.style.color = "#f1c40f"; }
+        
+        const btnInic = painelAposta ? painelAposta.querySelector('button:last-child') : null;
+        if (btnInic) {
+            if (duel.prontos[duel.meuId]) {
+                btnInic.innerText = "ESPERANDO RIVAL... ⏳"; btnInic.style.background = "#555";
+            } else {
+                btnInic.innerText = "APOSTAR E DESAFIAR ⚔️"; btnInic.style.background = "linear-gradient(145deg, #e74c3c, #c0392b)";
+            }
+        }
+        return; 
     }
 
-    // Renderiza fichas físicas
-    document.querySelectorAll('#craps-tabuleiro .container-fichas').forEach(el => el.innerHTML = '');
-    Object.values(window.motorCraps.apostas).forEach((ap, idx) => {
-        const zona = document.getElementById(`zona-${ap.tipo}`);
-        if (zona) {
-            const corBorda = ap.autor === 'joao' ? '#3498db' : '#e84393';
-            const x = (idx * 6) % 30;
-            zona.innerHTML += `<div class="ficha-cassino" style="border-color: ${corBorda}; transform: translate(${x}px, ${x}px);">${ap.valor}</div>`;
-        }
-    });
+    if(painelAposta) painelAposta.classList.add('escondido');
 
-    // 🚨 MUDANÇA VISUAL DO BOTÃO DE LANÇAMENTO
-    const btnLancar = document.getElementById('btn-lancar-craps');
-    if (btnLancar) {
-        if (window.motorCraps.prontos[window.motorCraps.meuId]) {
-            btnLancar.innerText = "AGUARDANDO PARCEIRO ⏳";
-            btnLancar.style.background = "#555";
-            btnLancar.style.boxShadow = "none";
-            btnLancar.style.animation = "none";
-            btnLancar.style.color = "#ccc";
+    const divMinhaMao = document.getElementById('duelo21-sua-mao');
+    if (divMinhaMao && eu.mao) {
+        divMinhaMao.innerHTML = '';
+        eu.mao.forEach((c) => divMinhaMao.innerHTML += criarDivCartaDuelo21(c, false));
+        document.getElementById('duelo21-sua-pontuacao').innerText = calcularPontosDuelo21(eu.mao);
+    }
+
+    const divMaoOponente = document.getElementById('duelo21-mao-oponente');
+    const ptsOponente = document.getElementById('duelo21-oponente-pontuacao');
+    
+    if (divMaoOponente && op.mao) {
+        divMaoOponente.innerHTML = '';
+        if (duel.status === 'resultado') {
+            op.mao.forEach((c) => divMaoOponente.innerHTML += criarDivCartaDuelo21(c, false));
+            ptsOponente.innerText = calcularPontosDuelo21(op.mao);
         } else {
-            btnLancar.innerText = "LANÇAR DADOS 🎲";
-            btnLancar.style.background = "linear-gradient(145deg, #e67e22, #d35400)";
-            btnLancar.style.boxShadow = "0 5px 20px rgba(230, 126, 34, 0.5)";
-            btnLancar.style.animation = "btnNeonPulse 1.5s infinite";
-            btnLancar.style.color = "#fff";
+            divMaoOponente.innerHTML += criarDivCartaDuelo21(op.mao[0], true); 
+            let cartasVisiveis = [];
+            for (let i = 1; i < op.mao.length; i++) {
+                divMaoOponente.innerHTML += criarDivCartaDuelo21(op.mao[i], false); 
+                cartasVisiveis.push(op.mao[i]);
+            }
+            ptsOponente.innerText = calcularPontosDuelo21(cartasVisiveis) + " + ?";
         }
     }
+
+    if (duel.status === 'jogando') {
+        if(painelResultado) painelResultado.classList.add('escondido');
+        
+        if (eu.status === 'estourou') {
+            if(avisoCentro) { avisoCentro.innerText = "💀 VOCÊ ESTOUROU!"; avisoCentro.style.color = "#e74c3c"; }
+            if(painelAcao) painelAcao.classList.add('escondido');
+        } else if (duel.turno === duel.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = "SUA VEZ! Compre ou Pare."; avisoCentro.style.color = "#2ecc71"; }
+            if(painelAcao) painelAcao.classList.remove('escondido');
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = "Turno da Adversária ⏳"; avisoCentro.style.color = "#f39c12"; }
+            if(painelAcao) painelAcao.classList.add('escondido');
+        }
+    } 
+    else if (duel.status === 'resultado') {
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelResultado) painelResultado.classList.remove('escondido'); 
+        
+        if (duel.vencedor) {
+            if (duel.vencedor === duel.meuId) {
+                if(avisoCentro) { avisoCentro.innerText = "🏆 VOCÊ VENCEU O DUELO!"; avisoCentro.style.color = "#2ecc71"; }
+                if (duel.quemFinalizou === duel.meuId && !duel.moedasPagas) {
+                    duel.moedasPagas = true;
+                    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(duel.pote, `Vitória no Duelo 21`);
+                    if(typeof confetti === 'function') confetti({colors: ['#e74c3c', '#ffffff'], particleCount: 300});
+                }
+            } else if (duel.vencedor === 'empate') {
+                if(avisoCentro) { avisoCentro.innerText = "🤝 EMPATE! Pote devolvido."; avisoCentro.style.color = "#f1c40f"; }
+                if (duel.quemFinalizou === duel.meuId && !duel.moedasPagas) {
+                    duel.moedasPagas = true;
+                    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(duel.pote, `Empate no Duelo 21`);
+                }
+            } else {
+                if(avisoCentro) { avisoCentro.innerText = "🩸 VOCÊ FOI DERROTADO."; avisoCentro.style.color = "#e74c3c"; }
+            }
+        }
+    }
+};
+
+window.resetarDuelo21 = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorDuelo21.moedasPagas = false;
+    await set(ref(db, `cassino/duelo21_royale`), {
+        status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', 
+        prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 }
+    });
+};
+
+// ==========================================
+// 🎲 MOTOR REAL-TIME: DADOS DO MENTIROSO
+// ==========================================
+
+window.motorDadosMentiroso = {
+    meuId: '', parceiroId: '', status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', moedasPagas: false, quemApostou: '', 
+    prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+    jogadores: { joao: { dados: [], checou: false }, thamiris: { dados: [], checou: false } }
+};
+
+function safeParseDados(val) {
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') { try { return JSON.parse(val); } catch(e) { return []; } }
+    return [];
 }
 
-// 🚨 A MÁGICA DA SINCRONIA: Avalia se os dois clicaram
-window.lancarDadosCraps = async function() {
-    if (window.motorCraps.status !== 'apostando') return;
-    if (window.motorCraps.prontos[window.motorCraps.meuId]) return; // Já confirmou
+window.iniciarOuvinteDadosMentiroso = function() {
+    window.motorDadosMentiroso.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorDadosMentiroso.parceiroId = window.souJoao ? 'thamiris' : 'joao';
 
-    if (Object.keys(window.motorCraps.apostas).length === 0) {
-        if(typeof mostrarToast === 'function') mostrarToast("Coloquem fichas na mesa antes de rolar!", "⚠️");
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    onValue(ref(db, `cassino/dados_mentiroso`), (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            window.motorDadosMentiroso.status = data.status || 'apostando';
+            window.motorDadosMentiroso.turno = data.turno || '';
+            window.motorDadosMentiroso.pote = Number(data.pote) || 0;
+            window.motorDadosMentiroso.vencedor = data.vencedor || null;
+            window.motorDadosMentiroso.quemFinalizou = data.quemFinalizou || '';
+            window.motorDadosMentiroso.quemApostou = data.quemApostou || '';
+            window.motorDadosMentiroso.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorDadosMentiroso.apostas = data.apostas || { joao: 0, thamiris: 0 };
+
+            let jInfo = data.jogadores?.joao || {};
+            let tInfo = data.jogadores?.thamiris || {};
+
+            window.motorDadosMentiroso.jogadores = {
+                joao: { checou: jInfo.checou || false, dados: safeParseDados(jInfo.dados) },
+                thamiris: { checou: tInfo.checou || false, dados: safeParseDados(tInfo.dados) }
+            };
+
+            renderizarMesaDadosMentiroso();
+
+            if (window.motorDadosMentiroso.status === 'resultado' && !window.motorDadosMentiroso.moedasPagas) {
+                processarFimDadosMentiroso();
+            }
+        } catch (e) { }
+    });
+};
+
+function rolar3Dados() { return [ Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1 ]; }
+function somaDados(dadosArr) { return (!dadosArr || dadosArr.length === 0) ? 0 : dadosArr.reduce((a, b) => a + b, 0); }
+
+function criarDivDado(valor, oculto = false) {
+    if (oculto) {
+        return `<div style="width: 65px; height: 65px; background: linear-gradient(145deg, #1a0b2e, #0d041a); border: 2px solid rgba(155, 89, 182, 0.8); border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(155, 89, 182, 0.4); display: flex; justify-content: center; align-items: center; font-size: 2.8rem; color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.8); font-weight: 900; margin: 0 5px;">?</div>`;
+    }
+    const faces = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    return `<div style="width: 65px; height: 65px; background: linear-gradient(145deg, #ffffff, #e0e0e0); border: 1px solid #fff; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 -5px 15px rgba(0,0,0,0.2), inset 0 5px 15px rgba(255,255,255,1); display: flex; justify-content: center; align-items: center; font-size: 4.5rem; color: #8e44ad; text-shadow: 0 3px 5px rgba(0,0,0,0.4); line-height: 1; margin: 0 5px; font-family: 'Segoe UI', Arial, sans-serif;">${faces[valor]}</div>`;
+}
+
+window.ajustarApostaDadosMentiroso = function(delta) {
+    if (window.motorDadosMentiroso.status !== 'apostando') return;
+    if (window.motorDadosMentiroso.prontos[window.motorDadosMentiroso.meuId]) return; 
+    
+    let visor = document.getElementById('dadosmentiroso-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    visor.innerText = novoValor;
+    let apostaOponente = window.motorDadosMentiroso.apostas[window.motorDadosMentiroso.parceiroId] || 0;
+    document.getElementById('dadosmentiroso-pote-valor').innerText = novoValor + apostaOponente;
+
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarDadosMentiroso = async function() {
+    if (window.motorDadosMentiroso.status !== 'apostando') return;
+    if (window.motorDadosMentiroso.prontos[window.motorDadosMentiroso.meuId]) return;
+
+    let minhaAposta = Number(document.getElementById('dadosmentiroso-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/dados_mentiroso`);
+
+    let meusProntos = { ...window.motorDadosMentiroso.prontos };
+    meusProntos[window.motorDadosMentiroso.meuId] = true;
+
+    let minhasApostas = { ...window.motorDadosMentiroso.apostas };
+    minhasApostas[window.motorDadosMentiroso.meuId] = minhaAposta;
+
+    if (meusProntos[window.motorDadosMentiroso.parceiroId] === true) {
+        let poteTotal = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteTotal, `Pote dos Dados`);
+
+        let dJoao = rolar3Dados(); let dThamiris = rolar3Dados();
+        let quemComeca = Math.random() > 0.5 ? 'joao' : 'thamiris';
+
+        await update(jogoRef, {
+            status: 'jogando', turno: quemComeca, apostas: minhasApostas, pote: poteTotal,
+            vencedor: null, quemFinalizou: '', quemApostou: '',
+            jogadores: {
+                joao: { dados: JSON.stringify(dJoao), checou: false },
+                thamiris: { dados: JSON.stringify(dThamiris), checou: false }
+            },
+            prontos: { joao: false, thamiris: false }
+        });
+        
+        window.motorDadosMentiroso.status = 'jogando';
+        renderizarMesaDadosMentiroso();
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+        window.motorDadosMentiroso.prontos = meusProntos;
+        renderizarMesaDadosMentiroso();
+    }
+};
+
+window.acaoDadosMentiroso = async function(acao) {
+    if (window.motorDadosMentiroso.status !== 'jogando') return;
+    if (window.motorDadosMentiroso.turno !== window.motorDadosMentiroso.meuId) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    let jogo = window.motorDadosMentiroso;
+    let proxTurno = jogo.parceiroId;
+
+    if (acao === 'apostar') {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-50, `Blefe nos Dados`);
+        up[`cassino/dados_mentiroso/pote`] = jogo.pote + 50;
+        up[`cassino/dados_mentiroso/quemApostou`] = jogo.meuId;
+        up[`cassino/dados_mentiroso/jogadores/${jogo.meuId}/checou`] = false;
+        up[`cassino/dados_mentiroso/jogadores/${jogo.parceiroId}/checou`] = false; 
+        up[`cassino/dados_mentiroso/turno`] = proxTurno;
+    } 
+    else if (acao === 'pagar') {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-50, `Call nos Dados`);
+        up[`cassino/dados_mentiroso/pote`] = jogo.pote + 50;
+        up[`cassino/dados_mentiroso/status`] = 'resultado';
+        up[`cassino/dados_mentiroso/quemFinalizou`] = jogo.meuId;
+    }
+    else if (acao === 'fugir') {
+        up[`cassino/dados_mentiroso/status`] = 'resultado';
+        up[`cassino/dados_mentiroso/vencedor`] = jogo.parceiroId;
+        up[`cassino/dados_mentiroso/quemFinalizou`] = jogo.meuId;
+    }
+    else if (acao === 'check') {
+        let opChecou = jogo.jogadores[jogo.parceiroId].checou;
+        if (opChecou) {
+            up[`cassino/dados_mentiroso/status`] = 'resultado';
+            up[`cassino/dados_mentiroso/quemFinalizou`] = jogo.meuId;
+        } else {
+            up[`cassino/dados_mentiroso/jogadores/${jogo.meuId}/checou`] = true;
+            up[`cassino/dados_mentiroso/turno`] = proxTurno;
+        }
+    }
+
+    await update(ref(db), up);
+};
+
+window.processarFimDadosMentiroso = async function() {
+    if (window.motorDadosMentiroso.quemFinalizou !== window.motorDadosMentiroso.meuId) return;
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    let jogo = window.motorDadosMentiroso;
+    let vencedor = jogo.vencedor; 
+
+    if (!vencedor) {
+        let ptsJoao = somaDados(jogo.jogadores.joao.dados);
+        let ptsThamiris = somaDados(jogo.jogadores.thamiris.dados);
+        if (ptsJoao > ptsThamiris) vencedor = 'joao';
+        else if (ptsThamiris > ptsJoao) vencedor = 'thamiris';
+        else vencedor = 'empate';
+    }
+    await set(ref(db, `cassino/dados_mentiroso/vencedor`), vencedor);
+};
+
+window.renderizarMesaDadosMentiroso = function() {
+    const jogo = window.motorDadosMentiroso;
+    const painelAposta = document.getElementById('dadosmentiroso-painel-aposta');
+    const painelAtaque = document.getElementById('dadosmentiroso-painel-ataque');
+    const painelDefesa = document.getElementById('dadosmentiroso-painel-defesa');
+    const painelResultado = document.getElementById('dadosmentiroso-painel-resultado');
+    const avisoCentro = document.getElementById('dadosmentiroso-aviso-centro');
+
+    const eu = jogo.jogadores[jogo.meuId];
+    const op = jogo.jogadores[jogo.parceiroId];
+
+    // 🚨 Cálculo Dinâmico do Pote
+    let minhaAposta = Number(document.getElementById('dadosmentiroso-valor-aposta').innerText) || 50;
+    let apostaParceiro = jogo.apostas[jogo.parceiroId] || 0;
+    const visorPote = document.getElementById('dadosmentiroso-pote-valor');
+    if (visorPote) visorPote.innerText = jogo.status === 'apostando' ? (minhaAposta + apostaParceiro) : jogo.pote;
+
+    const divMinhaMao = document.getElementById('dadosmentiroso-sua-mao');
+    if (divMinhaMao && eu.dados && eu.dados.length > 0) {
+        divMinhaMao.innerHTML = eu.dados.map(v => criarDivDado(v, false)).join('');
+        document.getElementById('dadosmentiroso-sua-pontuacao').innerText = somaDados(eu.dados);
+    }
+
+    const divMaoOponente = document.getElementById('dadosmentiroso-mao-oponente');
+    if (divMaoOponente && op.dados && op.dados.length > 0) {
+        if (jogo.status === 'resultado') {
+            divMaoOponente.innerHTML = op.dados.map(v => criarDivDado(v, false)).join('');
+        } else {
+            divMaoOponente.innerHTML = op.dados.map(v => criarDivDado(v, true)).join('');
+        }
+    }
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelAtaque) painelAtaque.classList.add('escondido');
+        if(painelDefesa) painelDefesa.classList.add('escondido');
+        if(painelResultado) painelResultado.classList.add('escondido');
+
+        if(avisoCentro) { avisoCentro.innerText = "Aguardando Oponente..."; avisoCentro.style.color = "#f1c40f"; }
+
+        const btnInic = document.getElementById('btn-iniciar-dadosmentiroso');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "ESPERANDO RIVAL... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "APOSTAR E LANÇAR 🎲"; btnInic.style.background = "linear-gradient(145deg, #9b59b6, #8e44ad)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelResultado) painelResultado.classList.add('escondido');
+        
+        if (jogo.turno === jogo.meuId) {
+            if(painelAtaque) painelAtaque.classList.add('escondido');
+            if(painelDefesa) painelDefesa.classList.add('escondido');
+
+            if (jogo.quemApostou === jogo.parceiroId) {
+                if(avisoCentro) { avisoCentro.innerText = "O OPONENTE BLEFOU! Vai pagar para ver?"; avisoCentro.style.color = "#e74c3c"; }
+                if(painelDefesa) painelDefesa.classList.remove('escondido');
+            } else {
+                if(avisoCentro) { avisoCentro.innerText = "SUA VEZ! Passe ou Blefe."; avisoCentro.style.color = "#2ecc71"; }
+                if(painelAtaque) painelAtaque.classList.remove('escondido');
+            }
+        } else {
+            if(painelAtaque) painelAtaque.classList.add('escondido');
+            if(painelDefesa) painelDefesa.classList.add('escondido');
+            if(avisoCentro) { avisoCentro.innerText = "Aguardando Decisão... ⏳"; avisoCentro.style.color = "#f39c12"; }
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAtaque) painelAtaque.classList.add('escondido');
+        if(painelDefesa) painelDefesa.classList.add('escondido');
+        if(painelResultado) painelResultado.classList.remove('escondido'); 
+        
+        if (jogo.vencedor) {
+            if (jogo.vencedor === jogo.meuId) {
+                if(avisoCentro) { avisoCentro.innerText = "🏆 VOCÊ VENCEU O BLEFE!"; avisoCentro.style.color = "#2ecc71"; }
+                if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                    jogo.moedasPagas = true;
+                    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Vitória no Blefe`);
+                    if(typeof confetti === 'function') confetti({colors: ['#9b59b6', '#ffffff'], particleCount: 300});
+                }
+            } else if (jogo.vencedor === 'empate') {
+                if(avisoCentro) { avisoCentro.innerText = "🤝 EMPATE!"; avisoCentro.style.color = "#f1c40f"; }
+                if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                    jogo.moedasPagas = true;
+                    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Empate no Blefe`);
+                }
+            } else {
+                if(avisoCentro) { avisoCentro.innerText = "🩸 VOCÊ FOI ENGANADO."; avisoCentro.style.color = "#e74c3c"; }
+            }
+        }
+    }
+};
+
+window.resetarDadosMentiroso = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorDadosMentiroso.moedasPagas = false;
+    await set(ref(db, `cassino/dados_mentiroso`), {
+        status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', quemApostou: '',
+        prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 }
+    });
+};
+
+// ==========================================
+// 💣 MOTOR REAL-TIME: ROLETA RUSSA DO COFRE
+// ==========================================
+
+window.motorRoletaRussa = {
+    meuId: '', parceiroId: '', status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', moedasPagas: false,
+    prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+    grade: [], caixasAbertas: [], loots: { joao: 0, thamiris: 0 }
+};
+
+window.iniciarOuvinteRoletaRussa = function() {
+    window.motorRoletaRussa.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorRoletaRussa.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    if (!window.roletaRussaResetadoNuclear) {
+        window.roletaRussaResetadoNuclear = true;
+        set(ref(db, `cassino/roleta_russa`), {
+            status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', 
+            prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+            grade: '[]', caixasAbertas: '[]', loots: { joao: 0, thamiris: 0 }
+        });
+    }
+
+    onValue(ref(db, `cassino/roleta_russa`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+            
+            if (data.status === 'jogando' && !data.grade) { await resetarRoletaRussa(); return; }
+
+            window.motorRoletaRussa.status = data.status || 'apostando';
+            window.motorRoletaRussa.turno = data.turno || '';
+            window.motorRoletaRussa.pote = Number(data.pote) || 0;
+            window.motorRoletaRussa.vencedor = data.vencedor || null;
+            window.motorRoletaRussa.quemFinalizou = data.quemFinalizou || '';
+            window.motorRoletaRussa.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorRoletaRussa.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            
+            window.motorRoletaRussa.grade = JSON.parse(data.grade || "[]");
+            window.motorRoletaRussa.caixasAbertas = JSON.parse(data.caixasAbertas || "[]");
+            
+            let lj = data.loots?.joao || 0; let lt = data.loots?.thamiris || 0;
+            window.motorRoletaRussa.loots = { joao: Number(lj), thamiris: Number(lt) };
+
+            renderizarMesaRoletaRussa();
+
+            if (window.motorRoletaRussa.status === 'resultado' && !window.motorRoletaRussa.moedasPagas) {
+                processarFimRoletaRussa();
+            }
+        } catch (e) { }
+    });
+};
+
+function gerarGradeRoletaRussa() {
+    let g = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    return g.sort(() => Math.random() - 0.5);
+}
+
+function criarDivCaixa(index, conteudo, revelada) {
+    if (!revelada) {
+        return `<div onclick="clicarCaixaRoletaRussa(${index})" style="width: 100%; aspect-ratio: 1; background: linear-gradient(145deg, #1f1103, #0a0501); border: 2px solid rgba(243, 156, 18, 0.6); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(243, 156, 18, 0.2); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.1s;"><span style="font-size: 1.5rem; opacity: 0.3;">📦</span></div>`;
+    }
+    if (conteudo === 1) return `<div style="width: 100%; aspect-ratio: 1; background: rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c; border-radius: 8px; box-shadow: inset 0 0 20px rgba(231, 76, 60, 0.8), 0 0 20px rgba(231, 76, 60, 0.6); display: flex; justify-content: center; align-items: center; font-size: 2rem;">💣</div>`;
+    return `<div style="width: 100%; aspect-ratio: 1; background: rgba(46, 204, 113, 0.2); border: 2px solid #2ecc71; border-radius: 8px; box-shadow: inset 0 0 15px rgba(46, 204, 113, 0.5); display: flex; justify-content: center; align-items: center; font-size: 2rem;">💎</div>`;
+}
+
+window.ajustarApostaRoletaRussa = function(delta) {
+    if (window.motorRoletaRussa.status !== 'apostando') return;
+    if (window.motorRoletaRussa.prontos[window.motorRoletaRussa.meuId]) return; 
+    
+    let visor = document.getElementById('roletarussa-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    visor.innerText = novoValor;
+    let apostaOponente = window.motorRoletaRussa.apostas[window.motorRoletaRussa.parceiroId] || 0;
+    document.getElementById('roletarussa-pote-valor').innerText = novoValor + apostaOponente;
+
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarRoletaRussa = async function() {
+    let minhaAposta = Number(document.getElementById('roletarussa-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/roleta_russa`);
+
+    let meusProntos = { ...window.motorRoletaRussa.prontos };
+    meusProntos[window.motorRoletaRussa.meuId] = true;
+
+    let minhasApostas = { ...window.motorRoletaRussa.apostas };
+    minhasApostas[window.motorRoletaRussa.meuId] = minhaAposta;
+
+    if (meusProntos[window.motorRoletaRussa.parceiroId] === true) {
+        let poteTotal = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteTotal, `Entrada Roleta Russa`);
+        
+        let grade = gerarGradeRoletaRussa();
+        let quemComeca = Math.random() > 0.5 ? 'joao' : 'thamiris';
+
+        await update(jogoRef, {
+            status: 'jogando', turno: quemComeca, apostas: minhasApostas, pote: poteTotal,
+            vencedor: null, quemFinalizou: '', grade: JSON.stringify(grade), caixasAbertas: '[]',
+            loots: { joao: 0, thamiris: 0 }, prontos: { joao: false, thamiris: false }
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+    }
+};
+
+window.clicarCaixaRoletaRussa = async function(index) {
+    if (window.motorRoletaRussa.status !== 'jogando') return;
+    if (window.motorRoletaRussa.turno !== window.motorRoletaRussa.meuId) return;
+    if (window.motorRoletaRussa.caixasAbertas.includes(index)) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {}; let jogo = window.motorRoletaRussa;
+    let conteudo = jogo.grade[index];
+    let abertas = [...jogo.caixasAbertas];
+    abertas.push(index);
+    up[`cassino/roleta_russa/caixasAbertas`] = JSON.stringify(abertas);
+
+    if (conteudo === 1) {
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([300, 100, 400]);
+        up[`cassino/roleta_russa/status`] = 'resultado';
+        up[`cassino/roleta_russa/vencedor`] = jogo.parceiroId;
+        up[`cassino/roleta_russa/quemFinalizou`] = jogo.meuId;
+    } else {
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
+        if (window.Haptics && navigator.vibrate) navigator.vibrate(20);
+        let meuLoot = jogo.loots[jogo.meuId] + 50;
+        up[`cassino/roleta_russa/loots/${jogo.meuId}`] = meuLoot;
+        up[`cassino/roleta_russa/turno`] = jogo.parceiroId;
+    }
+    await update(ref(db), up);
+};
+
+window.processarFimRoletaRussa = async function() {
+    if (window.motorRoletaRussa.quemFinalizou !== window.motorRoletaRussa.meuId) return;
+    let jogo = window.motorRoletaRussa;
+    let saqueTotal = jogo.pote + jogo.loots.joao + jogo.loots.thamiris;
+    if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(saqueTotal, `Vitória Roleta Russa`);
+};
+
+window.renderizarMesaRoletaRussa = function() {
+    const jogo = window.motorRoletaRussa;
+    const painelAposta = document.getElementById('roletarussa-painel-aposta');
+    const painelRes = document.getElementById('roletarussa-painel-resultado');
+    const avisoCentro = document.getElementById('roletarussa-aviso-centro');
+    const containerLoot = document.getElementById('roletarussa-seuloot-container');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    const artOponente = window.souJoao ? "A ADVERSÁRIA" : "O ADVERSÁRIO";
+    const prepOponente = window.souJoao ? "A ADVERSÁRIA" : "O ADVERSÁRIO"; 
+    const acaoOponente = window.souJoao ? "Adversária" : "Adversário";
+
+    // 🚨 Cálculo Dinâmico do Pote
+    let minhaAposta = Number(document.getElementById('roletarussa-valor-aposta').innerText) || 50;
+    let apostaParceiro = jogo.apostas[jogo.parceiroId] || 0;
+    document.getElementById('roletarussa-pote-valor').innerText = jogo.status === 'apostando' ? (minhaAposta + apostaParceiro) : jogo.pote;
+
+    document.getElementById('roletarussa-loot-jogador').innerText = jogo.loots[jogo.meuId] || 0;
+    document.getElementById('roletarussa-loot-oponente').innerText = jogo.loots[jogo.parceiroId] || 0;
+
+    const gridDiv = document.getElementById('roletarussa-grade');
+    if (gridDiv && jogo.grade.length > 0) {
+        let html = '';
+        for (let i = 0; i < 16; i++) {
+            let isAberta = jogo.caixasAbertas.includes(i);
+            if (jogo.status === 'resultado' && jogo.grade[i] === 1) isAberta = true; 
+            html += criarDivCaixa(i, jogo.grade[i], isAberta);
+        }
+        gridDiv.innerHTML = html;
+    } else if (gridDiv) {
+        gridDiv.innerHTML = '';
+        for (let i=0; i<16; i++) gridDiv.innerHTML += criarDivCaixa(i, 0, false);
+    }
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(containerLoot) containerLoot.classList.add('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "Aguardando Oponente..."; avisoCentro.style.color = "#f1c40f"; }
+        const btnInic = document.getElementById('btn-iniciar-roletarussa');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "ESPERANDO RIVAL... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "CRIAR TABULEIRO 💣"; btnInic.style.background = "linear-gradient(145deg, #f39c12, #d35400)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(containerLoot) containerLoot.classList.remove('escondido');
+
+        if (jogo.turno === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = "SUA VEZ! Escolha uma caixa..."; avisoCentro.style.color = "#2ecc71"; }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `${acaoOponente} clicando... ⏳`; avisoCentro.style.color = "#f39c12"; }
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        
+        if (jogo.vencedor === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = `🏆 ${artOponente} ACHOU A BOMBA!\nO SAQUE É TODO SEU!`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#f39c12', '#2ecc71'], particleCount: 300});
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `💥 CABUM! VOCÊ PERDEU TUDO\nPARA ${prepOponente}.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            }
+        }
+    }
+};
+
+window.resetarRoletaRussa = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorRoletaRussa.moedasPagas = false;
+    await set(ref(db, `cassino/roleta_russa`), {
+        status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', 
+        prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+        grade: '[]', caixasAbertas: '[]', loots: { joao: 0, thamiris: 0 }
+    });
+};
+
+// ==========================================
+// 🧊 MOTOR REAL-TIME: A PONTE DE VIDRO (CO-OP)
+// ==========================================
+
+window.motorPonteVidro = {
+    meuId: '', parceiroId: '', status: 'apostando', turno: '', 
+    apostaAtual: 50, poteInicial: 0, vencedor: null, quemFinalizou: '', moedasPagas: false,
+    prontos: { joao: false, thamiris: false },
+    passoAtual: 0, caminhoSeguro: [], // Array de 10 passos (0=Esq, 1=Dir)
+    multiplicadores: [1.2, 1.5, 2.0, 3.0, 5.0, 8.0, 12.0, 20.0, 50.0, 100.0]
+};
+
+window.iniciarOuvintePonteVidro = function() {
+    window.motorPonteVidro.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorPonteVidro.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    // ☢️ RESET NUCLEAR AUTOMÁTICO ☢️
+    if (!window.ponteVidroResetadoNuclear) {
+        window.ponteVidroResetadoNuclear = true;
+        set(ref(db, `cassino/ponte_vidro`), {
+            status: 'apostando', turno: '', apostaAtual: 50, poteInicial: 0, 
+            vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+            passoAtual: 0, caminhoSeguro: '[]'
+        });
+    }
+
+    onValue(ref(db, `cassino/ponte_vidro`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            if (data.status === 'jogando' && !data.caminhoSeguro) {
+                await resetarPonteVidro(); return;
+            }
+
+            window.motorPonteVidro.status = data.status || 'apostando';
+            window.motorPonteVidro.turno = data.turno || '';
+            window.motorPonteVidro.apostaAtual = Number(data.apostaAtual) || 50;
+            window.motorPonteVidro.poteInicial = Number(data.poteInicial) || 0;
+            window.motorPonteVidro.vencedor = data.vencedor || null;
+            window.motorPonteVidro.quemFinalizou = data.quemFinalizou || '';
+            window.motorPonteVidro.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorPonteVidro.passoAtual = Number(data.passoAtual) || 0;
+            window.motorPonteVidro.caminhoSeguro = JSON.parse(data.caminhoSeguro || "[]");
+
+            renderizarMesaPonteVidro();
+
+            if (window.motorPonteVidro.status === 'resultado' && !window.motorPonteVidro.moedasPagas) {
+                processarFimPonteVidro();
+            }
+        } catch (e) { console.error("Erro Ponte de Vidro", e); }
+    });
+};
+
+function gerarCaminhoPonte() {
+    let caminho = [];
+    for (let i = 0; i < 10; i++) {
+        caminho.push(Math.random() > 0.5 ? 1 : 0); // 0 = Esquerda Segura, 1 = Direita Segura
+    }
+    return caminho;
+}
+
+window.ajustarApostaPonteVidro = function(delta) {
+    if (window.motorPonteVidro.status !== 'apostando') return;
+    if (window.motorPonteVidro.prontos[window.motorPonteVidro.meuId]) return; 
+    let atual = Number(window.motorPonteVidro.apostaAtual) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    window.motorPonteVidro.apostaAtual = novoValor;
+    const visor = document.getElementById('pontevidro-valor-aposta');
+    if (visor) visor.innerText = novoValor;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarPonteVidro = async function() {
+    let aposta = Number(window.motorPonteVidro.apostaAtual) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/ponte_vidro`);
+
+    let meusProntos = { ...window.motorPonteVidro.prontos };
+    meusProntos[window.motorPonteVidro.meuId] = true;
+
+    if (meusProntos[window.motorPonteVidro.parceiroId] === true) {
+        // Cobra a aposta dos dois (Co-op)
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-(aposta * 2), `Entrada Ponte de Vidro`);
+        
+        let caminho = gerarCaminhoPonte();
+        let quemComeca = Math.random() > 0.5 ? 'joao' : 'thamiris';
+
+        await update(jogoRef, {
+            status: 'jogando', turno: quemComeca, apostaAtual: aposta, poteInicial: aposta * 2,
+            vencedor: null, quemFinalizou: '', passoAtual: 0, caminhoSeguro: JSON.stringify(caminho),
+            prontos: { joao: false, thamiris: false }
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostaAtual: aposta, status: 'apostando' });
+    }
+};
+
+window.pisarPonteVidro = async function(escolha) {
+    let jogo = window.motorPonteVidro;
+    if (jogo.status !== 'jogando') return;
+    if (jogo.turno !== jogo.meuId) {
+        if(typeof mostrarToast === 'function') mostrarToast("Espere a sua vez de pisar!", "⏳");
         return;
     }
 
-    const { db, ref, update, get } = window.SantuarioApp.modulos;
-    const crapsRef = ref(db, `cassino/craps_royale`);
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    
+    let passo = jogo.passoAtual;
+    let vidroSeguro = jogo.caminhoSeguro[passo];
+    
+    const divEsq = document.getElementById('vidro-esquerdo');
+    const divDir = document.getElementById('vidro-direito');
 
-    // Busca o status mais fresco do servidor para evitar conflito de milissegundos
-    const snap = await get(crapsRef);
-    const data = snap.val() || {};
-    let prontos = data.prontos || { joao: false, thamiris: false };
+    if (escolha === vidroSeguro) {
+        // SUCESSO!
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([20, 50, 20]);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
+        
+        let vidroAlvo = escolha === 0 ? divEsq : divDir;
+        vidroAlvo.style.background = "linear-gradient(145deg, rgba(46,204,113,0.4), rgba(46,204,113,0.1))";
+        vidroAlvo.style.borderColor = "#2ecc71";
+        
+        setTimeout(async () => {
+            vidroAlvo.style.background = "linear-gradient(145deg, rgba(0,242,254,0.15), rgba(0,242,254,0.05))";
+            vidroAlvo.style.borderColor = "rgba(0,242,254,0.6)";
+            
+            if (passo + 1 >= 10) {
+                // ZERARAM A PONTE!
+                up[`cassino/ponte_vidro/status`] = 'resultado';
+                up[`cassino/ponte_vidro/vencedor`] = 'jogadores';
+                up[`cassino/ponte_vidro/quemFinalizou`] = jogo.meuId;
+            } else {
+                // AVANÇA O PASSO E PASSA O TURNO PRO PARCEIRO (Co-op Pura)
+                up[`cassino/ponte_vidro/passoAtual`] = passo + 1;
+                up[`cassino/ponte_vidro/turno`] = jogo.parceiroId;
+            }
+            await update(ref(db), up);
+        }, 600);
 
-    // Marca você como pronto
-    prontos[window.motorCraps.meuId] = true;
-
-    if (prontos[window.motorCraps.parceiroId] === true) {
-        // 🚀 O PARCEIRO JÁ ESTAVA PRONTO! ROLA OS DADOS!
-        const d1 = Math.floor(Math.random() * 6) + 1;
-        const d2 = Math.floor(Math.random() * 6) + 1;
-
-        await update(crapsRef, {
-            status: 'rolando',
-            resultado: [d1, d2],
-            roladoPor: window.motorCraps.meuId, // Você foi o gatilho final
-            prontos: { joao: false, thamiris: false } // Reseta os botões
-        });
     } else {
-        // 🛑 O PARCEIRO AINDA NÃO CLICOU. Atualiza só o botão.
-        await update(crapsRef, { prontos: prontos });
-        if(typeof mostrarToast === 'function') mostrarToast("Aguardando confirmação da equipe...", "⏳");
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([30]);
-                    }
+        // QUEBROU! A QUEDA!
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([300, 100, 500]);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
+        
+        let vidroAlvo = escolha === 0 ? divEsq : divDir;
+        vidroAlvo.style.background = "rgba(231, 76, 60, 0.4)";
+        vidroAlvo.style.borderColor = "#e74c3c";
+        vidroAlvo.innerHTML = "<span style='font-size: 3rem;'>💥</span>";
+        
+        setTimeout(async () => {
+            up[`cassino/ponte_vidro/status`] = 'resultado';
+            up[`cassino/ponte_vidro/vencedor`] = 'casa'; // A Casa ganhou (vocês perderam)
+            up[`cassino/ponte_vidro/quemFinalizou`] = jogo.meuId;
+            await update(ref(db), up);
+        }, 800);
     }
 };
 
-function animarRolagemCraps() {
-    const d1El = document.getElementById('craps-dado1');
-    const d2El = document.getElementById('craps-dado2');
-    const resVisor = document.getElementById('craps-resultado-texto');
-    
-    if (!d1El || !d2El) return;
+window.sacarPonteVidro = async function() {
+    let jogo = window.motorPonteVidro;
+    if (jogo.status !== 'jogando' || jogo.turno !== jogo.meuId || jogo.passoAtual === 0) return;
 
-    resVisor.classList.add('escondido');
-    d1El.classList.add('rolando-dado');
-    d2El.classList.add('rolando-dado');
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    up[`cassino/ponte_vidro/status`] = 'resultado';
+    up[`cassino/ponte_vidro/vencedor`] = 'saque'; 
+    up[`cassino/ponte_vidro/quemFinalizou`] = jogo.meuId;
+    await update(ref(db), up);
+};
+
+window.processarFimPonteVidro = async function() {
+    if (window.motorPonteVidro.quemFinalizou !== window.motorPonteVidro.meuId) return;
+    let jogo = window.motorPonteVidro;
     
-    if(!window.SantuarioSomPausado) {
-        somRolagemDados.currentTime = 0;
-        somRolagemDados.play().catch(()=>{});
+    if (jogo.vencedor === 'jogadores' || jogo.vencedor === 'saque') {
+        let multiAtual = jogo.passoAtual === 0 ? 1 : jogo.multiplicadores[jogo.passoAtual - 1];
+        if (jogo.vencedor === 'jogadores') multiAtual = jogo.multiplicadores[9]; // ZEROU A PONTE
+        
+        let lucroGanho = Math.floor(jogo.poteInicial * multiAtual);
+        if(typeof window.atualizarPontosCasal === 'function') {
+            window.atualizarPontosCasal(lucroGanho, `Sobrevivência na Ponte de Vidro (${multiAtual}x)`);
+        }
+    }
+};
+
+window.renderizarMesaPonteVidro = function() {
+    const jogo = window.motorPonteVidro;
+    const painelAposta = document.getElementById('pontevidro-painel-aposta');
+    const painelRes = document.getElementById('pontevidro-painel-resultado');
+    const painelAcao = document.getElementById('pontevidro-painel-acao');
+    const areaVidros = document.getElementById('pontevidro-area-vidros');
+    const avisoCentro = document.getElementById('pontevidro-aviso-centro');
+
+    const acaoOponente = window.souJoao ? "Adversária" : "Adversário";
+    
+    if (avisoCentro) {
+        avisoCentro.style.textAlign = "center";
+        avisoCentro.style.lineHeight = "1.4";
     }
 
-    let interval = setInterval(() => {
-        d1El.innerText = facesDado[Math.floor(Math.random() * 6) + 1];
-        d2El.innerText = facesDado[Math.floor(Math.random() * 6) + 1];
-    }, 100);
+    // Status Superior
+    let multiExibido = jogo.passoAtual === 0 ? 1.0 : jogo.multiplicadores[jogo.passoAtual - 1];
+    if (jogo.status === 'resultado' && jogo.vencedor === 'jogadores') multiExibido = jogo.multiplicadores[9];
+    
+    document.getElementById('pontevidro-passo-texto').innerText = `${jogo.passoAtual} / 10`;
+    document.getElementById('pontevidro-multiplicador').innerText = multiExibido.toFixed(1);
+    document.getElementById('pontevidro-lucro-valor').innerText = Math.floor(jogo.poteInicial * multiExibido);
 
-    setTimeout(() => {
-        clearInterval(interval);
-        d1El.classList.remove('rolando-dado');
-        d2El.classList.remove('rolando-dado');
-        somRolagemDados.pause();
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(areaVidros) areaVidros.classList.add('escondido');
         
-        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
-        if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 200]);
-                    }
-
-        const resArray = window.motorCraps.resultado;
-        d1El.innerText = facesDado[resArray[0]];
-        d2El.innerText = facesDado[resArray[1]];
-        
-        const soma = resArray[0] + resArray[1];
-        resVisor.innerText = soma;
-        resVisor.classList.remove('escondido');
-
-        if (window.motorCraps.roladoPor === window.motorCraps.meuId) {
-            processarRecompensaCraps();
+        if(avisoCentro) { avisoCentro.innerText = "Aguardando Oponente..."; avisoCentro.style.color = "#00f2fe"; }
+        const btnInic = document.getElementById('btn-iniciar-pontevidro');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "ESPERANDO PARCEIRO... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "PAGAR E ENTRAR 🎟️"; btnInic.style.background = "linear-gradient(145deg, #00f2fe, #00a8cc)"; }
         }
-    }, 2500);
+        
+        // Reseta os vidros
+        const divEsq = document.getElementById('vidro-esquerdo');
+        const divDir = document.getElementById('vidro-direito');
+        if(divEsq) { divEsq.style.background = "linear-gradient(145deg, rgba(0,242,254,0.15), rgba(0,242,254,0.05))"; divEsq.style.borderColor = "rgba(0,242,254,0.6)"; divEsq.innerHTML = "<span style='font-size: 3rem; filter: drop-shadow(0 0 10px rgba(0,242,254,0.8));'>👈</span>"; }
+        if(divDir) { divDir.style.background = "linear-gradient(145deg, rgba(0,242,254,0.15), rgba(0,242,254,0.05))"; divDir.style.borderColor = "rgba(0,242,254,0.6)"; divDir.innerHTML = "<span style='font-size: 3rem; filter: drop-shadow(0 0 10px rgba(0,242,254,0.8));'>👉</span>"; }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(areaVidros) areaVidros.classList.remove('escondido');
+
+        if (jogo.turno === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = "SUA VEZ!\nEscolha o vidro seguro..."; avisoCentro.style.color = "#00f2fe"; }
+            // Só mostra o botão de sacar se não for o primeiro passo
+            if(painelAcao && jogo.passoAtual > 0) painelAcao.classList.remove('escondido');
+            else if(painelAcao) painelAcao.classList.add('escondido');
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `O ${acaoOponente} está\nescolhendo o vidro... ⏳`; avisoCentro.style.color = "#f39c12"; }
+            if(painelAcao) painelAcao.classList.add('escondido');
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        
+        if (jogo.vencedor === 'jogadores') {
+            if(avisoCentro) { avisoCentro.innerText = `🏆 VOCÊS ZERARAM A PONTE!\nO MULTIPLICADOR MÁXIMO É DE VOCÊS!`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#00f2fe', '#ffffff'], particleCount: 400});
+            }
+        } else if (jogo.vencedor === 'saque') {
+            if(avisoCentro) { avisoCentro.innerText = `💰 FUGIRAM COM O LUCRO!\nVocês sacaram ${Math.floor(jogo.poteInicial * multiExibido)} moedas.`; avisoCentro.style.color = "#f1c40f"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 1.0);
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `💥 O VIDRO QUEBROU!\nVocês caíram e perderam o pote.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            }
+        }
+    }
+};
+
+window.resetarPonteVidro = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorPonteVidro.moedasPagas = false;
+    await set(ref(db, `cassino/ponte_vidro`), {
+        status: 'apostando', turno: '', apostaAtual: window.motorPonteVidro.apostaAtual, poteInicial: 0, 
+        vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+        passoAtual: 0, caminhoSeguro: '[]'
+    });
+};
+
+// ==========================================
+// 🧨 MOTOR REAL-TIME: DESARME A BOMBA EXTREMO
+// ==========================================
+
+window.motorDesarmeBomba = {
+    meuId: '', parceiroId: '', status: 'apostando', apostaAtual: 50, pote: 0, 
+    vencedor: null, quemFinalizou: '', moedasPagas: false, prontos: { joao: false, thamiris: false },
+    desarmador: '', regrasManual: [], luzAtual: '', serialNumber: 0, 
+    fioCorreto: '[]', fiosCortados: 0, listaFiosCortados: '[]', endTime: 0
+};
+
+window.intervaloBombaTimer = null;
+
+window.iniciarOuvinteDesarmeBomba = function() {
+    window.motorDesarmeBomba.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorDesarmeBomba.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    // Reset Nuclear
+    if (!window.desarmeBombaResetadoNuclear) {
+        window.desarmeBombaResetadoNuclear = true;
+        set(ref(db, `cassino/desarme_bomba`), {
+            status: 'apostando', apostaAtual: 50, pote: 0, vencedor: null, quemFinalizou: '', 
+            prontos: { joao: false, thamiris: false }
+        });
+    }
+
+    onValue(ref(db, `cassino/desarme_bomba`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            if (data.status === 'jogando' && !data.desarmador) {
+                await resetarDesarmeBomba(); return;
+            }
+
+            window.motorDesarmeBomba.status = data.status || 'apostando';
+            window.motorDesarmeBomba.apostaAtual = Number(data.apostaAtual) || 50;
+            window.motorDesarmeBomba.pote = Number(data.pote) || 0;
+            window.motorDesarmeBomba.vencedor = data.vencedor || null;
+            window.motorDesarmeBomba.quemFinalizou = data.quemFinalizou || '';
+            window.motorDesarmeBomba.prontos = data.prontos || { joao: false, thamiris: false };
+            
+            window.motorDesarmeBomba.desarmador = data.desarmador || '';
+            window.motorDesarmeBomba.luzAtual = data.luzAtual || '';
+            window.motorDesarmeBomba.serialNumber = Number(data.serialNumber) || 0;
+            
+            window.motorDesarmeBomba.fioCorreto = data.fioCorreto || '[]';
+            window.motorDesarmeBomba.fiosCortados = Number(data.fiosCortados) || 0;
+            window.motorDesarmeBomba.listaFiosCortados = data.listaFiosCortados || '[]';
+            
+            window.motorDesarmeBomba.endTime = Number(data.endTime) || 0;
+            window.motorDesarmeBomba.regrasManual = JSON.parse(data.regrasManual || "[]");
+
+            renderizarMesaDesarmeBomba();
+            gerenciarRelogioBomba();
+
+            if (window.motorDesarmeBomba.status === 'resultado' && !window.motorDesarmeBomba.moedasPagas) {
+                processarFimDesarmeBomba();
+            }
+        } catch (e) { console.error("Erro na Bomba", e); }
+    });
+};
+
+function obterFioAleatorio() {
+    let fios = ['vermelho', 'azul', 'verde', 'amarelo'];
+    return fios[Math.floor(Math.random() * fios.length)];
 }
 
-async function processarRecompensaCraps() {
-    let ganhoTotal = 0;
-    const resArray = window.motorCraps.resultado;
-    const soma = resArray[0] + resArray[1];
-    const ehDuplo = resArray[0] === resArray[1];
+function gerarRegrasBombaExtrema() {
+    let luzes = [
+        { cor: 'vermelho', hex: '#ff4757', nome: 'VERMELHA 🔴' },
+        { cor: 'azul', hex: '#3498db', nome: 'AZUL 🔵' },
+        { cor: 'verde', hex: '#2ecc71', nome: 'VERDE 🟢' },
+        { cor: 'amarelo', hex: '#f1c40f', nome: 'AMARELA 🟡' }
+    ];
+    let regras = [];
     
-    Object.values(window.motorCraps.apostas).forEach(ap => {
-        let acertou = false;
-        let mult = 0;
+    for(let i=0; i<4; i++) {
+        let seqPar = [obterFioAleatorio(), obterFioAleatorio()];
+        while(seqPar[0] === seqPar[1]) seqPar[1] = obterFioAleatorio(); // Impede dois iguais seguidos
 
-        if (ap.tipo === 'pass_line' && (soma === 7 || soma === 11)) { acertou = true; mult = 2; }
-        if (ap.tipo === 'craps' && (soma === 2 || soma === 3 || soma === 12)) { acertou = true; mult = 8; }
-        if (ap.tipo === 'field' && [2,3,4,9,10,11,12].includes(soma)) { acertou = true; mult = 2; }
-        if (ap.tipo === 'sete' && soma === 7) { acertou = true; mult = 5; }
+        let seqImpar = [obterFioAleatorio(), obterFioAleatorio()];
+        while(seqImpar[0] === seqImpar[1]) seqImpar[1] = obterFioAleatorio();
+
+        regras.push({ luzObj: luzes[i], seqPar: seqPar, seqImpar: seqImpar });
+    }
+    return regras.sort(() => Math.random() - 0.5);
+}
+
+window.ajustarApostaDesarmeBomba = function(delta) {
+    if (window.motorDesarmeBomba.status !== 'apostando') return;
+    if (window.motorDesarmeBomba.prontos[window.motorDesarmeBomba.meuId]) return; 
+    let novoValor = (Number(window.motorDesarmeBomba.apostaAtual) || 50) + delta;
+    if (novoValor < 10) novoValor = 10;
+    window.motorDesarmeBomba.apostaAtual = novoValor;
+    const visor = document.getElementById('desarmebomba-valor-aposta');
+    if (visor) visor.innerText = novoValor;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarDesarmeBomba = async function() {
+    let aposta = Number(window.motorDesarmeBomba.apostaAtual) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/desarme_bomba`);
+
+    let meusProntos = { ...window.motorDesarmeBomba.prontos };
+    meusProntos[window.motorDesarmeBomba.meuId] = true;
+
+    if (meusProntos[window.motorDesarmeBomba.parceiroId] === true) {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-(aposta * 2), `Missão C-4 Extrema`);
         
-        if (ap.tipo === 'hardways' && [4,6,8,10].includes(soma) && ehDuplo) { acertou = true; mult = 8; }
+        let regras = gerarRegrasBombaExtrema();
+        let regraSorteada = regras[Math.floor(Math.random() * regras.length)];
+        
+        // Gera um Serial Number de 3 dígitos
+        let serialNum = Math.floor(Math.random() * 899) + 100; 
+        let isPar = (serialNum % 2 === 0);
+        
+        // Define qual é a sequência real que deve ser cortada!
+        let seqCorreta = isPar ? regraSorteada.seqPar : regraSorteada.seqImpar;
 
-        if (acertou) ganhoTotal += (Number(ap.valor) * mult);
+        let quemDesarma = Math.random() > 0.5 ? 'joao' : 'thamiris';
+        let tempoFinal = Date.now() + (25 * 1000); // 🚨 EXATOS 25 SEGUNDOS DE TENSÃO!
+
+        await update(jogoRef, {
+            status: 'jogando', apostaAtual: aposta, pote: aposta * 2,
+            vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+            desarmador: quemDesarma, luzAtual: JSON.stringify(regraSorteada.luzObj), 
+            serialNumber: serialNum, fioCorreto: JSON.stringify(seqCorreta), 
+            fiosCortados: 0, listaFiosCortados: '[]',
+            regrasManual: JSON.stringify(regras), endTime: tempoFinal
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostaAtual: aposta, status: 'apostando' });
+    }
+};
+
+function gerenciarRelogioBomba() {
+    if (window.motorDesarmeBomba.status !== 'jogando') {
+        if (window.intervaloBombaTimer) clearInterval(window.intervaloBombaTimer);
+        return;
+    }
+    
+    if (window.intervaloBombaTimer) clearInterval(window.intervaloBombaTimer);
+    
+    const timerUI = document.getElementById('desarmebomba-timer');
+    const dbMods = window.SantuarioApp.modulos;
+    
+    window.intervaloBombaTimer = setInterval(async () => {
+        let agora = Date.now();
+        let faltam = Math.ceil((window.motorDesarmeBomba.endTime - agora) / 1000);
+        
+        if (faltam <= 0) {
+            faltam = 0;
+            clearInterval(window.intervaloBombaTimer);
+            if (timerUI) timerUI.innerText = "00:00";
+            
+            // Só o Desarmador explode a bomba para evitar chamadas duplas no banco
+            if (window.motorDesarmeBomba.meuId === window.motorDesarmeBomba.desarmador && window.motorDesarmeBomba.status === 'jogando') {
+                await dbMods.update(dbMods.ref(dbMods.db), {
+                    [`cassino/desarme_bomba/status`]: 'resultado',
+                    [`cassino/desarme_bomba/vencedor`]: 'casa', // BOOM!
+                    [`cassino/desarme_bomba/quemFinalizou`]: window.motorDesarmeBomba.meuId
+                });
+            }
+        } else {
+            if (timerUI) {
+                timerUI.innerText = faltam >= 10 ? `00:${faltam}` : `00:0${faltam}`;
+                timerUI.style.color = faltam <= 10 ? '#ff4757' : '#2ecc71';
+            }
+            // Batimento cardíaco tátil nos últimos 5 segundos
+            if (faltam <= 5 && window.Haptics && navigator.vibrate) navigator.vibrate(50);
+        }
+    }, 1000);
+}
+
+window.cortarFioBomba = async function(corCortada) {
+    let jogo = window.motorDesarmeBomba;
+    if (jogo.status !== 'jogando' || jogo.meuId !== jogo.desarmador) return;
+
+    let listaJaCortados = JSON.parse(jogo.listaFiosCortados || "[]");
+    if (listaJaCortados.includes(corCortada)) return; // Fio já foi cortado, não faz nada!
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    
+    let seqCorreta = JSON.parse(jogo.fioCorreto || "[]");
+    let indexAtual = jogo.fiosCortados || 0;
+
+    if (corCortada === seqCorreta[indexAtual]) {
+        // ACERTOU O FIO DO PASSO ATUAL!
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.5);
+        
+        listaJaCortados.push(corCortada);
+        up[`cassino/desarme_bomba/listaFiosCortados`] = JSON.stringify(listaJaCortados);
+        
+        let proximoIndex = indexAtual + 1;
+        if (proximoIndex === seqCorreta.length) {
+            // CORTOU A SEQUÊNCIA INTEIRA COM SUCESSO!
+            up[`cassino/desarme_bomba/status`] = 'resultado';
+            up[`cassino/desarme_bomba/vencedor`] = 'jogadores';
+            up[`cassino/desarme_bomba/quemFinalizou`] = jogo.meuId;
+        } else {
+            // Continua cortando...
+            up[`cassino/desarme_bomba/fiosCortados`] = proximoIndex;
+        }
+    } else {
+        // ERROU A SEQUÊNCIA! BOOM DIRETO!
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([300, 100, 500]);
+        up[`cassino/desarme_bomba/status`] = 'resultado';
+        up[`cassino/desarme_bomba/vencedor`] = 'casa';
+        up[`cassino/desarme_bomba/quemFinalizou`] = jogo.meuId;
+    }
+
+    await update(ref(db), up);
+};
+
+window.processarFimDesarmeBomba = async function() {
+    if (window.motorDesarmeBomba.quemFinalizou !== window.motorDesarmeBomba.meuId) return;
+    let jogo = window.motorDesarmeBomba;
+    
+    if (jogo.vencedor === 'jogadores') {
+        let lucro = jogo.pote * 3; // Continua pagando muito bem!
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(lucro, `Desarme Efetuado (C-4)`);
+    }
+};
+
+window.renderizarMesaDesarmeBomba = function() {
+    const jogo = window.motorDesarmeBomba;
+    const painelAposta = document.getElementById('desarmebomba-painel-aposta');
+    const painelRes = document.getElementById('desarmebomba-painel-resultado');
+    const avisoCentro = document.getElementById('desarmebomba-aviso-centro');
+    
+    const visaoDesarmador = document.getElementById('visao-desarmador');
+    const visaoEspecialista = document.getElementById('visao-especialista');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    document.getElementById('desarmebomba-pote-valor').innerText = jogo.status === 'apostando' ? (jogo.apostaAtual * 2) : (jogo.pote * 3);
+
+    // Lógica Visual dos Fios Cortados
+    ['vermelho', 'azul', 'verde', 'amarelo'].forEach(cor => {
+        let divFio = document.getElementById(`fio-bomba-${cor}`);
+        if (divFio) {
+            divFio.style.opacity = '1';
+            divFio.style.pointerEvents = 'auto';
+        }
+    });
+    
+    let listaJaCortados = JSON.parse(jogo.listaFiosCortados || "[]");
+    listaJaCortados.forEach(cor => {
+        let divFio = document.getElementById(`fio-bomba-${cor}`);
+        if (divFio) {
+            divFio.style.opacity = '0.2'; // Fica transparente/apagado quando cortado
+            divFio.style.pointerEvents = 'none'; // Não deixa clicar de novo
+        }
     });
 
-    if (ganhoTotal > 0) {
-        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(ganhoTotal, `Prêmio Craps (${soma})`);
-        setTimeout(() => {
-            if(typeof confetti === 'function') confetti({colors: ['#e67e22', '#ffffff'], particleCount: 200});
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
-            if(typeof mostrarToast === 'function') mostrarToast(`A MESA PAGOU +${ganhoTotal} 💰!`, "🎲");
-        }, 500);
-    } else {
-        setTimeout(() => {
-            if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
-            if(typeof mostrarToast === 'function') mostrarToast(`A Casa levou... 💀`, "💸");
-        }, 500);
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(visaoDesarmador) visaoDesarmador.classList.add('escondido');
+        if(visaoEspecialista) visaoEspecialista.classList.add('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "Aguardando Equipe..."; avisoCentro.style.color = "#00f2fe"; }
+        const btnInic = document.getElementById('btn-iniciar-desarmebomba');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "AGUARDANDO PARCEIRO... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "ASSUMIR O RISCO 🧨"; btnInic.style.background = "linear-gradient(145deg, #ff4757, #c0392b)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+
+        if (jogo.meuId === jogo.desarmador) {
+            if(avisoCentro) { avisoCentro.innerText = "VOCÊ É O DESARMADOR!\nGrite a Luz e o Nº de Série!"; avisoCentro.style.color = "#ff4757"; }
+            if(visaoEspecialista) visaoEspecialista.classList.add('escondido');
+            if(visaoDesarmador) {
+                visaoDesarmador.classList.remove('escondido');
+                let luz = JSON.parse(jogo.luzAtual);
+                document.getElementById('desarmebomba-luz').style.background = luz.hex;
+                document.getElementById('desarmebomba-luz').style.boxShadow = `0 0 25px ${luz.hex}, inset 0 0 10px #fff`;
+                document.getElementById('desarmebomba-serial').innerText = jogo.serialNumber;
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = "VOCÊ É O ESPECIALISTA!\nDescubra a luz, o serial e leia o manual."; avisoCentro.style.color = "#00f2fe"; }
+            if(visaoDesarmador) visaoDesarmador.classList.add('escondido');
+            if(visaoEspecialista) {
+                visaoEspecialista.classList.remove('escondido');
+                let ul = document.getElementById('desarmebomba-manual-lista');
+                ul.innerHTML = '';
+                // Renderiza o Manual Complexo
+                jogo.regrasManual.forEach(regra => {
+                    ul.innerHTML += `
+                    <div style="border: 1px solid ${regra.luzObj.hex}; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.6);">
+                        <div style="color: ${regra.luzObj.hex}; font-weight: bold; margin-bottom: 5px; font-size: 1.1rem;">LUZ ${regra.luzObj.nome}</div>
+                        <div style="color: #ccc; font-size: 0.85rem; margin-bottom: 3px;">► Se S/N for <strong>PAR</strong>:</div>
+                        <div style="color: #fff; font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; padding-left: 15px;">Corte ${regra.seqPar[0].toUpperCase()}, depois ${regra.seqPar[1].toUpperCase()}</div>
+                        
+                        <div style="color: #ccc; font-size: 0.85rem; margin-bottom: 3px;">► Se S/N for <strong>ÍMPAR</strong>:</div>
+                        <div style="color: #fff; font-size: 0.9rem; font-weight: bold; padding-left: 15px;">Corte ${regra.seqImpar[0].toUpperCase()}, depois ${regra.seqImpar[1].toUpperCase()}</div>
+                    </div>`;
+                });
+            }
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(visaoDesarmador) visaoDesarmador.classList.add('escondido');
+        if(visaoEspecialista) visaoEspecialista.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        
+        if (jogo.vencedor === 'jogadores') {
+            if(avisoCentro) { avisoCentro.innerText = `🟢 BOMBA DESARMADA!\nA sequência foi exata e o pote triplicou!`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#ff4757', '#2ecc71'], particleCount: 400});
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `💥 CABUM!\nO fio estava errado ou o tempo acabou.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
+                // Um delay e um som de explosão fake com o slotsLose
+                setTimeout(()=> { if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8); }, 500);
+            }
+        }
+    }
+};
+
+window.resetarDesarmeBomba = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorDesarmeBomba.moedasPagas = false;
+    await set(ref(db, `cassino/desarme_bomba`), {
+        status: 'apostando', apostaAtual: window.motorDesarmeBomba.apostaAtual, pote: 0, 
+        vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false }
+    });
+};
+
+
+// ==========================================
+// 🏎️ MOTOR REAL-TIME: CORRIDA DE SABOTAGEM
+// ==========================================
+
+window.motorCorrida = {
+    meuId: '', parceiroId: '', status: 'apostando', apostaAtual: 50, pote: 0, 
+    vencedor: null, quemFinalizou: '', moedasPagas: false, prontos: { joao: false, thamiris: false },
+    meuCarro: -1, carroOponente: -1,
+    posicoes: [0, 0, 0, 0], // Posição (0 a 100) dos 4 carros
+    velocidades: [0, 0, 0, 0] // Velocidades calculadas pelo host
+};
+
+window.loopDeCorridaAnimacao = null;
+
+window.iniciarOuvinteCorrida = function() {
+    window.motorCorrida.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorCorrida.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    // ☢️ RESET NUCLEAR
+    if (!window.corridaResetadoNuclear) {
+        window.corridaResetadoNuclear = true;
+        set(ref(db, `cassino/corrida_sabotagem`), {
+            status: 'apostando', apostaAtual: 50, pote: 0, vencedor: null, quemFinalizou: '', 
+            prontos: { joao: false, thamiris: false },
+            selecoes: { joao: -1, thamiris: -1 }, posicoes: "[0,0,0,0]"
+        });
     }
 
-    setTimeout(async () => {
-        const { db, ref, set } = window.SantuarioApp.modulos;
-        // Limpa tudo, reseta as apostas e deixa o botão aceso de novo para ambos
-        await set(ref(db, `cassino/craps_royale`), { status: 'apostando', apostas: {}, resultado: [6,6], roladoPor: '', prontos: {joao: false, thamiris: false} });
-        document.getElementById('craps-resultado-texto').classList.add('escondido');
-    }, 3500);
+    onValue(ref(db, `cassino/corrida_sabotagem`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            window.motorCorrida.status = data.status || 'apostando';
+            window.motorCorrida.apostaAtual = Number(data.apostaAtual) || 50;
+            window.motorCorrida.pote = Number(data.pote) || 0;
+            window.motorCorrida.vencedor = data.vencedor || null;
+            window.motorCorrida.quemFinalizou = data.quemFinalizou || '';
+            window.motorCorrida.prontos = data.prontos || { joao: false, thamiris: false };
+            
+            let selecoes = data.selecoes || { joao: -1, thamiris: -1 };
+            window.motorCorrida.meuCarro = Number(selecoes[window.motorCorrida.meuId]);
+            window.motorCorrida.carroOponente = Number(selecoes[window.motorCorrida.parceiroId]);
+            
+            window.motorCorrida.posicoes = JSON.parse(data.posicoes || "[0,0,0,0]");
+
+            renderizarMesaCorrida();
+
+            // Se o jogo começou e sou o João (Host das animações), eu disparo as velocidades pro Firebase
+            if (window.motorCorrida.status === 'jogando' && window.souJoao && !window.loopDeCorridaAnimacao) {
+                iniciarFisicaDaCorrida();
+            }
+
+            if (window.motorCorrida.status === 'resultado') {
+                if (window.loopDeCorridaAnimacao) { cancelAnimationFrame(window.loopDeCorridaAnimacao); window.loopDeCorridaAnimacao = null; }
+                if (!window.motorCorrida.moedasPagas) processarFimCorrida();
+            }
+        } catch (e) { console.error("Erro na Corrida", e); }
+    });
+};
+
+window.escolherCarroCorrida = async function(indice) {
+    if (window.motorCorrida.status !== 'apostando') return;
+    if (window.motorCorrida.prontos[window.motorCorrida.meuId]) return; // Já deu pronto
+    if (indice === window.motorCorrida.carroOponente) {
+        if(typeof mostrarToast === 'function') mostrarToast("Oponente já escolheu este carro!", "🚫");
+        return;
+    }
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    up[`cassino/corrida_sabotagem/selecoes/${window.motorCorrida.meuId}`] = indice;
+    await update(ref(db), up);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.5);
+};
+
+window.ajustarApostaCorrida = function(delta) {
+    if (window.motorCorrida.status !== 'apostando') return;
+    if (window.motorCorrida.prontos[window.motorCorrida.meuId]) return; 
+    let novoValor = (Number(window.motorCorrida.apostaAtual) || 50) + delta;
+    if (novoValor < 10) novoValor = 10;
+    window.motorCorrida.apostaAtual = novoValor;
+    const visor = document.getElementById('corrida-valor-aposta');
+    if (visor) visor.innerText = novoValor;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarCorrida = async function() {
+    if (window.motorCorrida.meuCarro === -1) {
+        if(typeof mostrarToast === 'function') mostrarToast("Escolha um carro primeiro!", "🏎️");
+        return;
+    }
+
+    let aposta = Number(window.motorCorrida.apostaAtual) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/corrida_sabotagem`);
+
+    let meusProntos = { ...window.motorCorrida.prontos };
+    meusProntos[window.motorCorrida.meuId] = true;
+
+    if (meusProntos[window.motorCorrida.parceiroId] === true) {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-(aposta * 2), `Entrada Corrida`);
+        
+        await update(jogoRef, {
+            status: 'jogando', apostaAtual: aposta, pote: aposta * 2,
+            vencedor: null, quemFinalizou: '', posicoes: "[0,0,0,0]",
+            prontos: { joao: false, thamiris: false }
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostaAtual: aposta, status: 'apostando' });
+    }
+};
+
+window.sabotarOponente = async function() {
+    let jogo = window.motorCorrida;
+    if (jogo.status !== 'jogando' || jogo.carroOponente === -1) return;
+
+    // Desativa o botão visualmente por 1 segundo (Cooldown)
+    const btnSabotar = document.getElementById('btn-sabotar');
+    if (btnSabotar) {
+        btnSabotar.disabled = true;
+        btnSabotar.style.filter = "grayscale(1)";
+        setTimeout(() => { 
+            btnSabotar.disabled = false; 
+            btnSabotar.style.filter = "none";
+        }, 1000);
+    }
+
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 0.8);
+
+    const { db, ref, get, update } = window.SantuarioApp.modulos;
+    
+    // Puxa as posições e empurra o carro inimigo para trás (-8%)
+    const snap = await get(ref(db, `cassino/corrida_sabotagem/posicoes`));
+    if (snap.exists()) {
+        let posAtuais = JSON.parse(snap.val());
+        posAtuais[jogo.carroOponente] -= 8;
+        if (posAtuais[jogo.carroOponente] < 0) posAtuais[jogo.carroOponente] = 0;
+        await update(ref(db), { [`cassino/corrida_sabotagem/posicoes`]: JSON.stringify(posAtuais) });
+    }
+};
+
+// O HOST (João) cuida de mover os carros para a tela dos dois.
+function iniciarFisicaDaCorrida() {
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let vel = [Math.random() * 0.6 + 0.3, Math.random() * 0.6 + 0.3, Math.random() * 0.6 + 0.3, Math.random() * 0.6 + 0.3];
+    
+    let ultimaAttFirebase = Date.now();
+
+    function frameFisica() {
+        if (window.motorCorrida.status !== 'jogando') return;
+
+        let minhasPosicoes = [...window.motorCorrida.posicoes];
+        let alguemGanhou = false;
+        let vencedorId = null;
+
+        for (let i = 0; i < 4; i++) {
+            minhasPosicoes[i] += vel[i];
+            
+            // Randomiza levemente a velocidade ao longo da corrida pra dar emoção
+            if (Math.random() < 0.05) vel[i] = Math.random() * 0.6 + 0.3;
+
+            if (minhasPosicoes[i] >= 90) { // 90% é a linha de chegada
+                minhasPosicoes[i] = 90;
+                alguemGanhou = true;
+                
+                if (i === window.motorCorrida.meuCarro) vencedorId = 'joao';
+                else if (i === window.motorCorrida.carroOponente) vencedorId = 'thamiris';
+                else vencedorId = 'bot'; // Um carro neutro venceu!
+            }
+        }
+
+        window.motorCorrida.posicoes = minhasPosicoes;
+        atualizarCarrosVisualmente(minhasPosicoes); // Atualiza minha tela a 60FPS
+
+        // Sincroniza com a Thamiris a cada 200ms para não explodir o banco
+        let agora = Date.now();
+        if (agora - ultimaAttFirebase > 200 || alguemGanhou) {
+            ultimaAttFirebase = agora;
+            let up = { [`cassino/corrida_sabotagem/posicoes`]: JSON.stringify(minhasPosicoes) };
+            
+            if (alguemGanhou) {
+                up[`cassino/corrida_sabotagem/status`] = 'resultado';
+                up[`cassino/corrida_sabotagem/vencedor`] = vencedorId;
+                up[`cassino/corrida_sabotagem/quemFinalizou`] = 'joao';
+            }
+            update(ref(db), up).catch(e=>{});
+        }
+
+        if (!alguemGanhou) window.loopDeCorridaAnimacao = requestAnimationFrame(frameFisica);
+    }
+    
+    window.loopDeCorridaAnimacao = requestAnimationFrame(frameFisica);
 }
+
+function atualizarCarrosVisualmente(posicoes) {
+    for (let i = 0; i < 4; i++) {
+        let divC = document.getElementById(`carro-${i}`);
+        if (divC) divC.style.left = `${posicoes[i]}%`;
+    }
+}
+
+window.processarFimCorrida = async function() {
+    if (window.motorCorrida.quemFinalizou !== window.motorCorrida.meuId) return;
+    let jogo = window.motorCorrida;
+    
+    if (jogo.vencedor === jogo.meuId) {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Vitória na Corrida`);
+    }
+};
+
+window.renderizarMesaCorrida = function() {
+    const jogo = window.motorCorrida;
+    const painelAposta = document.getElementById('corrida-painel-aposta');
+    const painelRes = document.getElementById('corrida-painel-resultado');
+    const painelSel = document.getElementById('corrida-painel-selecao');
+    const painelAcao = document.getElementById('corrida-painel-acao');
+    const avisoCentro = document.getElementById('corrida-aviso-centro');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    document.getElementById('corrida-pote-valor').innerText = jogo.status === 'apostando' ? (jogo.apostaAtual * 2) : jogo.pote;
+
+    // 🚨 CORREÇÃO 2: Atualização Incondicional da Tela!
+    // Agora, o JavaScript força os carros a voltarem para o "0" fisicamente na tela
+    // assim que o status voltar para 'apostando'.
+    atualizarCarrosVisualmente(jogo.posicoes);
+
+    // Renderiza a seleção visual dos carros e os donos nas raias
+    for (let i = 0; i < 4; i++) {
+        let btn = document.getElementById(`btn-sel-${i}`);
+        let dono = document.getElementById(`dono-carro-${i}`);
+        
+        if (btn) {
+            btn.style.opacity = '1';
+            btn.style.boxShadow = 'none';
+            if (i === jogo.meuCarro) { btn.style.boxShadow = '0 0 15px #fff'; btn.style.transform = 'scale(1.1)'; }
+            else if (i === jogo.carroOponente) { btn.style.opacity = '0.3'; }
+        }
+        
+        if (dono) {
+            if (i === jogo.meuCarro) { dono.innerText = "VOCÊ"; dono.classList.remove('escondido'); dono.style.color = "#2ecc71"; }
+            else if (i === jogo.carroOponente) { dono.innerText = "RIVAL"; dono.classList.remove('escondido'); dono.style.color = "#e74c3c"; }
+            else { dono.classList.add('escondido'); }
+        }
+    }
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelSel) painelSel.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "Escolha seu carro e pague a entrada."; avisoCentro.style.color = "#e67e22"; }
+        const btnInic = document.getElementById('btn-iniciar-corrida');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "AGUARDANDO RIVAL... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "PRONTO PARA CORRER 🏁"; btnInic.style.background = "linear-gradient(145deg, #e67e22, #d35400)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelSel) painelSel.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.remove('escondido');
+
+        if(avisoCentro) { avisoCentro.innerText = "LARGARAM! SABOTE A ADVERSÁRIA!"; avisoCentro.style.color = "#ff4757"; }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelSel) painelSel.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        
+        if (jogo.vencedor === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = `🏆 SEU CARRO VENCEU!\nO Pote é todo seu.`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#e67e22', '#ffffff'], particleCount: 400});
+            }
+        } else if (jogo.vencedor === jogo.parceiroId) {
+            if(avisoCentro) { avisoCentro.innerText = `💥 VOCÊ PERDEU!\nO carro adversário cruzou a linha.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `🚕 UM CARRO NEUTRO VENCEU!\nO Pote ficou para a casa.`; avisoCentro.style.color = "#f1c40f"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            }
+        }
+    }
+};
+
+window.resetarCorrida = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorCorrida.moedasPagas = false;
+    await set(ref(db, `cassino/corrida_sabotagem`), {
+        status: 'apostando', apostaAtual: window.motorCorrida.apostaAtual, pote: 0, 
+        vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+        selecoes: { joao: -1, thamiris: -1 }, posicoes: "[0,0,0,0]"
+    });
+};
+
+
+// ==========================================
+// ⚔️ MOTOR REAL-TIME: COLISEU DOS ELEMENTOS
+// ==========================================
+
+window.motorElementos = {
+    meuId: '', parceiroId: '', status: 'apostando', pote: 0, 
+    vencedor: null, quemFinalizou: '', moedasPagas: false, prontos: { joao: false, thamiris: false },
+    apostas: { joao: 0, thamiris: 0 }, // 🚨 O SEGREDO: Controle individual de apostas no Firebase
+    escolhas: { joao: '', thamiris: '' }
+};
+
+window.iniciarOuvinteElementos = function() {
+    window.motorElementos.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorElementos.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    // ☢️ RESET NUCLEAR AUTOMÁTICO
+    if (!window.elementosResetadoNuclear) {
+        window.elementosResetadoNuclear = true;
+        set(ref(db, `cassino/elementos_duelo`), {
+            status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', 
+            prontos: { joao: false, thamiris: false }, 
+            apostas: { joao: 0, thamiris: 0 }, 
+            escolhas: { joao: '', thamiris: '' }
+        });
+    }
+
+    onValue(ref(db, `cassino/elementos_duelo`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            window.motorElementos.status = data.status || 'apostando';
+            window.motorElementos.pote = Number(data.pote) || 0;
+            window.motorElementos.vencedor = data.vencedor || null;
+            window.motorElementos.quemFinalizou = data.quemFinalizou || '';
+            window.motorElementos.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorElementos.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            
+            let escs = data.escolhas || { joao: '', thamiris: '' };
+            window.motorElementos.escolhas = { joao: escs.joao || '', thamiris: escs.thamiris || '' };
+
+            renderizarMesaElementos();
+
+            if (window.motorElementos.status === 'jogando' && window.motorElementos.escolhas.joao !== '' && window.motorElementos.escolhas.thamiris !== '') {
+                if (window.souJoao) resolverBatalhaElementos(); 
+            }
+
+            if (window.motorElementos.status === 'resultado' && !window.motorElementos.moedasPagas) {
+                processarFimElementos();
+            }
+        } catch (e) { console.error("Erro nos Elementos", e); }
+    });
+};
+
+window.ajustarApostaElementos = function(delta) {
+    if (window.motorElementos.status !== 'apostando') return;
+    if (window.motorElementos.prontos[window.motorElementos.meuId]) return; 
+    
+    let visor = document.getElementById('elementos-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    visor.innerText = novoValor; // 🚨 Modifica apenas o SEU valor na tela
+    
+    // 🚨 Calcula o Pote em tempo real: O seu valor atual + o valor da Thamiris que está no banco
+    let apostaOponente = window.motorElementos.apostas[window.motorElementos.parceiroId] || 0;
+    document.getElementById('elementos-pote-valor').innerText = novoValor + apostaOponente;
+
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarElementos = async function() {
+    // Lê exatamente o valor que o jogador deixou na sua própria tela
+    let minhaAposta = Number(document.getElementById('elementos-valor-aposta').innerText) || 50;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/elementos_duelo`);
+
+    let meusProntos = { ...window.motorElementos.prontos };
+    meusProntos[window.motorElementos.meuId] = true;
+
+    // Constrói a aposta individual
+    let minhasApostas = { ...window.motorElementos.apostas };
+    minhasApostas[window.motorElementos.meuId] = minhaAposta; 
+
+    if (meusProntos[window.motorElementos.parceiroId] === true) {
+        // Se ambos deram pronto, junta os dinheiros para formar o prêmio colossal
+        let poteTotal = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteTotal, `Entrada no Coliseu`);
+        
+        await update(jogoRef, {
+            status: 'jogando', apostas: minhasApostas, pote: poteTotal,
+            vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+            escolhas: { joao: '', thamiris: '' }
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        // Manda pro banco apenas a aposta de quem deu pronto
+        await update(jogoRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+    }
+};
+
+window.escolherElemento = async function(elemento) {
+    let jogo = window.motorElementos;
+    if (jogo.status !== 'jogando') return;
+    if (jogo.escolhas[jogo.meuId] !== '') return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    up[`cassino/elementos_duelo/escolhas/${jogo.meuId}`] = elemento;
+    
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([50]);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
+    
+    await update(ref(db), up);
+};
+
+function resolverBatalhaElementos() {
+    let escJoao = window.motorElementos.escolhas.joao;
+    let escThamiris = window.motorElementos.escolhas.thamiris;
+    let vencedorId = 'empate';
+
+    if (escJoao === 'fogo' && escThamiris === 'planta') vencedorId = 'joao';
+    else if (escJoao === 'planta' && escThamiris === 'agua') vencedorId = 'joao';
+    else if (escJoao === 'agua' && escThamiris === 'fogo') vencedorId = 'joao';
+    else if (escThamiris === 'fogo' && escJoao === 'planta') vencedorId = 'thamiris';
+    else if (escThamiris === 'planta' && escJoao === 'agua') vencedorId = 'thamiris';
+    else if (escThamiris === 'agua' && escJoao === 'fogo') vencedorId = 'thamiris';
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    update(ref(db), {
+        [`cassino/elementos_duelo/status`]: 'resultado',
+        [`cassino/elementos_duelo/vencedor`]: vencedorId,
+        [`cassino/elementos_duelo/quemFinalizou`]: window.motorElementos.meuId
+    });
+}
+
+window.processarFimElementos = async function() {
+    if (window.motorElementos.quemFinalizou !== window.motorElementos.meuId) return;
+    let jogo = window.motorElementos;
+    
+    if (jogo.vencedor === jogo.meuId) {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Vitória no Coliseu`);
+    } else if (jogo.vencedor === 'empate') {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Empate no Coliseu`);
+    }
+};
+
+window.renderizarMesaElementos = function() {
+    const jogo = window.motorElementos;
+    const painelAposta = document.getElementById('elementos-painel-aposta');
+    const painelRes = document.getElementById('elementos-painel-resultado');
+    const painelAcao = document.getElementById('elementos-painel-acao');
+    const avisoCentro = document.getElementById('elementos-aviso-centro');
+    const areaChoque = document.getElementById('elementos-area-choque');
+    const statusOponente = document.getElementById('elementos-status-oponente');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    
+    // 🚨 Cálculo Dinâmico do Pote na Interface
+    let minhaAposta = Number(document.getElementById('elementos-valor-aposta').innerText) || 50;
+    let apostaParceiro = jogo.apostas[jogo.parceiroId] || 0;
+    document.getElementById('elementos-pote-valor').innerText = jogo.status === 'apostando' ? (minhaAposta + apostaParceiro) : jogo.pote;
+
+    ['fogo', 'agua', 'planta'].forEach(el => {
+        let btn = document.getElementById(`btn-elemento-${el}`);
+        if (btn) {
+            if (jogo.escolhas[jogo.meuId] === '') {
+                btn.style.opacity = '1'; btn.style.transform = 'scale(1)';
+            } else if (jogo.escolhas[jogo.meuId] === el) {
+                btn.style.opacity = '1'; btn.style.transform = 'scale(1.1)'; btn.style.boxShadow = '0 0 25px #fff';
+            } else {
+                btn.style.opacity = '0.3'; btn.style.transform = 'scale(0.9)'; btn.style.boxShadow = 'none';
+            }
+        }
+    });
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(areaChoque) areaChoque.classList.add('escondido');
+        if(statusOponente) { statusOponente.innerText = "AGUARDANDO... ⏳"; statusOponente.style.color = "#ccc"; statusOponente.style.borderColor = "#555"; }
+        
+        if(avisoCentro) { avisoCentro.innerText = "Prepare sua aposta para o Duelo."; avisoCentro.style.color = "#2ecc71"; }
+        const btnInic = document.getElementById('btn-iniciar-elementos');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "AGUARDANDO RIVAL... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "DESAFIAR ⚔️"; btnInic.style.background = "linear-gradient(145deg, #2ecc71, #27ae60)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(areaChoque) areaChoque.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.remove('escondido');
+
+        if (jogo.escolhas[jogo.parceiroId] === '') {
+            if(statusOponente) { statusOponente.innerText = "PENSANDO... 🤔"; statusOponente.style.color = "#f1c40f"; statusOponente.style.borderColor = "#f1c40f"; }
+        } else {
+            if(statusOponente) { statusOponente.innerText = "ESCOLHA TRANCADA! 🔒"; statusOponente.style.color = "#e74c3c"; statusOponente.style.borderColor = "#e74c3c"; }
+        }
+
+        if (jogo.escolhas[jogo.meuId] === '') {
+            if(avisoCentro) { avisoCentro.innerText = "FAÇA A SUA ESCOLHA!\nQual elemento você invoca?"; avisoCentro.style.color = "#00f2fe"; }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = "ESCOLHA FEITA!\nAguardando a revelação..."; avisoCentro.style.color = "#f39c12"; }
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        if(areaChoque) areaChoque.classList.remove('escondido');
+        
+        if(statusOponente) { statusOponente.innerText = "REVELADO! ⚔️"; statusOponente.style.color = "#fff"; statusOponente.style.borderColor = "#fff"; }
+
+        const emojis = { 'fogo': '🔥', 'agua': '💧', 'planta': '🌿' };
+        document.getElementById('choque-meu-elemento').innerText = emojis[jogo.escolhas[jogo.meuId]] || '❓';
+        document.getElementById('choque-elemento-oponente').innerText = emojis[jogo.escolhas[jogo.parceiroId]] || '❓';
+
+        if (jogo.vencedor === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = `🏆 SEU ELEMENTO DOMINOU!\nVocê venceu o combate.`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#ffffff'], particleCount: 300});
+            }
+        } else if (jogo.vencedor === 'empate') {
+            if(avisoCentro) { avisoCentro.innerText = `🤝 CHOQUE DE ELEMENTOS!\nEmpate. O dinheiro foi devolvido.`; avisoCentro.style.color = "#f1c40f"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `💀 SEU ELEMENTO FOI DESTRUÍDO!\nA adversária levou o pote.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            }
+        }
+    }
+};
+
+window.resetarElementos = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorElementos.moedasPagas = false;
+    await set(ref(db, `cassino/elementos_duelo`), {
+        status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', 
+        prontos: { joao: false, thamiris: false },
+        apostas: { joao: 0, thamiris: 0 }, 
+        escolhas: { joao: '', thamiris: '' }
+    });
+};
+
+// ==========================================
+// 💎 MOTOR REAL-TIME: CAÇA AO DIAMANTE AVANÇADO
+// ==========================================
+
+window.motorCacaDiamante = {
+    meuId: '', parceiroId: '', status: 'apostando', pote: 0, turno: '',
+    vencedor: null, quemFinalizou: '', moedasPagas: false, prontos: { joao: false, thamiris: false },
+    apostas: { joao: 0, thamiris: 0 },
+    prontosOcultacao: { joao: false, thamiris: false },
+    // A base agora armazena o índice do Diamante (d) e os índices das Bombas (b)
+    bases: { 
+        joao: { d: -1, b: [] }, 
+        thamiris: { d: -1, b: [] } 
+    }, 
+    tirosRecebidos: { joao: [], thamiris: [] } 
+};
+
+window.iniciarOuvinteCacaDiamante = function() {
+    window.motorCacaDiamante.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorCacaDiamante.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    if (!window.cacaDiamanteResetadoNuclear) {
+        window.cacaDiamanteResetadoNuclear = true;
+        set(ref(db, `cassino/caca_diamante`), {
+            status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', 
+            prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 }, 
+            prontosOcultacao: { joao: false, thamiris: false },
+            bases: { joao: { d: -1, b: '[]' }, thamiris: { d: -1, b: '[]' } }, 
+            tirosRecebidos: { joao: '[]', thamiris: '[]' }
+        });
+    }
+
+    onValue(ref(db, `cassino/caca_diamante`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            window.motorCacaDiamante.status = data.status || 'apostando';
+            window.motorCacaDiamante.turno = data.turno || '';
+            window.motorCacaDiamante.pote = Number(data.pote) || 0;
+            window.motorCacaDiamante.vencedor = data.vencedor || null;
+            window.motorCacaDiamante.quemFinalizou = data.quemFinalizou || '';
+            window.motorCacaDiamante.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorCacaDiamante.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            window.motorCacaDiamante.prontosOcultacao = data.prontosOcultacao || { joao: false, thamiris: false };
+            
+            let basesBrutas = data.bases || { joao: { d: -1, b: '[]' }, thamiris: { d: -1, b: '[]' } };
+            window.motorCacaDiamante.bases = {
+                joao: { d: Number(basesBrutas.joao?.d ?? -1), b: JSON.parse(basesBrutas.joao?.b || "[]") },
+                thamiris: { d: Number(basesBrutas.thamiris?.d ?? -1), b: JSON.parse(basesBrutas.thamiris?.b || "[]") }
+            };
+            
+            window.motorCacaDiamante.tirosRecebidos = { 
+                joao: JSON.parse((data.tirosRecebidos || {}).joao || "[]"), 
+                thamiris: JSON.parse((data.tirosRecebidos || {}).thamiris || "[]") 
+            };
+
+            renderizarMesaCacaDiamante();
+
+            // Gatilho para iniciar a Guerra quando ambos trancarem as bases
+            if (window.motorCacaDiamante.status === 'escondendo' && window.motorCacaDiamante.prontosOcultacao.joao && window.motorCacaDiamante.prontosOcultacao.thamiris) {
+                if (window.souJoao) {
+                    const { db, ref, update } = window.SantuarioApp.modulos;
+                    update(ref(db), { [`cassino/caca_diamante/status`]: 'jogando' }).catch(e=>{});
+                }
+            }
+
+            if (window.motorCacaDiamante.status === 'resultado' && !window.motorCacaDiamante.moedasPagas) {
+                processarFimCacaDiamante();
+            }
+        } catch (e) { console.error("Erro Caça Diamante", e); }
+    });
+};
+
+function criarGridBox(tipo, index, estado) {
+    let estiloBase = `width: 100%; aspect-ratio: 1; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; cursor: pointer; transition: all 0.2s;`;
+    
+    if (tipo === 'defesa') {
+        if (estado === 'diamante') return `<div onclick="esconderDefesaCacaDiamante(${index})" style="${estiloBase} background: rgba(0, 206, 201, 0.3); border: 2px solid #00cec9; box-shadow: inset 0 0 15px rgba(0, 206, 201, 0.5);">💎</div>`;
+        if (estado === 'bomba') return `<div onclick="esconderDefesaCacaDiamante(${index})" style="${estiloBase} background: rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c; box-shadow: inset 0 0 15px rgba(231, 76, 60, 0.5);">💣</div>`;
+        if (estado === 'vazio_atingido') return `<div style="${estiloBase} background: rgba(0, 0, 0, 0.6); border: 2px solid #555; color: #555;">💨</div>`;
+        if (estado === 'bomba_atingida') return `<div style="${estiloBase} background: rgba(231, 76, 60, 0.8); border: 2px solid #ff4757; color: #fff;">💥</div>`;
+        
+        // Estado livre na fase de ocultação
+        return `<div onclick="esconderDefesaCacaDiamante(${index})" style="${estiloBase} background: rgba(0, 206, 201, 0.05); border: 2px dashed #00cec9; color: rgba(0, 206, 201, 0.2);">📦</div>`;
+    } 
+    else { // ATAQUE
+        if (estado === 'vazio') return `<div style="${estiloBase} background: rgba(0, 0, 0, 0.6); border: 2px solid #555; opacity: 0.5;">💨</div>`;
+        if (estado === 'diamante') return `<div style="${estiloBase} background: rgba(0, 206, 201, 0.8); border: 2px solid #00cec9; box-shadow: 0 0 20px #00cec9;">💎</div>`;
+        if (estado === 'bomba') return `<div style="${estiloBase} background: rgba(231, 76, 60, 0.8); border: 2px solid #ff4757; box-shadow: 0 0 20px #e74c3c;">💥</div>`;
+        
+        // Alvo intacto para atirar
+        return `<div onclick="atirarNaBaseInimiga(${index})" style="${estiloBase} background: linear-gradient(145deg, #2c0b0e, #1a0508); border: 2px solid #e74c3c; box-shadow: 0 5px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(231, 76, 60, 0.2);">❓</div>`;
+    }
+}
+
+window.ajustarApostaCacaDiamante = function(delta) {
+    if (window.motorCacaDiamante.status !== 'apostando') return;
+    if (window.motorCacaDiamante.prontos[window.motorCacaDiamante.meuId]) return; 
+    let visor = document.getElementById('cacadiamante-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    visor.innerText = novoValor; 
+    let apostaOponente = window.motorCacaDiamante.apostas[window.motorCacaDiamante.parceiroId] || 0;
+    document.getElementById('cacadiamante-pote-valor').innerText = novoValor + apostaOponente;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarCacaDiamante = async function() {
+    let minhaAposta = Number(document.getElementById('cacadiamante-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/caca_diamante`);
+
+    let meusProntos = { ...window.motorCacaDiamante.prontos };
+    meusProntos[window.motorCacaDiamante.meuId] = true;
+
+    let minhasApostas = { ...window.motorCacaDiamante.apostas };
+    minhasApostas[window.motorCacaDiamante.meuId] = minhaAposta; 
+
+    if (meusProntos[window.motorCacaDiamante.parceiroId] === true) {
+        let poteTotal = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteTotal, `Guerra do Diamante`);
+        
+        let quemComeca = Math.random() > 0.5 ? 'joao' : 'thamiris';
+
+        await update(jogoRef, {
+            status: 'escondendo', turno: quemComeca, apostas: minhasApostas, pote: poteTotal,
+            vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+            prontosOcultacao: { joao: false, thamiris: false },
+            bases: { joao: { d: -1, b: '[]' }, thamiris: { d: -1, b: '[]' } },
+            tirosRecebidos: { joao: '[]', thamiris: '[]' }
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+    }
+};
+
+window.esconderDefesaCacaDiamante = async function(index) {
+    let jogo = window.motorCacaDiamante;
+    if (jogo.status !== 'escondendo' || jogo.prontosOcultacao[jogo.meuId]) return;
+
+    let minhaBase = { d: jogo.bases[jogo.meuId].d, b: [...jogo.bases[jogo.meuId].b] };
+
+    // Lógica inteligente de clique (Remove se já tem, Adiciona Diamante primeiro, depois Bombas)
+    if (minhaBase.d === index) { minhaBase.d = -1; }
+    else if (minhaBase.b.includes(index)) { minhaBase.b = minhaBase.b.filter(i => i !== index); }
+    else {
+        if (minhaBase.d === -1) { minhaBase.d = index; }
+        else if (minhaBase.b.length < 2) { minhaBase.b.push(index); }
+        else { return; /* Já colocou os 3 itens */ }
+    }
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    up[`cassino/caca_diamante/bases/${jogo.meuId}`] = { d: minhaBase.d, b: JSON.stringify(minhaBase.b) };
+    
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([20]);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.5);
+    await update(ref(db), up);
+};
+
+window.trancarBaseCacaDiamante = async function() {
+    let jogo = window.motorCacaDiamante;
+    if (jogo.bases[jogo.meuId].d === -1 || jogo.bases[jogo.meuId].b.length < 2) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    up[`cassino/caca_diamante/prontosOcultacao/${jogo.meuId}`] = true;
+    
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([50, 50]);
+    await update(ref(db), up);
+};
+
+window.atirarNaBaseInimiga = async function(index) {
+    let jogo = window.motorCacaDiamante;
+    if (jogo.status !== 'jogando') return;
+    if (jogo.turno !== jogo.meuId) return;
+    
+    let tirosNoOponente = [...jogo.tirosRecebidos[jogo.parceiroId]];
+    if (tirosNoOponente.includes(index)) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    tirosNoOponente.push(index);
+    up[`cassino/caca_diamante/tirosRecebidos/${jogo.parceiroId}`] = JSON.stringify(tirosNoOponente);
+
+    let baseInimiga = jogo.bases[jogo.parceiroId];
+
+    if (index === baseInimiga.d) {
+        // ACHOU O DIAMANTE DO INIMIGO! VITÓRIA!
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([300, 100, 500]);
+        up[`cassino/caca_diamante/status`] = 'resultado';
+        up[`cassino/caca_diamante/vencedor`] = jogo.meuId;
+        up[`cassino/caca_diamante/quemFinalizou`] = jogo.meuId;
+    } 
+    else if (baseInimiga.b.includes(index)) {
+        // ATIROU NA BOMBA TÁTICA! (Sofre Multa + Passa a Vez)
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([200, 50, 200]);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
+        
+        let multa = 50;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-multa, `Multa por Bomba Tática`);
+        up[`cassino/caca_diamante/pote`] = jogo.pote + multa; // Pote engrossa com o sangue de quem errou
+        up[`cassino/caca_diamante/turno`] = jogo.parceiroId; // Perde o turno
+        
+        if(typeof mostrarToast === 'function') mostrarToast("BOMBA! Você perdeu 50 moedas pro pote!", "💥");
+    } 
+    else {
+        // TIRO NA FUMAÇA (Vazio)
+        if (window.Haptics && navigator.vibrate) navigator.vibrate(20);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.5);
+        up[`cassino/caca_diamante/turno`] = jogo.parceiroId;
+    }
+
+    await update(ref(db), up);
+};
+
+window.processarFimCacaDiamante = async function() {
+    if (window.motorCacaDiamante.quemFinalizou !== window.motorCacaDiamante.meuId) return;
+    let jogo = window.motorCacaDiamante;
+    if (jogo.vencedor === jogo.meuId) {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Vitória Caça Diamante`);
+    } 
+};
+
+window.renderizarMesaCacaDiamante = function() {
+    const jogo = window.motorCacaDiamante;
+    const painelAposta = document.getElementById('cacadiamante-painel-aposta');
+    const painelRes = document.getElementById('cacadiamante-painel-resultado');
+    const avisoCentro = document.getElementById('cacadiamante-aviso-centro');
+    
+    const areaOponente = document.getElementById('cacadiamante-area-oponente');
+    const areaJogador = document.getElementById('cacadiamante-area-jogador');
+    const visorPos = document.getElementById('visor-posicionamento');
+    const btnTrancar = document.getElementById('btn-trancar-base');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    
+    let minhaAposta = Number(document.getElementById('cacadiamante-valor-aposta').innerText) || 50;
+    let apostaParceiro = jogo.apostas[jogo.parceiroId] || 0;
+    
+    // Atualiza pote na tela com destaque visual quando houver multa
+    const visorPote = document.getElementById('cacadiamante-pote-valor');
+    let poteAtualCalculado = jogo.status === 'apostando' ? (minhaAposta + apostaParceiro) : jogo.pote;
+    
+    if (visorPote && Number(visorPote.innerText) < poteAtualCalculado && jogo.status === 'jogando') {
+        visorPote.parentElement.style.transform = "scale(1.1)";
+        visorPote.parentElement.style.borderColor = "#ff4757";
+        setTimeout(()=>{ visorPote.parentElement.style.transform = "scale(1)"; visorPote.parentElement.style.borderColor = "#00cec9"; }, 500);
+    }
+    if (visorPote) visorPote.innerText = poteAtualCalculado;
+
+    // RENDERIZAR GRADES (AGORA 16 CAIXAS)
+    const gridDefesa = document.getElementById('grid-defesa');
+    const gridAtaque = document.getElementById('grid-ataque');
+    
+    if (gridDefesa && gridAtaque) {
+        gridDefesa.innerHTML = '';
+        gridAtaque.innerHTML = '';
+        
+        let minhaBase = jogo.bases[jogo.meuId];
+        let baseInimiga = jogo.bases[jogo.parceiroId];
+        let tirosQueLevei = jogo.tirosRecebidos[jogo.meuId];
+        let tirosQueDei = jogo.tirosRecebidos[jogo.parceiroId];
+
+        // Atualiza contadores na fase 1
+        if (visorPos) {
+            document.getElementById('contador-diamante').innerText = minhaBase.d !== -1 ? '1/1' : '0/1';
+            document.getElementById('contador-bombas').innerText = `${minhaBase.b.length}/2`;
+            if (minhaBase.d !== -1 && minhaBase.b.length === 2 && !jogo.prontosOcultacao[jogo.meuId]) {
+                if(btnTrancar) btnTrancar.classList.remove('escondido');
+            } else {
+                if(btnTrancar) btnTrancar.classList.add('escondido');
+            }
+        }
+
+        for(let i=0; i<16; i++) {
+            // Desenhar Minha Defesa
+            let estadoDefesa = 'oculto';
+            if (i === minhaBase.d) estadoDefesa = 'diamante';
+            else if (minhaBase.b.includes(i)) estadoDefesa = 'bomba';
+            
+            // Se tomei tiro ali, mostra o estrago se não era o diamante (que acaba o jogo)
+            if (tirosQueLevei.includes(i)) {
+                if (minhaBase.b.includes(i)) estadoDefesa = 'bomba_atingida';
+                else if (i !== minhaBase.d) estadoDefesa = 'vazio_atingido';
+            }
+            gridDefesa.innerHTML += criarGridBox('defesa', i, estadoDefesa);
+
+            // Desenhar Ataque
+            let estadoAtaque = 'oculto';
+            if (tirosQueDei.includes(i)) {
+                if (i === baseInimiga.d) estadoAtaque = 'diamante'; // Win
+                else if (baseInimiga.b.includes(i)) estadoAtaque = 'bomba'; // Multa
+                else estadoAtaque = 'vazio'; // Fumaça
+            }
+            // Revelar Diamante no fim
+            if (jogo.status === 'resultado' && i === baseInimiga.d) estadoAtaque = 'diamante';
+            gridAtaque.innerHTML += criarGridBox('ataque', i, estadoAtaque);
+        }
+    }
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(areaOponente) areaOponente.classList.add('escondido');
+        if(areaJogador) areaJogador.classList.add('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "Financie sua base para entrar na guerra."; avisoCentro.style.color = "#00cec9"; }
+        const btnInic = document.getElementById('btn-iniciar-cacadiamante');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "AGUARDANDO RIVAL... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "FINANCIAR GUERRA ⚔️"; btnInic.style.background = "linear-gradient(145deg, #00cec9, #01908c)"; }
+        }
+    } 
+    else if (jogo.status === 'escondendo') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(areaOponente) areaOponente.classList.add('escondido');
+        if(areaJogador) areaJogador.classList.remove('escondido'); 
+        if(visorPos) visorPos.classList.remove('escondido');
+        
+        if (!jogo.prontosOcultacao[jogo.meuId]) {
+            if(avisoCentro) { avisoCentro.innerText = "FASE TÁTICA\nPlante 1 Diamante e 2 Bombas!"; avisoCentro.style.color = "#00cec9"; }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = "DEFESAS TRANCADAS!\nAguardando adversária... ⏳"; avisoCentro.style.color = "#f1c40f"; }
+            if(btnTrancar) btnTrancar.classList.add('escondido');
+        }
+    }
+    else if (jogo.status === 'jogando') {
+        if(visorPos) visorPos.classList.add('escondido');
+        if(btnTrancar) btnTrancar.classList.add('escondido');
+        if(areaOponente) areaOponente.classList.remove('escondido');
+        if(areaJogador) areaJogador.classList.remove('escondido');
+
+        if (jogo.turno === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = "SUA VEZ!\nAtire na Zona Inimiga!"; avisoCentro.style.color = "#e74c3c"; }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = "AGUARDE!\nSua base está sob ataque... 💥"; avisoCentro.style.color = "#f39c12"; }
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        if(areaOponente) areaOponente.classList.remove('escondido');
+        if(areaJogador) areaJogador.classList.remove('escondido');
+        if(visorPos) visorPos.classList.add('escondido');
+        if(btnTrancar) btnTrancar.classList.add('escondido');
+        
+        if (jogo.vencedor === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = `🏆 BASE INIMIGA DESTRUÍDA!\nO Diamante é todo seu!`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#00cec9', '#ffffff'], particleCount: 300});
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `💀 SUA BASE CAIU!\nO Diamante foi roubado.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8);
+            }
+        }
+    }
+};
+
+window.resetarCacaDiamante = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorCacaDiamante.moedasPagas = false;
+    await set(ref(db, `cassino/caca_diamante`), {
+        status: 'apostando', turno: '', pote: 0, vencedor: null, quemFinalizou: '', 
+        prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 }, 
+        prontosOcultacao: { joao: false, thamiris: false },
+        bases: { joao: { d: -1, b: '[]' }, thamiris: { d: -1, b: '[]' } }, 
+        tirosRecebidos: { joao: '[]', thamiris: '[]' }
+    });
+};
+
+// ==========================================
+// 🏦 MOTOR REAL-TIME: INVASÃO AO COFRE (PVP)
+// ==========================================
+
+window.motorSincroniaCofre = {
+    meuId: '', parceiroId: '', status: 'apostando', pote: 0, 
+    vencedor: null, quemFinalizou: '', moedasPagas: false, 
+    prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+    progresso: { joao: 0, thamiris: 0 }, 
+    firewallAtual: 'trava' // 'trava', 'fogo', 'agua', 'planta'
+};
+
+window.loopFirewall = null;
+
+window.iniciarOuvinteSincroniaCofre = function() { // Mantivemos o nome da função para não quebrar a rota
+    window.motorSincroniaCofre.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorSincroniaCofre.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    if (!window.sincroniaCofreResetadoNuclear) {
+        window.sincroniaCofreResetadoNuclear = true;
+        set(ref(db, `cassino/invasao_cofre`), {
+            status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '',
+            prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 }, 
+            progresso: { joao: 0, thamiris: 0 }, firewallAtual: 'trava'
+        });
+    }
+
+    onValue(ref(db, `cassino/invasao_cofre`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            window.motorSincroniaCofre.status = data.status || 'apostando';
+            window.motorSincroniaCofre.pote = Number(data.pote) || 0;
+            window.motorSincroniaCofre.vencedor = data.vencedor || null;
+            window.motorSincroniaCofre.quemFinalizou = data.quemFinalizou || '';
+            window.motorSincroniaCofre.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorSincroniaCofre.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            
+            let prog = data.progresso || { joao: 0, thamiris: 0 };
+            window.motorSincroniaCofre.progresso = { joao: Number(prog.joao), thamiris: Number(prog.thamiris) };
+            window.motorSincroniaCofre.firewallAtual = data.firewallAtual || 'trava';
+
+            renderizarMesaSincroniaCofre();
+
+            // O Host (João) coordena a mudança de fase do Firewall a cada 2.5s
+            if (window.motorSincroniaCofre.status === 'jogando' && window.souJoao && !window.loopFirewall) {
+                iniciarRotinaFirewall();
+            }
+
+            if (window.motorSincroniaCofre.status === 'resultado') {
+                if (window.loopFirewall) { clearInterval(window.loopFirewall); window.loopFirewall = null; }
+                if (!window.motorSincroniaCofre.moedasPagas) processarFimSincroniaCofre();
+            }
+        } catch (e) { console.error("Erro no Cofre", e); }
+    });
+};
+
+function iniciarRotinaFirewall() {
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const elementos = ['fogo', 'agua', 'planta'];
+    
+    // Troca inicial
+    update(ref(db), { [`cassino/invasao_cofre/firewallAtual`]: elementos[Math.floor(Math.random() * 3)] }).catch(e=>{});
+
+    window.loopFirewall = setInterval(() => {
+        if (window.motorSincroniaCofre.status !== 'jogando') {
+            clearInterval(window.loopFirewall); window.loopFirewall = null; return;
+        }
+        let novoEl = elementos[Math.floor(Math.random() * 3)];
+        update(ref(db), { [`cassino/invasao_cofre/firewallAtual`]: novoEl }).catch(e=>{});
+    }, 2500); // A cada 2.5 segundos o elemento muda!
+}
+
+window.ajustarApostaSincroniaCofre = function(delta) {
+    if (window.motorSincroniaCofre.status !== 'apostando') return;
+    if (window.motorSincroniaCofre.prontos[window.motorSincroniaCofre.meuId]) return; 
+    
+    let visor = document.getElementById('sincroniacofre-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    visor.innerText = novoValor; 
+    let apostaOponente = window.motorSincroniaCofre.apostas[window.motorSincroniaCofre.parceiroId] || 0;
+    document.getElementById('sincroniacofre-pote-valor').innerText = (novoValor + apostaOponente);
+
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarSincroniaCofre = async function() {
+    let minhaAposta = Number(document.getElementById('sincroniacofre-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/invasao_cofre`);
+
+    let meusProntos = { ...window.motorSincroniaCofre.prontos };
+    meusProntos[window.motorSincroniaCofre.meuId] = true;
+
+    let minhasApostas = { ...window.motorSincroniaCofre.apostas };
+    minhasApostas[window.motorSincroniaCofre.meuId] = minhaAposta; 
+
+    if (meusProntos[window.motorSincroniaCofre.parceiroId] === true) {
+        let poteCombinado = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteCombinado, `Hack ao Cofre`);
+        
+        await update(jogoRef, {
+            status: 'jogando', apostas: minhasApostas, pote: poteCombinado,
+            vencedor: null, quemFinalizou: '', firewallAtual: 'trava',
+            prontos: { joao: false, thamiris: false }, progresso: { joao: 0, thamiris: 0 }
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+    }
+};
+
+window.atacarFirewall = async function(meuAtaque) {
+    let jogo = window.motorSincroniaCofre;
+    if (jogo.status !== 'jogando' || jogo.firewallAtual === 'trava') return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    let progressoAtual = jogo.progresso[jogo.meuId];
+    let alvo = jogo.firewallAtual;
+    
+    // Lógica da Vantagem Elementar
+    let acertou = false;
+    if (alvo === 'fogo' && meuAtaque === 'agua') acertou = true;
+    else if (alvo === 'agua' && meuAtaque === 'planta') acertou = true;
+    else if (alvo === 'planta' && meuAtaque === 'fogo') acertou = true;
+
+    if (acertou) {
+        progressoAtual += 5; // Sobe 5%
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([20]);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.5);
+    } else {
+        progressoAtual -= 10; // Cai 10% de Punição
+        if (progressoAtual < 0) progressoAtual = 0;
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        
+        // Efeito visual de falha na tela local
+        document.getElementById('nucleo-firewall').style.borderColor = "#e74c3c";
+        document.getElementById('nucleo-firewall').style.boxShadow = "inset 0 0 40px #e74c3c";
+        setTimeout(()=>{ 
+            document.getElementById('nucleo-firewall').style.borderColor = "#333";
+            document.getElementById('nucleo-firewall').style.boxShadow = "inset 0 0 20px #000";
+        }, 300);
+    }
+
+    if (progressoAtual >= 100) {
+        progressoAtual = 100;
+        up[`cassino/invasao_cofre/status`] = 'resultado';
+        up[`cassino/invasao_cofre/vencedor`] = jogo.meuId;
+        up[`cassino/invasao_cofre/quemFinalizou`] = jogo.meuId;
+    }
+
+    up[`cassino/invasao_cofre/progresso/${jogo.meuId}`] = progressoAtual;
+    await update(ref(db), up);
+};
+
+window.processarFimSincroniaCofre = async function() {
+    if (window.motorSincroniaCofre.quemFinalizou !== window.motorSincroniaCofre.meuId) return;
+    let jogo = window.motorSincroniaCofre;
+    if (jogo.vencedor === jogo.meuId) {
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(jogo.pote, `Roubo ao Cofre Concluído`);
+    } 
+};
+
+window.renderizarMesaSincroniaCofre = function() {
+    const jogo = window.motorSincroniaCofre;
+    const painelAposta = document.getElementById('sincroniacofre-painel-aposta');
+    const painelRes = document.getElementById('sincroniacofre-painel-resultado');
+    const tecladoHacker = document.getElementById('teclado-hacker');
+    const avisoCentro = document.getElementById('sincroniacofre-aviso-centro');
+    const nucleo = document.getElementById('nucleo-firewall');
+    const painelProgresso = document.getElementById('painel-hacker-progresso');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    
+    let minhaAposta = Number(document.getElementById('sincroniacofre-valor-aposta').innerText) || 50;
+    let apostaParceiro = jogo.apostas[jogo.parceiroId] || 0;
+    document.getElementById('sincroniacofre-pote-valor').innerText = jogo.status === 'apostando' ? (minhaAposta + apostaParceiro) : jogo.pote;
+
+    // Atualiza barras de progresso
+    document.getElementById('hack-meu-pct').innerText = `${jogo.progresso[jogo.meuId]}%`;
+    document.getElementById('hack-meu-bar').style.width = `${jogo.progresso[jogo.meuId]}%`;
+    
+    document.getElementById('hack-oponente-pct').innerText = `${jogo.progresso[jogo.parceiroId]}%`;
+    document.getElementById('hack-oponente-bar').style.width = `${jogo.progresso[jogo.parceiroId]}%`;
+
+    // Visual do Núcleo do Cofre
+    const emojiMap = { 'trava': '🔒', 'fogo': '🔥', 'agua': '💧', 'planta': '🌿' };
+    const colorMap = { 'trava': '#111', 'fogo': '#e74c3c', 'agua': '#3498db', 'planta': '#2ecc71' };
+    if (nucleo) {
+        nucleo.innerText = emojiMap[jogo.firewallAtual];
+        if (jogo.status === 'jogando') {
+            nucleo.style.background = colorMap[jogo.firewallAtual];
+            nucleo.style.boxShadow = `0 0 30px ${colorMap[jogo.firewallAtual]}, inset 0 0 20px rgba(255,255,255,0.5)`;
+            nucleo.style.borderColor = "#fff";
+        } else {
+            nucleo.style.background = "#111";
+            nucleo.style.boxShadow = "inset 0 0 20px #000";
+            nucleo.style.borderColor = "#333";
+        }
+    }
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(tecladoHacker) tecladoHacker.classList.add('escondido');
+        if(painelProgresso) painelProgresso.classList.add('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "Financie a operação hacker."; avisoCentro.style.color = "#f1c40f"; }
+        const btnInic = document.getElementById('btn-iniciar-sincroniacofre');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "AGUARDANDO RIVAL... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "CRIAR LINK DE ACESSO 🔌"; btnInic.style.background = "linear-gradient(145deg, #f1c40f, #d4ac0d)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(tecladoHacker) tecladoHacker.classList.remove('escondido');
+        if(painelProgresso) painelProgresso.classList.remove('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "SISTEMA ONLINE!\nAtire a fraqueza do Firewall!"; avisoCentro.style.color = "#00f2fe"; }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(tecladoHacker) tecladoHacker.classList.add('escondido');
+        if(painelProgresso) painelProgresso.classList.remove('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        
+        if (jogo.vencedor === jogo.meuId) {
+            if(avisoCentro) { avisoCentro.innerText = `🔓 DOWNLOAD CONCLUÍDO!\nVocê invadiu o cofre primeiro!`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.Haptics && navigator.vibrate) navigator.vibrate([100, 100, 300]);
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#ffffff'], particleCount: 500});
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `🚨 ALARME ACIONADO!\nA adversária hackeou o sistema antes.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.Haptics && navigator.vibrate) navigator.vibrate([500, 200, 500]);
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
+                setTimeout(()=> { if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8); }, 500);
+            }
+        }
+    }
+};
+
+window.resetarSincroniaCofre = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorSincroniaCofre.moedasPagas = false;
+    await set(ref(db, `cassino/invasao_cofre`), {
+        status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', 
+        prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 }, 
+        progresso: { joao: 0, thamiris: 0 }, firewallAtual: 'trava'
+    });
+};
+
+// ==========================================
+// 🔦 MOTOR REAL-TIME: CAMPO MINADO CEGO (CO-OP)
+// ==========================================
+
+window.motorCampoMinado = {
+    meuId: '', parceiroId: '', status: 'apostando', poteInicial: 0, 
+    vencedor: null, quemFinalizou: '', moedasPagas: false, prontos: { joao: false, thamiris: false },
+    apostas: { joao: 0, thamiris: 0 },
+    rastreador: '', // O parceiro que vê as minas
+    minas: [], // Array de 5 posições
+    abertas: [], // Array de caixas seguras já abertas
+    // Multiplicadores por acerto (11 passos para a vitória total)
+    multis: [1.2, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.0, 10.0, 12.0, 15.0]
+};
+
+window.iniciarOuvinteCampoMinado = function() {
+    window.motorCampoMinado.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorCampoMinado.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    if (!window.campoMinadoResetadoNuclear) {
+        window.campoMinadoResetadoNuclear = true;
+        set(ref(db, `cassino/campo_minado`), {
+            status: 'apostando', poteInicial: 0, vencedor: null, quemFinalizou: '',
+            prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+            rastreador: '', minas: '[]', abertas: '[]'
+        });
+    }
+
+    onValue(ref(db, `cassino/campo_minado`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+
+            if (data.status === 'jogando' && !data.minas) { await resetarCampoMinado(); return; }
+
+            window.motorCampoMinado.status = data.status || 'apostando';
+            window.motorCampoMinado.poteInicial = Number(data.poteInicial) || 0;
+            window.motorCampoMinado.vencedor = data.vencedor || null;
+            window.motorCampoMinado.quemFinalizou = data.quemFinalizou || '';
+            window.motorCampoMinado.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorCampoMinado.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            window.motorCampoMinado.rastreador = data.rastreador || '';
+            
+            window.motorCampoMinado.minas = JSON.parse(data.minas || "[]");
+            window.motorCampoMinado.abertas = JSON.parse(data.abertas || "[]");
+
+            renderizarMesaCampoMinado();
+
+            if (window.motorCampoMinado.status === 'resultado' && !window.motorCampoMinado.moedasPagas) {
+                processarFimCampoMinado();
+            }
+        } catch (e) { console.error("Erro Campo Minado", e); }
+    });
+};
+
+function desenharCaixaCampoMinado(index, isMina, isAberta, euSouRastreador, jogoAcabou) {
+    // 🚨 Adicionado box-sizing: border-box na base de todas as caixas
+    let base = `width: 100%; aspect-ratio: 1; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 2rem; transition: all 0.3s; box-sizing: border-box;`;
+    
+    // VISÃO DO RASTREADOR (O Guia)
+    if (euSouRastreador) {
+        // 🚨 Removido o 'animation: pulsoUno' e adicionado um brilho neon estático mais forte
+        if (isMina) return `<div style="${base} background: rgba(231, 76, 60, 0.4); border: 2px solid #e74c3c; box-shadow: 0 0 15px rgba(231, 76, 60, 0.6), inset 0 0 15px rgba(231,76,60,0.8);">💣</div>`;
+        if (isAberta) return `<div style="${base} background: rgba(46, 204, 113, 0.2); border: 2px solid #2ecc71;">✅</div>`;
+        return `<div style="${base} background: rgba(0,0,0,0.6); border: 2px solid #555; color: #444;">🛡️</div>`;
+    } 
+    // VISÃO DO EXPLORADOR (O Jogador Cego)
+    else {
+        if (isAberta) {
+            if (isMina) return `<div style="${base} background: rgba(231, 76, 60, 0.8); border: 2px solid #ff4757; box-shadow: 0 0 20px #e74c3c;">💥</div>`;
+            return `<div style="${base} background: rgba(46, 204, 113, 0.4); border: 2px solid #2ecc71; box-shadow: 0 0 15px rgba(46,204,113,0.5);">✅</div>`;
+        }
+        
+        // Se o jogo acabou, revela as minas que ele não pisou
+        if (jogoAcabou && isMina) return `<div style="${base} background: rgba(231, 76, 60, 0.2); border: 2px solid #e74c3c; opacity: 0.5;">💣</div>`;
+        if (jogoAcabou) return `<div style="${base} background: rgba(0,0,0,0.8); border: 2px solid #333;">💨</div>`;
+
+        // Caixa clicável no escuro
+        return `<div onclick="clicarCampoMinado(${index})" style="${base} background: linear-gradient(145deg, #2c0b3e, #150524); border: 2px solid #9b59b6; box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(155, 89, 182, 0.2); cursor: pointer;">❓</div>`;
+    }
+}
+
+window.ajustarApostaCampoMinado = function(delta) {
+    if (window.motorCampoMinado.status !== 'apostando') return;
+    if (window.motorCampoMinado.prontos[window.motorCampoMinado.meuId]) return; 
+    let visor = document.getElementById('campominado-valor-aposta');
+    let atual = Number(visor.innerText) || 50;
+    let novoValor = atual + delta;
+    if (novoValor < 10) novoValor = 10;
+    
+    visor.innerText = novoValor; 
+    let apostaOponente = window.motorCampoMinado.apostas[window.motorCampoMinado.parceiroId] || 0;
+    document.getElementById('campominado-lucro-valor').innerText = (novoValor + apostaOponente);
+    if (window.Haptics && navigator.vibrate) navigator.vibrate([30]);
+};
+
+window.iniciarCampoMinado = async function() {
+    let minhaAposta = Number(document.getElementById('campominado-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    const jogoRef = ref(db, `cassino/campo_minado`);
+
+    let meusProntos = { ...window.motorCampoMinado.prontos };
+    meusProntos[window.motorCampoMinado.meuId] = true;
+
+    let minhasApostas = { ...window.motorCampoMinado.apostas };
+    minhasApostas[window.motorCampoMinado.meuId] = minhaAposta; 
+
+    if (meusProntos[window.motorCampoMinado.parceiroId] === true) {
+        let poteTotal = minhasApostas.joao + minhasApostas.thamiris;
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-poteTotal, `Entrada na Expedição`);
+        
+        // Sorteia as 5 Minas Letais
+        let minasGeradas = [];
+        while(minasGeradas.length < 5) {
+            let r = Math.floor(Math.random() * 16);
+            if(!minasGeradas.includes(r)) minasGeradas.push(r);
+        }
+
+        let quemEORastreador = Math.random() > 0.5 ? 'joao' : 'thamiris';
+
+        await update(jogoRef, {
+            status: 'jogando', apostas: minhasApostas, poteInicial: poteTotal,
+            vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false },
+            rastreador: quemEORastreador, minas: JSON.stringify(minasGeradas), abertas: '[]'
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(jogoRef, { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+    }
+};
+
+window.clicarCampoMinado = async function(index) {
+    let jogo = window.motorCampoMinado;
+    if (jogo.status !== 'jogando' || jogo.meuId === jogo.rastreador) return;
+    if (jogo.abertas.includes(index)) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let up = {};
+    let minhasAbertas = [...jogo.abertas];
+
+    if (jogo.minas.includes(index)) {
+        // CABUM! PISOU NA MINA!
+        minhasAbertas.push(index);
+        up[`cassino/campo_minado/abertas`] = JSON.stringify(minhasAbertas);
+        up[`cassino/campo_minado/status`] = 'resultado';
+        up[`cassino/campo_minado/vencedor`] = 'casa'; // Perderam
+        up[`cassino/campo_minado/quemFinalizou`] = jogo.meuId;
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([300, 100, 500]);
+    } else {
+        // SEGURO!
+        minhasAbertas.push(index);
+        up[`cassino/campo_minado/abertas`] = JSON.stringify(minhasAbertas);
+        if (window.Haptics && navigator.vibrate) navigator.vibrate(30);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
+        
+        // Verificação de Vitória Máxima (Limpou os 11 campos seguros)
+        if (minhasAbertas.length === 11) {
+            up[`cassino/campo_minado/status`] = 'resultado';
+            up[`cassino/campo_minado/vencedor`] = 'jogadores_max';
+            up[`cassino/campo_minado/quemFinalizou`] = jogo.meuId;
+        }
+    }
+    await update(ref(db), up);
+};
+
+window.sacarCampoMinado = async function() {
+    let jogo = window.motorCampoMinado;
+    if (jogo.status !== 'jogando' || jogo.abertas.length === 0 || jogo.meuId === jogo.rastreador) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    await update(ref(db), {
+        [`cassino/campo_minado/status`]: 'resultado',
+        [`cassino/campo_minado/vencedor`]: 'saque',
+        [`cassino/campo_minado/quemFinalizou`]: jogo.meuId
+    });
+};
+
+window.processarFimCampoMinado = async function() {
+    if (window.motorCampoMinado.quemFinalizou !== window.motorCampoMinado.meuId) return;
+    let jogo = window.motorCampoMinado;
+    
+    if (jogo.vencedor === 'jogadores_max' || jogo.vencedor === 'saque') {
+        let indiceMulti = jogo.abertas.length - 1;
+        if (indiceMulti < 0) indiceMulti = 0;
+        let multiAtual = jogo.multis[indiceMulti];
+        
+        let lucroFinal = Math.floor(jogo.poteInicial * multiAtual);
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(lucroFinal, `Fuga do Campo Minado (${multiAtual}x)`);
+    }
+};
+
+window.renderizarMesaCampoMinado = function() {
+    const jogo = window.motorCampoMinado;
+    const painelAposta = document.getElementById('campominado-painel-aposta');
+    const painelRes = document.getElementById('campominado-painel-resultado');
+    const painelAcao = document.getElementById('campominado-painel-acao');
+    const avisoCentro = document.getElementById('campominado-aviso-centro');
+    const grid = document.getElementById('grid-campominado');
+
+    if (avisoCentro) { avisoCentro.style.textAlign = "center"; avisoCentro.style.lineHeight = "1.4"; }
+    
+    let minhaAposta = Number(document.getElementById('campominado-valor-aposta').innerText) || 50;
+    let apostaParceiro = jogo.apostas[jogo.parceiroId] || 0;
+    
+    // Atualiza Placar e Multiplicador
+    let multiAtual = 1.0;
+    if (jogo.abertas.length > 0) multiAtual = jogo.multis[jogo.abertas.length - 1];
+    
+    document.getElementById('campominado-passos-texto').innerText = `${jogo.abertas.length} / 11`;
+    document.getElementById('campominado-multiplicador').innerText = multiAtual.toFixed(1);
+    
+    let poteParaExibir = jogo.status === 'apostando' ? (minhaAposta + apostaParceiro) : Math.floor(jogo.poteInicial * multiAtual);
+    document.getElementById('campominado-lucro-valor').innerText = poteParaExibir;
+
+    let euSouRastreador = (jogo.meuId === jogo.rastreador);
+    let jogoAcabou = (jogo.status === 'resultado');
+
+    if (grid) {
+        grid.innerHTML = '';
+        if (jogo.status === 'apostando') {
+            for(let i=0; i<16; i++) grid.innerHTML += `<div style="width: 100%; aspect-ratio: 1; border-radius: 8px; background: rgba(0,0,0,0.5); border: 2px solid #444;"></div>`;
+        } else {
+            for(let i=0; i<16; i++) {
+                let isMina = jogo.minas.includes(i);
+                let isAberta = jogo.abertas.includes(i);
+                grid.innerHTML += desenharCaixaCampoMinado(i, isMina, isAberta, euSouRastreador, jogoAcabou);
+            }
+        }
+    }
+
+    if (jogo.status === 'apostando') {
+        if(painelAposta) painelAposta.classList.remove('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        
+        if(avisoCentro) { avisoCentro.innerText = "Financie a expedição."; avisoCentro.style.color = "#9b59b6"; }
+        const btnInic = document.getElementById('btn-iniciar-campominado');
+        if (btnInic) {
+            if (jogo.prontos[jogo.meuId]) { btnInic.innerText = "AGUARDANDO PARCEIRO... ⏳"; btnInic.style.background = "#555"; }
+            else { btnInic.innerText = "FINANCIAR EXPEDIÇÃO 🔦"; btnInic.style.background = "linear-gradient(145deg, #9b59b6, #8e44ad)"; }
+        }
+    } 
+    else if (jogo.status === 'jogando') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelRes) painelRes.classList.add('escondido');
+        
+        if (euSouRastreador) {
+            if(painelAcao) painelAcao.classList.add('escondido');
+            if(avisoCentro) { avisoCentro.innerText = "📡 VOCÊ É O RASTREADOR!\nGrite onde é seguro pisar!"; avisoCentro.style.color = "#e74c3c"; }
+        } else {
+            if(painelAcao && jogo.abertas.length > 0) painelAcao.classList.remove('escondido');
+            if(avisoCentro) { avisoCentro.innerText = "🚶 VOCÊ É O EXPLORADOR!\nSiga as vozes. Cuidado onde pisa."; avisoCentro.style.color = "#00f2fe"; }
+        }
+    } 
+    else if (jogo.status === 'resultado') {
+        if(painelAposta) painelAposta.classList.add('escondido');
+        if(painelAcao) painelAcao.classList.add('escondido');
+        if(painelRes) painelRes.classList.remove('escondido');
+        
+        if (jogo.vencedor === 'jogadores_max') {
+            if(avisoCentro) { avisoCentro.innerText = `🏆 ZERARAM O CAMPO!\nO Multiplicador Máximo (15x) é de vocês!`; avisoCentro.style.color = "#2ecc71"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0);
+                if(typeof confetti === 'function') confetti({colors: ['#9b59b6', '#2ecc71'], particleCount: 500});
+            }
+        } else if (jogo.vencedor === 'saque') {
+            if(avisoCentro) { avisoCentro.innerText = `💰 FUGIRAM VIVOS!\nVocês sacaram com ${multiAtual.toFixed(1)}x de Lucro!`; avisoCentro.style.color = "#f1c40f"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 1.0);
+            }
+        } else {
+            if(avisoCentro) { avisoCentro.innerText = `💥 CABUM!\nO Explorador pisou na mina. Pote perdido.`; avisoCentro.style.color = "#e74c3c"; }
+            if (jogo.quemFinalizou === jogo.meuId && !jogo.moedasPagas) {
+                jogo.moedasPagas = true;
+                if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
+                setTimeout(()=> { if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8); }, 500);
+            }
+        }
+    }
+};
+
+window.resetarCampoMinado = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorCampoMinado.moedasPagas = false;
+    await set(ref(db, `cassino/campo_minado`), {
+        status: 'apostando', poteInicial: window.motorCampoMinado.poteInicial, 
+        vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false }, 
+        apostas: { joao: 0, thamiris: 0 }, rastreador: '', minas: '[]', abertas: '[]'
+    });
+};
+
+// ==========================================
+// 👽 MOTOR REAL-TIME: TRANSMISSÃO ALIENÍGENA (CAOS)
+// ==========================================
+
+window.motorTransmissao = {
+    meuId: '', parceiroId: '', status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', moedasPagas: false,
+    prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+    transmissor: '', senhaMestra: [], grade: [], cliques: [], ordemInversa: false, ultimaEmbaralhada: 0, endTime: 0
+};
+window.intervaloTransmissao = null;
+const simbolosAlien = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '⛎', '🔯', '♾️', '☯️'];
+
+window.iniciarOuvinteTransmissao = function() {
+    window.motorTransmissao.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorTransmissao.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    if (!window.transmissaoResetadoNuclear) {
+        window.transmissaoResetadoNuclear = true;
+        set(ref(db, `cassino/transmissao`), {
+            status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', 
+            prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+            ordemInversa: false, ultimaEmbaralhada: 0
+        });
+    }
+
+    onValue(ref(db, `cassino/transmissao`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+            if (data.status === 'jogando' && !data.grade) { await resetarTransmissao(); return; }
+
+            window.motorTransmissao.status = data.status || 'apostando';
+            window.motorTransmissao.pote = Number(data.pote) || 0;
+            window.motorTransmissao.vencedor = data.vencedor || null;
+            window.motorTransmissao.quemFinalizou = data.quemFinalizou || '';
+            window.motorTransmissao.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorTransmissao.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            window.motorTransmissao.transmissor = data.transmissor || '';
+            window.motorTransmissao.ordemInversa = data.ordemInversa || false;
+            window.motorTransmissao.ultimaEmbaralhada = Number(data.ultimaEmbaralhada) || 0;
+            
+            // Só regera a grade se vier nova do banco
+            let novaGrade = JSON.parse(data.grade || "[]");
+            if (JSON.stringify(window.motorTransmissao.grade) !== JSON.stringify(novaGrade) && window.motorTransmissao.meuId !== window.motorTransmissao.transmissor) {
+                let gridUI = document.getElementById('grid-alien');
+                if (gridUI) { gridUI.style.opacity = '0'; setTimeout(()=> { gridUI.style.opacity = '1'; }, 200); }
+            }
+            window.motorTransmissao.grade = novaGrade;
+            
+            window.motorTransmissao.senhaMestra = JSON.parse(data.senhaMestra || "[]");
+            window.motorTransmissao.cliques = JSON.parse(data.cliques || "[]");
+            window.motorTransmissao.endTime = Number(data.endTime) || 0;
+
+            renderizarMesaTransmissao();
+            gerenciarRelogioTransmissao();
+
+            if (window.motorTransmissao.status === 'resultado' && !window.motorTransmissao.moedasPagas) processarFimTransmissao();
+        } catch (e) { }
+    });
+};
+
+window.ajustarApostaTransmissao = function(delta) {
+    if (window.motorTransmissao.status !== 'apostando') return;
+    if (window.motorTransmissao.prontos[window.motorTransmissao.meuId]) return; 
+    let visor = document.getElementById('transmissao-valor-aposta');
+    let nv = (Number(visor.innerText) || 50) + delta;
+    visor.innerText = nv < 10 ? 10 : nv;
+    document.getElementById('transmissao-pote-valor').innerText = (nv + (window.motorTransmissao.apostas[window.motorTransmissao.parceiroId] || 0)) * 5;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate(30);
+};
+
+window.iniciarTransmissao = async function() {
+    let mAposta = Number(document.getElementById('transmissao-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let meusProntos = { ...window.motorTransmissao.prontos }; meusProntos[window.motorTransmissao.meuId] = true;
+    let minhasApostas = { ...window.motorTransmissao.apostas }; minhasApostas[window.motorTransmissao.meuId] = mAposta; 
+
+    if (meusProntos[window.motorTransmissao.parceiroId]) {
+        let pT = (minhasApostas.joao + minhasApostas.thamiris);
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-pT, `Decodificação`);
+        
+        let gradeF = [...simbolosAlien].sort(()=>Math.random() - 0.5);
+        let senhaF = gradeF.slice(0, 4).sort(()=>Math.random() - 0.5);
+        let trans = Math.random() > 0.5 ? 'joao' : 'thamiris';
+        let isInversa = Math.random() > 0.5; // 50% de chance de ser invertido!
+
+        await update(ref(db, `cassino/transmissao`), {
+            status: 'jogando', apostas: minhasApostas, pote: pT * 5, transmissor: trans,
+            ordemInversa: isInversa, ultimaEmbaralhada: Date.now(),
+            senhaMestra: JSON.stringify(senhaF), grade: JSON.stringify(gradeF), cliques: '[]',
+            endTime: Date.now() + 60000, prontos: {joao:false, thamiris:false}
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(ref(db, `cassino/transmissao`), { prontos: meusProntos, apostas: minhasApostas, status: 'apostando' });
+    }
+};
+
+window.clicarSimboloAlien = async function(simbolo) {
+    let jogo = window.motorTransmissao;
+    if (jogo.status !== 'jogando' || jogo.meuId === jogo.transmissor || jogo.cliques.includes(simbolo)) return;
+
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let clqs = [...jogo.cliques];
+    let up = {};
+
+    // Validação da ordem (Normal ou Inversa)
+    let indexEsperado = jogo.ordemInversa ? (3 - clqs.length) : clqs.length;
+    let simboloCorreto = jogo.senhaMestra[indexEsperado];
+
+    if (simbolo === simboloCorreto) {
+        clqs.push(simbolo);
+        if (window.Haptics && navigator.vibrate) navigator.vibrate(30);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.8);
+        
+        if (clqs.length === 4) {
+            up[`cassino/transmissao/status`] = 'resultado';
+            up[`cassino/transmissao/vencedor`] = 'jogadores';
+            up[`cassino/transmissao/quemFinalizou`] = jogo.meuId;
+        }
+        up[`cassino/transmissao/cliques`] = JSON.stringify(clqs);
+    } else {
+        // ERRO! PUNICAO DE -10 SEGUNDOS!
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([100,50,100]);
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('erro', 1.0);
+        
+        // Efeito visual de dano no relógio
+        let timerUI = document.getElementById('container-timer-transmissao');
+        if (timerUI) {
+            timerUI.style.background = "rgba(231, 76, 60, 0.4)";
+            timerUI.style.transform = "scale(1.1)";
+            setTimeout(()=> { timerUI.style.background = "rgba(231, 76, 60, 0.1)"; timerUI.style.transform = "scale(1)"; }, 300);
+        }
+
+        let novoTempo = jogo.endTime - 10000;
+        up[`cassino/transmissao/endTime`] = novoTempo;
+    }
+    
+    await update(ref(db), up);
+};
+
+function gerenciarRelogioTransmissao() {
+    if (window.motorTransmissao.status !== 'jogando') {
+        if (window.intervaloTransmissao) clearInterval(window.intervaloTransmissao); return;
+    }
+    if (window.intervaloTransmissao) clearInterval(window.intervaloTransmissao);
+    const tmUI = document.getElementById('transmissao-timer');
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    
+    window.intervaloTransmissao = setInterval(async () => {
+        let agora = Date.now();
+        let f = Math.ceil((window.motorTransmissao.endTime - agora) / 1000);
+        
+        if (f <= 0) {
+            clearInterval(window.intervaloTransmissao);
+            if (tmUI) tmUI.innerText = "00:00";
+            if (window.motorTransmissao.meuId === window.motorTransmissao.transmissor && window.motorTransmissao.status === 'jogando') {
+                await update(ref(db), { [`cassino/transmissao/status`]: 'resultado', [`cassino/transmissao/vencedor`]: 'casa', [`cassino/transmissao/quemFinalizou`]: window.motorTransmissao.meuId });
+            }
+        } else {
+            if (tmUI) { tmUI.innerText = f >= 10 ? `00:${f}` : `00:0${f}`; tmUI.style.color = f <= 10 ? '#e74c3c' : '#2ecc71'; }
+            
+            // Embaralhamento Quântico a cada 12 segundos (Controlado pelo Host para evitar duplicação)
+            if (window.souJoao && window.motorTransmissao.status === 'jogando') {
+                if (agora - window.motorTransmissao.ultimaEmbaralhada > 12000) {
+                    let novaGrade = [...window.motorTransmissao.grade].sort(()=>Math.random() - 0.5);
+                    update(ref(db), { [`cassino/transmissao/grade`]: JSON.stringify(novaGrade), [`cassino/transmissao/ultimaEmbaralhada`]: agora }).catch(e=>{});
+                }
+            }
+        }
+    }, 1000);
+}
+
+window.processarFimTransmissao = async function() {
+    if (window.motorTransmissao.quemFinalizou !== window.motorTransmissao.meuId) return;
+    if (window.motorTransmissao.vencedor === 'jogadores' && typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(window.motorTransmissao.pote, `Protocolo Decodificado (5x)`);
+};
+
+window.renderizarMesaTransmissao = function() {
+    const j = window.motorTransmissao;
+    const pAp = document.getElementById('transmissao-painel-aposta');
+    const pRe = document.getElementById('transmissao-painel-resultado');
+    const aC = document.getElementById('transmissao-aviso-centro');
+    const aTrans = document.getElementById('area-transmissor');
+    const aRec = document.getElementById('area-receptor');
+    
+    document.getElementById('transmissao-pote-valor').innerText = j.status === 'apostando' ? ((Number(document.getElementById('transmissao-valor-aposta').innerText) || 50) + (j.apostas[j.parceiroId] || 0)) * 5 : j.pote;
+    document.getElementById('transmissao-progresso-receptor').innerText = `${j.cliques.length} / 4`;
+
+    if (j.status === 'apostando') {
+        pAp.classList.remove('escondido'); pRe.classList.add('escondido'); aTrans.classList.add('escondido'); aRec.classList.add('escondido');
+        aC.innerText = "Financie o Hack."; aC.style.color = "#8e44ad";
+        const b = document.getElementById('btn-iniciar-transmissao');
+        if (b) b.innerText = j.prontos[j.meuId] ? "AGUARDANDO... ⏳" : "HACKEAR SINAL 📡";
+    } 
+    else if (j.status === 'jogando') {
+        pAp.classList.add('escondido'); pRe.classList.add('escondido');
+
+        if (j.meuId === j.transmissor) {
+            aTrans.classList.remove('escondido'); aRec.classList.add('escondido');
+            
+            // Protocolo Visor
+            const visorP = document.getElementById('protocolo-alerta');
+            if (j.ordemInversa) {
+                visorP.innerText = "⚠️ CUIDADO: ORDEM REVERSA"; visorP.style.color = "#e74c3c"; visorP.style.borderColor = "#e74c3c"; visorP.style.background = "rgba(231,76,60,0.1)";
+            } else {
+                visorP.innerText = "✅ PROTOCOLO: ORDEM NORMAL"; visorP.style.color = "#2ecc71"; visorP.style.borderColor = "#2ecc71"; visorP.style.background = "rgba(46,204,113,0.1)";
+            }
+
+            // Exibe a senha, escurecendo as que já foram clicadas
+            document.getElementById('transmissor-codigo').innerHTML = j.senhaMestra.map(s => `<span style="opacity:${j.cliques.includes(s) ? '0.2' : '1'}; transition: opacity 0.3s;">${s}</span>`).join('');
+            aC.innerText = "VOCÊ É O TRANSMISSOR!\nDite os símbolos. Leia o protocolo!"; aC.style.color = "#00f2fe";
+        } else {
+            aTrans.classList.add('escondido'); aRec.classList.remove('escondido');
+            document.getElementById('grid-alien').innerHTML = j.grade.map((s) => {
+                let isCortado = j.cliques.includes(s);
+                let bg = isCortado ? 'rgba(46, 204, 113, 0.4)' : 'linear-gradient(145deg, #2c0b3e, #150524)';
+                let st = isCortado ? 'pointer-events: none; border-color: #2ecc71;' : 'cursor: pointer; border-color: #9b59b6;';
+                return `<div onclick="clicarSimboloAlien('${s}')" style="width: 100%; aspect-ratio: 1; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 2rem; background: ${bg}; ${st} box-sizing: border-box; box-shadow: 0 5px 10px rgba(0,0,0,0.6);"> ${s} </div>`;
+            }).join('');
+            aC.innerText = "VOCÊ É O RECEPTOR!\nEscute a ordem. Ache os símbolos!"; aC.style.color = "#2ecc71";
+        }
+    } 
+    else if (j.status === 'resultado') {
+        pAp.classList.add('escondido'); aTrans.classList.add('escondido'); aRec.classList.add('escondido'); pRe.classList.remove('escondido');
+        if (j.vencedor === 'jogadores') {
+            aC.innerText = `🟢 SINAL DECODIFICADO!\nO Pote 5x é de vocês!`; aC.style.color = "#2ecc71";
+            if (j.quemFinalizou === j.meuId && !j.moedasPagas) { j.moedasPagas = true; if(typeof confetti === 'function') confetti({colors: ['#8e44ad', '#2ecc71'], particleCount: 300}); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0); }
+        } else {
+            aC.innerText = `💥 HACK FALHOU!\nO tempo ou o sistema estourou.`; aC.style.color = "#e74c3c";
+            if (j.quemFinalizou === j.meuId && !j.moedasPagas) { j.moedasPagas = true; if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8); }
+        }
+    }
+};
+
+window.resetarTransmissao = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorTransmissao.moedasPagas = false;
+    await set(ref(db, `cassino/transmissao`), { 
+        status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', 
+        prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+        ordemInversa: false, ultimaEmbaralhada: 0 
+    });
+};
+
+
+// ==========================================
+// ☢️ MOTOR REAL-TIME: ESTABILIZADOR DE NÚCLEO
+// ==========================================
+
+window.motorReator = {
+    meuId: '', parceiroId: '', status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', moedasPagas: false,
+    prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 },
+    nivel: 1, alvo: 0, carga: 0, botoesJ: [], botoesT: [], endTime: 0
+};
+window.intervaloReator = null;
+
+window.iniciarOuvinteReator = function() {
+    window.motorReator.meuId = window.souJoao ? 'joao' : 'thamiris';
+    window.motorReator.parceiroId = window.souJoao ? 'thamiris' : 'joao';
+    const { db, ref, onValue, set } = window.SantuarioApp.modulos;
+    
+    if (!window.reatorResetadoNuclear) {
+        window.reatorResetadoNuclear = true;
+        set(ref(db, `cassino/reator`), { status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 } });
+    }
+
+    onValue(ref(db, `cassino/reator`), async (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+            if (data.status === 'jogando' && !data.alvo) { await resetarReator(); return; }
+
+            window.motorReator.status = data.status || 'apostando';
+            window.motorReator.pote = Number(data.pote) || 0;
+            window.motorReator.vencedor = data.vencedor || null;
+            window.motorReator.quemFinalizou = data.quemFinalizou || '';
+            window.motorReator.prontos = data.prontos || { joao: false, thamiris: false };
+            window.motorReator.apostas = data.apostas || { joao: 0, thamiris: 0 };
+            window.motorReator.nivel = Number(data.nivel) || 1;
+            window.motorReator.alvo = Number(data.alvo) || 0;
+            window.motorReator.carga = Number(data.carga) || 0;
+            window.motorReator.endTime = Number(data.endTime) || 0;
+            window.motorReator.botoesJ = JSON.parse(data.botoesJ || "[]");
+            window.motorReator.botoesT = JSON.parse(data.botoesT || "[]");
+
+            renderizarMesaReator();
+            gerenciarRelogioReator();
+
+            if (window.motorReator.status === 'resultado' && !window.motorReator.moedasPagas) processarFimReator();
+        } catch (e) { }
+    });
+};
+
+function gerarBotoesEAlvo(nivel) {
+    let bsJ = [Math.floor(Math.random()*10)+5, Math.floor(Math.random()*10)+5, -(Math.floor(Math.random()*8)+3)];
+    let bsT = [Math.floor(Math.random()*10)+5, Math.floor(Math.random()*10)+5, -(Math.floor(Math.random()*8)+3)];
+    let passos = nivel + 2; 
+    let alvoSimulado = 0;
+    for(let i=0; i<passos; i++) alvoSimulado += Math.random() > 0.5 ? bsJ[Math.floor(Math.random()*3)] : bsT[Math.floor(Math.random()*3)];
+    if (alvoSimulado <= 0) alvoSimulado = bsJ[0] + bsT[0]; // Previne alvo negativo
+    return { j: bsJ, t: bsT, a: alvoSimulado };
+}
+
+window.ajustarApostaReator = function(delta) {
+    if (window.motorReator.status !== 'apostando') return;
+    if (window.motorReator.prontos[window.motorReator.meuId]) return; 
+    let v = document.getElementById('reator-valor-aposta');
+    let nv = (Number(v.innerText) || 50) + delta;
+    v.innerText = nv < 10 ? 10 : nv;
+    document.getElementById('reator-pote-valor').innerText = (nv + (window.motorReator.apostas[window.motorReator.parceiroId] || 0)) * 5;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate(30);
+};
+
+window.iniciarReator = async function() {
+    let mA = Number(document.getElementById('reator-valor-aposta').innerText) || 50;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let mP = { ...window.motorReator.prontos }; mP[window.motorReator.meuId] = true;
+    let mAp = { ...window.motorReator.apostas }; mAp[window.motorReator.meuId] = mA; 
+
+    if (mP[window.motorReator.parceiroId]) {
+        let pT = (mAp.joao + mAp.thamiris);
+        if(typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(-pT, `Calibragem`);
+        
+        let fase1 = gerarBotoesEAlvo(1);
+
+        await update(ref(db, `cassino/reator`), {
+            status: 'jogando', apostas: mAp, pote: pT * 5, nivel: 1, carga: 0, alvo: fase1.a,
+            botoesJ: JSON.stringify(fase1.j), botoesT: JSON.stringify(fase1.t), endTime: Date.now() + 60000, 
+            vencedor: null, quemFinalizou: '', prontos: {joao:false, thamiris:false}
+        });
+        if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('bjStart', 1.0);
+    } else {
+        await update(ref(db, `cassino/reator`), { prontos: mP, apostas: mAp, status: 'apostando' });
+    }
+};
+
+window.apertarReator = async function(indiceBtn) {
+    let j = window.motorReator;
+    if (j.status !== 'jogando') return;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    let btnVal = j.meuId === 'joao' ? j.botoesJ[indiceBtn] : j.botoesT[indiceBtn];
+    let nCarga = j.carga + btnVal;
+    if (window.Haptics && navigator.vibrate) navigator.vibrate(20);
+    if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('fichaAdd', 0.5);
+    await update(ref(db), { [`cassino/reator/carga`]: nCarga });
+};
+
+window.travarReator = async function() {
+    let j = window.motorReator;
+    if (j.status !== 'jogando') return;
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    
+    if (j.carga === j.alvo) {
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([50,50]);
+        if (j.nivel >= 5) {
+            await update(ref(db), { [`cassino/reator/status`]: 'resultado', [`cassino/reator/vencedor`]: 'jogadores', [`cassino/reator/quemFinalizou`]: j.meuId });
+        } else {
+            let novaFase = gerarBotoesEAlvo(j.nivel + 1);
+            await update(ref(db), { [`cassino/reator/nivel`]: j.nivel + 1, [`cassino/reator/carga`]: 0, [`cassino/reator/alvo`]: novaFase.a, [`cassino/reator/botoesJ`]: JSON.stringify(novaFase.j), [`cassino/reator/botoesT`]: JSON.stringify(novaFase.t) });
+        }
+    } else {
+        if (window.Haptics && navigator.vibrate) navigator.vibrate([300,100,500]);
+        await update(ref(db), { [`cassino/reator/status`]: 'resultado', [`cassino/reator/vencedor`]: 'casa', [`cassino/reator/quemFinalizou`]: j.meuId });
+    }
+};
+
+function gerenciarRelogioReator() {
+    if (window.motorReator.status !== 'jogando') {
+        if (window.intervaloReator) clearInterval(window.intervaloReator); return;
+    }
+    if (window.intervaloReator) clearInterval(window.intervaloReator);
+    const tmUI = document.getElementById('reator-timer');
+    const { db, ref, update } = window.SantuarioApp.modulos;
+    
+    window.intervaloReator = setInterval(async () => {
+        let f = Math.ceil((window.motorReator.endTime - Date.now()) / 1000);
+        if (f <= 0) {
+            clearInterval(window.intervaloReator);
+            if (tmUI) tmUI.innerText = "00:00";
+            if (window.souJoao && window.motorReator.status === 'jogando') {
+                await update(ref(db), { [`cassino/reator/status`]: 'resultado', [`cassino/reator/vencedor`]: 'casa', [`cassino/reator/quemFinalizou`]: 'joao' });
+            }
+        } else {
+            if (tmUI) { tmUI.innerText = f >= 10 ? `00:${f}` : `00:0${f}`; tmUI.style.color = f <= 10 ? '#e74c3c' : '#2ecc71'; }
+        }
+    }, 1000);
+}
+
+window.processarFimReator = async function() {
+    if (window.motorReator.quemFinalizou !== window.motorReator.meuId) return;
+    if (window.motorReator.vencedor === 'jogadores' && typeof window.atualizarPontosCasal === 'function') window.atualizarPontosCasal(window.motorReator.pote, `Núcleo Estabilizado`);
+};
+
+window.renderizarMesaReator = function() {
+    const j = window.motorReator;
+    const pAp = document.getElementById('reator-painel-aposta');
+    const pRe = document.getElementById('reator-painel-resultado');
+    const aC = document.getElementById('reator-aviso-centro');
+    const ctls = document.getElementById('reator-controles');
+    const bT = document.getElementById('btn-reator-travar');
+    
+    document.getElementById('reator-pote-valor').innerText = j.status === 'apostando' ? ((Number(document.getElementById('reator-valor-aposta').innerText) || 50) + (j.apostas[j.parceiroId] || 0)) * 5 : j.pote;
+    document.getElementById('reator-alvo-valor').innerText = j.status === 'jogando' ? j.alvo : "--";
+    document.getElementById('reator-carga-atual').innerText = j.carga;
+    document.getElementById('reator-nivel-texto').innerText = `${j.nivel} / 5`;
+
+    if (j.carga === j.alvo && j.status === 'jogando') document.getElementById('reator-carga-atual').style.color = "#f1c40f";
+    else document.getElementById('reator-carga-atual').style.color = "#2ecc71";
+
+    if (j.status === 'apostando') {
+        pAp.classList.remove('escondido'); pRe.classList.add('escondido'); ctls.classList.add('escondido'); bT.classList.add('escondido');
+        document.getElementById('reator-nivel-visor').classList.add('escondido');
+        aC.innerText = "Pague a taxa de controle."; aC.style.color = "#f39c12";
+        const b = document.getElementById('btn-iniciar-reator');
+        if (b) b.innerText = j.prontos[j.meuId] ? "AGUARDANDO... ⏳" : "INICIAR REATOR ☢️";
+    } 
+    else if (j.status === 'jogando') {
+        pAp.classList.add('escondido'); pRe.classList.add('escondido'); ctls.classList.remove('escondido'); bT.classList.remove('escondido');
+        document.getElementById('reator-nivel-visor').classList.remove('escondido');
+        
+        let meusBtns = j.meuId === 'joao' ? j.botoesJ : j.botoesT;
+        if(meusBtns && meusBtns.length === 3) {
+            document.getElementById('btn-reator-1').innerText = meusBtns[0] > 0 ? `+${meusBtns[0]}` : meusBtns[0];
+            document.getElementById('btn-reator-2').innerText = meusBtns[1] > 0 ? `+${meusBtns[1]}` : meusBtns[1];
+            document.getElementById('btn-reator-3').innerText = meusBtns[2] > 0 ? `+${meusBtns[2]}` : meusBtns[2];
+        }
+        aC.innerText = "IGUALE A CARGA ATUAL AO ALVO!"; aC.style.color = "#00f2fe";
+    } 
+    else if (j.status === 'resultado') {
+        pAp.classList.add('escondido'); ctls.classList.add('escondido'); bT.classList.add('escondido'); pRe.classList.remove('escondido');
+        if (j.vencedor === 'jogadores') {
+            aC.innerText = `🟢 NÚCLEO ESTABILIZADO!\nOs 5 níveis foram vencidos!`; aC.style.color = "#2ecc71";
+            if (j.quemFinalizou === j.meuId && !j.moedasPagas) { j.moedasPagas = true; if(typeof confetti === 'function') confetti({colors: ['#f39c12', '#2ecc71'], particleCount: 300}); if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsWin', 1.0); }
+        } else {
+            aC.innerText = `💥 COLAPSO TOTAL!\nA matemática falhou ou o tempo acabou.`; aC.style.color = "#e74c3c";
+            if (j.quemFinalizou === j.meuId && !j.moedasPagas) { j.moedasPagas = true; if(window.CassinoAudio && !window.SantuarioSomPausado) window.CassinoAudio.tocar('slotsLose', 0.8); }
+        }
+    }
+};
+
+window.resetarReator = async function() {
+    const { db, ref, set } = window.SantuarioApp.modulos;
+    window.motorReator.moedasPagas = false;
+    await set(ref(db, `cassino/reator`), { status: 'apostando', pote: 0, vencedor: null, quemFinalizou: '', prontos: { joao: false, thamiris: false }, apostas: { joao: 0, thamiris: 0 } });
+};

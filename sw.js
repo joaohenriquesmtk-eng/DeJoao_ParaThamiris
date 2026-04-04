@@ -1,11 +1,11 @@
 // ==========================================
 // MOTOR OFFLINE & NOTIFICAÇÕES (PWA SANTUÁRIO)
-// Versão: 4.0.0 (Blindagem Ouro - iOS e Android)
+// Versão: 5.0.0 (Blindagem Diamante - iOS e Android)
 // ==========================================
 
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js'); // 🚨 NOVO: Dá poder de enviar dados ao Service Worker!
+importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js');
 
 firebase.initializeApp({
     apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
@@ -22,6 +22,11 @@ const messaging = firebase.messaging();
 // 🚨 MOTOR DE RECEBIMENTO EM SEGUNDO PLANO
 messaging.onBackgroundMessage((payload) => {
     console.log('[Santuário SW] Mensagem recebida no éter (background).', payload);
+    
+    // 🔥 Adiciona a "Bolinha Vermelha" de notificação no ícone do app
+    if ('setAppBadge' in navigator) {
+        navigator.setAppBadge(1).catch((error) => console.error('[Santuário SW] Erro no Badge:', error));
+    }
     
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
@@ -67,10 +72,18 @@ self.addEventListener('notificationclick', (event) => {
 // ==========================================
 // ESTRATÉGIA DE CACHE INTELIGENTE UNIFICADA
 // ==========================================
-const CACHE_NAME = 'santuario-cache-ouro-v5.0'; // Atualizado para forçar o reset da versão bugada
+const CACHE_NAME = 'santuario-cache-ouro-v6.0'; 
 
 self.addEventListener('install', (event) => {
-    self.skipWaiting();
+    // 🔥 A Atualização Automática foi removida para não quebrar jogos no meio!
+    // Ele só vai atualizar quando a gente mandar a mensagem "SKIP_WAITING"
+    console.log('[Santuário SW] Novo Service Worker instalado. Aguardando ordem para ativar.');
+});
+
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 self.addEventListener('activate', (event) => {
@@ -89,7 +102,7 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// 🚨 O NOVO CÉREBRO INTERCEPTADOR (Um único 'fetch' perfeito)
+// 🚨 O NOVO CÉREBRO INTERCEPTADOR
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
     const url = new URL(event.request.url);
@@ -117,7 +130,6 @@ self.addEventListener('fetch', (event) => {
     }
 
     // 3. ESTRATÉGIA NETWORK-FIRST (Para HTML, JS e CSS)
-    // Garante que o código do jogo esteja sempre na última versão, mas funciona offline se a net cair.
     event.respondWith(
         fetch(event.request).then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
@@ -126,7 +138,10 @@ self.addEventListener('fetch', (event) => {
             }
             return networkResponse;
         }).catch(() => {
-            return caches.match(event.request);
+            return caches.match(event.request).then((cached) => {
+                // 🔥 SE NÃO TIVER INTERNET E NEM CACHE, MOSTRA A TELA 404 DO SEU PROJETO!
+                return cached || caches.match('/404.html');
+            });
         })
     );
 });

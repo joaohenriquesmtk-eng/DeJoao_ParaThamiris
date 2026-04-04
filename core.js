@@ -792,3 +792,12 @@ HTMLMediaElement.prototype.play = function() {
         });
     }
 };
+
+// Adicionar no final do core.js
+window.addEventListener('online', () => {
+    console.log('[Santuário] Internet voltou! Acionando limpeza de fila...');
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        // Tenta forçar a sincronização caso o SW não tenha pego
+        navigator.serviceWorker.controller.postMessage({ comando: 'forcar_sync_ecos' });
+    }
+});

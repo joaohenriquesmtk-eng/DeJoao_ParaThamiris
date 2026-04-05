@@ -40,39 +40,51 @@
         document.getElementById('contratos-tela-selecao').classList.remove('escondido');
         document.getElementById('contratos-tela-mesa').classList.add('escondido');
         document.getElementById('contratos-tela-resultado').classList.add('escondido');
-        carregarSiloParaExportacao();
+        carregarDespensaParaExportacao();
     };
 
-    function carregarSiloParaExportacao() {
+    function carregarDespensaParaExportacao() {
         const lista = document.getElementById('contratos-lista-silo');
         lista.innerHTML = '';
         
-        let fazendaSalva = JSON.parse(localStorage.getItem('estado_minifazenda_ultimate'));
-        if (!fazendaSalva || !fazendaSalva.silo) {
-            lista.innerHTML = '<p style="color:#aaa; text-align:center; grid-column: 1/-1; padding: 20px;">O silo está vazio. Cultive primeiro na Mini Fazenda!</p>';
+        // 🚨 Puxa os dados direto da nossa nova Mochila Global
+        let inventario = window.inventarioCasal;
+        
+        // Verifica se a mochila tem qualquer coisa
+        let temItem = Object.values(inventario).some(qtd => qtd > 0);
+
+        if (!inventario || !temItem) {
+            lista.innerHTML = '<p style="color:#aaa; text-align:center; grid-column: 1/-1; padding: 20px;">A Despensa está vazia.<br>Cultive Morangos ou Rosas na Mini Fazenda primeiro!</p>';
             return;
         }
 
-        const produtos = [
-            { id: 'soja', nome: 'Soja Premium', icone: '🌱', estoque: fazendaSalva.silo.soja, preco: fazendaSalva.mercado.soja },
-            { id: 'milho', nome: 'Milho Safrinha', icone: '🌽', estoque: fazendaSalva.silo.milho, preco: fazendaSalva.mercado.milho },
-            { id: 'cafe', nome: 'Café Arábica', icone: '☕', estoque: fazendaSalva.silo.cafe, preco: fazendaSalva.mercado.cafe },
-            { id: 'leite', nome: 'Leite Orgânico', icone: '🥛', estoque: fazendaSalva.silo.leite, preco: fazendaSalva.mercado.leite }
+        // Mapeia os itens da mochila para o formato de exportação com os preços base
+        const produtosValidos = [
+            { id: 'morangos', nome: 'Lote de Morangos', icone: '🍓', estoque: inventario.morangos || 0, preco: 350 },
+            { id: 'cenouras', nome: 'Cenouras Orgânicas', icone: '🥕', estoque: inventario.cenouras || 0, preco: 200 },
+            { id: 'trigos', nome: 'Sacas de Trigo', icone: '🌾', estoque: inventario.trigos || 0, preco: 180 },
+            { id: 'girassois', nome: 'Óleo de Girassol', icone: '🌻', estoque: inventario.girassois || 0, preco: 500 },
+            { id: 'rosas', nome: 'Buquês de Rosas', icone: '🌹', estoque: inventario.rosas || 0, preco: 1200 },
+            { id: 'orquideas', nome: 'Orquídeas Raras', icone: '🌸', estoque: inventario.orquideas || 0, preco: 2500 }
         ];
 
-        produtos.forEach(p => {
-            const bloqueado = p.estoque < 10;
-            const card = document.createElement('div');
-            card.className = `card-exportacao-pro ${bloqueado ? 'bloqueado' : ''}`;
-            card.innerHTML = `
-                <div class="icone-safra">${p.icone}</div>
-                <h3>${p.nome}</h3>
-                <p>Estoque: <b style="color: #fff;">${p.estoque} sc</b></p>
-                <p style="color: #2ecc71; font-weight: bold; margin-top: 5px;">R$ ${p.preco} /sc</p>
-                ${bloqueado ? '<p style="color: #e74c3c; font-size: 0.7rem; margin-top: 8px;">Mínimo: 10 sc</p>' : ''}
-            `;
-            if (!bloqueado) card.onclick = () => iniciarMesaDeNegociacao(p.id, p.nome, p.estoque, p.preco);
-            lista.appendChild(card);
+        produtosValidos.forEach(p => {
+            // Só exibe o que o casal realmente tem na mochila
+            if (p.estoque > 0) {
+                // A trava de mínimo agora é 5 (antes era 10), já que os novos itens são mais raros
+                const bloqueado = p.estoque < 5;
+                const card = document.createElement('div');
+                card.className = `card-exportacao-pro ${bloqueado ? 'bloqueado' : ''}`;
+                card.innerHTML = `
+                    <div class="icone-safra">${p.icone}</div>
+                    <h3>${p.nome}</h3>
+                    <p>Estoque: <b style="color: #fff;">${p.estoque} caixas</b></p>
+                    <p style="color: #2ecc71; font-weight: bold; margin-top: 5px;">R$ ${p.preco} base/cx</p>
+                    ${bloqueado ? '<p style="color: #e74c3c; font-size: 0.7rem; margin-top: 8px;">Mínimo para Exportação: 5 caixas</p>' : ''}
+                `;
+                if (!bloqueado) card.onclick = () => iniciarMesaDeNegociacao(p.id, p.nome, p.estoque, p.preco);
+                lista.appendChild(card);
+            }
         });
     }
 
@@ -80,14 +92,17 @@
         document.getElementById('contratos-tela-selecao').classList.add('escondido');
         document.getElementById('contratos-tela-mesa').classList.remove('escondido');
         
+        // Exporta sempre em lotes máximos de 10 por vez para não esvaziar a mochila de uma vez só
+        let quantidadeExportada = quantidade > 10 ? 10 : quantidade;
+
         negociacao = {
             ativa: true, turno: 1, maxTurnos: 3, idProduto: idProduto,
-            quantidade: quantidade, precoBase: quantidade * precoUnitario, multiplicador: 1.0,
+            quantidade: quantidadeExportada, precoBase: quantidadeExportada * precoUnitario, multiplicador: 1.0,
             ataqueAtual: null, imunidadeAtiva: false
         };
 
         document.getElementById('contrato-safra-nome').innerText = nome;
-        document.getElementById('contrato-safra-qtd').innerText = quantidade;
+        document.getElementById('contrato-safra-qtd').innerText = quantidadeExportada + " cx";
         document.getElementById('contrato-valor-base').innerText = negociacao.precoBase.toLocaleString('pt-BR');
         
         atualizarUIPlacar();
@@ -189,17 +204,18 @@
         const lucroEl = document.getElementById('contrato-lucro-final');
         animarContadorDinheiro(lucroEl, 0, lucroCalculado, 1500);
 
-        let fazendaSalva = JSON.parse(localStorage.getItem('estado_minifazenda_ultimate'));
-        if (fazendaSalva && fazendaSalva.silo) {
-            fazendaSalva.silo[negociacao.idProduto] -= negociacao.quantidade;
-            if (fazendaSalva.silo[negociacao.idProduto] < 0) fazendaSalva.silo[negociacao.idProduto] = 0;
-            localStorage.setItem('estado_minifazenda_ultimate', JSON.stringify(fazendaSalva));
+        // 🚨 REMOVE DA MOCHILA GLOBAL USANDO A FUNÇÃO NEGATIVA
+        if(typeof window.adicionarItemInventario === 'function') {
+            // Manda um valor negativo para subtrair as caixas que foram exportadas
+            window.adicionarItemInventario(negociacao.idProduto, -negociacao.quantidade);
         }
 
         setTimeout(() => {
             AudioContratos.lucro.play();
             if(window.Haptics) navigator.vibrate([100, 50, 200, 100, 300]);
-            if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroCalculado, `Exportação de ${negociacao.quantidade} sc de ${negociacao.idProduto}`);
+            
+            if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroCalculado, `Exportação de ${negociacao.quantidade} cx de ${negociacao.idProduto}`);
+            
             if(typeof confetti === 'function') confetti({colors: ['#3498db', '#D4AF37'], spread: 120, particleCount: 150});
         }, 1600);
     }

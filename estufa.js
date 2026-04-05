@@ -218,15 +218,17 @@ window.concluirCicloComSucesso = function() {
     if(audioFim) audioFim.play().catch(e => console.log(e));
     
     if (window.Haptics && navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
-    if (typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37'], particleCount: 150});
+    if (typeof confetti === 'function') confetti({colors: ['#3498db', '#D4AF37'], particleCount: 150});
 
-    const humusGanhos = window.estufaEstado.minutosIniciais >= 20 ? 2 : 1;
-    let humusTotal = parseInt(localStorage.getItem('santuario_humus_ouro') || '0') + humusGanhos;
-    localStorage.setItem('santuario_humus_ouro', humusTotal);
+    // 🚨 Gera as Gotas de Orvalho baseadas no tempo focado!
+    const gotasGanhos = window.estufaEstado.minutosIniciais >= 20 ? 3 : 1;
     
-    window.atualizarHumoUI();
+    // 🚨 MÁGICA: Envia para a Mochila Global do Casal
+    if (typeof window.adicionarItemInventario === 'function') {
+        window.adicionarItemInventario('gotas_orvalho', gotasGanhos);
+    }
     
-    if(typeof mostrarToast === 'function') mostrarToast(`Sessão Concluída! Você ganhou +${humusGanhos} Húmus de Ouro ✨!`, "🌳");
+    if(typeof mostrarToast === 'function') mostrarToast(`Foco Impecável! Você gerou +${gotasGanhos} Gotas de Orvalho 💧!`, "🧠");
 
     const { db, ref, set } = window.SantuarioApp.modulos;
     set(ref(db, 'estufa_foco/estado_global'), { ativo: false });

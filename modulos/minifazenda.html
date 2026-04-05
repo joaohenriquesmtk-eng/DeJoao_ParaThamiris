@@ -74,21 +74,18 @@
         <div id="grade-fazenda" class="grade-plantacao">
             </div>
 
-        <div class="painel-economia-agricola">
-            <div class="modulo-economia silo">
-                <h5>🏭 Meu Silo</h5>
-                <div class="item-estoque">🌾 Soja: <span id="estoque-soja">0</span> sc</div>
-                <div class="item-estoque">🌽 Milho: <span id="estoque-milho">0</span> sc</div>
-                <div class="item-estoque">☕ Café: <span id="estoque-cafe">0</span> sc</div>
-                <div class="item-estoque" style="color: #fffdf2; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px;">🥛 Leite: <span id="estoque-leite">0</span> L</div>
-            </div>
-            
-            <div class="modulo-economia mercado">
-                <h5>📈 Bolsa (R$)</h5>
-                <div class="item-mercado" onclick="venderProduto('soja')">🌾 Soja: <span id="preco-soja" class="preco-neutro">120</span> <button class="btn-vender">Vender</button></div>
-                <div class="item-mercado" onclick="venderProduto('milho')">🌽 Milho: <span id="preco-milho" class="preco-neutro">50</span> <button class="btn-vender">Vender</button></div>
-                <div class="item-mercado" onclick="venderProduto('cafe')">☕ Café: <span id="preco-cafe" class="preco-neutro">800</span> <button class="btn-vender">Vender</button></div>
-                <div class="item-mercado" onclick="venderProduto('leite')">🥛 Leite: <span id="preco-leite" class="preco-neutro">15</span> <button class="btn-vender">Vender</button></div>
+        <div class="painel-economia-agricola" style="display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.6); border: 1px solid #D4AF37; border-radius: 12px; padding: 15px; margin: 15px 0; box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1);">
+            <div style="font-size: 2rem; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(212,175,55,0.5));">🎒</div>
+            <h5 style="color: #D4AF37; margin: 0 0 5px 0; font-family: 'Playfair Display', serif; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">Logística Ativa</h5>
+            <p style="color: #aaa; font-size: 0.8rem; text-align: center; margin: 0; line-height: 1.4;">
+                Todas as colheitas são ensacadas e enviadas instantaneamente para a <b>Despensa do Santuário</b> (Mochila) na tela principal.
+            </p>
+            <div style="width: 100%; height: 1px; background: rgba(212, 175, 55, 0.3); margin: 15px 0;"></div>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div style="color: #fff; font-size: 0.9rem;">🥛 Produção Leiteira:</div>
+                <button onclick="venderLeiteDireto()" style="background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; box-shadow: 0 3px 10px rgba(241, 196, 15, 0.4); cursor: pointer;">
+                    Vender Leite (+R$ 150)
+                </button>
             </div>
         </div>
 

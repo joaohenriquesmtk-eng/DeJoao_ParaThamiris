@@ -62,13 +62,19 @@ window.escutarPetGlobal = function() {
 };
 
 // --- O MOTOR GRÁFICO DO HOLOGRAMA ---
+// --- O MOTOR GRÁFICO DO HOLOGRAMA ---
 window.renderizarHolograma = function() {
+    // 🚨 A TRAVA DE SEGURANÇA MESTRA (O Pulo do Gato)
+    // Verifica se a tela do Guardião está realmente aberta. Se não estiver, sai em silêncio e não trava nada!
+    const barraFome = document.getElementById('barra-fome-pet');
+    if (!barraFome) return; 
+
     const fome = window.estadoPet.fome;
     const sede = window.estadoPet.sede;
     const afeto = window.estadoPet.afeto;
 
     // Atualiza HUD Sci-Fi
-    document.getElementById('barra-fome-pet').style.width = `${fome}%`;
+    barraFome.style.width = `${fome}%`;
     document.getElementById('barra-sede-pet').style.width = `${sede}%`;
     document.getElementById('barra-afeto-pet').style.width = `${afeto}%`;
 
@@ -134,34 +140,65 @@ window.renderizarHolograma = function() {
     }
 };
 
-window.cuidarDoPet = function(tipo) {
-    let custo = 0; let incremento = 0; let sfx = '';
-    
-    if (tipo === 'fome') {
-        custo = 10; incremento = 30; 
-        sfx = './assets/sons/pet/cat.mp3'; 
-    } else if (tipo === 'sede') {
-        custo = 0; incremento = 40;
-        sfx = './assets/sons/pet/cat.mp3'; 
-    } else if (tipo === 'afeto') {
-        custo = 0; incremento = 25;
-        sfx = './assets/sons/pet/cat.mp3'; 
+window.cuidarDoPet = async function(tipoAcao) {
+    let custoMoedas = 0; let incremento = 0; let sfx = './assets/sons/pet/cat.mp3'; 
+    let itemGasto = null; let inventario = window.inventarioCasal || {};
+
+    // 1. A LÓGICA DE CUSTOS COLOSSAIS E HACKS ORGÂNICOS
+    if (tipoAcao === 'fome_sintetica') {
+        custoMoedas = 8500; incremento = 20;
+    } else if (tipoAcao === 'sede_sintetica') {
+        custoMoedas = 6000; incremento = 25;
+    } else if (tipoAcao === 'afeto_basico') {
+        custoMoedas = 5000; incremento = 10;
+    } else if (tipoAcao === 'afeto_terapia') {
+        custoMoedas = 25000; incremento = 100; // Enche tudo, mas causa um rombo bancário
+        sfx = 'https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3';
+    } else if (tipoAcao === 'fome_organica') {
+        if (inventario.morangos > 0) itemGasto = 'morangos';
+        else if (inventario.cenouras > 0) itemGasto = 'cenouras';
+        else {
+            if(typeof mostrarToast === 'function') mostrarToast("Sem Morangos/Cenouras na Mochila! Cultivem!", "🍓");
+            if(window.Haptics) window.Haptics.erro();
+            return;
+        }
+        incremento = 100; // Hack Supremo
+        sfx = 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3';
+    } else if (tipoAcao === 'sede_organica') {
+        if (inventario.gotas_orvalho > 0) itemGasto = 'gotas_orvalho';
+        else {
+            if(typeof mostrarToast === 'function') mostrarToast("Sem Gotas de Orvalho na Mochila! Liguem a Estufa!", "💧");
+            if(window.Haptics) window.Haptics.erro();
+            return;
+        }
+        incremento = 100; // Hack Supremo
+        sfx = 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3';
     }
 
+    // 2. VALIDAÇÃO DE SALDO (A Dor do Custo)
     const moedasAtuais = window.pontosDoCasal || 0;
-    if (moedasAtuais < custo) {
-        if(typeof mostrarToast === 'function') mostrarToast("Recursos insuficientes.", "📉");
+    if (custoMoedas > 0 && moedasAtuais < custoMoedas) {
+        if(typeof mostrarToast === 'function') mostrarToast(`Fundos insuficientes! O Guardião exige ${custoMoedas.toLocaleString('pt-BR')} moedas.`, "💸");
         if(window.Haptics) window.Haptics.erro();
         return;
     }
 
-    if (custo > 0 && typeof atualizarPontosCasal === 'function') {
-        atualizarPontosCasal(-custo, "Síntese de Ração");
+    // 3. DÉBITO (Moedas ou Mochila)
+    if (custoMoedas > 0 && typeof atualizarPontosCasal === 'function') {
+        atualizarPontosCasal(-custoMoedas, "Manutenção do Guardião");
+    }
+    if (itemGasto && typeof window.adicionarItemInventario === 'function') {
+        await window.adicionarItemInventario(itemGasto, -1);
     }
 
-    let novaFome = tipo === 'fome' ? Math.min(100, window.estadoPet.fome + incremento) : window.estadoPet.fome;
-    let novaSede = tipo === 'sede' ? Math.min(100, window.estadoPet.sede + incremento) : window.estadoPet.sede;
-    let novoAfeto = tipo === 'afeto' ? Math.min(100, window.estadoPet.afeto + incremento) : window.estadoPet.afeto;
+    // 4. APLICAÇÃO DOS STATUS
+    let ehFome = tipoAcao.includes('fome');
+    let ehSede = tipoAcao.includes('sede');
+    let ehAfeto = tipoAcao.includes('afeto');
+
+    let novaFome = ehFome ? Math.min(100, window.estadoPet.fome + incremento) : window.estadoPet.fome;
+    let novaSede = ehSede ? Math.min(100, window.estadoPet.sede + incremento) : window.estadoPet.sede;
+    let novoAfeto = ehAfeto ? Math.min(100, window.estadoPet.afeto + incremento) : window.estadoPet.afeto;
 
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, update } = window.SantuarioApp.modulos;
@@ -169,24 +206,45 @@ window.cuidarDoPet = function(tipo) {
     update(ref(db, 'utilitarios/guardiao'), {
         fome: novaFome, sede: novaSede, afeto: novoAfeto, ultimoUpdate: Date.now()
     }).then(() => {
-        if (window.Haptics) navigator.vibrate([50, 100, 50]);
+        // Efeitos Visuais
+        if (window.Haptics) navigator.vibrate(itemGasto ? [100, 100, 100] : [50, 50]);
         const audio = new Audio(sfx); audio.volume = 0.5; audio.play().catch(e=>{});
         
-        // Dispara a animação de pulo
         document.getElementById('entidade-pet').classList.add('pet-comendo');
         setTimeout(() => document.getElementById('entidade-pet').classList.remove('pet-comendo'), 1200);
 
-        if(typeof confetti === 'function') confetti({colors: ['#fd9644', '#00d4ff', '#ffffff'], particleCount: 80, spread: 80, origin: {y: 0.5}});
-        
-        // Mineração Holográfica
-        if (novaFome >= 90 && novaSede >= 90 && novoAfeto >= 90) {
-            if (Math.random() < 0.25) { // 25% chance
+        // 🚨 5. O EVENTO ÉPICO: PROTOCOLO SUPERNOVA (JACKPOT GIGANTE) 🌌
+        if (novaFome === 100 && novaSede === 100 && novoAfeto === 100) {
+            
+            // Só aciona o Jackpot se você acabou de encher a última barra (evita spam)
+            if (window.estadoPet.fome < 100 || window.estadoPet.sede < 100 || window.estadoPet.afeto < 100) {
+                
+                // Trava a tela e faz o efeito
+                document.getElementById('entidade-pet').style.transform = "scale(1.5)";
+                document.getElementById('entidade-pet').style.filter = "drop-shadow(0 0 50px #fff)";
+                document.getElementById('mensagem-status-pet').innerText = "⚠️ PROTOCOLO SUPERNOVA ATIVADO ⚠️";
+                document.getElementById('mensagem-status-pet').style.color = "#fff";
+                
+                if (window.Haptics) navigator.vibrate([300, 100, 400, 100, 500, 100, 800]); 
+                
                 setTimeout(() => {
-                    const premio = Math.floor(Math.random() * 50) + 10;
-                    if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(premio, "Mineração do Guardião");
-                    if(window.Haptics) navigator.vibrate([200, 100, 400]);
-                    if(typeof mostrarToast === 'function') mostrarToast(`O Guardião minerou +${premio}💰!`, "💎");
-                }, 1000);
+                    // O Jackpot Cósmico (Entre 50.000 e 150.000 moedas)
+                    const jackpot = Math.floor(Math.random() * 100000) + 50000;
+                    
+                    if (typeof atualizarPontosCasal === 'function') atualizarPontosCasal(jackpot, "SUPERNOVA DO GUARDIÃO");
+                    if (typeof mostrarToast === 'function') mostrarToast(`Atenção Cósmica! O Guardião expeliu +${jackpot.toLocaleString('pt-BR')} 💰!`, "🌌");
+                    if (typeof confetti === 'function') confetti({colors: ['#FFD700', '#ffffff', '#00f2fe'], particleCount: 400, spread: 180, zIndex: 9999999});
+                    
+                    const audioSuper = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+                    audioSuper.volume = 1.0; audioSuper.play().catch(e=>{});
+
+                    // Retorna ao normal após o surto
+                    setTimeout(() => {
+                        document.getElementById('entidade-pet').style.transform = "scale(1)";
+                        document.getElementById('entidade-pet').style.filter = "none";
+                    }, 2000);
+                    
+                }, 1500);
             }
         }
     });

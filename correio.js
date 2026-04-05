@@ -112,7 +112,7 @@ window.renderizarListaDeCartas = function() {
             // CARTA EM ROTA (Apenas um card tático de transporte)
             div.innerHTML = `
                 <div class="envelope-transito">
-                    <div style="font-family: monospace; font-size: 0.7rem; color: #6ab04c; display:flex; justify-content:space-between;">
+                    <div style="font-family: monospace; font-size: 0.7rem; color: #D4AF37; display:flex; justify-content:space-between;">
                         <span>De: ${carta.remetente.toUpperCase()}</span>
                         <span>Carga Selada 🔒</span>
                     </div>
@@ -165,7 +165,7 @@ window.renderizarListaDeCartas = function() {
         const statusRadar = document.getElementById('status-envio');
         if(statusRadar) {
             statusRadar.innerText = maiorProgresso > 0 ? "MENSAGEIRO EM ROTA" : "SISTEMA OCIOSO";
-            statusRadar.style.color = maiorProgresso > 0 ? "#6ab04c" : "#888";
+            statusRadar.style.color = maiorProgresso > 0 ? "#D4AF37" : "#888";
         }
     }
 };

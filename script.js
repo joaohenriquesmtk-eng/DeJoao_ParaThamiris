@@ -5341,3 +5341,139 @@ window.fecharMesaCassino = function(nomeDoJogo) {
     }
     window.gerenciarMusicaVegas('stop');
 };
+
+// ============================================================================
+// 🎒 MOTOR DO INVENTÁRIO GLOBAL (A MOCHILA DO CASAL)
+// ============================================================================
+
+window.inventarioCasal = {
+    morangos: 0, cenouras: 0, trigos: 0,
+    girassois: 0, rosas: 0, orquideas: 0,
+    gotas_orvalho: 0, raca_pet: 0
+};
+
+// Dicionário Visual do Inventário Premium
+window.dicionarioInventario = {
+    morangos: { emoji: '🍓', nome: 'Morangos', cor: '#e74c3c' },
+    cenouras: { emoji: '🥕', nome: 'Cenouras', cor: '#e67e22' },
+    trigos: { emoji: '🌾', nome: 'Trigo', cor: '#f1c40f' },
+    girassois: { emoji: '🌻', nome: 'Girassóis', cor: '#f39c12' },
+    rosas: { emoji: '🌹', nome: 'Rosas', cor: '#ff4757' },
+    orquideas: { emoji: '🌸', nome: 'Orquídeas', cor: '#9b59b6' },
+    gotas_orvalho: { emoji: '💧', nome: 'Orvalho', cor: '#3498db' },
+    raca_pet: { emoji: '🥩', nome: 'Ração Pet', cor: '#c0392b' }
+};
+
+window.iniciarOuvinteInventario = function() {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, onValue } = window.SantuarioApp.modulos;
+    
+    // Escuta o nó 'recursos/inventario' em tempo real
+    onValue(ref(db, 'recursos/inventario'), (snapshot) => {
+        try {
+            const data = snapshot.val() || {};
+            let inventarioMudou = false;
+            
+            // Verifica se algum item subiu (para mostrar a bolinha vermelha na mochila)
+            Object.keys(window.dicionarioInventario).forEach(item => {
+                let novoValor = Number(data[item]) || 0;
+                if (novoValor > (window.inventarioCasal[item] || 0)) inventarioMudou = true;
+                window.inventarioCasal[item] = novoValor;
+            });
+
+            window.renderizarInventarioSantuario();
+
+            // Pisca a bolinha vermelha se a Thamiris colher algo e você estiver com a tela fechada
+            const alerta = document.getElementById('alerta-novo-item');
+            const modal = document.getElementById('modal-inventario-santuario');
+            if (inventarioMudou && alerta && modal && modal.classList.contains('escondido')) {
+                alerta.classList.remove('escondido');
+                if (window.Haptics && navigator.vibrate) navigator.vibrate(30); 
+            }
+
+        } catch (e) { console.error("Erro ao sincronizar inventário:", e); }
+    });
+};
+
+// 🚨 A INJEÇÃO DE INICIALIZAÇÃO INVISÍVEL
+window.addEventListener('loginSucesso', () => {
+    if (typeof window.iniciarOuvinteInventario === 'function') window.iniciarOuvinteInventario();
+});
+if (window.usuarioLogado) {
+    if (typeof window.iniciarOuvinteInventario === 'function') window.iniciarOuvinteInventario();
+}
+
+window.abrirInventarioSantuario = function() {
+    const modal = document.getElementById('modal-inventario-santuario');
+    const alerta = document.getElementById('alerta-novo-item');
+    if (modal) {
+        modal.classList.remove('escondido');
+        modal.style.display = 'flex';
+        // Limpa a notificação ao abrir
+        if (alerta) alerta.classList.add('escondido');
+        if (window.Haptics && navigator.vibrate) navigator.vibrate(20);
+    }
+};
+
+window.fecharInventarioSantuario = function() {
+    const modal = document.getElementById('modal-inventario-santuario');
+    if (modal) {
+        modal.classList.add('escondido');
+        setTimeout(() => modal.style.display = 'none', 300); 
+    }
+};
+
+window.renderizarInventarioSantuario = function() {
+    const grid = document.getElementById('grid-inventario-casal');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    let temItem = false;
+
+    Object.keys(window.dicionarioInventario).forEach(chave => {
+        let quantidade = window.inventarioCasal[chave] || 0;
+        let info = window.dicionarioInventario[chave];
+
+        if (quantidade > 0) {
+            temItem = true;
+            grid.innerHTML += `
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px 5px; display: flex; flex-direction: column; align-items: center; position: relative; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);">
+                    <div style="font-size: 2.5rem; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); transform: translateY(-5px);">${info.emoji}</div>
+                    <div style="color: #ccc; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-top: 5px; min-height: 20px; display: flex; align-items: center; justify-content: center;">${info.nome}</div>
+                    
+                    <div style="position: absolute; top: -5px; right: -5px; background: ${info.cor}; border: 2px solid #000; color: #fff; font-size: 0.75rem; font-weight: 900; font-family: monospace; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px ${info.cor};">
+                        ${quantidade}
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    if (!temItem) {
+        grid.style.display = "flex";
+        grid.style.justifyContent = "center";
+        grid.innerHTML = `
+            <div style="text-align: center; color: #555; padding: 30px; font-family: monospace; letter-spacing: 1px;">
+                <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;">🕸️</div>
+                A despensa está vazia.<br>Plantem na Estufa ou na Fazenda.
+            </div>
+        `;
+    } else {
+        grid.style.display = "grid";
+    }
+};
+
+// 🚨 FUNÇÃO GLOBAL PARA ADICIONAR ITENS (Será usada pelos outros jogos)
+window.adicionarItemInventario = async function(chaveItem, quantidadeAdicional) {
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    const { db, ref, get, update } = window.SantuarioApp.modulos;
+    
+    try {
+        const snap = await get(ref(db, `recursos/inventario/${chaveItem}`));
+        let quantAtual = snap.val() || 0;
+        let up = {};
+        up[`recursos/inventario/${chaveItem}`] = quantAtual + quantidadeAdicional;
+        await update(ref(db), up);
+        // O onValue se encarrega de atualizar a tela na mesma hora nos dois celulares!
+    } catch (e) { console.error("Erro ao adicionar item:", e); }
+};

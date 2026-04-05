@@ -15,9 +15,9 @@
         <div id="instrucoes-guardiao" class="escondido cartao-instrucoes" style="border-left: 5px solid var(--pet-cor-base, #fd9644); margin-bottom: 20px; background: rgba(10,5,0,0.95); box-shadow: 0 20px 50px rgba(0,0,0,1); width: 100%; transition: border-color 0.5s;">
             <h4 style="color: var(--pet-cor-base, #fd9644); font-family: 'Playfair Display', serif; font-size: 1.3rem; transition: color 0.5s;">🧬 O Guardião Cibernético</h4>
             <ul style="font-size: 0.85rem; color: #ccc; line-height: 1.6;">
-                <li>Este constructo de luz sobrevive do código de afeto de vocês.</li>
-                <li>Mantenham a bio-energia acima de 80% para habilitar a <b>Mineração de Ouro</b>.</li>
-                <li>O holograma reagirá visualmente à falta de cuidado. Não o deixem apagar.</li>
+                <li>A manutenção desta entidade exige <b>dezenas de milhares de moedas</b>. A falência é um risco real.</li>
+                <li><b>O Hack Supremo:</b> Usem os itens orgânicos da <b>Despensa do Santuário</b> (cultivados na Fazenda/Estufa) para ignorar os custos extorsivos e maximizar os status de graça!</li>
+                <li><b>Protocolo Supernova:</b> Se as 3 barras atingirem <b>100% SIMULTANEAMENTE</b>, a entidade colapsa e gera um Jackpot Cósmico (50.000 a 150.000 moedas)!</li>
             </ul>
         </div>
 
@@ -89,24 +89,47 @@
             
         </div>
 
-        <div class="grade-acoes-pet">
-            <button class="btn-acao-pet" onclick="window.cuidarDoPet('fome')" style="--cor-btn: #f39c12;">
-                <span style="font-size: 1.8rem; margin-bottom: 8px;">🥩</span>
-                <span class="btn-pet-titulo">Sintetizar Ração</span>
-                <span class="btn-pet-custo">-10 💰</span>
-            </button>
+        <div class="grade-acoes-pet" style="display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 15px;">
             
-            <button class="btn-acao-pet" onclick="window.cuidarDoPet('sede')" style="--cor-btn: #3498db;">
-                <span style="font-size: 1.8rem; margin-bottom: 8px;">🧊</span>
-                <span class="btn-pet-titulo">Injetar H₂O</span>
-                <span class="btn-pet-custo">0 💰</span>
-            </button>
-            
-            <button class="btn-acao-pet" onclick="window.cuidarDoPet('afeto')" style="--cor-btn: #e74c3c;">
-                <span style="font-size: 1.8rem; margin-bottom: 8px;">✨</span>
-                <span class="btn-pet-titulo">Transmitir Afeto</span>
-                <span class="btn-pet-custo">0 💰</span>
-            </button>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <button onclick="window.cuidarDoPet('fome_sintetica')" style="background: rgba(0,0,0,0.6); border: 1px solid #f39c12; border-radius: 8px; padding: 10px 5px; cursor: pointer; color: #fff; box-shadow: inset 0 0 10px rgba(243,156,18,0.2);">
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 2px;">🥩</span>
+                    <span style="font-size: 0.65rem; text-transform: uppercase;">Ração (+20%)</span>
+                    <span style="color: #e74c3c; font-size: 0.75rem; font-weight: bold; font-family: monospace;">-8.500 💰</span>
+                </button>
+                <button onclick="window.cuidarDoPet('fome_organica')" style="background: linear-gradient(145deg, rgba(243,156,18,0.2), rgba(0,0,0,0.8)); border: 1px solid #f1c40f; border-radius: 8px; padding: 10px 5px; cursor: pointer; color: #fff; box-shadow: 0 0 15px rgba(241,196,15,0.4);">
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 2px;">🍓</span>
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: #f1c40f; font-weight: bold;">Orgânico (Máx)</span>
+                    <span style="color: #ccc; font-size: 0.65rem; font-family: monospace;">-1 Mochila</span>
+                </button>
+            </div>
+
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <button onclick="window.cuidarDoPet('sede_sintetica')" style="background: rgba(0,0,0,0.6); border: 1px solid #3498db; border-radius: 8px; padding: 10px 5px; cursor: pointer; color: #fff; box-shadow: inset 0 0 10px rgba(52,152,219,0.2);">
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 2px;">🧪</span>
+                    <span style="font-size: 0.65rem; text-transform: uppercase;">Filtro (+25%)</span>
+                    <span style="color: #e74c3c; font-size: 0.75rem; font-weight: bold; font-family: monospace;">-6.000 💰</span>
+                </button>
+                <button onclick="window.cuidarDoPet('sede_organica')" style="background: linear-gradient(145deg, rgba(52,152,219,0.2), rgba(0,0,0,0.8)); border: 1px solid #00f2fe; border-radius: 8px; padding: 10px 5px; cursor: pointer; color: #fff; box-shadow: 0 0 15px rgba(0,242,254,0.4);">
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 2px;">💧</span>
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: #00f2fe; font-weight: bold;">Orvalho (Máx)</span>
+                    <span style="color: #ccc; font-size: 0.65rem; font-family: monospace;">-1 Mochila</span>
+                </button>
+            </div>
+
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <button onclick="window.cuidarDoPet('afeto_basico')" style="background: rgba(0,0,0,0.6); border: 1px solid #e74c3c; border-radius: 8px; padding: 10px 5px; cursor: pointer; color: #fff; box-shadow: inset 0 0 10px rgba(231,76,60,0.2);">
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 2px;">✋</span>
+                    <span style="font-size: 0.65rem; text-transform: uppercase;">Carinho (+10%)</span>
+                    <span style="color: #e74c3c; font-size: 0.75rem; font-weight: bold; font-family: monospace;">-5.000 💰</span>
+                </button>
+                <button onclick="window.cuidarDoPet('afeto_terapia')" style="background: linear-gradient(145deg, rgba(231,76,60,0.2), rgba(0,0,0,0.8)); border: 1px solid #ff4757; border-radius: 8px; padding: 10px 5px; cursor: pointer; color: #fff; box-shadow: 0 0 15px rgba(255,71,87,0.4);">
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 2px;">🎁</span>
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: #ff4757; font-weight: bold;">Mimos (Máx)</span>
+                    <span style="color: #e74c3c; font-size: 0.75rem; font-weight: bold; font-family: monospace;">-25.000 💰</span>
+                </button>
+            </div>
+
         </div>
 
         <div id="mensagem-status-pet" style="margin-top: 25px; font-family: monospace; font-size: 0.9rem; color: var(--pet-cor-base, #fd9644); text-align: center; text-transform: uppercase; letter-spacing: 2px; transition: color 0.5s;">SISTEMA OPERACIONAL ESTÁVEL</div>

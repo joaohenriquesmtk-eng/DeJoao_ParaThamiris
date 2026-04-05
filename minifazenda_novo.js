@@ -4,9 +4,12 @@
 
 // 1. O BANCO DE DADOS COMPLETO (Com Estações e Estresse)
 const catSementes = [
-    { id: 'soja', nome: 'Soja Premium', preco: 50, icone: '🌱', ciclo: 30, estacaoIdeal: 'verao' },
-    { id: 'milho', nome: 'Milho Safrinha', preco: 30, icone: '🌽', ciclo: 20, estacaoIdeal: 'outono' },
-    { id: 'cafe', nome: 'Café Arábica', preco: 150, icone: '☕', ciclo: 60, estacaoIdeal: 'primavera' }
+    { id: 'morangos', nome: 'Morangos Doces', preco: 50, icone: '🍓', ciclo: 20, estacaoIdeal: 'verao' },
+    { id: 'cenouras', nome: 'Cenouras Crocantes', preco: 30, icone: '🥕', ciclo: 15, estacaoIdeal: 'outono' },
+    { id: 'trigos', nome: 'Trigo Dourado', preco: 25, icone: '🌾', ciclo: 10, estacaoIdeal: 'outono' },
+    { id: 'girassois', nome: 'Girassóis', preco: 80, icone: '🌻', ciclo: 30, estacaoIdeal: 'verao' },
+    { id: 'rosas', nome: 'Rosas Escarlates', preco: 150, icone: '🌹', ciclo: 60, estacaoIdeal: 'primavera' },
+    { id: 'orquideas', nome: 'Orquídea Rara', preco: 300, icone: '🌸', ciclo: 90, estacaoIdeal: 'inverno' }
 ];
 
 const catInsumos = [
@@ -36,13 +39,7 @@ const estacoesAno = [
 
 // 2. A MEMÓRIA DO JOGO
 let fazenda = {
-    silo: { soja: 0, milho: 0, cafe: 0, leite: 0 },
-    mercado: { 
-        // 🚨 VALORES BASE MULTIPLICADOS POR 4x (A base da inflação)
-        soja: 480, milho: 200, cafe: 3200, leite: 60,
-        tendencia: 'estavel', // estavel, alta, queda
-        ciclosMercado: 0 
-    },
+    estoqueLeite: 0, // Apenas o leite fica armazenado localmente
     terrenos: [
         { id: 1, livre: true, planta: null, ph: 7.0, npk: 100, umidade: 100, praga: null, progresso: 0 },
         { id: 2, livre: true, planta: null, ph: 6.5, npk: 80, umidade: 100, praga: null, progresso: 0 },
@@ -233,7 +230,16 @@ function continuarInicializacaoFazenda() {
     atualizarVisuaisAnimatronics();
     renderizarTerrenos();
     renderizarLoja('sementes');
-    renderizarSiloEMercado();
+    
+    // 🚨 ATUALIZA O BOTÃO DE LEITE ASSIM QUE ENTRA NA FAZENDA
+    const btnVender = document.querySelector('.painel-economia-agricola button');
+    if (btnVender) {
+        if (fazenda.estoqueLeite > 0) {
+            btnVender.innerText = `Vender ${fazenda.estoqueLeite}L de Leite (+R$ ${fazenda.estoqueLeite * 150})`;
+        } else {
+            btnVender.innerText = `Sem Estoque de Leite`;
+        }
+    }
     
     if (loopSimulador) clearInterval(loopSimulador);
     loopSimulador = setInterval(motorAgronomico, 1000); 
@@ -336,39 +342,14 @@ function motorAgronomico() {
         else if (!mostrarVagalumes && !overlayVagalumes.classList.contains('escondido')) overlayVagalumes.classList.add('escondido');
     }
 
-    // ECONOMIA MACRO: Tendências de Mercado
-    fazenda.mercado.ciclosMercado++;
-    if (fazenda.mercado.ciclosMercado >= 120) {
-        fazenda.mercado.ciclosMercado = 0;
-        const roll = Math.random();
-        if (roll < 0.3) fazenda.mercado.tendencia = 'alta';
-        else if (roll < 0.6) fazenda.mercado.tendencia = 'queda';
-        else fazenda.mercado.tendencia = 'estavel';
-        atualizarUIEstacao();
-    }
-
-    // FLUTUAÇÃO DE PREÇOS (SUPER VALORIZADOS)
-    if (Math.random() < 0.15) {
-        const velhaSoja = fazenda.mercado.soja;
-        let multiplicador = fazenda.mercado.tendencia === 'alta' ? 1.2 : (fazenda.mercado.tendencia === 'queda' ? 0.8 : 1.0);
-        
-        // 🚨 FAIXAS DE PREÇO MIN/MAX MULTIPLICADAS PARA GARANTIR RIQUEZA
-        fazenda.mercado.soja = Math.floor((Math.random() * (600 - 360) + 360) * multiplicador);
-        fazenda.mercado.milho = Math.floor((Math.random() * (320 - 120) + 120) * multiplicador);
-        fazenda.mercado.cafe = Math.floor((Math.random() * (4000 - 2400) + 2400) * multiplicador);
-        fazenda.mercado.leite = Math.floor((Math.random() * (88 - 40) + 40) * multiplicador);
-        
-        animarPreco('preco-soja', fazenda.mercado.soja, velhaSoja);
-        animarPreco('preco-milho', fazenda.mercado.milho);
-        animarPreco('preco-cafe', fazenda.mercado.cafe);
-        animarPreco('preco-leite', fazenda.mercado.leite);
-    }
-
+    // (Localize dentro da função motorAgronomico)
     if (fazenda.pecuaria.vacaComprada) {
         fazenda.pecuaria.vacaFome = Math.min(100, fazenda.pecuaria.vacaFome + (estacaoAtual.id === 'inverno' ? 1.5 : 1));
         if (fazenda.pecuaria.vacaFome < 50 && Math.random() < 0.2) {
-            fazenda.silo.leite += 1;
-            renderizarSiloEMercado();
+            fazenda.estoqueLeite += 1; // Leite guardado localmente
+            // Atualiza texto do botão de venda
+            const btnVender = document.querySelector('.painel-economia-agricola button');
+            if(btnVender) btnVender.innerText = `Vender ${fazenda.estoqueLeite}L de Leite (+R$ ${fazenda.estoqueLeite * 150})`;
         }
         const statusVaca = document.getElementById('status-vaca');
         if (statusVaca) {
@@ -537,44 +518,7 @@ function atualizarVisuaisSemDestruirDOM() {
     });
 }
 
-function atualizarVisuaisSemDestruirDOM() {
-    fazenda.terrenos.forEach((t, index) => {
-        if (!t.livre) return;
-
-        const barraAgua = document.getElementById(`agua-terreno-${index}`);
-        const barraNpk = document.getElementById(`npk-terreno-${index}`);
-        const barraPh = document.getElementById(`ph-terreno-${index}`);
-        const textoPh = document.getElementById(`texto-ph-${index}`);
-        const pragaEl = document.getElementById(`praga-terreno-${index}`);
-        const barraProgresso = document.getElementById(`progresso-planta-${index}`);
-
-        if (barraAgua) barraAgua.style.width = `${t.umidade}%`;
-        if (barraNpk) barraNpk.style.width = `${t.npk}%`;
-        if (barraPh) {
-            barraPh.style.width = `${(t.ph / 7) * 100}%`;
-            barraPh.style.background = t.ph < 5.5 || t.ph > 7.5 ? '#e74c3c' : '#2ecc71';
-        }
-        if (textoPh) textoPh.innerText = `pH: ${t.ph.toFixed(1)}`;
-        
-        if (pragaEl) {
-            if (t.praga) {
-                pragaEl.innerText = t.praga === 'mato' ? '🌿' : '🍄';
-                pragaEl.classList.remove('escondido');
-            } else {
-                pragaEl.classList.add('escondido');
-            }
-        }
-
-        if (barraProgresso && t.planta) {
-            barraProgresso.style.width = `${t.progresso}%`;
-            if (t.progresso >= 100) {
-                renderizarTerrenos();
-            }
-        }
-    });
-}
-
-// 🚨 O SISTEMA DE QUALIDADE NA COLHEITA (Ouro, Prata, Comum)
+// 🚨 O SISTEMA DE QUALIDADE NA COLHEITA (Envia para o Inventário Global)
 window.colherPlanta = function(index) {
     const t = fazenda.terrenos[index];
     if (t.planta && t.progresso >= 100) {
@@ -594,61 +538,50 @@ window.colherPlanta = function(index) {
             iconeQualidade = "🥈";
         }
 
-        fazenda.silo[t.planta.id] += multiplicadorYield;
+        // 🚨 MÁGICA: Envia a colheita direto para a Mochila Global do Casal
+        if (typeof window.adicionarItemInventario === 'function') {
+            window.adicionarItemInventario(t.planta.id, multiplicadorYield);
+        }
         
         if(typeof mostrarToast === 'function') {
-            mostrarToast(`Colheita ${qualidadeText}! +${multiplicadorYield} sc de ${t.planta.nome} ao Silo!`, iconeQualidade);
+            mostrarToast(`Colheita ${qualidadeText}! +${multiplicadorYield} ${t.planta.nome} para a Despensa!`, iconeQualidade);
         }
         if(window.Haptics) window.Haptics.sucesso();
         
         t.planta = null;
         t.progresso = 0;
         
-        renderizarSiloEMercado();
         renderizarTerrenos();
+        
+        // Pulsa o ícone da mochila na tela para indicar que guardou!
+        const btnMochila = document.querySelector('.visor-moedas-global-container').previousElementSibling;
+        if (btnMochila) {
+            btnMochila.style.transform = "scale(1.2)";
+            btnMochila.style.borderColor = "#2ecc71";
+            setTimeout(() => { btnMochila.style.transform = "scale(1)"; btnMochila.style.borderColor = "rgba(212, 175, 55, 0.5)"; }, 400);
+        }
     }
 };
 
-window.venderProduto = function(idProduto) {
-    const qtd = fazenda.silo[idProduto];
-    if (qtd > 0) {
-        const precoAtual = fazenda.mercado[idProduto];
-        const lucroTotal = qtd * precoAtual;
-        
-        fazenda.silo[idProduto] = 0;
-        
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroTotal, `Venda de ${qtd} de ${idProduto}`);
-        if(typeof mostrarToast === 'function') mostrarToast(`Venda concluída! +R$ ${lucroTotal}`, "💰");
+// VENDA DIRETA DO LEITE (Sustento Rápido da Fazenda)
+window.venderLeiteDireto = function() {
+    if (fazenda.estoqueLeite > 0) {
+        const lucroLeite = fazenda.estoqueLeite * 150; // Cada garrafa de leite vale 150 moedas
+        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroLeite, `Venda de ${fazenda.estoqueLeite}L de Leite`);
+        if(typeof mostrarToast === 'function') mostrarToast(`Laticínio vendido! +R$ ${lucroLeite}`, "💰");
         if(window.Haptics) navigator.vibrate([30, 50, 30]);
         
+        fazenda.estoqueLeite = 0; // Zera o estoque
         document.getElementById('fazenda-capital').innerText = window.pontosDoCasal;
-        renderizarSiloEMercado();
+        
+        // Atualiza a UI do botão
+        const btnVender = document.querySelector('.painel-economia-agricola button');
+        if(btnVender) btnVender.innerText = `Sem Estoque de Leite`;
     } else {
-        if(typeof mostrarToast === 'function') mostrarToast(`Seu estoque de ${idProduto} está vazio!`, "⚠️");
+        if(typeof mostrarToast === 'function') mostrarToast(`A Vaca ainda não produziu leite suficiente.`, "⚠️");
         if(window.Haptics) window.Haptics.erro();
     }
 };
-
-function renderizarSiloEMercado() {
-    document.getElementById('estoque-soja').innerText = fazenda.silo.soja;
-    document.getElementById('estoque-milho').innerText = fazenda.silo.milho;
-    document.getElementById('estoque-cafe').innerText = fazenda.silo.cafe;
-    document.getElementById('estoque-leite').innerText = fazenda.silo.leite;
-    
-    document.getElementById('preco-soja').innerText = `R$ ${fazenda.mercado.soja}`;
-    document.getElementById('preco-milho').innerText = `R$ ${fazenda.mercado.milho}`;
-    document.getElementById('preco-cafe').innerText = `R$ ${fazenda.mercado.cafe}`;
-    document.getElementById('preco-leite').innerText = `R$ ${fazenda.mercado.leite}`;
-}
-
-function animarPreco(elementoId, novoPreco, velhoPreco) {
-    const el = document.getElementById(elementoId);
-    if (!el) return;
-    el.innerText = `R$ ${novoPreco}`;
-    if (velhoPreco && novoPreco > velhoPreco) el.className = 'preco-alta';
-    else if (velhoPreco && novoPreco < velhoPreco) el.className = 'preco-baixa';
-    setTimeout(() => { el.className = 'preco-neutro'; }, 2000);
-}
 
 // 6. LOJA AVANÇADA COM TARGETING SYSTEM MESTRE
 window.mudarAbaLoja = function(aba) {

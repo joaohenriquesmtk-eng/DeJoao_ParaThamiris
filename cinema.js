@@ -93,6 +93,21 @@ function montarPlayerYoutube(dados) {
                     event.target.pauseVideo();
                 }
 
+                // 🚨 PROTOCOLO PI-P (Picture in Picture)
+                setTimeout(() => {
+                    const iframeVideo = document.querySelector('#youtube-player-container');
+                    if (iframeVideo) {
+                        // Injeta permissão de PiP na tag do iframe gerada pelo YouTube
+                        iframeVideo.setAttribute('allow', 'picture-in-picture');
+                        
+                        // Mostra o Botão de Janela Flutuante na UI
+                        const btnPip = document.getElementById('btn-pip-cinema');
+                        if (btnPip && document.pictureInPictureEnabled) {
+                            btnPip.classList.remove('escondido');
+                        }
+                    }
+                }, 1000);
+
                 setTimeout(() => { window.isCinemaSyncing = false; }, 800);
             },
             'onStateChange': propagarMudancaDeEstado
@@ -309,4 +324,38 @@ window.escutarNuvemReacoes = function() {
             }
         });
     });
+};
+
+// ==========================================
+// 🚀 MODO JANELA FLUTUANTE (Picture-in-Picture)
+// ==========================================
+window.ativarModoFlutuanteCinema = async function() {
+    const iframeVideo = document.querySelector('#youtube-player-container');
+    
+    if (!iframeVideo) {
+        if(typeof mostrarToast === 'function') mostrarToast("O projetor ainda está desligado.", "⚠️");
+        return;
+    }
+
+    try {
+        // Como o YouTube roda em um iframe isolado, a API padrão não captura o vídeo facilmente.
+        // Solução de Engenharia: Forçamos o navegador a colocar o IFRAME inteiro em modo Fullscreen,
+        // E usamos o 'playsinline=1' que configuramos lá em cima para permitir que o SO gerencie o PiP.
+        
+        if(typeof mostrarToast === 'function') mostrarToast("Se o vídeo pausar ao sair do app, dê play na janelinha flutuante!", "ℹ️");
+        
+        if (iframeVideo.requestFullscreen) {
+            await iframeVideo.requestFullscreen();
+        } else if (iframeVideo.webkitRequestFullscreen) { /* Safari */
+            await iframeVideo.webkitRequestFullscreen();
+        } else if (iframeVideo.msRequestFullscreen) { /* IE11 */
+            await iframeVideo.msRequestFullscreen();
+        }
+
+        if(window.Haptics) window.Haptics.sucesso();
+
+    } catch (erro) {
+        console.error("Erro ao solicitar modo flutuante:", erro);
+        if(typeof mostrarToast === 'function') mostrarToast("O seu celular não autorizou a janela flutuante.", "❌");
+    }
 };

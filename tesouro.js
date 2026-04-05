@@ -398,6 +398,53 @@ function desbloquearTesouroFisico() {
 
     if(window.Haptics) navigator.vibrate([200, 100, 400, 100, 600]);
     if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71', '#ffffff'], particleCount: 300, spread: 180, zIndex: 100000});
+
+    // ==========================================
+    // 💎 O SAQUE DO TESOURO (A EXPLOSÃO DIAMANTE)
+    // ==========================================
+    
+    // Evita que o prêmio seja dado duas vezes se a pessoa fechar e abrir a mesma cápsula
+    const idUnicoPremio = `premio_resgatado_${tesouroIdVigente}`;
+    const jaResgatou = localStorage.getItem(idUnicoPremio);
+
+    if (!jaResgatou) {
+        setTimeout(async () => {
+            // O Jackpot da Exploração Real (100.000 a 500.000 Moedas!)
+            const jackpotExploracao = Math.floor(Math.random() * 400000) + 100000;
+            
+            // Recompensa em Itens Orgânicos Raros para a Mochila (Munição pro Guardião!)
+            const bonusMorangos = Math.floor(Math.random() * 15) + 5; // 5 a 20 Morangos
+            const bonusOrvalho = Math.floor(Math.random() * 10) + 5;  // 5 a 15 Orvalhos
+            const bonusRosas = Math.floor(Math.random() * 5) + 1;     // 1 a 5 Rosas de Luxo
+            
+            // 1. Credita as Moedas na conta do Casal
+            if (typeof atualizarPontosCasal === 'function') {
+                atualizarPontosCasal(jackpotExploracao, "Descoberta Arqueológica (GPS)");
+            }
+            
+            // 2. Credita a Mochila Global
+            if (typeof window.adicionarItemInventario === 'function') {
+                await window.adicionarItemInventario('morangos', bonusMorangos);
+                await window.adicionarItemInventario('gotas_orvalho', bonusOrvalho);
+                await window.adicionarItemInventario('rosas', bonusRosas);
+            }
+            
+            // 3. Efeitos Sonoros e Avisos Visuais Absurdos
+            if (typeof mostrarToast === 'function') {
+                mostrarToast(`BAÚ ÉPICO: +${jackpotExploracao.toLocaleString('pt-BR')} 💰`, "🗺️");
+                setTimeout(() => mostrarToast(`Saque Extra: +${bonusMorangos}🍓, +${bonusOrvalho}💧, +${bonusRosas}🌹`, "🎒"), 2000);
+            }
+
+            // Toca um som de conquista/baú aberto
+            const audioBau = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+            audioBau.volume = 1.0;
+            audioBau.play().catch(e=>{});
+
+            // 4. Trava de segurança
+            localStorage.setItem(idUnicoPremio, "true");
+            
+        }, 3500); // Aguarda 3,5s para a pessoa apreciar a sua mensagem/foto antes de jogar o dinheiro nela!
+    }
 }
 
 window.destruirTesouroLido = function() {

@@ -525,49 +525,113 @@ window.baterMarteloVisual = function() {
     }, 1000);
 };
 
+// ==========================================
+// 🤖 O JUIZ SINTÉTICO (GERADOR DE SENTENÇAS IA - WEB NAMORO +18)
+// ==========================================
+function gerarSentencaIA(caso) {
+    const nomeCasal = window.MEU_NOME || "A parte autora";
+    const nomeParceiro = window.NOME_PARCEIRO || "A parte ré";
+    
+    const introducoes = [
+        `Tendo em vista a gravidade absurda do evento "${caso.titulo}", este juízo declara: `,
+        `Após minuciosa análise dos autos no caso "${caso.titulo}", o Santuário delibera: `,
+        `É inadmissível o comportamento verificado na lide "${caso.titulo}". Determino que: `,
+        `Analisando as evidências inegáveis do processo "${caso.titulo}", sentencio que: `
+    ];
+
+    // 🌶️ O PAINEL DE JURISDIÇÃO +18 (A "Safadeza Engraçada")
+    const miolosSafados = [
+        `A infração ativou a Jurisdição +18 do Santuário! A parte condenada deve enviar um áudio sussurrando, com riqueza de detalhes, o que faria se o teletransporte existisse e vocês estivessem sozinhos agora.`,
+        `Reparação de danos morais com juros picantes exigida. A pena é enviar uma foto provocante (mas que não dê ban no WhatsApp) com o único objetivo de acabar com a concentração da outra pessoa hoje.`,
+        `Crime inafiançável! Como punição, a parte culpada é obrigada a responder com absoluta sinceridade a uma (1) pergunta íntima e sem nenhum tipo de censura que a parte vencedora fará agora no chat.`,
+        `A pena imposta é de confissão em regime fechado: O perdedor deve descrever em um 'textão' detalhado qual é a sua fantasia mais secreta para o dia em que a distância física finalmente chegar a zero.`
+    ];
+
+    // 💖 O PAINEL ROMÂNTICO/ENGRAÇADO PADRÃO
+    const miolosTematicos = {
+        "comida": [
+            `O estelionato gastronômico à distância é inafiançável. A parte condenada deverá enviar um áudio de no mínimo 30 segundos descrevendo qual seria o jantar perfeito de vocês dois hoje.`,
+            `A ostentação de comida boa sem dividir configura tortura virtual. A pena é mandar foto de todas as suas refeições do dia de amanhã para a parte lesada aprovar.`
+        ],
+        "ciume": [
+            `Por infração ao Código Penal do Afeto Digital, o culpado é condenado a enviar 5 elogios criativos e inéditos no WhatsApp nos próximos 10 minutos.`,
+            `A pena para este delito é a Ordem de Restrição de Vocabulário: o perdedor está terminantemente proibido de responder mensagens com 'Ok', 'Aham' ou 'Uhum' nas próximas 48 horas.`
+        ],
+        "sono": [
+            `O sequestro de atenção seguido de capotamento (dormir na call) atenta contra a Constituição do Santuário. A pena é enviar amanhã de manhã o primeiro áudio do dia com voz de sono.`,
+            `Ativar sonecas consecutivas e atrasar o encontro virtual configura perturbação da ordem pacífica. A pena é ser o responsável por iniciar a próxima chamada de vídeo.`
+        ],
+        "casa": [
+            `A tentativa de impor a escolha do entretenimento configura ditadura audiovisual. A parte vencedora ganha o direito irrevogável de escolher o próximo filme no Cine Quântico.`,
+            `O mistério da rotina não compartilhada é crime. A punição é gravar um 'vídeo-tour' de 1 minuto mostrando um detalhe aleatório e engraçado do seu quarto agora mesmo.`
+        ],
+        "celular": [
+            `O vácuo prolongado com visualização ativa é crime de 1º grau. A parte infratora deve enviar imediatamente uma selfie fazendo uma careta para o arquivo do casal.`,
+            `A fofoca pela metade fere a curiosidade alheia. A pena imposta é o envio de um áudio cantando o refrão de uma música que faça lembrar a parte vencedora.`
+        ],
+        "indecisao": [
+            `O crime do 'Tanto Faz' foi comprovado. O condenado perde o direito de reclamar da próxima música ou vídeo escolhido pela parte autora no Santuário.`,
+            `A lentidão nas escolhas afeta o andamento da relação. Como multa, o perdedor deve procurar e enviar um meme que defina a personalidade do vencedor.`
+        ]
+    };
+
+    const miolosGerais = [
+        `A quebra da confiança é severa. Fica determinado o envio de um 'textão' romântico de no mínimo 5 linhas no WhatsApp, com juros aplicáveis imediatamente.`,
+        `Como punição compensatória para a manutenção do amor, a parte culpada deverá confessar no WhatsApp um segredo bobo de infância que a outra parte ainda não saiba.`,
+        `O tribunal decide aplicar uma multa afetiva: o perdedor deve colocar uma foto que lembre o casal (ou o próprio Santuário) como papel de parede do celular por 24h.`
+    ];
+
+    let textoIntro = introducoes[Math.floor(Math.random() * introducoes.length)];
+    let textoMiolo = "";
+    
+    // 🎲 A ROLETA DO CAOS: 20% de chance de cair na Safadeza!
+    let chanceSafadeza = Math.random(); // Gera um número entre 0 e 1
+
+    if (chanceSafadeza <= 0.20) {
+        // Caiu nos 20%! Tensão no ar.
+        textoMiolo = miolosSafados[Math.floor(Math.random() * miolosSafados.length)];
+    } else {
+        // Lógica Normal Romântica/Engraçada (80% das vezes)
+        let tagEncontrada = caso.tags.find(t => miolosTematicos[t]);
+        if (tagEncontrada) {
+            let opcoes = miolosTematicos[tagEncontrada];
+            textoMiolo = opcoes[Math.floor(Math.random() * opcoes.length)];
+        } else {
+            textoMiolo = miolosGerais[Math.floor(Math.random() * miolosGerais.length)];
+        }
+    }
+
+    return textoIntro + textoMiolo + " Cumpra-se.";
+}
+
 function julgarCaso() {
     if (tribunal.somaAtual === tribunal.metaAtual) {
         
-        // 🚨 CONEXÃO FEITA: Dispara a Fanfarra de Vitória!
-        if (AudioTribunal.vitoria) {
-            AudioTribunal.vitoria.currentTime = 0;
-            AudioTribunal.vitoria.play().catch(e=>e);
+        // 🚨 O ACERTO AGORA CHAMA O JUIZ DE IA
+        const modalIA = document.getElementById('modal-veredito-ia');
+        if (modalIA) {
+            document.getElementById('ia-numero-processo').innerText = `1400.${Math.floor(Math.random() * 9000) + 1000}`;
+            document.getElementById('ia-texto-sentenca').innerText = gerarSentencaIA(tribunal.casoAtual);
+            modalIA.classList.remove('escondido');
+            
+            // Dispara um som de "Efeito Nuke/Revelação" para dar peso à leitura da sentença
+            if (AudioTribunal.impacto) { AudioTribunal.impacto.currentTime = 0; AudioTribunal.impacto.play().catch(e=>e); }
+            if (window.Haptics) navigator.vibrate([100, 50, 400]);
         }
         
-        mostrarToast("Veredito Aceito! +200💰", "⚖️"); 
-        estatisticasTribunal.ganhos++; salvarEstatisticas();
-        
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(200, "Caso Ganho no Tribunal");
-        
-        tribunal.nivel++;
-        document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
-        
-        salvarEstadoNaNuvemTribunal(); 
-        
-        setTimeout(iniciarNovoCaso, 1500);
     } else {
+        // O ERRO PERMANECE INTOCADO
         tribunal.estrelas--;
         document.getElementById('tribunal-estrelas').innerText = tribunal.estrelas;
         
         if (tribunal.estrelas <= 0) {
-            
-            // 🚨 CONEXÃO FEITA: Dispara o som de Game Over (Erro)
-            if (AudioTribunal.erro) {
-                AudioTribunal.erro.currentTime = 0;
-                AudioTribunal.erro.play().catch(e=>e);
-            }
-            
+            if (AudioTribunal.erro) { AudioTribunal.erro.currentTime = 0; AudioTribunal.erro.play().catch(e=>e); }
             mostrarToast("Justiça falhou! Tribunal encerrado.", "💔");
             estatisticasTribunal.perdidos++; salvarEstatisticas();
-            
-            if (typeof window.salvarProgressoJogo === 'function') {
-                window.salvarProgressoJogo('tribunal', { nivel: 1, estrelas: 3 });
-            }
-            
+            if (typeof window.salvarProgressoJogo === 'function') window.salvarProgressoJogo('tribunal', { nivel: 1, estrelas: 3 });
             setTimeout(voltarMenuJogos, 2000);
         } else {
             salvarEstadoNaNuvemTribunal(); 
-            
             let diferenca = Math.abs(tribunal.metaAtual - tribunal.somaAtual);
             mostrarToast(`Errou por ${diferenca}! Vidas: ${tribunal.estrelas}`, "❌");
             tribunal.somaAtual = 0;
@@ -578,7 +642,27 @@ function julgarCaso() {
     }
 }
 
-// Função global para reiniciar o caso (Blindada contra o Lazy Load)
+// 🚨 NOVA FUNÇÃO EXCLUSIVA PARA O BOTÃO DA TELA DA IA
+window.fecharVereditoEAvancar = function() {
+    document.getElementById('modal-veredito-ia').classList.add('escondido');
+    
+    // Agora sim entregamos a grana, a fanfarra e avançamos de nível!
+    if (AudioTribunal.vitoria) { AudioTribunal.vitoria.currentTime = 0; AudioTribunal.vitoria.play().catch(e=>e); }
+    if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#9b59b6'], spread: 120, particleCount: 150});
+    
+    mostrarToast("Veredito Aceito! +200💰", "⚖️"); 
+    estatisticasTribunal.ganhos++; salvarEstatisticas();
+    
+    if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(200, "Caso Ganho no Tribunal");
+    
+    tribunal.nivel++;
+    document.getElementById('tribunal-nivel').innerText = tribunal.nivel;
+    salvarEstadoNaNuvemTribunal(); 
+    
+    setTimeout(iniciarNovoCaso, 1000);
+};
+
+// Função global para reiniciar o caso
 window.reiniciarTribunalManual = function() {
     if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(-5, "Reset Tribunal");
     iniciarNovoCaso();

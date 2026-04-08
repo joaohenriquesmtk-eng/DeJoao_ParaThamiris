@@ -5,23 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>O Fim do Ciclo</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    
+    <script type="importmap">
+      {
+        "imports": {
+          "@firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+          "@firebase/database": "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js",
+          "@firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
+        }
+      }
+    </script>
+
     <style>
-        /* POLIMENTO ESPECÍFICO PARA iOS / iPHONE - COM SCROLL ELEGANTE */
         body { 
-            background-color: #000000; /* Preto Puro OLED para tela de iPhone */
+            background-color: #000000; 
             color: #d1d1d1; 
             font-family: 'Playfair Display', serif; 
             margin: 0; 
-            min-height: 100dvh; /* Correção da barra do Safari (Dynamic Height) */
-            overscroll-behavior-y: none; /* Mata o efeito elástico do iOS, mas permite rolagem */
-            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; /* Respeita a Dynamic Island */
+            min-height: 100dvh; 
+            overscroll-behavior-y: none; 
+            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; 
             box-sizing: border-box;
-            -webkit-font-smoothing: antialiased; /* Letras super nítidas no iOS */
+            -webkit-font-smoothing: antialiased; 
         }
         .carta-container { 
-            padding: 60px 20px 80px 20px; /* Dá espaço para o texto respirar no topo e no final */
+            padding: 60px 20px 80px 20px; 
             max-width: 600px; 
-            margin: 0 auto; /* Centraliza a carta horizontalmente na tela */
+            margin: 0 auto; 
             animation: surgir 5s ease-in-out; 
             text-align: left;
             width: 100%;
@@ -97,44 +107,82 @@
         <div class="assinatura">- João</div>
     </div>
 
-    <script>
-        // ============================================================================
-        // 💣 MOTOR DE AUTODESTRUIÇÃO (COM BLINDAGEM DO ARQUITETO)
-        // ============================================================================
+    <script type="module">
+        import { initializeApp } from '@firebase/app';
+        import { getDatabase, ref, set, push } from '@firebase/database';
+        import { getAuth, onAuthStateChanged } from '@firebase/auth';
 
-        // 1. Verifica se o usuário atual é o João (O Arquiteto). 
-        // Se for, ele desativa o motor de explosão completamente.
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYTqgvf42EJHgPHEMP0auJIaMGSDjo4lY",
+            authDomain: "santuario-jt.firebaseapp.com",
+            databaseURL: "https://santuario-jt-default-rtdb.firebaseio.com",
+            projectId: "santuario-jt",
+            storageBucket: "santuario-jt.firebasestorage.app",
+            messagingSenderId: "381433603925",
+            appId: "1:381433603925:web:27d899e7fba589f2e231dc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
         const escudoAtivado = localStorage.getItem('imunidade_joao') === 'true';
+        const jaDestruido = localStorage.getItem('santuario_destruido') === 'true';
 
-        // 2. Verifica se a pessoa já leu e o app já foi destruído (A Lápide)
-        if (!escudoAtivado && localStorage.getItem('santuario_destruido') === 'true') {
+        // 1. Bloqueio visual imediato se já foi lido (mas deixa o script rodar)
+        if (!escudoAtivado && jaDestruido) {
             document.getElementById('tela-vazia').style.display = 'block';
             document.getElementById('conteudo-carta').style.display = 'none';
-            throw new Error("Santuário desativado."); 
         }
 
-        let protocoloIniciado = false;
+        // 2. O Radar entra em ação quando o celular autentica a sessão antiga dela
+        onAuthStateChanged(auth, (user) => {
+            if (user && !escudoAtivado) {
+                const dataAtual = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                
+                if (jaDestruido) {
+                    // CURIOSIDADE DETECTADA: Ela abriu o aplicativo dias depois
+                    // O "push" cria uma nova linha na lista de tentativas, com um ID único
+                    push(ref(db, 'encerramento/tentativas_acesso'), {
+                        dataHora: dataAtual,
+                        uid_leitor: user.uid
+                    }).then(() => console.log("Radar: Tentativa registrada."));
+                } else {
+                    // PRIMEIRA LEITURA: A carta ainda está visível para ela
+                    set(ref(db, 'encerramento/leitura_inicial'), {
+                        lida: true,
+                        dataHora_Abertura: dataAtual,
+                        uid_leitor: user.uid
+                    }).then(() => console.log("Radar: Primeira leitura registrada."));
+                }
+            }
+        });
+    </script>
 
+    <script>
+        let protocoloIniciado = false;
+        
         function executarDesintegracao() {
-            // Se o escudo do João estiver ativado, aborta a missão!
+            const escudoAtivado = localStorage.getItem('imunidade_joao') === 'true';
+            
             if (escudoAtivado) {
-                console.log("🛡️ Blindagem do Arquiteto detectada. Autodestruição abortada.");
+                console.log("🛡️ Blindagem do Arquiteto ativa.");
                 return; 
             }
 
             if (protocoloIniciado) return;
             protocoloIniciado = true;
 
-            // Corta a visão imediatamente
+            // Corta a visão da carta
             document.getElementById('tela-vazia').style.display = 'block';
             document.getElementById('conteudo-carta').style.display = 'none';
 
-            // Marca o celular da Thamiris com a "lápide" para nunca mais abrir e limpa os dados dela
+            // Marca o celular da Thamiris com a "lápide" para o Firebase saber nos próximos dias
             localStorage.clear();
             sessionStorage.clear();
             localStorage.setItem('santuario_destruido', 'true');
 
-            // Arranca o aplicativo do sistema operacional do celular dela
+            // Arranca o aplicativo do sistema
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for(let registration of registrations) {
@@ -143,7 +191,7 @@
                 });
             }
 
-            // Extermina os arquivos salvos em cache na memória do iPhone dela
+            // Extermina os caches da memória
             if ('caches' in window) {
                 caches.keys().then(function(names) {
                     for (let name of names) {
@@ -153,9 +201,7 @@
             }
         }
 
-        // ============================================================================
-        // 🎯 OS GATILHOS (Só disparam se não for o João)
-        // ============================================================================
+        // Gatilhos de destruição: fechar a tela, minimizar, bloquear o celular
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'hidden') executarDesintegracao();
         });

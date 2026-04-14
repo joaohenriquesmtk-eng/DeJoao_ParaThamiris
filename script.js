@@ -5477,3 +5477,135 @@ window.adicionarItemInventario = async function(chaveItem, quantidadeAdicional) 
         // O onValue se encarrega de atualizar a tela na mesma hora nos dois celulares!
     } catch (e) { console.error("Erro ao adicionar item:", e); }
 };
+
+// ============================================================================
+// 🎨 PROTOCOLO SINCRO-POÉTICO (COR, TESTE E CONEXÃO REAL-TIME)
+// ============================================================================
+
+function inicializarSincroniaFeliz() {
+    console.log("✨ Iniciando Motor de Conexão e Metáfora da Cor...");
+
+    const appPrincipal = document.getElementById('app-shell') || document.body;
+    const visorMoedas = document.querySelector('.visor-moedas-global-container');
+    const { db, ref, set, onValue } = window.SantuarioApp.modulos;
+
+    // 1. CHAVE MESTRA PARA O JOÃO CONFERIR (Clique 3x nas moedas)
+    let cliquesTeste = 0;
+    if (visorMoedas) {
+        visorMoedas.onclick = () => {
+            cliquesTeste++;
+            if (cliquesTeste >= 3) {
+                cliquesTeste = 0;
+                ativarFiltroVisual(true); // Ativa para você ver o resultado
+                if(typeof mostrarToast === 'function') mostrarToast("Modo Visual: Preview Ativado", "👁️");
+                setTimeout(() => ativarFiltroVisual(false), 10000); // Volta ao normal em 10s
+            }
+        };
+    }
+
+    // Função central de cor
+    function ativarFiltroVisual(ativar) {
+        appPrincipal.style.transition = "filter 4s ease-in-out";
+        if (ativar) {
+            appPrincipal.style.filter = "grayscale(80%) sepia(15%) brightness(0.85)";
+        } else {
+            appPrincipal.style.filter = "grayscale(0%) sepia(0%) brightness(1)";
+        }
+    }
+
+    // 2. APLICAÇÃO DO FILTRO (Apenas para a Thamiris)
+    if (!window.souJoao && localStorage.getItem('imunidade_joao') !== 'true') {
+        ativarFiltroVisual(true);
+        setTimeout(() => {
+            if(typeof mostrarToast === 'function') {
+                mostrarToast("As cores estão em repouso. O Santuário sente o silêncio.", "🍂");
+            }
+        }, 3000);
+    }
+
+    // 3. O RADAR DE PRESENÇA (A "Cutucada" em Tempo Real)
+    // Monitora se o outro lado clicou no coração "feliz"
+    onValue(ref(db, 'sincronia/cutucada_feliz'), (snapshot) => {
+        const dados = snapshot.val();
+        if (dados && dados.timestamp) {
+            const agora = Date.now();
+            // Se a cutucada foi enviada nos últimos 5 segundos, dispara a alegria!
+            if (agora - dados.timestamp < 5000) {
+                dispararExplosaoAlegria(dados.autor);
+            }
+        }
+    });
+
+    // 4. INTERCEPTAÇÃO DO PULSO (Gatilho da Felicidade)
+    const pulsoOriginal = window.enviarPulso;
+    window.enviarPulso = function() {
+        if (typeof pulsoOriginal === 'function') pulsoOriginal();
+
+        // Se clicar no pulso, envia a "cutucada" para o Firebase
+        set(ref(db, 'sincronia/cutucada_feliz'), {
+            autor: window.MEU_NOME,
+            timestamp: Date.now()
+        });
+
+        // Efeito Visual da Metáfora da Cor (Volta a cor por 5s)
+        if (!window.souJoao) {
+            ativarFiltroVisual(false);
+            setTimeout(() => {
+                const contador = document.getElementById('contador-pulso');
+                if (contador) {
+                    contador.innerHTML = "Um batimento solitário aquece, mas não sustenta a cor.<br><span style='font-size:0.8rem;'>O SISTEMA AGUARDA A VOZ DELE.</span>";
+                    contador.style.color = "#D4AF37";
+                }
+                ativarFiltroVisual(true);
+            }, 5000);
+        }
+    };
+
+    // 5. A ANIMAÇÃO FELIZ (Chuva de Ouro e Corações)
+    function dispararExplosaoAlegria(quemEnviou) {
+        // Só mostra o balão se não foi você que clicou (para dar a sensação de ser tocado)
+        if (quemEnviou !== window.MEU_NOME && typeof mostrarToast === 'function') {
+            mostrarToast(`${quemEnviou} está vibrando com você agora!`, "💖");
+        }
+
+        if (window.confetti) {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                // Configuração da chuva feliz
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#D4AF37', '#ff6b6b', '#ffffff']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#D4AF37', '#ff6b6b', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+        
+        // Haptic Feedback de batimento duplo (Tum-tum!)
+        if (window.Haptics) {
+            navigator.vibrate([100, 50, 100]);
+        }
+    }
+}
+
+// Inicializador Automático
+const aguardarAppParaInception = setInterval(() => {
+    if (window.SantuarioApp && window.SantuarioApp.inicializado && document.getElementById('btn-pulso')) {
+        inicializarSincroniaFeliz();
+        clearInterval(aguardarAppParaInception);
+    }
+}, 2000);

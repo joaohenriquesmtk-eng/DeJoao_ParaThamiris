@@ -22,6 +22,7 @@ function configurarNavegacao() {
 
                 // 2. Esconde todas as telas principais com segurança
                 todasAsTelas.forEach(tela => {
+                    pausarMidiasDeElemento(tela);
                     tela.classList.add('escondido');
                     tela.classList.remove('saindo');
                     tela.classList.remove('ativo');
@@ -32,6 +33,7 @@ function configurarNavegacao() {
                 if (elementoTela) {
                     elementoTela.classList.remove('escondido');
                     elementoTela.classList.add('ativo');
+                    reativarVideosDeElemento(elementoTela);
                 }
 
                 telaAtual = telaAlvo;
@@ -274,46 +276,42 @@ window.injetarMotor3D = function() {
     document.body.appendChild(script); // Dispara o download em segundo plano
 };
 
-// ==========================================
-// 🚀 O GERENCIADOR DE BATERIA (VERSÃO SEGURA E ESTÁVEL)
-// ==========================================
-window.addEventListener('DOMContentLoaded', () => {
-    const motorDeUnmount = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'class') {
-                const elemento = mutation.target;
-                
-                const foiOcultado = elemento.classList.contains('escondido') || 
-                                    elemento.classList.contains('takeover-escondido') ||
-                                    (!elemento.classList.contains('ativo') && elemento.classList.contains('tela'));
-                                    
-                const ficouAtivo = (elemento.classList.contains('ativo') || !elemento.classList.contains('escondido')) && 
-                                   !elemento.classList.contains('takeover-escondido');
-                
-                if (foiOcultado) {
-                    // PAUSA INTELIGENTE: Apenas manda vídeos e áudios dormirem.
-                    // Os gráficos 3D (Canvas) não são mais destruídos, eles hibernam sozinhos!
-                    const midias = elemento.querySelectorAll('audio, video');
-                    midias.forEach(midia => midia.pause());
-                } 
-                else if (ficouAtivo) {
-                    // O DESPERTAR: Se a aba voltar, a música ou o vídeo de fundo volta a tocar
-                    const videos = elemento.querySelectorAll('video');
-                    videos.forEach(v => {
-                        if (v.hasAttribute('loop') || v.hasAttribute('autoplay') || v.className.includes('clima') || v.id.includes('clima')) {
-                            v.play().catch(e => console.log("Aguardando interação"));
-                        }
-                    });
-                }
-            }
-        });
-    });
+function pausarMidiasDeElemento(elemento) {
+    if (!elemento) return;
 
-    const blocosPesados = document.querySelectorAll('.tela, [id^="container-"], [id^="mesa-"], [id^="overlay-"], .modal, .modal-overlay');
-    blocosPesados.forEach(bloco => {
-        if(bloco) motorDeUnmount.observe(bloco, { attributes: true });
+    const midias = elemento.querySelectorAll('audio, video');
+    midias.forEach(midia => {
+        try {
+            midia.pause();
+        } catch (erro) {
+            console.warn('Falha ao pausar mídia:', erro);
+        }
     });
-});
+}
+
+function reativarVideosDeElemento(elemento) {
+    if (!elemento) return;
+
+    const videos = elemento.querySelectorAll('video');
+    videos.forEach(video => {
+        const deveRetomar =
+            video.hasAttribute('loop') ||
+            video.hasAttribute('autoplay') ||
+            video.className.includes('clima') ||
+            (video.id && video.id.includes('clima'));
+
+        if (!deveRetomar) return;
+
+        try {
+            const tentativa = video.play();
+            if (tentativa && typeof tentativa.catch === 'function') {
+                tentativa.catch(() => {});
+            }
+        } catch (erro) {
+            console.warn('Falha ao retomar vídeo:', erro);
+        }
+    });
+}
 
 // 🚨 FORÇA O iPHONE A DESCER A TELA QUANDO O TECLADO FECHA
 const onFocusOutSantuario = function(e) {

@@ -192,6 +192,9 @@ function escutarNuvemCinema() {
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
     offCinemaEstado = onValue(ref(db, 'cinema/estado'), (snapshot) => {
+        if (window.SantuarioRuntime && offCinemaEstado) {
+            window.SantuarioRuntime.addCleanup('cinema', offCinemaEstado);
+        }
         const dados = snapshot.val();
         if (!dados || !dados.videoId) return;
 
@@ -248,10 +251,6 @@ function escutarNuvemCinema() {
 
         setTimeout(() => { window.isCinemaSyncing = false; }, 800); 
     });
-}
-
-if (window.SantuarioRuntime && offCinemaEstado) {
-    window.SantuarioRuntime.addCleanup('cinema', offCinemaEstado);
 }
 
 window.entrarNaSessaoCinema = function() {
@@ -324,10 +323,6 @@ window.escutarNuvemReacoes = function() {
             ultimoTimestampReacaoProcessado = reacoesNovas[reacoesNovas.length - 1].timestamp;
         }
 
-        if (window.SantuarioRuntime && offCinemaReacoes) {
-            window.SantuarioRuntime.addCleanup('cinema', offCinemaReacoes);
-        }
-
         reacoesNovas.forEach(reacao => {
             const coracao = document.createElement('div');
             coracao.className = 'coracao-cinema';
@@ -342,11 +337,15 @@ window.escutarNuvemReacoes = function() {
                 if (container.contains(coracao)) container.removeChild(coracao);
             }, 2500);
 
-            if(window.Haptics && reacao.autor !== window.MEU_NOME) {
-                navigator.vibrate(20);
+            if (window.Haptics && reacao.autor !== window.MEU_NOME) {
+                window.Haptics.toqueLeve();
             }
         });
     });
+    
+    if (window.SantuarioRuntime && offCinemaReacoes) {
+        window.SantuarioRuntime.addCleanup('cinema', offCinemaReacoes);
+    }
 };
 
 // ==========================================

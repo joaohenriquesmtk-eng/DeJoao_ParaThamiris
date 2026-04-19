@@ -17,7 +17,7 @@ window.injetarModuloHTML = function(jogoId) {
         // 🚨 A MÁGICA FURTIVA: Substituímos o 'fetch' moderno pelo 'XMLHttpRequest'
         // Isso passa invisível pelos bloqueios do 200.js (Kaspersky/AdBlocks)
         const xhr = new XMLHttpRequest();
-        const urlFurtiva = `./modulos/${jogoId}.html?v=${Date.now()}`;
+        const urlFurtiva = `./modulos/${jogoId}.html?v=${window.APP_VERSION}`;
         
         xhr.open('GET', urlFurtiva, true);
         
@@ -48,6 +48,7 @@ window.injetarModuloHTML = function(jogoId) {
 // ============================================================================
 
 window.modulosCarregadosJS = {};
+window.APP_VERSION = window.APP_VERSION || '2026.04.19-ultra1';
 
 window.injetarModuloJS = function(nomeDoArquivo) {
     return new Promise((resolve, reject) => {
@@ -62,7 +63,7 @@ window.injetarModuloJS = function(nomeDoArquivo) {
         const script = document.createElement('script');
         
         // Colocamos um Date.now() para burlar o cache fantasma durante o desenvolvimento!
-        script.src = `./${nomeDoArquivo}.js?v=${Date.now()}`; 
+        script.src = `./${nomeDoArquivo}.js?v=${window.APP_VERSION}`;
         
         // 🚨 A CHAVE DA PERFORMANCE: 'async = true' diz ao processador do celular 
         // para ler o script em uma linha paralela, sem congelar as animações da tela!
@@ -1537,24 +1538,6 @@ window.enviarPostit = function() {
         timestamp: idUnico,
         fixado: false,
         curtidas: 0
-    });
-
-    // Conecta o transmissor ao campo de texto assim que a tela carregar
-    window.addEventListener('DOMContentLoaded', () => {
-        const inputPostit = document.getElementById('input-postit');
-        if (inputPostit) {
-            inputPostit.addEventListener('input', () => {
-                window.avisarDigitando(true);
-                clearTimeout(timeoutDigitacao);
-                timeoutDigitacao = setTimeout(() => {
-                    window.avisarDigitando(false);
-                }, TEMPO_ESPERA_DIGITACAO);
-            });
-        }
-            // Ativa os efeitos sonoros do cassino
-        if (window.CassinoAudio) {
-            window.CassinoAudio.ativo = true;
-        }
     });
 
     // 2. 🚨 A MÁGICA DA NOTIFICAÇÃO: Avisa a conta do parceiro que tem mensagem!
@@ -4910,16 +4893,17 @@ window.renderizarEstanteReliquias = function() {
     }
 };
 
-// O "Guarda-Costas" Invisível do Saldo
-let saldoAnteriorEstante = -1;
-setInterval(() => {
-    if (window.pontosDoCasal !== saldoAnteriorEstante) {
-        saldoAnteriorEstante = window.pontosDoCasal;
-        if(typeof window.renderizarEstanteReliquias === 'function') {
-            window.renderizarEstanteReliquias();
-        }
+document.addEventListener('santuario:saldo-atualizado', () => {
+    if (typeof window.renderizarEstanteReliquias === 'function') {
+        window.renderizarEstanteReliquias();
     }
-}, 2000);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.renderizarEstanteReliquias === 'function') {
+        window.renderizarEstanteReliquias();
+    }
+});
 
 
 // ==========================================

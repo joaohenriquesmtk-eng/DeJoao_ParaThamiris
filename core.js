@@ -336,57 +336,7 @@ window.atualizarContadorInterface = function(quantidade) {
     elemento.innerText = texto;
 };
 
-// ==========================================
-// BANCO CENTRAL DO SANTUÁRIO (SISTEMA FINANCEIRO)
-// ==========================================
-let pontosSalvos = localStorage.getItem('santuario_pontos');
-if (pontosSalvos === null) {
-    window.pontosDoCasal = 100;
-    localStorage.setItem('santuario_pontos', 100);
-} else {
-    window.pontosDoCasal = parseInt(pontosSalvos) || 0;
-}
 
-window.atualizarPontosCasal = function(valor, motivo) {
-    window.pontosDoCasal += valor;
-    if (window.pontosDoCasal < 0) window.pontosDoCasal = 0;
-    localStorage.setItem('santuario_pontos', window.pontosDoCasal);
-
-    // 1. Atualiza IDs legados (Fazenda e Termo)
-    const visores = ['fazenda-capital', 'jardim-moedas', 'termo-moedas'];
-    visores.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = window.pontosDoCasal;
-    });
-
-    // 2. ATUALIZA A NOVA PÍLULA GLOBAL EM TODOS OS JOGOS
-    document.querySelectorAll('.visor-moedas-global-texto').forEach(el => {
-        el.innerText = window.pontosDoCasal;
-    });
-    
-    // 3. EFEITO DOPAMINA: Faz a pílula pular e brilhar em verde quando ganha dinheiro
-    if (valor > 0) {
-        document.querySelectorAll('.visor-moedas-global-container').forEach(el => {
-            el.style.transform = 'scale(1.15)';
-            el.style.borderColor = '#2ecc71';
-            el.style.boxShadow = '0 0 15px rgba(46, 204, 113, 0.6)';
-            setTimeout(() => {
-                el.style.transform = 'scale(1)';
-                el.style.borderColor = 'rgba(212, 175, 55, 0.5)';
-                el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(212, 175, 55, 0.2)';
-            }, 400);
-        });
-    }
-
-    console.log(`Economia atualizada: ${motivo} | Saldo: ${window.pontosDoCasal}`);
-};
-
-// Função para injetar o valor assim que ela abrir a tela de um jogo
-window.sincronizarMoedasUI = function() {
-    document.querySelectorAll('.visor-moedas-global-texto').forEach(el => {
-        el.innerText = window.pontosDoCasal || 0;
-    });
-};
 
 // ==========================================
 // MOTOR BOTÂNICO SÊNIOR (O CORAÇÃO DO SANTUÁRIO)
@@ -741,44 +691,62 @@ window.fecharCassino = function() {
 };
 
 // ============================================================================
-// 🏦 SISTEMA BANCÁRIO CENTRAL (CONTA CONJUNTA EM TEMPO REAL)
+// 🏦 SISTEMA BANCÁRIO CENTRAL (VERSÃO ÚNICA E DEFINITIVA)
 // ============================================================================
+window.pontosDoCasal = window.pontosDoCasal || 0;
+window.bancoCentralOffSaldo = null;
 
-window.pontosDoCasal = 0; // Variável global de memória da UI
+window.aplicarSaldoNaUI = function() {
+    const saldoFormatado = (window.pontosDoCasal || 0).toLocaleString('pt-BR');
+
+    const visoresTexto = document.querySelectorAll('.visor-moedas-global-texto');
+    visoresTexto.forEach(el => {
+        el.innerText = saldoFormatado;
+    });
+
+    const visoresLegados = ['fazenda-capital', 'jardim-moedas', 'termo-moedas', 'boutique-moedas-visor'];
+    visoresLegados.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = saldoFormatado;
+    });
+};
+
+window.sincronizarMoedasUI = function() {
+    window.aplicarSaldoNaUI();
+};
 
 window.iniciarContaConjunta = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    if (window.bancoCentralOffSaldo) return;
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    // 1. Ouve o saldo consolidado do casal na nuvem em tempo real
     const saldoRef = ref(db, 'banco_central/conta_conjunta/saldo');
-    
-    onValue(saldoRef, (snapshot) => {
-        // Atualiza a memória do celular
+
+    window.bancoCentralOffSaldo = onValue(saldoRef, (snapshot) => {
         window.pontosDoCasal = snapshot.val() || 0;
-        
-        // Atualiza TODOS os visores de moeda do aplicativo ao mesmo tempo
-        const visores = document.querySelectorAll('.visor-moedas-global-texto, #boutique-moedas-visor, #fazenda-capital');
-        visores.forEach(visor => {
-            visor.innerText = window.pontosDoCasal.toLocaleString('pt-BR');
-        });
+        window.aplicarSaldoNaUI();
+
+        document.dispatchEvent(new CustomEvent('santuario:saldo-atualizado', {
+            detail: { saldo: window.pontosDoCasal }
+        }));
     });
+
+    if (window.SantuarioRuntime && window.bancoCentralOffSaldo) {
+        window.SantuarioRuntime.addCleanup('core', window.bancoCentralOffSaldo);
+    }
 };
 
 window.atualizarPontosCasal = function(valorAlteracao, motivo = "Transação") {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+
     const { db, ref, runTransaction, push } = window.SantuarioApp.modulos;
-    
     const saldoRef = ref(db, 'banco_central/conta_conjunta/saldo');
     const extratoRef = ref(db, 'banco_central/conta_conjunta/extrato');
-    
-    // 2. A MÁGICA: runTransaction enfileira as somas lá no servidor do Google.
-    // Se vocês dois ganharem 500 no exato mesmo milissegundo, ele soma +1000 perfeitamente!
+
     runTransaction(saldoRef, (saldoAtual) => {
         let novoSaldo = (saldoAtual || 0) + valorAlteracao;
-        return novoSaldo < 0 ? 0 : novoSaldo; // Impede que o casal fique com saldo negativo
+        return novoSaldo < 0 ? 0 : novoSaldo;
     }).then(() => {
-        // 3. (Opcional) Cria um "Extrato Bancário" invisível na nuvem para registro
         const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
         push(extratoRef, {
             autor: eu,
@@ -791,14 +759,11 @@ window.atualizarPontosCasal = function(valorAlteracao, motivo = "Transação") {
     });
 };
 
-// 4. Inicia a sincronização bancária assim que o login for aprovado
 window.addEventListener('loginSucesso', window.iniciarContaConjunta);
 
-// Fallback: Se o login já aconteceu e o script carregou depois, inicia forçado
 if (window.usuarioLogado) {
     window.iniciarContaConjunta();
 }
-
 
 // ============================================================================
 // 🔇 MOTOR DE SUSPENSÃO DE MÍDIA (COM AUDIÇÃO SELETIVA PARA MENSAGENS)

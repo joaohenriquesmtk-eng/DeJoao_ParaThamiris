@@ -192,9 +192,6 @@ function escutarNuvemCinema() {
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
     offCinemaEstado = onValue(ref(db, 'cinema/estado'), (snapshot) => {
-        if (window.SantuarioRuntime && offCinemaEstado) {
-            window.SantuarioRuntime.addCleanup('cinema', offCinemaEstado);
-        }
         const dados = snapshot.val();
         if (!dados || !dados.videoId) return;
 
@@ -251,6 +248,10 @@ function escutarNuvemCinema() {
 
         setTimeout(() => { window.isCinemaSyncing = false; }, 800); 
     });
+
+    if (window.SantuarioRuntime && offCinemaEstado) {
+        window.SantuarioRuntime.addCleanup('cinema', offCinemaEstado);
+    }
 }
 
 window.entrarNaSessaoCinema = function() {

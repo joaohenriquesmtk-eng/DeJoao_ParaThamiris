@@ -66,6 +66,17 @@ window.RadarDePerformance = {
 // Liga o radar assim que o app avisa que o 3D foi injetado
 window.addEventListener('motor3DPronto', () => window.RadarDePerformance.iniciar());
 
+// ==========================================
+// REGISTRY DE CENAS PESADAS
+// ==========================================
+window.Santuario3D = window.Santuario3D || {
+    markScene(modulo, cleanupFn) {
+        if (window.SantuarioRuntime && typeof cleanupFn === 'function') {
+            window.SantuarioRuntime.addCleanup(modulo, cleanupFn);
+        }
+    }
+};
+
 
 // ==========================================
 // ESCUDO CONTRA EVENT STORMS (DEBOUNCE)
@@ -290,13 +301,16 @@ window.inicializarOrbeClima = () => {
         window.mudarClimaOrbe(dados.condicao, dados.eNoite);
     }
 
-    window.addEventListener('resize', window.otimizadorDeResize(() => {
-        if(container.clientWidth > 0) {
+    const onResizeOrbe = window.otimizadorDeResize(() => {
+        if (container.clientWidth > 0) {
             renderer.setSize(container.clientWidth, container.clientHeight);
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
         }
-    }));
+    });
+
+window.addEventListener('resize', onResizeOrbe);
+window.Santuario3D.markScene('orbe3d', () => window.removeEventListener('resize', onResizeOrbe));
 
     let tempo = 0;
     let ultimoFrameOrbe = 0;
@@ -552,10 +566,8 @@ window.tocarEco = async () => { /* Sua lógica perfeita */ };
     powerPreference: "high-performance" /* Dá ordem máxima ao Android */
 });
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
-        
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
         renderer.setSize(largura, altura);
-        renderer.setPixelRatio(window.devicePixelRatio);
         container.insertBefore(renderer.domElement, container.firstChild);
 
         camera.position.set(0, 5, 0);
@@ -718,6 +730,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
             // Escuta as variações magnéticas da Terra
             window.addEventListener('deviceorientationabsolute', orientacaoHandler, true);
             window.addEventListener('deviceorientation', orientacaoHandler, true);
+            window.Santuario3D.markScene('bussola3d', () => {
+            window.removeEventListener('deviceorientationabsolute', orientacaoHandler, true);
+            window.removeEventListener('deviceorientation', orientacaoHandler, true);
+        });
 
             // Trava de segurança: Se o sensor não responder em 2.5 segundos, avisa que é PC
             setTimeout(() => {
@@ -1085,10 +1101,13 @@ window.inicializarPrisma3D = () => {
     scene.add(arvoreGroup);
 
     let pulsoRegador = 1;
-    container.addEventListener('click', () => {
-        pulsoRegador = 1.15; 
-        if (navigator.vibrate) navigator.vibrate([40, 60, 40]); 
-    });
+    const onClickPrisma = () => {
+        pulsoRegador = 1.15;
+        if (window.safeVibrate) window.safeVibrate([40, 60, 40]);
+    };
+
+    container.addEventListener('click', onClickPrisma);
+    window.Santuario3D.markScene('prisma3d', () => container.removeEventListener('click', onClickPrisma));
 
     const matTronco = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.3, metalness: 0.8 }); 
     const matFolha = new THREE.MeshBasicMaterial({ color: 0xff6b6b, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending }); 
@@ -1209,15 +1228,18 @@ window.inicializarPrisma3D = () => {
     };
     
     // Ouve redimensionamentos manuais do celular (virar a tela, etc)
-    window.addEventListener('resize', window.otimizadorDeResize(() => {
-        if(container.clientWidth > 0) {
+    const onResizePrisma = window.otimizadorDeResize(() => {
+        if (container.clientWidth > 0) {
             w = container.clientWidth;
             h = container.clientHeight;
             renderer.setSize(w, h);
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
         }
-    }));
+    });
+
+    window.addEventListener('resize', onResizePrisma);
+    window.Santuario3D.markScene('prisma3d', () => window.removeEventListener('resize', onResizePrisma));
     
     animar();
 };
@@ -1264,6 +1286,7 @@ window.inicializarPlanetario3D = () => {
     const observerTamanho = new ResizeObserver(redimensionar);
     observerTamanho.observe(container);
     redimensionar();
+    window.Santuario3D.markScene('planetario3d', () => observerTamanho.disconnect());
 
     // Forja das Estrelas
     const estrelasBackground = [];
@@ -1311,10 +1334,18 @@ window.inicializarPlanetario3D = () => {
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
 
+    window.Santuario3D.markScene('planetario3d', () => {
+        wrapper.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointermove', onPointerMove, { passive: true });
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+    });
+
     const observer = new IntersectionObserver((entries) => {
         planetarioVisivel = entries[0].isIntersecting;
     });
     observer.observe(container);
+    window.Santuario3D.markScene('planetario3d', () => observer.disconnect());
 
     const animarPlanetario = () => {
         requestAnimationFrame(animarPlanetario);
@@ -1454,6 +1485,10 @@ window.inicializarGalaxia3D = () => {
 
     container.addEventListener('mousemove', onMove);
     container.addEventListener('touchmove', onMove, {passive: true});
+    window.Santuario3D.markScene('galaxia3d', () => {
+        container.removeEventListener('mousemove', onMove);
+        container.removeEventListener('touchmove', onMove, { passive: true });
+    });
 
     let tempo = 0;
     const animar = () => {
@@ -1647,8 +1682,11 @@ window.inicializarJornada3D = () => {
             uniforms.uResolution.value.set(container.clientWidth, container.clientHeight);
         }
     };
-    new ResizeObserver(atualizarTamanho).observe(container);
+    const observerJornadaResize = new ResizeObserver(atualizarTamanho);
+    observerJornadaResize.observe(container);
     atualizarTamanho();
+
+    window.Santuario3D.markScene('jornada3d', () => observerJornadaResize.disconnect());
 
     const telaJornada = document.getElementById('jornada');
     let tempoAnterior = performance.now();

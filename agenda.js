@@ -4,13 +4,27 @@
 
 window.bancoEventos = {};
 window.loopRelogiosGlobais = null;
+window.agendaOffEventos = null;
 
 window.inicializarAgenda = function() {
     console.log("Iniciando Astrolábio Temporal...");
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('agenda');
+    }
+
     window.escutarAgendaGlobal();
-    
+
     if (window.loopRelogiosGlobais) clearInterval(window.loopRelogiosGlobais);
-    window.loopRelogiosGlobais = setInterval(window.processarTickDosRelogios, 1000);
+    window.loopRelogiosGlobais = setInterval(() => {
+        const containerAgenda = document.getElementById('container-agenda');
+        if (!containerAgenda || containerAgenda.classList.contains('escondido')) return;
+        window.processarTickDosRelogios();
+    }, 1000);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addInterval('agenda', window.loopRelogiosGlobais);
+    }
 };
 
 window.toggleInstrucoesAgenda = function() {
@@ -82,14 +96,18 @@ window.salvarNovaAudiencia = function() {
 window.escutarAgendaGlobal = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
+
     const refAgenda = ref(db, 'agenda_santuario/eventos');
-    
-    onValue(refAgenda, (snapshot) => {
+
+    window.agendaOffEventos = onValue(refAgenda, (snapshot) => {
         window.bancoEventos = snapshot.val() || {};
         window.renderizarListaDeEventos();
-        window.processarTickDosRelogios(); 
+        window.processarTickDosRelogios();
     });
+
+    if (window.SantuarioRuntime && window.agendaOffEventos) {
+        window.SantuarioRuntime.addCleanup('agenda', window.agendaOffEventos);
+    }
 };
 
 window.excluirEventoAgenda = function(idEvento) {
@@ -97,7 +115,7 @@ window.excluirEventoAgenda = function(idEvento) {
     
     const { db, ref, remove } = window.SantuarioApp.modulos;
     remove(ref(db, `agenda_santuario/eventos/${idEvento}`));
-    if(window.Haptics) navigator.vibrate([50, 50, 50]);
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([50, 50, 50]);
 };
 
 window.renderizarListaDeEventos = function() {

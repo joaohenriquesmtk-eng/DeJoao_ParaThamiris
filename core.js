@@ -13,31 +13,107 @@ window.MEU_NOME = "";
 window.NOME_PARCEIRO = "";
 
 // ==========================================
-// 🛡️ ESCUDO SAFARI GLOBAL (Proteção contra travamentos no iOS)
+// RUNTIME CENTRAL DO SANTUÁRIO
 // ==========================================
+window.SantuarioRuntime = window.SantuarioRuntime || {
+    intervals: {},
+    timeouts: {},
+    cleanups: {},
 
-// 1. Blindagem de Vibração: Finge que vibrou para o Safari não entrar em pânico
-const vibracaoOriginal = navigator.vibrate;
-navigator.vibrate = function(padrao) {
-    if (typeof vibracaoOriginal === 'function') {
-        try {
-            return vibracaoOriginal.apply(navigator, [padrao]);
-        } catch (erro) {
-            return false; // Morre silenciosamente sem travar o código
+    addInterval(modulo, id) {
+        if (!this.intervals[modulo]) this.intervals[modulo] = [];
+        this.intervals[modulo].push(id);
+        return id;
+    },
+
+    addTimeout(modulo, id) {
+        if (!this.timeouts[modulo]) this.timeouts[modulo] = [];
+        this.timeouts[modulo].push(id);
+        return id;
+    },
+
+    addCleanup(modulo, fn) {
+        if (!this.cleanups[modulo]) this.cleanups[modulo] = [];
+        this.cleanups[modulo].push(fn);
+        return fn;
+    },
+
+    clearModule(modulo) {
+        if (this.intervals[modulo]) {
+            this.intervals[modulo].forEach(clearInterval);
+            this.intervals[modulo] = [];
         }
+
+        if (this.timeouts[modulo]) {
+            this.timeouts[modulo].forEach(clearTimeout);
+            this.timeouts[modulo] = [];
+        }
+
+        if (this.cleanups[modulo]) {
+            this.cleanups[modulo].forEach(fn => {
+                try { fn(); } catch (e) { console.warn(`Cleanup falhou em ${modulo}`, e); }
+            });
+            this.cleanups[modulo] = [];
+        }
+    },
+
+    clearAll() {
+        const modulos = new Set([
+            ...Object.keys(this.intervals),
+            ...Object.keys(this.timeouts),
+            ...Object.keys(this.cleanups)
+        ]);
+
+        modulos.forEach(modulo => this.clearModule(modulo));
     }
+};
+
+// ==========================================
+// WRAPPERS SEGUROS (SEM HACKEAR O NAVEGADOR)
+// ==========================================
+window.safeVibrate = function(padrao) {
+    try {
+        if (typeof navigator.vibrate === 'function') {
+            return navigator.vibrate(padrao);
+        }
+    } catch (e) {}
     return false;
 };
 
-// 2. Blindagem de Armazenamento: Protege contra o limite de 5MB da Apple
-const setItemOriginal = Storage.prototype.setItem;
-Storage.prototype.setItem = function(chave, valor) {
+window.safeSetItem = function(storage, chave, valor) {
     try {
-        setItemOriginal.apply(this, arguments);
-    } catch (erro) {
-        console.warn(`O Safari bloqueou o salvamento da chave "${chave}". A tela não vai congelar.`);
+        storage.setItem(chave, valor);
+        return true;
+    } catch (e) {
+        console.warn(`Falha ao salvar "${chave}" no storage`, e);
+        return false;
     }
 };
+
+window.safePlayMedia = function(media) {
+    if (!media) return Promise.resolve(false);
+
+    if (window.SantuarioSomPausado) {
+        const url = media.src || "";
+        const isMensagemPessoal =
+            url.includes('firebasestorage') ||
+            url.includes('blob:') ||
+            media.classList.contains('midia-pessoal');
+
+        if (!isMensagemPessoal) return Promise.resolve(false);
+    }
+
+    try {
+        const p = media.play();
+        if (p && typeof p.catch === 'function') {
+            return p.catch(() => false);
+        }
+        return Promise.resolve(true);
+    } catch (e) {
+        return Promise.resolve(false);
+    }
+};
+
 
 // ==========================================
 // MÁQUINA ENIGMA (CRIPTOGRAFIA DE PONTA-A-PONTA)
@@ -90,24 +166,26 @@ window.SantuarioApp.conectar = function() {
     this.conectado = true; 
 
     const refPulsoParceiro = ref(db, 'pulsos/' + window.NOME_PARCEIRO.toLowerCase());
-    onValue(refPulsoParceiro, (snapshot) => {
-        const dados = snapshot.val();
-        if (dados && dados.timestamp > window.ultimoPulsoRecebido) {
-            window.ultimoPulsoRecebido = dados.timestamp;
-            if(typeof window.receberPulsoVisual === 'function') window.receberPulsoVisual();
-        }
-    });
+    const offPulsoParceiro = onValue(refPulsoParceiro, (snapshot) => {
+    const dados = snapshot.val();
+    if (dados && dados.timestamp > window.ultimoPulsoRecebido) {
+        window.ultimoPulsoRecebido = dados.timestamp;
+        if(typeof window.receberPulsoVisual === 'function') window.receberPulsoVisual();
+    }
+});
+window.SantuarioRuntime.addCleanup('core', offPulsoParceiro);
 
     const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     const refContadorParceiro = ref(db, 'pulsosContador/' + window.NOME_PARCEIRO.toLowerCase() + '/' + hoje);
-    onValue(refContadorParceiro, (snapshot) => {
-        const contador = snapshot.val() || 0;
-        if(typeof window.atualizarContadorInterface === 'function') window.atualizarContadorInterface(contador);
-    });
+    const offContadorParceiro = onValue(refContadorParceiro, (snapshot) => {
+    const contador = snapshot.val() || 0;
+    if(typeof window.atualizarContadorInterface === 'function') window.atualizarContadorInterface(contador);
+});
+window.SantuarioRuntime.addCleanup('core', offContadorParceiro);
 
     // 🌳 MÓDULO DO JARDIM (CURA DO BUG DOS 16% E MOTOR DE REGRESSÃO)
     const refJardim = ref(db, 'jardim_global');
-    onValue(refJardim, (snapshot) => {
+    const offJardim = onValue(refJardim, (snapshot) => {
         if (snapshot.exists()) {
             let dados = snapshot.val();
             
@@ -146,14 +224,16 @@ window.SantuarioApp.conectar = function() {
         
         if(typeof window.renderizarPlanta === 'function') window.renderizarPlanta();
     });
+    window.SantuarioRuntime.addCleanup('core', offJardim);
 
     const refMoodParceiro = ref(db, 'moods/' + window.NOME_PARCEIRO.toLowerCase());
-    onValue(refMoodParceiro, (snapshot) => {
-        const dados = snapshot.val();
-        if (dados && typeof window.atualizarTelaPeloMood === 'function') {
-            window.atualizarTelaPeloMood(dados.estado, dados.timestamp, dados.mensagem);
-        }
-    });
+    const offMoodParceiro = onValue(refMoodParceiro, (snapshot) => {
+    const dados = snapshot.val();
+    if (dados && typeof window.atualizarTelaPeloMood === 'function') {
+        window.atualizarTelaPeloMood(dados.estado, dados.timestamp, dados.mensagem);
+    }
+});
+window.SantuarioRuntime.addCleanup('core', offMoodParceiro);
 
     // 11. Ignição do Mural de Recados (Post-its)
     if (typeof window.escutarPostits === 'function') window.escutarPostits();
@@ -202,7 +282,7 @@ window.enviarPulso = function() {
     const refMeuContador = ref(db, 'pulsosContador/' + window.MEU_NOME.toLowerCase() + '/' + hoje);
     runTransaction(refMeuContador, (valorAtual) => (valorAtual || 0) + 1);
     // Registra o pulso para a Ofensiva Diária
-    localStorage.setItem('pulso_enviado_dia', hoje);
+    window.safeSetItem(localStorage, 'pulso_enviado_dia', hoje);
     if(typeof window.verificarRitualDoDia === 'function') window.verificarRitualDoDia();
 
     const btn = document.getElementById("btn-pulso");
@@ -226,7 +306,7 @@ window.enviarPulso = function() {
 };
 
 window.receberPulsoVisual = function() {
-    if (navigator.vibrate) navigator.vibrate([100, 50, 400]);
+    window.safeVibrate([100, 50, 400]);
     if(typeof window.mostrarToast === 'function') window.mostrarToast(`💓 ${window.NOME_PARCEIRO} está pensando em você agora!`);
 
     const btn = document.getElementById("btn-pulso");
@@ -763,34 +843,6 @@ window.alternarMutarSantuario = function() {
     }
     
     if (window.Haptics) window.Haptics.toqueLeve();
-};
-
-// 🚨 A MÁGICA SÊNIOR: INTERCEPTAÇÃO COM FILTRO DE ORIGEM + ESCUDO SAFARI
-const playOriginalAudio = HTMLMediaElement.prototype.play;
-HTMLMediaElement.prototype.play = function() {
-    if (window.SantuarioSomPausado) {
-        const url = this.src || "";
-        
-        // Filtro Seletivo: A voz de vocês tem passagem VIP livre!
-        const isMensagemPessoal = url.includes('firebasestorage') || url.includes('blob:') || this.classList.contains('midia-pessoal');
-        
-        if (!isMensagemPessoal) {
-            // É som de botão, música de fundo ou efeito. Bloqueia em silêncio.
-            return Promise.resolve(); 
-        }
-    }
-    
-    // 🛡️ ESCUDO SAFARI DE ÁUDIO AQUI:
-    // Capturamos a Promessa que o navegador retorna ao tentar tocar a música
-    const promessaAudio = playOriginalAudio.apply(this, arguments);
-    
-    if (promessaAudio !== undefined) {
-        return promessaAudio.catch(erro => {
-            // Se o iPhone bloquear o "autoplay" da música, o erro cai aqui.
-            // O jogo engole o erro e continua rodando liso!
-            console.log("Áudio bloqueado pelo iOS, mas o Santuário segue blindado.");
-        });
-    }
 };
 
 // Adicionar no final do core.js

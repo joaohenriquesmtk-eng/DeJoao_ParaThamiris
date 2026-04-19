@@ -9,13 +9,35 @@ window.estadoPet = {
 };
 
 window.loopPetLocal = null;
+window.petOffGlobal = null;
+window.petAudioAcao = null;
+window.petAudioSuper = null;
 
 window.inicializarGuardiao = function() {
     console.log("Ligando Feixes de Luz da Incubadora...");
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('guardiao');
+    }
+
+    if (!window.petAudioAcao) {
+        window.petAudioAcao = new Audio('./assets/sons/pet/cat.mp3');
+        window.petAudioAcao.volume = 0.5;
+    }
+
+    if (!window.petAudioSuper) {
+        window.petAudioSuper = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+        window.petAudioSuper.volume = 1.0;
+    }
+
     window.escutarPetGlobal();
-    
+
     if (window.loopPetLocal) clearInterval(window.loopPetLocal);
-    window.loopPetLocal = setInterval(window.processarDecaimentoPet, 60000); 
+    window.loopPetLocal = setInterval(window.processarDecaimentoPet, 60000);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addInterval('guardiao', window.loopPetLocal);
+    }
 };
 
 window.toggleInstrucoesGuardiao = function() {
@@ -45,8 +67,8 @@ window.escutarPetGlobal = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue, set } = window.SantuarioApp.modulos;
     const refPet = ref(db, 'utilitarios/guardiao');
-    
-    onValue(refPet, (snapshot) => {
+
+    window.petOffGlobal = onValue(refPet, (snapshot) => {
         const dados = snapshot.val();
         if (dados) {
             window.estadoPet.fome = dados.fome;
@@ -57,11 +79,13 @@ window.escutarPetGlobal = function() {
             set(refPet, window.estadoPet);
         }
         window.renderizarHolograma();
-        window.processarDecaimentoPet(); 
     });
+
+    if (window.SantuarioRuntime && window.petOffGlobal) {
+        window.SantuarioRuntime.addCleanup('guardiao', window.petOffGlobal);
+    }
 };
 
-// --- O MOTOR GRÁFICO DO HOLOGRAMA ---
 // --- O MOTOR GRÁFICO DO HOLOGRAMA ---
 window.renderizarHolograma = function() {
     // 🚨 A TRAVA DE SEGURANÇA MESTRA (O Pulo do Gato)
@@ -207,8 +231,20 @@ window.cuidarDoPet = async function(tipoAcao) {
         fome: novaFome, sede: novaSede, afeto: novoAfeto, ultimoUpdate: Date.now()
     }).then(() => {
         // Efeitos Visuais
-        if (window.Haptics) navigator.vibrate(itemGasto ? [100, 100, 100] : [50, 50]);
-        const audio = new Audio(sfx); audio.volume = 0.5; audio.play().catch(e=>{});
+        if (window.Haptics && window.safeVibrate) {
+            window.safeVibrate(itemGasto ? [100, 100, 100] : [50, 50]);
+        }
+        if (!window.petAudioAcao || window.petAudioAcao.src !== new URL(sfx, window.location.href).href) {
+            window.petAudioAcao = new Audio(sfx);
+            window.petAudioAcao.volume = 0.5;
+        }
+
+        window.petAudioAcao.currentTime = 0;
+        if (window.safePlayMedia) {
+            window.safePlayMedia(window.petAudioAcao);
+        } else {
+            window.petAudioAcao.play().catch(() => {});
+        }
         
         document.getElementById('entidade-pet').classList.add('pet-comendo');
         setTimeout(() => document.getElementById('entidade-pet').classList.remove('pet-comendo'), 1200);
@@ -225,7 +261,9 @@ window.cuidarDoPet = async function(tipoAcao) {
                 document.getElementById('mensagem-status-pet').innerText = "⚠️ PROTOCOLO SUPERNOVA ATIVADO ⚠️";
                 document.getElementById('mensagem-status-pet').style.color = "#fff";
                 
-                if (window.Haptics) navigator.vibrate([300, 100, 400, 100, 500, 100, 800]); 
+                if (window.Haptics && window.safeVibrate) {
+                    window.safeVibrate([300, 100, 400, 100, 500, 100, 800]);
+                }
                 
                 setTimeout(() => {
                     // O Jackpot Cósmico (Entre 50.000 e 150.000 moedas)
@@ -235,8 +273,17 @@ window.cuidarDoPet = async function(tipoAcao) {
                     if (typeof mostrarToast === 'function') mostrarToast(`Atenção Cósmica! O Guardião expeliu +${jackpot.toLocaleString('pt-BR')} 💰!`, "🌌");
                     if (typeof confetti === 'function') confetti({colors: ['#FFD700', '#ffffff', '#00f2fe'], particleCount: 400, spread: 180, zIndex: 9999999});
                     
-                    const audioSuper = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
-                    audioSuper.volume = 1.0; audioSuper.play().catch(e=>{});
+                    if (!window.petAudioSuper) {
+                        window.petAudioSuper = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+                        window.petAudioSuper.volume = 1.0;
+                    }
+
+                    window.petAudioSuper.currentTime = 0;
+                    if (window.safePlayMedia) {
+                        window.safePlayMedia(window.petAudioSuper);
+                    } else {
+                        window.petAudioSuper.play().catch(() => {});
+                    }
 
                     // Retorna ao normal após o surto
                     setTimeout(() => {

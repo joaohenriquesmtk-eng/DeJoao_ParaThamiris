@@ -9,20 +9,33 @@ window.estadoAgua = {
     parceiro: { ml: 0, data: '' }
 };
 
+window.hidratacaoOffNivel = null;
+window.hidratacaoTimerEu = null;
+window.hidratacaoTimerParceiro = null;
+window.hidratacaoAudioCopo = null;
+
 function pegarDataDeHoje() {
     const hoje = new Date();
     return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 }
 
 window.inicializarHidratacao = function() {
-        if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
-        
-        console.log("Inicializando Laboratório de Fluidos...");
-    
-    // Insere nomes ou "Amor" caso falte configuração global
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('hidratacao');
+    }
+
+    if (typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI();
+
+    console.log("Inicializando Laboratório de Fluidos...");
+
     const nomeParc = document.getElementById('nome-parceiro-agua');
-    if(nomeParc) nomeParc.innerText = window.NOME_PARCEIRO || "Amor";
-    
+    if (nomeParc) nomeParc.innerText = window.NOME_PARCEIRO || "Amor";
+
+    if (!window.hidratacaoAudioCopo) {
+        window.hidratacaoAudioCopo = new Audio('https://assets.mixkit.co/active_storage/sfx/2405/2405-preview.mp3');
+        window.hidratacaoAudioCopo.volume = 0.8;
+    }
+
     window.atualizarOrvalhoUI();
     window.escutarNivelAguaGlobal();
 };
@@ -43,7 +56,8 @@ window.gerarBolhas = function(containerId, quantidade) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    for (let i = 0; i < quantidade; i++) {
+    const quantidadeFinal = Math.min(quantidade, 8);
+    for (let i = 0; i < quantidadeFinal; i++) {
         const bolha = document.createElement('div');
         bolha.classList.add('bolha-h2o');
         
@@ -69,38 +83,50 @@ window.gerarBolhas = function(containerId, quantidade) {
 // --- FÍSICA NO DOM (ATUALIZADA PARA O CILINDRO) ---
 function atualizarTanqueAgua(quem, mlDepositado) {
     const meta = window.estadoAgua.metaDiaria;
-    // Trava em 100% no visual, mas permite que o número passe de 2000ml se beber mais
-    const porcentagem = Math.min((mlDepositado / meta) * 100, 100); 
-    
+    const porcentagem = Math.min((mlDepositado / meta) * 100, 100);
+
     const liquidoEl = document.getElementById(`liquido-${quem}`);
     const valorEl = document.getElementById(`valor-ml-${quem}`);
-    
-    // Sobe o líquido
-    if (liquidoEl) liquidoEl.style.height = `${porcentagem}%`;
-    
-    // Roda o odômetro numérico
-    if (valorEl) {
-        let atual = parseInt(valorEl.innerText) || 0;
-        if (atual !== mlDepositado) {
-            
-            // Se a água subiu, solta bolhas!
-            if (mlDepositado > atual) {
-                window.gerarBolhas(`bolhas-container-${quem}`, 15);
-            }
 
-            let incremento = Math.ceil(Math.abs(mlDepositado - atual) / 15);
-            let timer = setInterval(() => {
-                if (atual < mlDepositado) {
-                    atual += incremento;
-                    if (atual > mlDepositado) atual = mlDepositado;
-                } else {
-                    atual -= incremento;
-                    if (atual < mlDepositado) atual = mlDepositado;
-                }
-                valorEl.innerText = atual;
-                if (atual === mlDepositado) clearInterval(timer);
-            }, 30);
+    if (liquidoEl) liquidoEl.style.height = `${porcentagem}%`;
+
+    if (!valorEl) return;
+
+    let timerKey = quem === 'eu' ? 'hidratacaoTimerEu' : 'hidratacaoTimerParceiro';
+
+    if (window[timerKey]) {
+        clearInterval(window[timerKey]);
+        window[timerKey] = null;
+    }
+
+    let atual = parseInt(valorEl.innerText) || 0;
+    if (atual === mlDepositado) return;
+
+    if (mlDepositado > atual) {
+        window.gerarBolhas(`bolhas-container-${quem}`, 8);
+    }
+
+    let incremento = Math.ceil(Math.abs(mlDepositado - atual) / 15);
+
+    window[timerKey] = setInterval(() => {
+        if (atual < mlDepositado) {
+            atual += incremento;
+            if (atual > mlDepositado) atual = mlDepositado;
+        } else {
+            atual -= incremento;
+            if (atual < mlDepositado) atual = mlDepositado;
         }
+
+        valorEl.innerText = atual;
+
+        if (atual === mlDepositado) {
+            clearInterval(window[timerKey]);
+            window[timerKey] = null;
+        }
+    }, 30);
+
+    if (window.SantuarioRuntime && window[timerKey]) {
+        window.SantuarioRuntime.addInterval('hidratacao', window[timerKey]);
     }
 }
 
@@ -111,7 +137,7 @@ window.escutarNivelAguaGlobal = function() {
     
     const refAgua = ref(db, 'saude/hidratacao');
     
-    onValue(refAgua, (snapshot) => {
+    window.hidratacaoOffNivel = onValue(refAgua, (snapshot) => {
         const dados = snapshot.val();
         const hoje = pegarDataDeHoje();
 
@@ -153,16 +179,28 @@ window.escutarNivelAguaGlobal = function() {
         
         checarMetaDiaria(dados);
     });
+    if (window.SantuarioRuntime && window.hidratacaoOffNivel) {
+        window.SantuarioRuntime.addCleanup('hidratacao', window.hidratacaoOffNivel);
+    }
 };
 
 window.registrarCopoAgua = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     
     // SFX Imersivo
-    const soundAgua = new Audio('https://assets.mixkit.co/active_storage/sfx/2405/2405-preview.mp3');
-    soundAgua.volume = 0.8; soundAgua.play().catch(e=>{});
-    
-    if(window.Haptics) navigator.vibrate([40, 60, 40, 60, 150]); // Vibração de Válvula Pesada
+    if (!window.hidratacaoAudioCopo) {
+        window.hidratacaoAudioCopo = new Audio('https://assets.mixkit.co/active_storage/sfx/2405/2405-preview.mp3');
+        window.hidratacaoAudioCopo.volume = 0.8;
+    }
+
+    window.hidratacaoAudioCopo.currentTime = 0;
+    if (window.safePlayMedia) {
+        window.safePlayMedia(window.hidratacaoAudioCopo);
+    } else {
+        window.hidratacaoAudioCopo.play().catch(() => {});
+    }
+
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([40, 60, 40, 60, 150]);
 
     const hoje = pegarDataDeHoje();
     const novoNivel = window.estadoAgua.eu.ml + window.estadoAgua.copo;
@@ -189,9 +227,9 @@ function checarMetaDiaria(dadosGlobais) {
 
     if (euDado && euDado.ml >= window.estadoAgua.metaDiaria && !localStorage.getItem(chaveConquistaLocal)) {
         
-        localStorage.setItem(chaveConquistaLocal, 'true');
+        window.safeSetItem(localStorage, chaveConquistaLocal, 'true');
         
-        if(window.Haptics) navigator.vibrate([100, 200, 500]);
+        if (window.Haptics && window.safeVibrate) window.safeVibrate([100, 200, 500]);
         if(typeof confetti === 'function') confetti({colors: ['#00d4ff', '#00ffcc', '#ffffff'], particleCount: 200, spread: 120, origin: {y: 0.8}});
         
         let orvalhoTotal = parseInt(localStorage.getItem('santuario_gotas_orvalho') || '0') + 1;

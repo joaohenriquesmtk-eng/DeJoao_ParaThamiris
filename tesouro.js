@@ -9,6 +9,8 @@ let tesouroIdVigente = null;
 // Variáveis do Gravador Nativo
 let mediaRecorderTesouro = null;
 let audioChunksTesouro = [];
+window.tesouroOffRadar = null;
+window.tesouroUltimaDistancia = null;
 
 window.inicializarTesouro = function() {
     console.log("🛰️ Módulo GPS Acionado - HUD Fullscreen");
@@ -41,6 +43,9 @@ window.inicializarTesouro = function() {
 };
 
 window.sairDoTesouro = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('tesouro');
+    }
     if (window.tesouroWatchId !== null) {
         navigator.geolocation.clearWatch(window.tesouroWatchId);
         window.tesouroWatchId = null;
@@ -271,7 +276,7 @@ function escutarRadarTesouros() {
     
     const refMeuMapa = ref(db, `tesouros_geo/${window.MEU_NOME.toLowerCase()}`);
     
-    onValue(refMeuMapa, (snapshot) => {
+    window.tesouroOffRadar = onValue(refMeuMapa, (snapshot) => {
         const dados = snapshot.val();
         
         if (!dados) {
@@ -282,6 +287,7 @@ function escutarRadarTesouros() {
                 navigator.geolocation.clearWatch(window.tesouroWatchId);
                 window.tesouroWatchId = null;
             }
+            window.tesouroUltimaDistancia = null;
             return;
         }
 
@@ -294,6 +300,9 @@ function escutarRadarTesouros() {
         
         iniciarRastreamentoFisico();
     });
+    if (window.SantuarioRuntime && window.tesouroOffRadar) {
+    window.SantuarioRuntime.addCleanup('tesouro', window.tesouroOffRadar);
+}
 }
 
 function iniciarRastreamentoFisico() {
@@ -309,6 +318,13 @@ function iniciarRastreamentoFisico() {
         const minhaLon = pos.coords.longitude;
         
         const distMetros = calcularFisicaHaversine(minhaLat, minhaLon, dadosDoTesouroAtual.lat, dadosDoTesouroAtual.lon);
+        if (
+            window.tesouroUltimaDistancia !== null &&
+            Math.abs(window.tesouroUltimaDistancia - distMetros) < 3
+        ) {
+            return;
+        }
+        window.tesouroUltimaDistancia = distMetros;
         const txt = document.getElementById('tesouro-distancia-texto');
         const blip = document.getElementById('radar-alvo');
 
@@ -336,7 +352,11 @@ function iniciarRastreamentoFisico() {
     }, (err) => {
         console.error("GPS Perdido:", err);
         document.getElementById('tesouro-distancia-texto').innerText = "SINAL PERDIDO";
-    }, { enableHighAccuracy: true, maximumAge: 0 });
+    }, {
+        enableHighAccuracy: false,
+        maximumAge: 10000,
+        timeout: 15000
+    });
 }
 
 function calcularFisicaHaversine(lat1, lon1, lat2, lon2) {
@@ -396,7 +416,7 @@ function desbloquearTesouroFisico() {
         window.pauseAudioJogos();
     }
 
-    if(window.Haptics) navigator.vibrate([200, 100, 400, 100, 600]);
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([200, 100, 400, 100, 600]);
     if(typeof confetti === 'function') confetti({colors: ['#D4AF37', '#2ecc71', '#ffffff'], particleCount: 300, spread: 180, zIndex: 100000});
 
     // ==========================================
@@ -438,12 +458,17 @@ function desbloquearTesouroFisico() {
             // Toca um som de conquista/baú aberto
             const audioBau = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
             audioBau.volume = 1.0;
-            audioBau.play().catch(e=>{});
+            if (window.safePlayMedia) {
+                window.safePlayMedia(audioBau);
+            } else {
+                audioBau.play().catch(() => {});
+            }
 
             // 4. Trava de segurança
             localStorage.setItem(idUnicoPremio, "true");
             
         }, 3500); // Aguarda 3,5s para a pessoa apreciar a sua mensagem/foto antes de jogar o dinheiro nela!
+        window.tesouroUltimaDistancia = null;
     }
 }
 

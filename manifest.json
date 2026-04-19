@@ -4,30 +4,56 @@
   "short_name": "Santuário",
   "description": "Um santuário digital exclusivo para João e Thamiris",
   "lang": "pt-BR",
-  "start_url": "./index.html",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#090909",
   "theme_color": "#D4AF37",
   "categories": ["lifestyle", "games"],
   "icons": [
-    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
     {
       "name": "Acessar Cassino a Dois",
       "short_name": "Cassino",
       "description": "Vá direto para a área de jogos",
-      "url": "/?abrir=cassino",
-      "icons": [{ "src": "assets/icones-cassino/cassino.png", "sizes": "192x192" }]
+      "url": "/index.html?abrir=cassino",
+      "icons": [
+        {
+          "src": "/assets/icones-cassino/cassino.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Enviar Pulso Rápido",
       "short_name": "Enviar Pulso",
-      "url": "/?acao=disparar_pulso_remoto"
+      "url": "/index.html?acao=disparar_pulso_remoto"
     }
   ]
 }

@@ -96,6 +96,7 @@ let audioJogos = null;
 
 
 let telaAtual = 'home';
+window.moduloAtivo = null;
 const dataInicio = new Date("2025-10-29T16:30:00").getTime();
 
 // 🚨 A DATA E HORA EXATA DO REENCONTRO (O MOMENTO EM QUE A DISTÂNCIA ZERA)
@@ -1077,6 +1078,10 @@ window.fecharModal = function(apenasLimpar = false) {
 // GERENCIADOR DE TELAS (MEMÓRIA INTELIGENTE E BLINDADA)
 // ==========================================
 window.abrirJogo = async function(tipo) {
+        if (window.moduloAtivo && window.moduloAtivo !== tipo && window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule(window.moduloAtivo);
+    }
+    window.moduloAtivo = tipo;
     // 1. Esconde a interface principal de jogos, a navegação inferior e o áudio
     const menuLista = document.getElementById('menu-jogos-lista');
     const menuGrid = document.querySelector('.jogos-grid');
@@ -1236,6 +1241,10 @@ window.abrirJogo = async function(tipo) {
 }; // Fim da função window.abrirJogo
 
 window.voltarMenuJogos = function() {
+        if (window.moduloAtivo && window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule(window.moduloAtivo);
+    }
+    window.moduloAtivo = null;
     window.julgamentoAtivo = false; // Trava do Julgamento
     window.defesaAtiva = false; // Trava do Tower Defense
 
@@ -1530,23 +1539,6 @@ window.enviarPostit = function() {
         curtidas: 0
     });
 
-    // ==========================================
-// MOTOR DE SINCRONIA DE DIGITAÇÃO (TRANSMISSOR)
-// ==========================================
-let timeoutDigitacao;
-const TEMPO_ESPERA_DIGITACAO = 2500; // Tempo até o app considerar que você parou de digitar
-
-window.avisarDigitando = function(estaDigitando) {
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
-    const { db, ref, set } = window.SantuarioApp.modulos;
-    const euId = window.souJoao ? 'joao' : 'thamiris';
-    
-    set(ref(db, `typing_status/${euId}`), {
-        isTyping: estaDigitando,
-        timestamp: Date.now()
-    });
-};
-
     // Conecta o transmissor ao campo de texto assim que a tela carregar
     window.addEventListener('DOMContentLoaded', () => {
         const inputPostit = document.getElementById('input-postit');
@@ -1603,41 +1595,6 @@ window.addEventListener('loginSucesso', async (e) => {
         window.SantuarioApp.conectar();
     }
 });
-
-// 🚨 A MÁGICA PARA O IPHONE APROVAR A NOTIFICAÇÃO
-window.ativarNotificacoesApple = async function() {
-    const permitido = await solicitarPermissaoNotificacao();
-    if (permitido) {
-        document.getElementById('btn-ativar-notificacoes').classList.add('escondido');
-        salvarTokenFCM();
-        if(typeof mostrarToast === 'function') mostrarToast("Satélite sincronizado! Notificações ativas.", "✅");
-        if(window.Haptics) window.Haptics.sucesso();
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast("Permissão negada. Vá nos Ajustes do iPhone.", "❌");
-        if(window.Haptics) window.Haptics.erro();
-    }
-};
-
-async function salvarTokenFCM() {
-    if (typeof window.SantuarioApp?.modulos?.messaging === 'undefined') return;
-
-    try {
-        const registration = await navigator.serviceWorker.ready;
-        const messaging = window.SantuarioApp.modulos.messaging;
-        const token = await window.SantuarioApp.modulos.getToken(messaging, {
-            vapidKey: 'BMfoiE5OUoxMK970zucUsdMO-X6zPX36rmOwlTKPEp8JTzDZzGbwqm097kQKd_508hZORw-B3AwKC6gRxm5iMjg',
-            serviceWorkerRegistration: registration 
-        });
-
-        if (token) {
-            console.log('Token FCM obtido:', token);
-            const { db, ref, set } = window.SantuarioApp.modulos;
-            await set(ref(db, `fcmTokens/${window.MEU_NOME.toLowerCase()}`), token);
-        }
-    } catch (err) {
-        console.error('Erro ao obter token FCM:', err);
-    }
-}
 
 // ==========================================
 // REGISTRAR LOGIN COM TRIANGULAÇÃO EXATA (GPS + IP)
@@ -4295,36 +4252,6 @@ window.addEventListener('load', () => {
     }, 3000);
 });
 
-window.escutarEcosDoParceiro = function() {
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
-
-    const { db, ref, onValue } = window.SantuarioApp.modulos;
-    const minhaChave = window.souJoao ? 'joao' : 'thamiris';
-    const caminho = `eco_santuario/${minhaChave}`;
-
-    onValue(ref(db, caminho), (snapshot) => {
-        const dados = snapshot.val();
-        if (dados && dados.padrao) {
-            window.ecoRecebido = dados.padrao;
-            window.autorEco = dados.autor;
-            
-            const overlay = document.getElementById('overlay-eco-coracao');
-            if(overlay) overlay.classList.remove('takeover-escondido');
-
-            document.getElementById('titulo-eco').innerText = `Sinfonia de ${dados.autor}`;
-            document.getElementById('instrucao-eco').innerText = "Escute e sinta as batidas do coração.";
-            document.getElementById('icone-radar-eco').innerText = "💓";
-            
-            document.getElementById('controles-gravacao-eco').classList.add('escondido');
-            document.getElementById('controles-reproducao-eco').classList.remove('escondido');
-            
-            if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 200, 100]);
-                    }
-        }
-    });
-};
-
 // 🚨 QUANDO ELA RECEBE O SEU ECO: A REPRODUÇÃO SINESTÉSICA
 window.reproduzirEcoRecebido = function() {
     if (!window.ecoRecebido) return;
@@ -5298,39 +5225,6 @@ window.fecharBoutique = function() {
     const overlay = document.getElementById('overlay-boutique');
     if (overlay) overlay.style.display = 'none';
     window.gerenciarMusicaVegas('stop');
-};
-
-window.abrirCassinoDois = async function() {
-    if(typeof mostrarToast === 'function') mostrarToast("Carregando Las Vegas...", "🎰");
-    await window.injetarModuloJS('cassino');
-    
-    const overlay = document.getElementById('overlay-cassino-dois');
-    if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.classList.remove('escondido');
-    }
-    window.gerenciarMusicaVegas('play');
-};
-
-window.fecharCassinoDois = function() {
-    const overlay = document.getElementById('overlay-cassino-dois');
-    if (overlay) {
-        overlay.style.display = 'none';
-        overlay.classList.add('escondido');
-    }
-    window.gerenciarMusicaVegas('stop');
-};
-
-window.abrirMesaCassino = async function(nomeDoJogo) {
-    if(typeof mostrarToast === 'function') mostrarToast("Arrumando a mesa...", "🃏");
-    await window.injetarModuloJS('cassino');
-    
-    const overlay = document.getElementById('overlay-' + nomeDoJogo) || document.getElementById('mesa-' + nomeDoJogo);
-    if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.classList.remove('escondido');
-    }
-    window.gerenciarMusicaVegas('play');
 };
 
 window.fecharMesaCassino = function(nomeDoJogo) {

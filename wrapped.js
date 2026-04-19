@@ -8,6 +8,12 @@ window.wrapTotalSlides = 5;
 window.wrapTimers = [];
 
 window.iniciarWrapped = async function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('wrapped');
+    }
+
+    window.wrapTimers = [];
+
     console.log("🎞️ Iniciando Motor de Biometria Emocional...");
     
     // ============================================================================
@@ -55,11 +61,16 @@ window.iniciarWrapped = async function() {
 
     // 3. TRILHA SONORA ÉPICA (Usa a música de vocês)
     if(typeof window.pauseAudioJogos === 'function') window.pauseAudioJogos(); // Pausa som normal
-    const audioSinc = document.getElementById('audio-sincronizado'); // A música do toca-discos
+    const audioSinc = document.getElementById('audio-sincronizado');
     if (audioSinc) {
         audioSinc.currentTime = 0;
         audioSinc.volume = 0.8;
-        audioSinc.play().catch(e => console.log("Áudio bloqueado pelo navegador."));
+
+        if (window.safePlayMedia) {
+            window.safePlayMedia(audioSinc);
+        } else {
+            audioSinc.play().catch(() => {});
+        }
     }
 
     // 4. LUZ, CÂMERA, AÇÃO!
@@ -68,6 +79,10 @@ window.iniciarWrapped = async function() {
 };
 
 window.fecharWrapped = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('wrapped');
+    }
+
     // Limpa todos os temporizadores
     window.wrapTimers.forEach(t => clearTimeout(t));
     window.wrapTimers = [];
@@ -85,7 +100,11 @@ window.fecharWrapped = function() {
 function rodarSlideWrapped(numeroSlide) {
     if (numeroSlide > wrapTotalSlides) {
         // Acabou o Wrapped. Fecha suavemente após alguns segundos do último slide.
-        window.wrapTimers.push(setTimeout(window.fecharWrapped, 3000));
+        const timerFecharWrapped = setTimeout(window.fecharWrapped, 3000);
+        window.wrapTimers.push(timerFecharWrapped);
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.addTimeout('wrapped', timerFecharWrapped);
+        }
         return;
     }
 
@@ -105,20 +124,30 @@ function rodarSlideWrapped(numeroSlide) {
     const fillAtual = document.getElementById(`wrap-fill-${numeroSlide}`);
     if (fillAtual) {
         // Pequeno delay (50ms) para o CSS registrar o 0% antes de transitar para 100%
-        window.wrapTimers.push(setTimeout(() => {
-            fillAtual.style.transition = `width ${window.wrapTempoPorSlide}ms linear`;
-            fillAtual.style.width = '100%';
-        }, 50));
+    const timerBarraWrapped = setTimeout(() => {
+        fillAtual.style.transition = `width ${window.wrapTempoPorSlide}ms linear`;
+        fillAtual.style.width = '100%';
+    }, 50);
+
+    window.wrapTimers.push(timerBarraWrapped);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addTimeout('wrapped', timerBarraWrapped);
+    }
     }
 
     // Haptics de impacto a cada troca de slide
-    if(window.Haptics) navigator.vibrate([40, 50, 40]);
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([40, 50, 40]);
 
     // Prepara o próximo slide
-    window.wrapTimers.push(setTimeout(() => {
-        if(slide) slide.classList.remove('ativo');
+    const timerProximoSlide = setTimeout(() => {
+        if (slide) slide.classList.remove('ativo');
         rodarSlideWrapped(numeroSlide + 1);
-    }, window.wrapTempoPorSlide));
+    }, window.wrapTempoPorSlide);
+
+    window.wrapTimers.push(timerProximoSlide);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addTimeout('wrapped', timerProximoSlide);
+    }
 }
 
 // O Mapeador de Dados do Casal

@@ -10,8 +10,27 @@ window.estadoRoleta = {
     paletaCores: ['#c0392b', '#2c3e50', '#e67e22', '#8e44ad', '#d35400', '#2980b9']
 };
 
+window.roletaOffOpcoes = null;
+window.roletaAudioCatraca = null;
+window.roletaAudioVitoria = null;
+
 window.inicializarRoleta = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('roleta');
+    }
+
+    if (!window.roletaAudioCatraca) {
+        window.roletaAudioCatraca = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        window.roletaAudioCatraca.volume = 0.5;
+    }
+
+    if (!window.roletaAudioVitoria) {
+        window.roletaAudioVitoria = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+        window.roletaAudioVitoria.volume = 1.0;
+    }
+
     window.escutarOpcoesRoleta();
+
     const txtVencedor = document.getElementById('texto-vencedor-roleta');
     if (txtVencedor) {
         txtVencedor.classList.remove('revelacao-ativa');
@@ -31,14 +50,14 @@ window.escutarOpcoesRoleta = function() {
         window.renderizarFichasComida();
         return;
     }
-    
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const refOpcoes = ref(db, 'utilitarios/roleta_comidas');
-    
-    onValue(refOpcoes, (snapshot) => {
+
+    window.roletaOffOpcoes = onValue(refOpcoes, (snapshot) => {
         const dados = snapshot.val();
         let opcoesNuvem = [];
-        
+
         if (dados && Array.isArray(dados)) {
             opcoesNuvem = dados;
         } else if (dados) {
@@ -46,13 +65,16 @@ window.escutarOpcoesRoleta = function() {
         } else {
             opcoesNuvem = ["Pizza 🍕", "Sushi 🍣", "Hambúrguer 🍔"];
         }
-        
-        // O "Zero Verde" do Afeto sempre no topo!
+
         window.estadoRoleta.opcoes = ["Voucher Especial 💚", ...opcoesNuvem];
-        
+
         window.renderizarFichasComida();
         window.desenharCanvasRetina();
     });
+
+    if (window.SantuarioRuntime && window.roletaOffOpcoes) {
+        window.SantuarioRuntime.addCleanup('roleta', window.roletaOffOpcoes);
+    }
 };
 
 window.salvarOpcoesNoFirebase = function() {
@@ -260,15 +282,21 @@ window.iniciarGiroRoleta = function() {
 
     let tempoAtual = 0;
     let intervaloBase = 20; 
-    const somCatraca = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-    somCatraca.volume = 0.5;
+    if (!window.roletaAudioCatraca) {
+        window.roletaAudioCatraca = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        window.roletaAudioCatraca.volume = 0.5;
+    }
 
     function tocarCatraca() {
         if (!window.estadoRoleta.girando) return;
         
         if (!window.SantuarioSomPausado) {
-            somCatraca.currentTime = 0;
-            somCatraca.play().catch(e=>{});
+            window.roletaAudioCatraca.currentTime = 0;
+            if (window.safePlayMedia) {
+                window.safePlayMedia(window.roletaAudioCatraca);
+            } else {
+                window.roletaAudioCatraca.play().catch(() => {});
+            }
         }
         
         if (window.Haptics) window.Haptics.toqueLeve();
@@ -307,19 +335,28 @@ window.iniciarGiroRoleta = function() {
             txtVencedor.innerHTML = `💚 Mimo Desbloqueado!`;
             txtVencedor.style.color = "#2ecc71";
             if(typeof mostrarToast === 'function') mostrarToast("Você ganhou um voucher romântico surpresa!", "✨");
-            if(window.Haptics) navigator.vibrate([300, 100, 300, 100, 500]);
+            if (window.Haptics && window.safeVibrate) window.safeVibrate([300, 100, 300, 100, 500]);
             if(typeof confetti === 'function') confetti({colors: ['#2ecc71', '#D4AF37', '#ffffff'], particleCount: 300, spread: 150, zIndex: 999999, origin: {y: 0.6}});
         } else {
             txtVencedor.innerText = `👑 ${vencedor.toUpperCase()}`;
-            if(window.Haptics) navigator.vibrate([200, 100, 200, 100, 600]);
+            if (window.Haptics && window.safeVibrate) window.safeVibrate([200, 100, 200, 100, 600]);
             if(typeof confetti === 'function') confetti({colors: ['#ff4757', '#FFD700', '#ffffff'], particleCount: 300, spread: 150, zIndex: 999999, origin: {y: 0.6}});
         }
 
         txtVencedor.classList.add('revelacao-ativa');
         
         if (!window.SantuarioSomPausado) {
-            const winSom = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
-            winSom.volume = 1.0; winSom.play().catch(e=>{});
+            if (!window.roletaAudioVitoria) {
+                window.roletaAudioVitoria = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+                window.roletaAudioVitoria.volume = 1.0;
+            }
+
+            window.roletaAudioVitoria.currentTime = 0;
+            if (window.safePlayMedia) {
+                window.safePlayMedia(window.roletaAudioVitoria);
+            } else {
+                window.roletaAudioVitoria.play().catch(() => {});
+            }
         }
 
     }, tempoGiroMs);

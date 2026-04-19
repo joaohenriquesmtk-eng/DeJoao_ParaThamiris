@@ -7,21 +7,31 @@ window.gravadorPTT = null;
 window.chunksDeAudioPTT = [];
 window.isGravandoPTT = false;
 window.audioRecebidoPTT = null;
+window.pagerAudioContext = null;
+window.pagerOffFrequencia = null;
 
 // O Sintetizador de Elite: Cria o som de rádio amador (Beep) usando pura matemática, sem arquivos externos
 function tocarBeepRadio(tipo) {
     try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
+        const AudioContextRef = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextRef) return;
+
+        if (!window.pagerAudioContext) {
+            window.pagerAudioContext = new AudioContextRef();
+        }
+
+        const ctx = window.pagerAudioContext;
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        
+
         osc.connect(gain);
         gain.connect(ctx.destination);
-        
-        osc.type = 'square'; // Tipo de onda áspera e robótica (estilo rádio)
-        
+        osc.type = 'square';
+
         if (tipo === 'inicio') {
             osc.frequency.setValueAtTime(800, ctx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
@@ -60,7 +70,8 @@ function iniciarEqualizadorVisor() {
         container.appendChild(barra);
     }
     
-    if(loopEqualizador) clearInterval(loopEqualizador);
+    if (loopEqualizador) clearInterval(loopEqualizador);
+
     loopEqualizador = setInterval(() => {
         Array.from(container.children).forEach(barra => {
             let altura = Math.floor(Math.random() * 25) + 4;
@@ -69,10 +80,19 @@ function iniciarEqualizadorVisor() {
             barra.style.boxShadow = `0 0 8px ${window.isGravandoPTT ? '#ff3366' : '#8ab4f8'}`;
         });
     }, 100);
+    
+    if (window.SantuarioRuntime) {
+    window.SantuarioRuntime.addInterval('pager', loopEqualizador);
+}
 }
 
+
+
 function pararEqualizadorVisor() {
-    if(loopEqualizador) clearInterval(loopEqualizador);
+    if (loopEqualizador) {
+        clearInterval(loopEqualizador);
+        loopEqualizador = null;
+    }
     const container = document.getElementById('pager-ondas-visuais');
     if (container) {
         Array.from(container.children).forEach(barra => {
@@ -90,6 +110,9 @@ window.inicializarPager = function() {
 };
 
 window.sairDoPager = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('pager');
+    }
     if (window.isGravandoPTT) window.pararGravacaoPTT(); // Segurança
     if (loopEqualizador) clearInterval(loopEqualizador);
     if (window.audioRecebidoPTT) {
@@ -175,7 +198,7 @@ window.pararGravacaoPTT = function(e) {
     
     // Feedback Físico e Auditivo
     tocarBeepRadio('fim');
-    if(window.Haptics) navigator.vibrate(20);
+    if (window.Haptics && window.safeVibrate) window.safeVibrate(20);
     
     // UI Change
     const btn = document.getElementById('btn-ptt-mestre');
@@ -245,7 +268,7 @@ function escutarFrequenciaPager() {
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const refCanal = ref(db, 'pager/frequencia');
 
-    onValue(refCanal, (snapshot) => {
+    window.pagerOffFrequencia = onValue(refCanal, (snapshot) => {
         const dados = snapshot.val();
         if (!dados || !dados.url) return;
 
@@ -267,7 +290,7 @@ function escutarFrequenciaPager() {
         const statusTxt = document.getElementById('pager-status-texto');
         if(statusTxt) { statusTxt.innerText = 'RECEBENDO...'; statusTxt.style.color = '#2ecc71'; }
         iniciarEqualizadorVisor();
-        if(window.Haptics) navigator.vibrate([50, 100, 50]);
+        if (window.Haptics && window.safeVibrate) window.safeVibrate([50, 100, 50]);
 
         // Carrega e toca o áudio enviado
         window.audioRecebidoPTT = new Audio(dados.url);
@@ -298,4 +321,7 @@ function escutarFrequenciaPager() {
             window.audioRecebidoPTT = null;
         };
     });
+    if (window.SantuarioRuntime && window.pagerOffFrequencia) {
+    window.SantuarioRuntime.addCleanup('pager', window.pagerOffFrequencia);
+}
 }

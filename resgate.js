@@ -5,6 +5,10 @@
 window.cicloTextosResgate = null;
 
 window.iniciarResgateEmocional = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('resgate');
+    }
+
     console.log("Protocolo de Resgate Acionado.");
 
     // 1. ISOLAMENTO ACÚSTICO: Destrói qualquer som do aplicativo
@@ -25,19 +29,29 @@ window.iniciarResgateEmocional = function() {
     const lofi = document.getElementById('audio-resgate-lofi');
     const voz = document.getElementById('audio-resgate-voz');
     
-    if (lofi) { 
-        lofi.volume = 0.4; 
-        let playPromise = lofi.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(e => console.warn("Lofi de resgate pendente.", e));
+    if (lofi) {
+        lofi.volume = 0.4;
+
+        if (window.safePlayMedia) {
+            window.safePlayMedia(lofi);
+        } else {
+            const playPromise = lofi.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {});
+            }
         }
     }
     
-    if (voz) { 
-        voz.volume = 1.0; 
-        let vozPromise = voz.play();
-        if (vozPromise !== undefined) {
-            vozPromise.catch(e => console.warn("Áudio de voz não encontrado. Adicione conforto.mp3 na pasta assets/sons/resgate/ para ativar.", e));
+    if (voz) {
+        voz.volume = 1.0;
+
+        if (window.safePlayMedia) {
+            window.safePlayMedia(voz);
+        } else {
+            const vozPromise = voz.play();
+            if (vozPromise !== undefined) {
+                vozPromise.catch(() => {});
+            }
         }
     }
 
@@ -57,19 +71,25 @@ window.iniciarResgateEmocional = function() {
         textoGuia.style.opacity = 1;
 
         if (window.cicloTextosResgate) clearInterval(window.cicloTextosResgate);
-        
+
         window.cicloTextosResgate = setInterval(() => {
             fase++;
-            // Fade Out
             textoGuia.style.opacity = 0;
-            
-            setTimeout(() => {
-                // Troca o texto enquanto está invisível e faz o Fade In
+
+            const timerFadeResgate = setTimeout(() => {
                 textoGuia.innerText = frases[fase % frases.length];
                 textoGuia.style.opacity = 1;
             }, 1000);
 
-        }, 4000); // Troca a cada 4 segundos (Metade do ciclo do pulmão)
+            if (window.SantuarioRuntime) {
+                window.SantuarioRuntime.addTimeout('resgate', timerFadeResgate);
+            }
+
+        }, 4000);
+
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.addInterval('resgate', window.cicloTextosResgate);
+        }
     }
 
     // 5. O SINALIZADOR DE EMERGÊNCIA (ALERTA MÁXIMO PRO PARCEIRO)
@@ -84,10 +104,14 @@ window.iniciarResgateEmocional = function() {
         });
     }
 
-    if (window.Haptics) navigator.vibrate([200, 100, 200, 100, 500]);
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([200, 100, 200, 100, 500]);
 };
 
 window.encerrarResgateEmocional = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('resgate');
+    }
+
     // 1. DESLIGA A CÂMARA
     const tela = document.getElementById('tela-resgate-emocional');
     if (tela) {

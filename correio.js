@@ -3,11 +3,28 @@
 // ============================================================================
 
 window.TEMPO_TRANSITO_MS = 12 * 60 * 60 * 1000; // 12 Horas de Delay
+window.correioOffCartas = null;
+window.correioIntervalRender = null;
+window.correioAudioSelo = null;
 
 window.inicializarCorreio = function() {
     console.log("Servidores Postais God Tier Online.");
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('correio');
+    }
+
+    if (!window.correioAudioSelo) {
+        window.correioAudioSelo = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        window.correioAudioSelo.volume = 0.4;
+    }
+
     window.escutarCartasGlobais();
-    setInterval(window.renderizarListaDeCartas, 30000); 
+
+    window.correioIntervalRender = setInterval(window.renderizarListaDeCartas, 30000);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addInterval('correio', window.correioIntervalRender);
+    }
 };
 
 window.toggleInstrucoesCorreio = function() {
@@ -53,11 +70,15 @@ window.enviarCartaCorreio = function() {
 window.escutarCartasGlobais = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    onValue(ref(db, 'utilitarios/correio'), (snapshot) => {
+
+    window.correioOffCartas = onValue(ref(db, 'utilitarios/correio'), (snapshot) => {
         window.bancoCartas = snapshot.val() || {};
         window.renderizarListaDeCartas();
     });
+
+    if (window.SantuarioRuntime && window.correioOffCartas) {
+        window.SantuarioRuntime.addCleanup('correio', window.correioOffCartas);
+    }
 };
 
 // 🚨 A MÁGICA FÍSICA: Abre o envelope em 3 etapas
@@ -66,9 +87,19 @@ window.quebrarSeloEAbrir = function(idCarta, elementoSelo) {
     if(!envelopePai) return;
 
     // 1. Som tátil forte de cera quebrando
-    if(window.Haptics) navigator.vibrate([100, 30, 50]);
-    const crackSom = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-    crackSom.volume = 0.4; crackSom.play().catch(e=>{});
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([100, 30, 50]);
+
+    if (!window.correioAudioSelo) {
+        window.correioAudioSelo = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        window.correioAudioSelo.volume = 0.4;
+    }
+
+    window.correioAudioSelo.currentTime = 0;
+    if (window.safePlayMedia) {
+        window.safePlayMedia(window.correioAudioSelo);
+    } else {
+        window.correioAudioSelo.play().catch(() => {});
+    }
 
     // 2. Aciona o CSS que rotaciona a aba e sobe o papel
     envelopePai.classList.add('envelope-aberto');

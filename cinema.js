@@ -8,9 +8,15 @@ window.isCinemaSyncing = false; // A Trava Quântica Anti-Loop
 window.idVideoAtual = null;
 window.ytApiPronta = false; // Bandeira de segurança da API
 let dadosPendentesParaMontagem = null;
+let offCinemaEstado = null;
+let offCinemaReacoes = null;
+let ultimoTimestampReacaoProcessado = 0;
 
 // Função chamada pelo core.js quando o módulo é injetado
 window.inicializarCinema = function() {
+    if (window.SantuarioRuntime) {
+    window.SantuarioRuntime.clearModule('cinema');
+}
     console.log("🎬 Cine Quântico Ativado");
 
     // Reseta o estado local ao entrar na sala
@@ -102,8 +108,11 @@ function montarPlayerYoutube(dados) {
                         
                         // Mostra o Botão de Janela Flutuante na UI
                         const btnPip = document.getElementById('btn-pip-cinema');
-                        if (btnPip && document.pictureInPictureEnabled) {
+                        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                        if (btnPip && document.pictureInPictureEnabled && !isIOS) {
                             btnPip.classList.remove('escondido');
+                        } else if (btnPip) {
+                            btnPip.classList.add('escondido');
                         }
                     }
                 }, 1000);
@@ -182,7 +191,7 @@ function escutarNuvemCinema() {
     if (!window.SantuarioApp) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    onValue(ref(db, 'cinema/estado'), (snapshot) => {
+    offCinemaEstado = onValue(ref(db, 'cinema/estado'), (snapshot) => {
         const dados = snapshot.val();
         if (!dados || !dados.videoId) return;
 
@@ -241,6 +250,10 @@ function escutarNuvemCinema() {
     });
 }
 
+if (window.SantuarioRuntime && offCinemaEstado) {
+    window.SantuarioRuntime.addCleanup('cinema', offCinemaEstado);
+}
+
 window.entrarNaSessaoCinema = function() {
     const overlay = document.getElementById('cinema-overlay');
     if (overlay) overlay.classList.add('escondido');
@@ -251,6 +264,9 @@ window.entrarNaSessaoCinema = function() {
 
 // 🚨 RECONSTRUÇÃO DO DOM: A cura para os Iframe Ghosts (Fantasmas do YouTube)
 window.sairDoCinema = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('cinema');
+    }
     if (window.playerCinema && typeof window.playerCinema.destroy === 'function') {
         window.playerCinema.destroy(); // Remove o iframe do YouTube
         window.playerCinema = null;
@@ -291,9 +307,8 @@ window.escutarNuvemReacoes = function() {
     if (!window.SantuarioApp) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    let horaDeAberturaDaTela = Date.now();
 
-    onValue(ref(db, 'cinema/reacoes'), (snapshot) => {
+    offCinemaReacoes = onValue(ref(db, 'cinema/reacoes'), (snapshot) => {
         const dados = snapshot.val();
         if (!dados) return;
 
@@ -301,9 +316,17 @@ window.escutarNuvemReacoes = function() {
         if (!container) return;
 
         const arrayReacoes = Object.keys(dados).map(k => dados[k]);
-        const reacoesNovas = arrayReacoes.filter(r => r.timestamp > horaDeAberturaDaTela);
-        
-        horaDeAberturaDaTela = Date.now();
+        const reacoesNovas = arrayReacoes
+            .filter(r => r.timestamp > ultimoTimestampReacaoProcessado)
+            .sort((a, b) => a.timestamp - b.timestamp);
+
+        if (reacoesNovas.length > 0) {
+            ultimoTimestampReacaoProcessado = reacoesNovas[reacoesNovas.length - 1].timestamp;
+        }
+
+        if (window.SantuarioRuntime && offCinemaReacoes) {
+            window.SantuarioRuntime.addCleanup('cinema', offCinemaReacoes);
+        }
 
         reacoesNovas.forEach(reacao => {
             const coracao = document.createElement('div');

@@ -10,6 +10,8 @@ window.estadoLogistica = {
     historicoVitorias: 0
 };
 
+window.logisticaAudioClique = null;
+
 // SVG Paths Imaculados (100x100 viewBox). Corrente = stroke="currentColor"
 const SVGS = {
     'I': '<path d="M 50 0 L 50 100" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="square"/>',
@@ -49,6 +51,15 @@ const PLANTAS_NIVEIS = [
 ];
 
 window.inicializarLogistica = function() {
+        if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('logistica');
+    }
+
+    if (!window.logisticaAudioClique) {
+        window.logisticaAudioClique = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        window.logisticaAudioClique.volume = 0.2;
+        window.logisticaAudioClique.playbackRate = 2.0;
+    }
     if(typeof sincronizarMoedasUI === 'function') sincronizarMoedasUI(); // 🚨 PUXA O SALDO
     console.log("Abrindo Planta de Escoamento...");
     const hist = parseInt(localStorage.getItem('santuario_logistica_vitorias') || '0');
@@ -86,7 +97,7 @@ window.iniciarPartidaLogistica = function() {
     window.atualizarFluxoEletrico();
     window.iniciarTimerLogistica();
     
-    if(window.Haptics) navigator.vibrate([100, 50, 100]); // Motor ligando
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([100, 50, 100]);
 };
 
 // Transforma o número de rotação (0-3) em graus
@@ -137,8 +148,18 @@ window.girarTile = function(y, x) {
     if(window.Haptics) window.Haptics.toqueLeve();
     
     // Opcional: Som mecânico de catraca
-    const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-    clickSound.volume = 0.2; clickSound.playbackRate = 2.0; clickSound.play().catch(e=>{});
+    if (!window.logisticaAudioClique) {
+        window.logisticaAudioClique = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        window.logisticaAudioClique.volume = 0.2;
+        window.logisticaAudioClique.playbackRate = 2.0;
+    }
+
+    window.logisticaAudioClique.currentTime = 0;
+    if (window.safePlayMedia) {
+        window.safePlayMedia(window.logisticaAudioClique);
+    } else {
+        window.logisticaAudioClique.play().catch(() => {});
+    }
 
     window.atualizarFluxoEletrico(); // A Mágica do Pathfinding acontece aqui!
 };
@@ -212,13 +233,16 @@ window.iniciarTimerLogistica = function() {
 
         if (tempo <= 10) {
             barra.classList.add('timer-critico');
-            if(window.Haptics) navigator.vibrate(50); // Batimento cardíaco de tensão
+            if (window.Haptics && window.safeVibrate) window.safeVibrate(50);
         }
 
         if (tempo <= 0) {
             window.finalizarPartidaComDerrota();
         }
     }, 1000);
+    if (window.SantuarioRuntime && window.estadoLogistica.timerId) {
+        window.SantuarioRuntime.addInterval('logistica', window.estadoLogistica.timerId);
+    }
 };
 
 window.pararTimerLogistica = function() {
@@ -231,7 +255,7 @@ window.finalizarPartidaComVitoria = function() {
     window.estadoLogistica.jogando = false;
     window.pararTimerLogistica();
 
-    if(window.Haptics) navigator.vibrate([100, 100, 400]);
+    if (window.Haptics && window.safeVibrate) window.safeVibrate([100, 100, 400]);
     if(typeof confetti === 'function') confetti({colors: ['#f1c40f', '#2ecc71'], particleCount: 200, spread: 100});
     
     // 🚨 INFLAÇÃO DO BEM: Recompensa aumentada de 50 para 300!

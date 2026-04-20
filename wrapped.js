@@ -198,16 +198,16 @@ async function compilarDadosBiometricos() {
 }
 
 // ============================================================================
-// GERENTE DE SHELL PESADO (FASE 1 DA REFATORAÇÃO ESTRUTURAL)
-// Estaciona o distrito Cassino/Boutique fora do DOM vivo até o primeiro uso.
+// GERENTE DE SHELL PESADO (FASE 2 DA REFATORAÇÃO ESTRUTURAL)
+// O distrito Cassino/Boutique sai fisicamente do index.html e passa a ser
+// injetado sob demanda a partir de um shell dedicado.
 // ============================================================================
 
 window.SantuarioShellPesado = window.SantuarioShellPesado || {
-    acoplado: true,
     patchAplicado: false,
     shellJaFoiUsado: false,
-    fragmento: document.createDocumentFragment(),
-    itens: [],
+    carregando: null,
+    shellUrl: 'cassino-shell.html',
     ids: [
         'overlay-cassino',
         'overlay-cassino-dois',
@@ -251,55 +251,77 @@ window.SantuarioShellPesado = window.SantuarioShellPesado || {
         'mesa-bridge'
     ],
 
-    coletar: function() {
-        if (!this.acoplado && this.itens.length > 0) return;
+    shellPresente: function() {
+        return this.ids.some(id => document.getElementById(id));
+    },
 
-        this.itens = this.ids
+    coletar: function() {
+        return this.ids
             .map(id => document.getElementById(id))
             .filter(Boolean);
     },
 
-    haAlgumaTelaAtiva: function() {
-        return this.itens.some(el => {
-            const escondido = el.classList.contains('escondido');
-            const display = window.getComputedStyle(el).display;
-            return !escondido && display !== 'none';
-        });
+    async carregarSobDemanda() {
+        if (this.shellPresente()) {
+            this.shellJaFoiUsado = true;
+            return true;
+        }
+
+        if (this.carregando) return this.carregando;
+
+        this.carregando = fetch(this.shellUrl, { cache: 'no-store' })
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error(`Falha ao buscar ${this.shellUrl}: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then((html) => {
+                if (!html || !html.trim()) {
+                    throw new Error('Shell pesado vazio.');
+                }
+
+                if (this.shellPresente()) {
+                    this.shellJaFoiUsado = true;
+                    return true;
+                }
+
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+
+                const filhos = Array.from(temp.children);
+                if (filhos.length === 0) {
+                    throw new Error('Shell pesado sem nós raiz válidos.');
+                }
+
+                const ancora = document.body || document.documentElement;
+                filhos.forEach(no => ancora.appendChild(no));
+
+                this.shellJaFoiUsado = true;
+                console.log('[ShellPesado] Distrito carregado sob demanda.');
+                return true;
+            })
+            .catch((erro) => {
+                console.error('[ShellPesado] Erro ao carregar shell sob demanda:', erro);
+                if (typeof window.mostrarToast === 'function') {
+                    window.mostrarToast('Falha ao abrir o Distrito Noturno. Tente novamente.', '⚠️');
+                }
+                throw erro;
+            })
+            .finally(() => {
+                this.carregando = null;
+            });
+
+        return this.carregando;
     },
 
-    desacoplar: function() {
-        if (!this.acoplado) return;
-        this.coletar();
-        if (this.itens.length === 0) return;
-        if (this.haAlgumaTelaAtiva()) return;
+    async garantirDistrito() {
+        if (this.shellPresente()) {
+            this.shellJaFoiUsado = true;
+            return true;
+        }
 
-        this.itens.forEach(el => {
-            if (el.parentNode) this.fragmento.appendChild(el);
-        });
-
-        this.acoplado = false;
-        console.log('[ShellPesado] Distrito cassino/boutique estacionado fora do DOM vivo.');
-    },
-
-    acoplar: function() {
-        if (this.acoplado) return;
-        const ancora = document.body || document.documentElement;
-        if (!ancora) return;
-
-        this.itens.forEach(el => {
-            if (!document.getElementById(el.id)) {
-                ancora.appendChild(el);
-            }
-        });
-
-        this.acoplado = true;
-        this.shellJaFoiUsado = true;
-        console.log('[ShellPesado] Distrito cassino/boutique reanexado ao DOM.');
-    },
-
-    garantirDistrito: function() {
-        this.coletar();
-        if (!this.acoplado) this.acoplar();
+        return this.carregarSobDemanda();
     }
 };
 
@@ -310,11 +332,10 @@ window.aplicarPatchShellPesado = function() {
     const envelopar = function(nomeFn) {
         const original = window[nomeFn];
         if (typeof original !== 'function') return;
-
         if (original.__shellPesadoEnvolvido) return;
 
-        const wrapper = function(...args) {
-            shell.garantirDistrito();
+        const wrapper = async function(...args) {
+            await shell.garantirDistrito();
             return original.apply(this, args);
         };
 
@@ -323,6 +344,7 @@ window.aplicarPatchShellPesado = function() {
         window[nomeFn] = wrapper;
     };
 
+    envelopar('abrirLobbyCassino');
     envelopar('abrirMesaCassino');
     envelopar('abrirBoutique');
     envelopar('abrirCassinoDois');
@@ -333,18 +355,6 @@ window.aplicarPatchShellPesado = function() {
 
 window.inicializarShellPesado = function() {
     window.aplicarPatchShellPesado();
-
-    const shell = window.SantuarioShellPesado;
-    if (shell.shellJaFoiUsado) return;
-
-    const timerEstacionarShell = setTimeout(() => {
-        window.aplicarPatchShellPesado();
-        shell.desacoplar();
-    }, 1800);
-
-    if (window.SantuarioRuntime) {
-        window.SantuarioRuntime.addTimeout('boot', timerEstacionarShell);
-    }
 };
 
 window.addEventListener('load', () => {
@@ -352,7 +362,7 @@ window.addEventListener('load', () => {
 
     const timerReforcoShell = setTimeout(() => {
         window.aplicarPatchShellPesado();
-    }, 3200);
+    }, 1200);
 
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.addTimeout('boot', timerReforcoShell);

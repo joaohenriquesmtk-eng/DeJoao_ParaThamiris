@@ -95,16 +95,29 @@ function configurarNavegacao() {
 }
 
 // ========== SERVICE WORKER E ATUALIZAÇÕES ==========
+window.toastServiceWorkerMostrado = false;
+
+function mostrarToastServiceWorkerAtivo() {
+    if (window.toastServiceWorkerMostrado) return;
+    if (typeof mostrarToast !== 'function') return;
+
+    window.toastServiceWorkerMostrado = true;
+    mostrarToast('Service Worker ativo! ✨');
+}
+
 function registrarServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
     navigator.serviceWorker.register('./sw.js')
         .then(reg => {
             console.log('Service Worker registrado!', reg);
+            mostrarToastServiceWorkerAtivo();
 
-            if (typeof mostrarToast === 'function') {
-                mostrarToast('✅ Service Worker ativo!');
-            }
+            navigator.serviceWorker.ready
+                .then(() => {
+                    mostrarToastServiceWorkerAtivo();
+                })
+                .catch(() => {});
 
             reg.addEventListener('updatefound', () => {
                 const novoSW = reg.installing;

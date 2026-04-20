@@ -231,7 +231,7 @@ function bootCritico() {
 }
 
 function bootSecundario() {
-    window.SantuarioRuntime.addInterval('boot', setInterval(atualizarMotorDoTempo, 15000));
+    window.SantuarioRuntime.addInterval('boot', setInterval(atualizarMotorDoTempo, 1000));
     window.SantuarioRuntime.addInterval('boot', setInterval(atualizarSaudacao, 60000));
     window.SantuarioRuntime.addInterval('boot', setInterval(verificarEstadoBotaoSurpresa, 60000));
 

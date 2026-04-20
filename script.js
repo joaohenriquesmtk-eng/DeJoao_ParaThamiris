@@ -49,6 +49,26 @@ window.injetarModuloHTML = function(jogoId) {
 
 window.modulosCarregadosJS = {};
 window.APP_VERSION = window.APP_VERSION || '2026.04.19-ultra1';
+window.mapaModulosJS = {
+    sincronia: 'sincronia',
+    tribunal: 'tribunal',
+    julgamento: 'julgamento',
+    minifazenda: 'minifazenda_novo',
+    contratos: 'contratos',
+    estufa: 'estufa',
+    cartorio: 'cartorio',
+    banco: 'banco',
+    pericia: 'pericia',
+    logistica: 'logistica',
+    agua: 'hidratacao',
+    agenda: 'agenda',
+    roleta: 'roleta',
+    guardiao: 'pet',
+    cinema: 'cinema',
+    correio: 'correio',
+    pager: 'pager',
+    tesouro: 'tesouro'
+};
 
 window.injetarModuloJS = function(nomeDoArquivo) {
     return new Promise((resolve, reject) => {
@@ -93,6 +113,21 @@ window.injetarModuloJS = function(nomeDoArquivo) {
 // ==========================================
 window.statusPlanta = { nivel: 0, ultimaRegada: 0, diaUltimaRegada: "", ultimaVerificacao: Date.now(), sequencia: 0, ciclos: 0 };
 let audioJogos = null;
+window.offEcoSantuario = null;
+window.offFuturoTempo = null;
+window.offPlanetario = null;
+window.offSonoParceira = null;
+window.offRotaDestino = null;
+window.offMandados = null;
+window.offPresencaConexao = null;
+window.offPresencaParceiro = null;
+window.offRadarParceiro = null;
+window.offRadarGeoParceiro = null;
+window.offEpicentroParceiro = null;
+
+window.loopRadarGeo = null;
+window.parceiroPresencaAnterior = null;
+window.onParadoxoOrientation = null;
 
 
 
@@ -1055,6 +1090,14 @@ window.fecharModal = function(apenasLimpar = false) {
         clearInterval(loopRelogioFuturo);
         loopRelogioFuturo = null;
     }
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('eco3d');
+        window.SantuarioRuntime.clearModule('bussola3d');
+        window.SantuarioRuntime.clearModule('planetario3d');
+        window.SantuarioRuntime.clearModule('galaxia3d');
+        window.SantuarioRuntime.clearModule('epicentro');
+    }
     
     // 3. EXTINTOR DE GPS
     if (window.gpsWatcher !== undefined && window.gpsWatcher !== null) {
@@ -1115,6 +1158,18 @@ window.abrirJogo = async function(tipo) {
             
             // Se a internet cair ou o arquivo não existir, ele aborta e volta pro menu
             if (!htmlPronto) {
+                window.voltarMenuJogos();
+                return;
+            }
+        }
+
+        const arquivoJSDoModulo = window.mapaModulosJS[tipo];
+
+        if (arquivoJSDoModulo) {
+            try {
+                await window.injetarModuloJS(arquivoJSDoModulo);
+            } catch (erro) {
+                console.error(`Falha ao carregar o JS do módulo ${tipo}:`, erro);
                 window.voltarMenuJogos();
                 return;
             }
@@ -2010,26 +2065,26 @@ window.fecharCapsula = () => {
 // Agora o aplicativo escuta uma única "Frequência" compartilhada por ambos!
 window.escutarEcosDoParceiro = function() {
     if (!window.SantuarioApp || !window.MEU_NOME) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('eco-global');
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
-    // Frequência de rádio unificada do Santuário
     const refEcoSantuario = ref(db, 'eco_santuario/frequencia_atual');
-    
-    onValue(refEcoSantuario, (snapshot) => {
+
+    window.offEcoSantuario = onValue(refEcoSantuario, (snapshot) => {
         const dados = snapshot.val();
         const btnOuvir = document.getElementById('btn-ouvir-eco');
         const statusEco = document.getElementById('status-eco');
-        
-        // Aceita tanto a chave antiga (se houver cache) quanto a URL nova
+
         const urlOuBase64 = dados ? (dados.audioUrl || dados.audioBase64) : null;
-        
+
         if (dados && urlOuBase64) {
-            // Guarda a URL na memória vital do celular
             window.audioCarregado = urlOuBase64;
             window.autorEcoAtual = dados.autor;
-            
+
             if (btnOuvir) btnOuvir.style.display = 'block';
-            
+
             if (statusEco) {
                 if (dados.autor === window.MEU_NOME) {
                     statusEco.innerText = "Sua voz está ecoando no espaço. 🎵";
@@ -2042,13 +2097,19 @@ window.escutarEcosDoParceiro = function() {
         } else {
             window.audioCarregado = null;
             window.autorEcoAtual = null;
+
             if (btnOuvir) btnOuvir.style.display = 'none';
+
             if (statusEco) {
                 statusEco.innerText = "O silêncio reina. Grave o primeiro eco.";
                 statusEco.style.color = "var(--cor-primaria)";
             }
         }
     });
+
+    if (window.SantuarioRuntime && window.offEcoSantuario) {
+        window.SantuarioRuntime.addCleanup('eco-global', window.offEcoSantuario);
+    }
 };
 
 
@@ -2093,6 +2154,9 @@ window.abrirPainelFuturo = function() {
 };
 
 window.fecharPainelFuturo = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('capsula-futuro');
+    }
     const container = document.getElementById('painel-capsula-futuro');
     if (container) {
         container.classList.add('escondido');
@@ -2195,23 +2259,32 @@ window.tocarAudioFuturoLida = function() {
 
 function escutarFuturoDoTempo() {
     if (!window.SantuarioApp || !window.MEU_NOME) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('capsula-futuro');
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
     const refMinhasCapsulas = ref(db, 'capsulas_tempo/' + window.MEU_NOME.toLowerCase());
-    
-    onValue(refMinhasCapsulas, (snapshot) => {
+
+    window.offFuturoTempo = onValue(refMinhasCapsulas, (snapshot) => {
         const dados = snapshot.val();
         if (!dados) {
-            capsulaFuturoDados = null; capsulaFuturoId = null; totalFuturoNaFila = 0;
+            capsulaFuturoDados = null;
+            capsulaFuturoId = null;
+            totalFuturoNaFila = 0;
         } else {
             const listaCapsulas = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
             totalFuturoNaFila = listaCapsulas.length;
-            listaCapsulas.sort((a, b) => a.dataAbertura - b.dataAbertura); 
+            listaCapsulas.sort((a, b) => a.dataAbertura - b.dataAbertura);
             capsulaFuturoDados = listaCapsulas[0];
             capsulaFuturoId = listaCapsulas[0].id;
         }
         atualizarInterfaceFuturo();
     });
+
+    if (window.SantuarioRuntime && window.offFuturoTempo) {
+        window.SantuarioRuntime.addCleanup('capsula-futuro', window.offFuturoTempo);
+    }
 }
 
 function atualizarInterfaceFuturo() {
@@ -2452,44 +2525,49 @@ window.pararPulsoRadar = function(e) {
 // O Ouvido Constante (Escuta o parceiro 24 horas por dia)
 window.escutarRadarParceiro = function() {
     if (!window.SantuarioApp) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('telepresenca-global');
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
     const chaveParceiro = window.souJoao ? 'thamiris' : 'joao';
     const radarParceiroRef = ref(db, 'telepresenca/' + chaveParceiro);
-    
-    onValue(radarParceiroRef, (snapshot) => {
+
+    window.offRadarParceiro = onValue(radarParceiroRef, (snapshot) => {
         const dados = snapshot.val();
         const containerRadar = document.getElementById('radar-telepresenca');
-        
+
         if (dados && dados.pulsando) {
-            // O PARCEIRO APERTOU O DEDO LÁ DO OUTRO LADO!
             if (containerRadar) containerRadar.classList.add('radar-recebendo');
-            
-            // Inicia o motor de batimento (100 BPM)
+
             if (!loopVibracaoRadar) {
-                
-                // 🚨 A MÁGICA: Dispara o grave e o flash visual imediatamente
                 if (typeof window.dispararEfeitoCoracao === 'function') {
                     window.dispararEfeitoCoracao(containerRadar);
                 }
-                
-                // Repete a sinestesia audiovisual enquanto o parceiro segurar o botão
+
                 loopVibracaoRadar = setInterval(() => {
                     if (typeof window.dispararEfeitoCoracao === 'function') {
                         window.dispararEfeitoCoracao(containerRadar);
                     }
-                }, 800); 
+                }, 800);
+
+                if (window.SantuarioRuntime) {
+                    window.SantuarioRuntime.addInterval('telepresenca-global', loopVibracaoRadar);
+                }
             }
         } else {
-            // O PARCEIRO SOLTOU O DEDO
             if (containerRadar) containerRadar.classList.remove('radar-recebendo');
-            
+
             if (loopVibracaoRadar) {
-                clearInterval(loopVibracaoRadar); // Desliga a bateria de grave
+                clearInterval(loopVibracaoRadar);
                 loopVibracaoRadar = null;
             }
         }
     });
+
+    if (window.SantuarioRuntime && window.offRadarParceiro) {
+        window.SantuarioRuntime.addCleanup('telepresenca-global', window.offRadarParceiro);
+    }
 };
 
 // ==========================================
@@ -2615,12 +2693,16 @@ window.cancelarCriacaoEstrela = function() {
 
 window.escutarPlanetario = function() {
     if (!window.SantuarioApp) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('planetario-global');
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const refPlanetario = ref(db, 'planetario_sonhos');
-    
-    onValue(refPlanetario, (snapshot) => {
+
+    window.offPlanetario = onValue(refPlanetario, (snapshot) => {
         const dados = snapshot.val();
-        
+
         let lista = document.querySelector('#corpo-modal #lista-estrelas-planetario');
         if (!lista) lista = document.querySelector('#reliquias-templates #lista-estrelas-planetario');
         if (!lista) return;
@@ -2635,13 +2717,12 @@ window.escutarPlanetario = function() {
         const arrayEstrelas = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
         arrayEstrelas.sort((a, b) => a.realizado - b.realizado || b.dataCriacao - a.dataCriacao);
 
-        // 🚨 BUFFER DE MEMÓRIA: Montamos o HTML inteiro fora do DOM para evitar o colapso do navegador!
         let htmlBuffer = "";
 
         arrayEstrelas.forEach(estrela => {
             const dataCriacao = new Date(estrela.dataCriacao).toLocaleDateString('pt-BR');
             const isSupernova = estrela.realizado;
-            if(isSupernova) countSupernovas++;
+            if (isSupernova) countSupernovas++;
 
             htmlBuffer += `
                 <div class="estrela-item ${isSupernova ? 'supernova' : ''}">
@@ -2655,11 +2736,14 @@ window.escutarPlanetario = function() {
                 </div>
             `;
         });
-        
-        // Injeta tudo no HTML de uma única vez (Performance impecável)
+
         lista.innerHTML = htmlBuffer;
         window.quantidadeSupernovas = countSupernovas;
     });
+
+    if (window.SantuarioRuntime && window.offPlanetario) {
+        window.SantuarioRuntime.addCleanup('planetario-global', window.offPlanetario);
+    }
 };
 
 window.comprarEstrela = function() {
@@ -2978,23 +3062,28 @@ window.enviarRespostaEspelho = function() {
 // ==========================================
 window.escutarRotaDestino = function() {
     if (!window.SantuarioApp?.modulos) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('jornada-global');
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const refRota = ref(db, 'rota_destino/estado');
-    
-    // Listener constante para atualizar o contador na tela
-    onValue(refRota, (snapshot) => {
+
+    window.offRotaDestino = onValue(refRota, (snapshot) => {
         const dados = snapshot.val() || { km: 0 };
-        // Garante que o KM seja um número exato e não ultrapasse a meta de 1300
         let kmTotal = Math.min(Number(dados.km || 0), 1300);
-        
+
         const contador = document.getElementById('km-contador');
         if (contador) {
             contador.innerHTML = `${kmTotal} <span class="hud-max">/ 1300 KM</span>`;
         }
-        
-        // Atualiza o progresso para o motor 3D (0.0 a 1.0)
+
         window.ProgressoAlvoJornada = kmTotal / 1300;
     });
+
+    if (window.SantuarioRuntime && window.offRotaDestino) {
+        window.SantuarioRuntime.addCleanup('jornada-global', window.offRotaDestino);
+    }
 };
 
 window.comprarCombustivel = function() {
@@ -3039,10 +3128,6 @@ window.comprarCombustivel = function() {
     });
 };
 
-// O GATILHO MÁGICO: Garante que a função acorde sozinha quando o app carregar!
-window.addEventListener('load', () => {
-    setTimeout(window.escutarRotaDestino, 1000);
-});
 
 
 // ==========================================
@@ -3051,6 +3136,9 @@ window.addEventListener('load', () => {
 window.gpsWatcher = null;
 
 window.inicializarEpicentro = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('epicentro');
+    }
     const painelBloqueado = document.getElementById('epicentro-bloqueado');
     const painelDesbloqueado = document.getElementById('epicentro-desbloqueado');
     const txtDistancia = document.getElementById('distancia-epicentro');
@@ -3078,7 +3166,7 @@ window.inicializarEpicentro = function() {
     let minhaLon = null;
 
     // Fica ouvindo onde ela está na nuvem em tempo real
-    onValue(parceiroGpsRef, (snap) => {
+    window.offEpicentroParceiro = onValue(parceiroGpsRef, (snap) => {
         const dados = snap.val();
         if (dados) {
             parceiroLat = dados.lat;
@@ -3087,19 +3175,35 @@ window.inicializarEpicentro = function() {
         }
     });
 
+    if (window.SantuarioRuntime && window.offEpicentroParceiro) {
+        window.SantuarioRuntime.addCleanup('epicentro', window.offEpicentroParceiro);
+    }
+
     // Aciona o chip de GPS do celular
     if (navigator.geolocation) {
         window.gpsWatcher = navigator.geolocation.watchPosition((pos) => {
             minhaLat = pos.coords.latitude;
             minhaLon = pos.coords.longitude;
-            
-            // Grava a sua posição na nuvem para o celular dela ler
+
             set(meuGpsRef, { lat: minhaLat, lon: minhaLon, timestamp: Date.now() });
             calcularColisao();
-            
-        }, (err) => {
-            if(txtDistancia) txtDistancia.innerText = "GPS Recusado";
-        }, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+
+        }, () => {
+            if (txtDistancia) txtDistancia.innerText = "GPS Recusado";
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 5000,
+            timeout: 10000
+        });
+
+        if (window.SantuarioRuntime && window.gpsWatcher !== null) {
+            window.SantuarioRuntime.addCleanup('epicentro', () => {
+                if (window.gpsWatcher !== null) {
+                    navigator.geolocation.clearWatch(window.gpsWatcher);
+                    window.gpsWatcher = null;
+                }
+            });
+        }
     } else {
         if(txtDistancia) txtDistancia.innerText = "Satélite Indisponível";
     }
@@ -3154,6 +3258,10 @@ window.inicializarEpicentro = function() {
     function desbloquearEpicentro() {
         // Grava na memória do celular que o encontro aconteceu
         localStorage.setItem('epicentro_destravado', 'sim');
+
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.clearModule('epicentro');
+        }
         
         if(painelBloqueado) painelBloqueado.classList.add('escondido');
         if(painelDesbloqueado) {
@@ -3180,17 +3288,23 @@ window.ativarSensorParadoxo = function() {
     const txtSuperficie = document.getElementById('texto-superficie');
     const txtProfundo = document.getElementById('texto-profundo');
     const valZ = document.getElementById('valor-z');
-    
-    // 🚨 A CORREÇÃO: Agora ele olha para a Tela Cheia (container-paradoxo)
     const container = document.getElementById('container-paradoxo');
 
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('paradoxo');
+    }
+
+    if (window.onParadoxoOrientation) {
+        window.removeEventListener('deviceorientation', window.onParadoxoOrientation, true);
+        window.onParadoxoOrientation = null;
+    }
+
     const analisarInclinacao = (event) => {
-        // 🚨 A MÁGICA: Se a tela cheia estiver fechada (escondida), poupa a bateria. Se estiver aberta, o sensor trabalha livremente!
         if (!container || container.classList.contains('escondido')) return;
 
-        let beta = event.beta;   // Inclinação frente/trás (-180 a 180)
-        let gamma = event.gamma; // Inclinação esquerda/direita (-90 a 90)
-        
+        let beta = event.beta;
+        let gamma = event.gamma;
+
         if (beta === null || gamma === null) return;
 
         let absBeta = Math.abs(beta);
@@ -3198,12 +3312,12 @@ window.ativarSensorParadoxo = function() {
         let inclinacaoHorizontal = Math.abs(gamma);
 
         let inclinacaoAbsoluta = Math.max(inclinacaoVertical, inclinacaoHorizontal);
-        let progresso = 0; 
-        
+        let progresso = 0;
+
         if (inclinacaoAbsoluta < 20) {
-            progresso = 1; 
+            progresso = 1;
         } else if (inclinacaoAbsoluta > 45) {
-            progresso = 0; 
+            progresso = 0;
         } else {
             progresso = 1 - ((inclinacaoAbsoluta - 20) / 25);
         }
@@ -3220,21 +3334,34 @@ window.ativarSensorParadoxo = function() {
             valZ.innerText = inclinacaoAbsoluta.toFixed(1) + '°';
             valZ.style.color = progresso > 0.8 ? '#ff3366' : '#555';
         }
-        
+
         if (progresso > 0.95 && !window.paradoxoRevelado) {
             window.paradoxoRevelado = true;
             if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([40, 60, 40]);
-                    }
+                navigator.vibrate([40, 60, 40]);
+            }
         } else if (progresso < 0.5) {
             window.paradoxoRevelado = false;
         }
     };
 
-    window.addEventListener('deviceorientation', analisarInclinacao, true);
+    window.onParadoxoOrientation = analisarInclinacao;
+    window.addEventListener('deviceorientation', window.onParadoxoOrientation, true);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('paradoxo', () => {
+            if (window.onParadoxoOrientation) {
+                window.removeEventListener('deviceorientation', window.onParadoxoOrientation, true);
+                window.onParadoxoOrientation = null;
+            }
+        });
+    }
 };
 
 window.fecharParadoxoTelaCheia = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('paradoxo');
+    }
     const container = document.getElementById('container-paradoxo');
     const navInferior = document.querySelector('.menu-inferior');
     
@@ -3262,8 +3389,11 @@ window.playAudioJogos = function() {
     audioJogos.volume = 0.3; 
     
     if (audioJogos.paused) {
-        // Tenta tocar. A Apple e o Google exigem que a pessoa toque na tela pelo menos uma vez antes do som sair.
-        audioJogos.play().catch(e => console.log('O navegador vai liberar o som assim que a tela for tocada.'));
+        if (window.safePlayMedia) {
+            window.safePlayMedia(audioJogos);
+        } else {
+            audioJogos.play().catch(() => {});
+        }
     }
 };
 
@@ -3308,17 +3438,23 @@ function liberarTela() {
 
 window.escutarEstadoSono = function() {
     if (!window.SantuarioApp || !window.NOME_PARCEIRO || !window.MEU_NOME) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('sono-global');
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    
     const refSonoDela = ref(db, `estado_sono/${window.NOME_PARCEIRO.toLowerCase()}`);
-    
-    // Escuta em tempo real o que acontece na cama dela
-    onValue(refSonoDela, (snapshot) => {
+
+    window.offSonoParceira = onValue(refSonoDela, (snapshot) => {
         const dados = snapshot.val();
         window.estadoSonoDela = dados && dados.dormindo ? true : false;
         atualizarPainelSonoHome(dados);
         atualizarCenaSono3D();
     });
+
+    if (window.SantuarioRuntime && window.offSonoParceira) {
+        window.SantuarioRuntime.addCleanup('sono-global', window.offSonoParceira);
+    }
 };
 
 function atualizarPainelSonoHome(dadosParceiro) {
@@ -3434,12 +3570,20 @@ window.alternarModoSono = function() {
 
         const tempoStart = Date.now();
         const txtTempo = document.getElementById('texto-tempo-sono');
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.clearModule('modo-sono');
+        }
+
         loopRelogioSono = setInterval(() => {
             const mins = Math.floor((Date.now() - tempoStart) / 60000);
             const hrs = Math.floor(mins / 60);
             const m = mins % 60;
-            if(txtTempo) txtTempo.innerText = `EM REPOUSO PROFUNDO: ${hrs}H ${m}M`;
+            if (txtTempo) txtTempo.innerText = `EM REPOUSO PROFUNDO: ${hrs}H ${m}M`;
         }, 60000);
+
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.addInterval('modo-sono', loopRelogioSono);
+        }
         if(txtTempo) txtTempo.innerText = `EM REPOUSO PROFUNDO: 0H 0M`;
 
         atualizarCenaSono3D();
@@ -3452,18 +3596,16 @@ window.alternarModoSono = function() {
         tela.classList.add('escondido');
         orbeMeu.classList.remove('anim-respirar');
         if(audioLoFi) audioLoFi.pause();
-        if(loopRelogioSono) clearInterval(loopRelogioSono);
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.clearModule('modo-sono');
+        }
+        if (loopRelogioSono) loopRelogioSono = null;
         
         if(typeof window.playAudioJogos === 'function') window.playAudioJogos();
     }
     
     atualizarPainelSonoHome();
 };
-
-// GATILHO AUTOMÁTICO: Acorda o radar logo que o sistema der boot
-window.addEventListener('loginSucesso', () => {
-    setTimeout(window.escutarEstadoSono, 2000); 
-});
 
 // ============================================================================
 // MOTOR DE REALIDADE AUMENTADA (Holograma 3D)
@@ -3757,41 +3899,36 @@ const TELEFONE_THAMIRIS = "+5562994838837";  // Ex: +55629...
 
 // 1. O Vigilante do Supremo Tribunal
 window.vigiarMandados = function() {
-    if (!window.SantuarioApp || !window.SantuarioApp.modulos || !window.MEU_NOME) {
-        setTimeout(window.vigiarMandados, 1000);
-        return;
+    if (!window.SantuarioApp || !window.SantuarioApp.modulos || !window.MEU_NOME) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('mandados-global');
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const takeover = document.getElementById('takeover-mandado');
     if (!takeover) return;
 
-    // Escuta a porta do Tribunal
     const refMandado = ref(db, 'tribunal/mandado_alvo');
-    
-    onValue(refMandado, (snapshot) => {
-        const alvo = snapshot.val(); // Agora o Firebase devolve um NOME
-        
-        // Se o nome no Firebase for exatamente o MEU nome... A casa caiu!
+
+    window.offMandados = onValue(refMandado, (snapshot) => {
+        const alvo = snapshot.val();
+
         if (alvo === window.MEU_NOME.toLowerCase()) {
-            
-            // Preenche o documento com os nomes corretos antes de mostrar
             document.getElementById('nome-reu-mandado').innerText = window.MEU_NOME;
             document.getElementById('nome-autor-mandado').innerText = window.NOME_PARCEIRO;
-
-            // Derruba a tela
             takeover.classList.remove('takeover-escondido');
-            
-            // Vibração de alerta máximo
+
             if (window.Haptics && window.Haptics.erro) {
-                navigator.vibrate([100, 100, 100, 100, 400]); 
+                navigator.vibrate([100, 100, 100, 100, 400]);
             }
-            
         } else {
-            // Se o alvo não for eu (ou for nulo), eu continuo navegando livremente.
             takeover.classList.add('takeover-escondido');
         }
     });
+
+    if (window.SantuarioRuntime && window.offMandados) {
+        window.SantuarioRuntime.addCleanup('mandados-global', window.offMandados);
+    }
 };
 
 // 2. A Rendição (O que a pessoa travada clica)
@@ -3835,11 +3972,6 @@ window.expedirMandadoApreensao = function() {
         if(typeof mostrarToast === 'function') mostrarToast("Identificação pendente.", "⚠️");
     }
 };
-
-// Inicia a vigilância assim que a página é montada
-document.addEventListener("DOMContentLoaded", () => {
-    window.vigiarMandados();
-});
 
 
 // ============================================================================
@@ -4033,37 +4165,46 @@ function revelarCartaSecreta(stream) {
 // 🚨 1. A NOVA MÁGICA: ÁUDIO GRAVE E FLASH DE LUZ (PARA ENGANAR O iPHONE)
 const somCoracaoGrave = new Audio('./assets/sons/coracao.mp3');
 somCoracaoGrave.volume = 1.0; 
+window.overlayPulsoCoracao = null;
 
 window.dispararEfeitoCoracao = function(elementoCoracao) {
-    // Toca o grave profundo (respeitando o botão de Mudo global)
     if (!window.SantuarioSomPausado) {
         somCoracaoGrave.currentTime = 0;
-        somCoracaoGrave.play().catch(e => { console.log("Áudio contido pela Apple") });
+        if (window.safePlayMedia) {
+            window.safePlayMedia(somCoracaoGrave);
+        } else {
+            somCoracaoGrave.play().catch(() => {});
+        }
     }
-    
-    // Pulsa o botão fisicamente na tela
+
     if (elementoCoracao) {
         elementoCoracao.style.transform = "scale(1.4)";
         setTimeout(() => { elementoCoracao.style.transform = "scale(1)"; }, 150);
     }
-    
-    // Pisca a tela em tom de sangue bem rápido
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0'; overlay.style.left = '0';
-    overlay.style.width = '100vw'; overlay.style.height = '100vh';
-    overlay.style.backgroundColor = 'rgba(255, 0, 50, 0.15)'; 
-    overlay.style.zIndex = '9999999';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.transition = 'opacity 0.3s ease-out';
-    document.body.appendChild(overlay);
-    
-    // Se for o Android, vibra de verdade
+
+    if (!window.overlayPulsoCoracao) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100vw';
+        overlay.style.height = '100vh';
+        overlay.style.backgroundColor = 'rgba(255, 0, 50, 0.15)';
+        overlay.style.zIndex = '9999999';
+        overlay.style.pointerEvents = 'none';
+        overlay.style.transition = 'opacity 0.3s ease-out';
+        overlay.style.opacity = '0';
+        document.body.appendChild(overlay);
+        window.overlayPulsoCoracao = overlay;
+    }
+
+    const overlay = window.overlayPulsoCoracao;
+    overlay.style.opacity = '1';
+
     if (window.Haptics) window.Haptics.toqueForte();
-    
-    setTimeout(() => { 
-        overlay.style.opacity = '0'; 
-        setTimeout(() => overlay.remove(), 300);
+
+    setTimeout(() => {
+        overlay.style.opacity = '0';
     }, 50);
 };
 
@@ -4294,6 +4435,10 @@ window.abrirMesaCassino = async function(nomeDoJogo) {
         if(typeof mostrarToast === 'function') mostrarToast("Falha ao acessar os jogos.", "❌");
         return;
     }
+
+    if (window.CassinoAudio && typeof window.CassinoAudio.carregarTudo === 'function') {
+        window.CassinoAudio.carregarTudo();
+    }
 };
 
 // Ponte 2: Cassino a Dois
@@ -4302,6 +4447,10 @@ window.abrirCassinoDois = async function() {
     if (!carregado) {
         if(typeof mostrarToast === 'function') mostrarToast("Falha ao carregar as mesas do Cassino.", "❌");
         return;
+    }
+
+    if (window.CassinoAudio && typeof window.CassinoAudio.carregarTudo === 'function') {
+        window.CassinoAudio.carregarTudo();
     }
 
     const overlay = document.getElementById('overlay-cassino-dois');
@@ -4369,14 +4518,19 @@ window.CassinoAudio = {
     },
     
     sonsProntos: {},
+    carregado: false,
 
     carregarTudo: function() {
+        if (this.carregado) return;
+
         for (let chave in this.links) {
-            let audio = new Audio(this.links[chave]);
-            audio.preload = 'auto'; 
+            const audio = new Audio(this.links[chave]);
+            audio.preload = 'metadata';
             this.sonsProntos[chave] = audio;
         }
-        console.log("Estúdio carregado e música antiga neutralizada!");
+
+        this.carregado = true;
+        console.log("Estúdio carregado sob demanda.");
     },
 
     // 🚨 Redirecionamos os comandos antigos para o nosso novo Maestro
@@ -4911,53 +5065,53 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 window.iniciarSensorDePresenca = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('presenca-global');
+    }
+
     const { db, ref, onValue, set, onDisconnect } = window.SantuarioApp.modulos;
 
     const euId = window.souJoao ? 'joao' : 'thamiris';
     const parceiroId = window.souJoao ? 'thamiris' : 'joao';
-    const nomeParceiro = window.souJoao ? 'Thamiris' : 'João';
 
     const minhaRef = ref(db, `presenca_online/${euId}`);
     const parceiroRef = ref(db, `presenca_online/${parceiroId}`);
-    
-    // O '.info/connected' é uma ferramenta secreta do Firebase que diz se você tem internet
     const conexaoRef = ref(db, '.info/connected');
 
-    // 1. AVISA O FIREBASE QUE VOCÊ ESTÁ ONLINE
-    onValue(conexaoRef, (snap) => {
+    window.offPresencaConexao = onValue(conexaoRef, (snap) => {
         if (snap.val() === true) {
             set(minhaRef, true);
-            // Se o Safari/Chrome fechar, o servidor apaga sua luz sozinho!
             onDisconnect(minhaRef).set(false);
         }
     });
 
-    // 2. FICA OLHANDO A LUZ DO PARCEIRO
-    onValue(parceiroRef, (snap) => {
-        const parceiroOnline = snap.val();
+    window.offPresencaParceiro = onValue(parceiroRef, (snap) => {
+        const parceiroOnline = !!snap.val();
         const aura = document.getElementById('aura-conexao-global');
-        
+
         if (parceiroOnline) {
-            if (aura) {
-                aura.className = 'aura-presenca-ativa';
-                if(typeof mostrarToast === 'function') mostrarToast(`Sua alma gêmea acaba de entrar no Santuário...`, "🫀");
-                if(window.Haptics) window.Haptics.toqueForte();
+            if (aura) aura.className = 'aura-presenca-ativa';
+
+            if (window.parceiroPresencaAnterior !== true) {
+                if (typeof mostrarToast === 'function') {
+                    mostrarToast(`Sua alma gêmea acaba de entrar no Santuário...`, "🫀");
+                }
+                if (window.Haptics) window.Haptics.toqueForte();
             }
         } else {
             if (aura) aura.className = 'escondido';
         }
-    });
-};
 
-// 3. LIGA O MOTOR ASSIM QUE O APLICATIVO CARREGAR
-window.addEventListener('load', () => {
-    // Dá 2 segundos para ter certeza que o login confirmou quem é quem
-    setTimeout(() => {
-        if (typeof window.iniciarSensorDePresenca === 'function') {
-            window.iniciarSensorDePresenca();
-        }
-    }, 2000);
-});
+        window.parceiroPresencaAnterior = parceiroOnline;
+    });
+
+    if (window.SantuarioRuntime && window.offPresencaConexao) {
+        window.SantuarioRuntime.addCleanup('presenca-global', window.offPresencaConexao);
+    }
+    if (window.SantuarioRuntime && window.offPresencaParceiro) {
+        window.SantuarioRuntime.addCleanup('presenca-global', window.offPresencaParceiro);
+    }
+};
 
 // ==========================================
 // 🔔 MOTOR DE NOTIFICAÇÕES PUSH NATIVAS
@@ -5024,81 +5178,85 @@ function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
 
 window.iniciarRadarGeofencing = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('radargeo-global');
+    }
+
     const { db, ref, set, onValue } = window.SantuarioApp.modulos;
 
     const euId = window.souJoao ? 'joao' : 'thamiris';
     const parceiroId = window.souJoao ? 'thamiris' : 'joao';
+
     let minhaUltimaLat = null;
     let minhaUltimaLon = null;
 
-    // 1. Pede a localização do celular de forma suave (apenas quando o app está aberto)
-    if ("geolocation" in navigator) {
-        navigator.geolocation.watchPosition((position) => {
+    const atualizarMinhaPosicao = () => {
+        if (!("geolocation" in navigator)) return;
+
+        navigator.geolocation.getCurrentPosition((position) => {
             minhaUltimaLat = position.coords.latitude;
             minhaUltimaLon = position.coords.longitude;
 
-            // Envia para o Firebase
             set(ref(db, `gps/${euId}`), {
                 lat: minhaUltimaLat,
                 lon: minhaUltimaLon,
                 timestamp: Date.now()
             });
-        }, (erro) => {
-            console.warn("Radar Quântico: Permissão de GPS negada ou indisponível.");
+        }, () => {
+            console.warn("Radar Quântico: GPS indisponível neste momento.");
         }, {
-            enableHighAccuracy: true,
-            maximumAge: 60000,
-            timeout: 10000
+            enableHighAccuracy: false,
+            maximumAge: 120000,
+            timeout: 12000
         });
+    };
+
+    atualizarMinhaPosicao();
+
+    window.loopRadarGeo = setInterval(atualizarMinhaPosicao, 90000);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addInterval('radargeo-global', window.loopRadarGeo);
     }
 
-    // 2. Fica de olho no GPS da parceira e cruza os dados
-    onValue(ref(db, `gps/${parceiroId}`), (snapshot) => {
+    window.offRadarGeoParceiro = onValue(ref(db, `gps/${parceiroId}`), (snapshot) => {
         const gpsParceiro = snapshot.val();
-        
+
         if (gpsParceiro && minhaUltimaLat && minhaUltimaLon) {
-            // Ignora dados antigos (mais de 1 hora) para não disparar falso positivo
             if (Date.now() - gpsParceiro.timestamp > 3600000) return;
 
             const distanciaMetros = calcularDistanciaMetros(
-                minhaUltimaLat, minhaUltimaLon, 
-                gpsParceiro.lat, gpsParceiro.lon
+                minhaUltimaLat,
+                minhaUltimaLon,
+                gpsParceiro.lat,
+                gpsParceiro.lon
             );
 
             console.log(`[Radar Quântico] Distância atual: ${distanciaMetros} metros.`);
 
-            // 🚨 A MÁGICA: Se a distância for menor ou igual a 50 metros!
             if (distanciaMetros <= 50) {
                 const telaReencontro = document.getElementById('tela-reencontro');
                 if (telaReencontro && !telaReencontro.classList.contains('revelado')) {
-                    
-                    // Dispara a animação épica!
                     telaReencontro.classList.add('revelado');
-                    if (window.Haptics) navigator.vibrate([200, 100, 200, 100, 500]); // Batida do coração forte
-                    
+
+                    if (window.Haptics) navigator.vibrate([200, 100, 200, 100, 500]);
+
                     if (typeof confetti === 'function') {
-                        // Faz chover confetes brancos e dourados para combinar com a tela clara
-                        confetti({ colors: ['#D4AF37', '#ffffff', '#ffd700'], particleCount: 300, spread: 180, zIndex: 999999999 });
+                        confetti({
+                            colors: ['#D4AF37', '#ffffff', '#ffd700'],
+                            particleCount: 300,
+                            spread: 180,
+                            zIndex: 999999999
+                        });
                     }
                 }
             }
         }
     });
+
+    if (window.SantuarioRuntime && window.offRadarGeoParceiro) {
+        window.SantuarioRuntime.addCleanup('radargeo-global', window.offRadarGeoParceiro);
+    }
 };
-
-// 3. Liga o Radar assim que a identidade do usuário for confirmada (pós-login)
-window.addEventListener('loginSucesso', () => {
-    setTimeout(() => {
-        if(typeof window.iniciarRadarGeofencing === 'function') {
-            window.iniciarRadarGeofencing();
-        }
-    }, 5000); // Espera 5 segundos para não pedir 20 permissões de uma vez na primeira abertura
-});
-
-// Fallback: Se o usuário já estava logado ao abrir o app
-if (window.usuarioLogado) {
-    setTimeout(() => { if(typeof window.iniciarRadarGeofencing === 'function') window.iniciarRadarGeofencing(); }, 5000);
-}
 
 // =======================================================
 // 💾 MOTOR UNIVERSAL DE AUTO-SAVE (PROGRESSO NA NUVEM)
@@ -5146,14 +5304,6 @@ window.carregarProgressoJogo = function(nomeDoJogo, callback) {
 // 🎵 MAESTRO MUSICAL E RESTAURAÇÃO DE EFEITOS (SFX)
 // ============================================================================
 
-// 1. A CURA DOS EFEITOS SONOROS (SFX)
-// Devolvemos a sua regra original: carrega os barulhos (fichas, bombas, roleta) logo que o app abre.
-setTimeout(() => {
-    if (window.CassinoAudio && typeof window.CassinoAudio.carregarTudo === 'function') {
-        window.CassinoAudio.carregarTudo();
-    }
-}, 1000);
-
 // 2. O MAESTRO DA MÚSICA DO CASSINO (Sem conflito e sem som baixo)
 window.gerenciarMusicaVegas = function(acao) {
     const audioAmbiente = document.getElementById('audio-ambiente');
@@ -5175,8 +5325,13 @@ window.gerenciarMusicaVegas = function(acao) {
     }
 
     if (acao === 'play') {
-        if (audioAmbiente) audioAmbiente.pause(); // Para a música do Santuário
-        audioVegas.play().catch(e => console.log("Aguardando clique na tela"));
+        if (audioAmbiente) audioAmbiente.pause();
+
+        if (window.safePlayMedia) {
+            window.safePlayMedia(audioVegas);
+        } else {
+            audioVegas.play().catch(() => {});
+        }
     } else if (acao === 'stop') {
         audioVegas.pause(); // Para a música do Cassino
         audioVegas.currentTime = 0;
@@ -5190,6 +5345,9 @@ window.gerenciarMusicaVegas = function(acao) {
 // 💎 BOUTIQUE VIP E MESAS DE CASSINO (As 3 Portas de Entrada)
 // ============================================================================
 window.abrirBoutique = function() {
+    if (window.CassinoAudio && typeof window.CassinoAudio.carregarTudo === 'function') {
+        window.CassinoAudio.carregarTudo();
+    }
 
 
     // ==========================================
@@ -5355,3 +5513,32 @@ window.adicionarItemInventario = async function(chaveItem, quantidadeAdicional) 
         // O onValue se encarrega de atualizar a tela na mesma hora nos dois celulares!
     } catch (e) { console.error("Erro ao adicionar item:", e); }
 };
+
+window.iniciarListenersGlobaisUltra = function() {
+    if (typeof window.escutarEstadoSono === 'function') window.escutarEstadoSono();
+    if (typeof window.escutarRotaDestino === 'function') window.escutarRotaDestino();
+    if (typeof window.vigiarMandados === 'function') window.vigiarMandados();
+    if (typeof window.iniciarSensorDePresenca === 'function') window.iniciarSensorDePresenca();
+    if (typeof window.iniciarRadarGeofencing === 'function') window.iniciarRadarGeofencing();
+    if (typeof window.escutarEcosDoParceiro === 'function') window.escutarEcosDoParceiro();
+};
+
+window.addEventListener('loginSucesso', () => {
+    const timerGlobaisUltra = setTimeout(() => {
+        window.iniciarListenersGlobaisUltra();
+    }, 1500);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addTimeout('boot', timerGlobaisUltra);
+    }
+});
+
+if (window.usuarioLogado) {
+    const timerGlobaisUltraJaLogado = setTimeout(() => {
+        window.iniciarListenersGlobaisUltra();
+    }, 1500);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addTimeout('boot', timerGlobaisUltraJaLogado);
+    }
+}

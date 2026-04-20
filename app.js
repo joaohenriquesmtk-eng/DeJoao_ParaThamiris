@@ -33,6 +33,7 @@ function configurarNavegacao() {
                 if (elementoTela) {
                     elementoTela.classList.remove('escondido');
                     elementoTela.classList.add('ativo');
+                    ativarImagensDeElemento(elementoTela);
                     reativarVideosDeElemento(elementoTela);
                 }
 
@@ -161,6 +162,32 @@ function verificarAtualizacao() {
     });
 }
 
+function agendarTarefaLeveBoot(fn, atraso = 0, timeoutIdle = 2000) {
+    const timer = setTimeout(() => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                try {
+                    fn();
+                } catch (erro) {
+                    console.error('Falha em tarefa leve do boot:', erro);
+                }
+            }, { timeout: timeoutIdle });
+        } else {
+            setTimeout(() => {
+                try {
+                    fn();
+                } catch (erro) {
+                    console.error('Falha em tarefa leve do boot:', erro);
+                }
+            }, 0);
+        }
+    }, atraso);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addTimeout('boot', timer);
+    }
+}
+
 function bootCritico() {
     window.isAndroidDevice = /Android/i.test(navigator.userAgent);
 
@@ -175,6 +202,12 @@ function bootCritico() {
     atualizarDinamicaHome();
     configurarNavegacao();
     verificarEstadoBotaoSurpresa();
+
+    const home = document.getElementById('home');
+    if (home) {
+        ativarImagensDeElemento(home);
+        reativarVideosDeElemento(home);
+    }
 
     const temaIcon = document.getElementById('tema-icon');
     const temaSelector = document.getElementById('tema-selector');
@@ -195,8 +228,6 @@ function bootCritico() {
     if (btnVerificar) {
         btnVerificar.addEventListener('click', verificarAtualizacao);
     }
-
-    registrarServiceWorker();
 }
 
 function bootSecundario() {
@@ -206,22 +237,22 @@ function bootSecundario() {
 
     atualizarSaudacao();
 
-    window.SantuarioRuntime.addTimeout('boot', setTimeout(() => {
+    agendarTarefaLeveBoot(() => {
         carregarDadosExternos();
-    }, 400));
+    }, 500, 2500);
 
-    window.SantuarioRuntime.addTimeout('boot', setTimeout(() => {
+    agendarTarefaLeveBoot(() => {
         carregarLeis();
-    }, 700));
+    }, 900, 3000);
 
-    window.SantuarioRuntime.addTimeout('boot', setTimeout(() => {
+    agendarTarefaLeveBoot(() => {
         atualizarClima();
-    }, 1000));
+    }, 1400, 3000);
 
     if (typeof inicializarSurpresaDiaria === 'function') {
-        window.SantuarioRuntime.addTimeout('boot', setTimeout(() => {
+        agendarTarefaLeveBoot(() => {
             inicializarSurpresaDiaria();
-        }, 800));
+        }, 1200, 2500);
     }
 
     const btnSurpresa = document.getElementById("btn-surpresa");
@@ -238,9 +269,15 @@ function bootSobDemanda() {
 
             window.SantuarioRuntime.addTimeout('boot', setTimeout(() => splash.remove(), 1000));
 
-            if (typeof window.injetarMotor3D === 'function') {
-                window.injetarMotor3D();
-            }
+            agendarTarefaLeveBoot(() => {
+                if (typeof window.injetarMotor3D === 'function') {
+                    window.injetarMotor3D();
+                }
+            }, 300, 2500);
+
+            agendarTarefaLeveBoot(() => {
+                registrarServiceWorker();
+            }, 700, 3000);
         }, 2500));
     }
 
@@ -283,6 +320,10 @@ function pausarMidiasDeElemento(elemento) {
     midias.forEach(midia => {
         try {
             midia.pause();
+
+            if (midia.tagName === 'VIDEO' && !midia.hasAttribute('data-preload-fixo')) {
+                midia.setAttribute('preload', 'none');
+            }
         } catch (erro) {
             console.warn('Falha ao pausar mídia:', erro);
         }
@@ -302,6 +343,10 @@ function reativarVideosDeElemento(elemento) {
 
         if (!deveRetomar) return;
 
+        if (video.getAttribute('preload') === 'none') {
+            video.setAttribute('preload', 'metadata');
+        }
+
         try {
             const tentativa = video.play();
             if (tentativa && typeof tentativa.catch === 'function') {
@@ -310,6 +355,16 @@ function reativarVideosDeElemento(elemento) {
         } catch (erro) {
             console.warn('Falha ao retomar vídeo:', erro);
         }
+    });
+}
+
+function ativarImagensDeElemento(elemento) {
+    if (!elemento) return;
+
+    const imagens = elemento.querySelectorAll('img[loading="lazy"]');
+    imagens.forEach(img => {
+        img.decoding = 'async';
+        img.fetchPriority = 'low';
     });
 }
 

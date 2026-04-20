@@ -74,8 +74,27 @@ window.Santuario3D = window.Santuario3D || {
         if (window.SantuarioRuntime && typeof cleanupFn === 'function') {
             window.SantuarioRuntime.addCleanup(modulo, cleanupFn);
         }
+    },
+
+    destroyThreeScene(sceneKey, rendererKey, container) {
+        const scene = window[sceneKey];
+        const renderer = window[rendererKey];
+
+        if (scene && renderer) {
+            window.RadarDePerformance.limparCena3D(scene, renderer);
+        }
+
+        window[sceneKey] = null;
+        window[rendererKey] = null;
+
+        if (container) {
+            container.innerHTML = '';
+        }
     }
 };
+
+window.Eco3DAtivo = false;
+window.Planetario3DAtivo = false;
 
 
 // ==========================================
@@ -374,6 +393,11 @@ let audioAtual = new Audio();
 window.inicializarEco3D = () => {
     const container = document.getElementById('eco-3d');
     if (!container || container.querySelector('canvas')) return;
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('eco3d');
+    }
+    window.Eco3DAtivo = true;
     
     container.innerHTML = `
         <div class="osciloscopio-wrapper" style="width: 100%; height: 180px; display: flex; align-items: center; justify-content: center; transform: translateZ(0);">
@@ -384,14 +408,14 @@ window.inicializarEco3D = () => {
     const canvas = document.getElementById('canvas-eco');
     const ctx = canvas.getContext('2d');
 
-    const redimensionar = () => {
+    const onResizeEco = () => {
         const rect = container.getBoundingClientRect();
         if (rect.width > 0) {
             canvas.width = rect.width * (window.devicePixelRatio || 1);
             canvas.height = 180 * (window.devicePixelRatio || 1);
         }
     };
-    window.addEventListener('resize', redimensionar);
+    window.addEventListener('resize', onResizeEco);
     
     let tempo = 0;
 
@@ -473,7 +497,7 @@ window.inicializarEco3D = () => {
             if (typeof pauseAudioJogos === 'function') pauseAudioJogos();
             if (typeof pausarAmbiente === 'function') pausarAmbiente();
             window.musicaNossaTocando = true;
-            setTimeout(redimensionar, 100); 
+            setTimeout(onResizeEco, 100); 
         } else {
             window.musicaNossaTocando = false; 
             const modal = document.getElementById('modal-reliquia');
@@ -485,11 +509,22 @@ window.inicializarEco3D = () => {
     });
     observerEco.observe(container);
 
+    window.Santuario3D.markScene('eco3d', () => {
+        window.Eco3DAtivo = false;
+        window.removeEventListener('resize', onResizeEco);
+        observerEco.disconnect();
+
+        const wrapper = container.querySelector('.osciloscopio-wrapper');
+        if (wrapper) wrapper.remove();
+
+        window.isEcoAtivo = false;
+    });
+
     // 5. O Loop de Renderização
     const animar = () => {
+        if (!window.Eco3DAtivo) return;
         requestAnimationFrame(animar);
 
-        // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
         if (!container || container.offsetParent === null) return;
         if (!ecoVisivel || window.SantuarioAtivo === false) return;
         if (canvas.width === 0) redimensionar();
@@ -559,6 +594,7 @@ window.tocarEco = async () => { /* Sua lógica perfeita */ };
         let altura = container.clientHeight || 200;
 
         const scene = new THREE.Scene();
+        window.BussolaScene = scene;
         const camera = new THREE.PerspectiveCamera(45, largura / altura, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ 
     alpha: true, 
@@ -568,6 +604,7 @@ window.tocarEco = async () => { /* Sua lógica perfeita */ };
 /* ESSA É A LINHA MÁGICA: Limita a densidade de pixels no Samsung sem piorar a do iPhone */
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
         renderer.setSize(largura, altura);
+        window.BussolaRenderer = renderer;
         container.insertBefore(renderer.domElement, container.firstChild);
 
         camera.position.set(0, 5, 0);
@@ -612,10 +649,12 @@ window.tocarEco = async () => { /* Sua lógica perfeita */ };
         const observerBussola = new IntersectionObserver((entries) => { bussolaVisivel = entries[0].isIntersecting; });
         observerBussola.observe(container);
 
+        window.Santuario3D.markScene('bussola3d', () => observerBussola.disconnect());
+
         let tempo = 0;
         const animar = () => {
+            if (!window.BussolaRenderer) return;
             requestAnimationFrame(animar);
-                        // 🚨 TRAVA DE SEGURANÇA: Aborta cálculos se a tela estiver oculta!
             if (!container || container.offsetParent === null) return;
             const elBussola = document.getElementById('bussola-3d');
         if (!elBussola || elBussola.clientWidth === 0) return;
@@ -651,6 +690,12 @@ window.tocarEco = async () => { /* Sua lógica perfeita */ };
         if (esqueletoBussola) {
             setTimeout(() => esqueletoBussola.classList.add('esqueleto-oculto'), 800);
         }
+
+        window.Santuario3D.markScene('bussola3d', () => {
+            window.agulhaBussola = null;
+            window.anguloAlvoBussola = 0;
+            window.Santuario3D.destroyThreeScene('BussolaScene', 'BussolaRenderer', container);
+        });
         
     };
 
@@ -1254,6 +1299,10 @@ window.inicializarPlanetario3D = () => {
     const container = document.querySelector('#modal-reliquia #planetario-3d-container');
     if (!container || container.querySelector('.planetario-canvas-wrapper')) return;
 
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('planetario3d');
+    }
+    window.Planetario3DAtivo = true;
     const QUANTIDADE_ESTRELAS = window.isAndroidDevice ? 2000 : 8000;
     const TAMANHO_UNIVERSO = 2000; 
     const PROPORCAO_POEIRA = 0.85; 
@@ -1348,6 +1397,7 @@ window.inicializarPlanetario3D = () => {
     window.Santuario3D.markScene('planetario3d', () => observer.disconnect());
 
     const animarPlanetario = () => {
+        if (!window.Planetario3DAtivo) return;
         requestAnimationFrame(animarPlanetario);
         if (!planetarioVisivel || window.SantuarioAtivo === false) return;
 
@@ -1397,6 +1447,15 @@ window.inicializarPlanetario3D = () => {
         }
     };
     animarPlanetario();
+
+    window.Santuario3D.markScene('planetario3d', () => {
+        window.Planetario3DAtivo = false;
+
+        const wrapperExistente = container.querySelector('.planetario-canvas-wrapper');
+        if (wrapperExistente) wrapperExistente.remove();
+
+        window.estrelasCompradasGlobais = null;
+    });
 
     window.renderizarEstrelasCompradas = (estrelasArray) => {
         if (!constelacaoCasal) return;
@@ -1488,6 +1547,10 @@ window.inicializarGalaxia3D = () => {
     window.Santuario3D.markScene('galaxia3d', () => {
         container.removeEventListener('mousemove', onMove);
         container.removeEventListener('touchmove', onMove, { passive: true });
+    });
+
+    window.Santuario3D.markScene('galaxia3d', () => {
+        window.Santuario3D.destroyThreeScene('GalaxiaScene', 'GalaxiaRenderer', container);
     });
 
     let tempo = 0;
@@ -1687,6 +1750,9 @@ window.inicializarJornada3D = () => {
     atualizarTamanho();
 
     window.Santuario3D.markScene('jornada3d', () => observerJornadaResize.disconnect());
+    window.Santuario3D.markScene('jornada3d', () => {
+        window.Santuario3D.destroyThreeScene('JornadaScene', 'JornadaRenderer', container);
+    });
 
     const telaJornada = document.getElementById('jornada');
     let tempoAnterior = performance.now();

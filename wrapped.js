@@ -255,14 +255,16 @@ window.SantuarioShellPesado = window.SantuarioShellPesado || {
         return this.ids.some(id => document.getElementById(id));
     },
 
-    coletar: function() {
-        return this.ids
-            .map(id => document.getElementById(id))
-            .filter(Boolean);
+    shellValido: function() {
+        return Boolean(
+            document.getElementById('overlay-cassino') &&
+            document.getElementById('overlay-boutique') &&
+            document.getElementById('overlay-cassino-dois')
+        );
     },
 
     async carregarSobDemanda() {
-        if (this.shellPresente()) {
+        if (this.shellValido()) {
             this.shellJaFoiUsado = true;
             return true;
         }
@@ -281,7 +283,7 @@ window.SantuarioShellPesado = window.SantuarioShellPesado || {
                     throw new Error('Shell pesado vazio.');
                 }
 
-                if (this.shellPresente()) {
+                if (this.shellValido()) {
                     this.shellJaFoiUsado = true;
                     return true;
                 }
@@ -296,6 +298,10 @@ window.SantuarioShellPesado = window.SantuarioShellPesado || {
 
                 const ancora = document.body || document.documentElement;
                 filhos.forEach(no => ancora.appendChild(no));
+
+                if (!this.shellValido()) {
+                    throw new Error('Shell externo carregado, mas ainda incompleto.');
+                }
 
                 this.shellJaFoiUsado = true;
                 console.log('[ShellPesado] Distrito carregado sob demanda.');
@@ -316,7 +322,7 @@ window.SantuarioShellPesado = window.SantuarioShellPesado || {
     },
 
     async garantirDistrito() {
-        if (this.shellPresente()) {
+        if (this.shellValido()) {
             this.shellJaFoiUsado = true;
             return true;
         }

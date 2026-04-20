@@ -124,10 +124,18 @@ window.offPresencaParceiro = null;
 window.offRadarParceiro = null;
 window.offRadarGeoParceiro = null;
 window.offEpicentroParceiro = null;
+window.offEspelhoDaAlma = null;
+window.offBoutiqueGastos = null;
+window.offChecklistBoutique = null;
+window.offTocaDiscos = null;
+window.offInventarioCasal = null;
 
 window.loopRadarGeo = null;
 window.parceiroPresencaAnterior = null;
 window.onParadoxoOrientation = null;
+window.observadoresUISantuario = window.observadoresUISantuario || [];
+window.observadoresUISantuarioAtivos = window.observadoresUISantuarioAtivos || false;
+window.listenersGlobaisUltraAtivos = false;
 
 
 
@@ -1097,6 +1105,7 @@ window.fecharModal = function(apenasLimpar = false) {
         window.SantuarioRuntime.clearModule('planetario3d');
         window.SantuarioRuntime.clearModule('galaxia3d');
         window.SantuarioRuntime.clearModule('epicentro');
+        window.SantuarioRuntime.clearModule('tocadiscos');
     }
     
     // 3. EXTINTOR DE GPS
@@ -1550,26 +1559,36 @@ function atualizarDinamicaHome() {
                         navigator.vibrate([200, 100, 200]);
                     }
             
-            const audio = new Audio('assets/alerta.mp3'); 
-            audio.play().catch(() => console.log("Áudio bloqueado"));
+            if (!window.SantuarioSomPausado && window.audioAlertaEmergencia) {
+                window.audioAlertaEmergencia.currentTime = 0;
+
+                if (window.safePlayMedia) {
+                    window.safePlayMedia(window.audioAlertaEmergencia);
+                } else {
+                    window.audioAlertaEmergencia.play().catch(() => console.log("Áudio bloqueado"));
+                }
+            }
         }
     };
 
     window.fecharEmergencia = function() {
-        const modal = document.getElementById('modal-emergencia');
-        if (modal) {
-            modal.classList.add('escondido');
+    const modal = document.getElementById('modal-emergencia');
+    if (modal) {
+        modal.classList.add('escondido');
 
-            // Traz o som de volta!
-            if (window.MotorDeAudio) window.MotorDeAudio.focar();
-            
-            // O PULO DO GATO: Salva no celular que esse alerta específico já foi atendido!
-            const timestamp = modal.dataset.timestampAtual;
-            if (timestamp) {
-                localStorage.setItem('alerta_resolvido_timestamp', timestamp);
-            }
+        if (window.audioAlertaEmergencia) {
+            window.audioAlertaEmergencia.pause();
+            window.audioAlertaEmergencia.currentTime = 0;
         }
-    };
+
+        if (window.MotorDeAudio) window.MotorDeAudio.focar();
+
+        const timestamp = modal.dataset.timestampAtual;
+        if (timestamp) {
+            localStorage.setItem('alerta_resolvido_timestamp', timestamp);
+        }
+    }
+};
 
 // ==========================================
 // MURAL DE RECADOS: ENVIO COM NOTIFICAÇÃO
@@ -2065,8 +2084,14 @@ window.fecharCapsula = () => {
 // Agora o aplicativo escuta uma única "Frequência" compartilhada por ambos!
 window.escutarEcosDoParceiro = function() {
     if (!window.SantuarioApp || !window.MEU_NOME) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('eco-global');
+    }
+
+    if (window.offEcoSantuario) {
+        window.offEcoSantuario();
+        window.offEcoSantuario = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -2107,8 +2132,13 @@ window.escutarEcosDoParceiro = function() {
         }
     });
 
-    if (window.SantuarioRuntime && window.offEcoSantuario) {
-        window.SantuarioRuntime.addCleanup('eco-global', window.offEcoSantuario);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('eco-global', () => {
+            if (window.offEcoSantuario) {
+                window.offEcoSantuario();
+                window.offEcoSantuario = null;
+            }
+        });
     }
 };
 
@@ -2259,8 +2289,14 @@ window.tocarAudioFuturoLida = function() {
 
 function escutarFuturoDoTempo() {
     if (!window.SantuarioApp || !window.MEU_NOME) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('capsula-futuro');
+    }
+
+    if (window.offFuturoTempo) {
+        window.offFuturoTempo();
+        window.offFuturoTempo = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -2268,6 +2304,7 @@ function escutarFuturoDoTempo() {
 
     window.offFuturoTempo = onValue(refMinhasCapsulas, (snapshot) => {
         const dados = snapshot.val();
+
         if (!dados) {
             capsulaFuturoDados = null;
             capsulaFuturoId = null;
@@ -2279,11 +2316,17 @@ function escutarFuturoDoTempo() {
             capsulaFuturoDados = listaCapsulas[0];
             capsulaFuturoId = listaCapsulas[0].id;
         }
+
         atualizarInterfaceFuturo();
     });
 
-    if (window.SantuarioRuntime && window.offFuturoTempo) {
-        window.SantuarioRuntime.addCleanup('capsula-futuro', window.offFuturoTempo);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('capsula-futuro', () => {
+            if (window.offFuturoTempo) {
+                window.offFuturoTempo();
+                window.offFuturoTempo = null;
+            }
+        });
     }
 }
 
@@ -2525,8 +2568,19 @@ window.pararPulsoRadar = function(e) {
 // O Ouvido Constante (Escuta o parceiro 24 horas por dia)
 window.escutarRadarParceiro = function() {
     if (!window.SantuarioApp) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('telepresenca-global');
+    }
+
+    if (window.offRadarParceiro) {
+        window.offRadarParceiro();
+        window.offRadarParceiro = null;
+    }
+
+    if (loopVibracaoRadar) {
+        clearInterval(loopVibracaoRadar);
+        loopVibracaoRadar = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -2565,56 +2619,80 @@ window.escutarRadarParceiro = function() {
         }
     });
 
-    if (window.SantuarioRuntime && window.offRadarParceiro) {
-        window.SantuarioRuntime.addCleanup('telepresenca-global', window.offRadarParceiro);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('telepresenca-global', () => {
+            if (window.offRadarParceiro) {
+                window.offRadarParceiro();
+                window.offRadarParceiro = null;
+            }
+
+            if (loopVibracaoRadar) {
+                clearInterval(loopVibracaoRadar);
+                loopVibracaoRadar = null;
+            }
+        });
     }
 };
 
 // ==========================================
 // OLHEIRO INTELIGENTE: OCULTA O RADAR E BOTÕES GLOBAIS
 // ==========================================
-window.addEventListener('load', () => {
+window.inicializarObservadoresUI = function() {
+    if (window.observadoresUISantuarioAtivos) return;
+    window.observadoresUISantuarioAtivos = true;
+
     const radar = document.getElementById('radar-telepresenca');
-    const btnMutar = document.getElementById('btn-mutar-global'); // 🚨 Olheiro agora vigia o botão de mudo
+    const btnMutar = document.getElementById('btn-mutar-global');
     const modalReliquia = document.getElementById('modal-reliquia');
     const telaLogin = document.getElementById('tela-login');
-    
+
     const verificarVisibilidadeElementos = () => {
         const emJogo = document.body.classList.contains('modo-jogo-ativo');
         const emReliquia = modalReliquia && !modalReliquia.classList.contains('escondido');
-        const noLogin = telaLogin && telaLogin.style.display !== 'none'; // Verifica se está na tela de carregamento/senha
-        
-        // Se estiver em jogo, lendo relíquia, ou na tela de login: ESCONDE TUDO
+        const noLogin = telaLogin && telaLogin.style.display !== 'none';
+
         if (emJogo || emReliquia || noLogin) {
-            if (radar) radar.style.display = 'none'; 
-            if (btnMutar) btnMutar.style.display = 'none'; 
+            if (radar) radar.style.display = 'none';
+            if (btnMutar) btnMutar.style.display = 'none';
         } else {
-            // Se já logou e está livre pelo app: MOSTRA OS BOTÕES
-            if (radar) radar.style.display = 'flex'; 
-            if (btnMutar) btnMutar.style.display = 'flex'; 
+            if (radar) radar.style.display = 'flex';
+            if (btnMutar) btnMutar.style.display = 'flex';
         }
     };
 
-    // Vigia as mudanças de classe no Body (quando ela entra e sai dos jogos)
     const observerBody = new MutationObserver(verificarVisibilidadeElementos);
     observerBody.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    window.observadoresUISantuario.push(observerBody);
 
-    // Vigia as Relíquias (Cápsula, Espelho, etc)
     if (modalReliquia) {
         const observerModal = new MutationObserver(verificarVisibilidadeElementos);
         observerModal.observe(modalReliquia, { attributes: true, attributeFilter: ['class'] });
+        window.observadoresUISantuario.push(observerModal);
     }
-    
-    // Vigia o Login (Para fazer os botões brotarem no exato milissegundo em que a senha é aceita)
+
     if (telaLogin) {
         const observerLogin = new MutationObserver(verificarVisibilidadeElementos);
         observerLogin.observe(telaLogin, { attributes: true, attributeFilter: ['style'] });
+        window.observadoresUISantuario.push(observerLogin);
     }
 
-    // Faz a checagem inicial da tela e uma checagem de segurança após a animação da logo (splash) terminar
     verificarVisibilidadeElementos();
-    setTimeout(verificarVisibilidadeElementos, 3000); 
-});
+
+    const timerVisibilidade = setTimeout(verificarVisibilidadeElementos, 3000);
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addTimeout('ui-observers', timerVisibilidade);
+        window.SantuarioRuntime.addCleanup('ui-observers', () => {
+            window.observadoresUISantuario.forEach(observer => {
+                try { observer.disconnect(); } catch (e) {}
+            });
+            window.observadoresUISantuario = [];
+            window.observadoresUISantuarioAtivos = false;
+        });
+    }
+};
+
+window.addEventListener('load', window.inicializarObservadoresUI, { once: true });
 
 
 
@@ -2693,8 +2771,14 @@ window.cancelarCriacaoEstrela = function() {
 
 window.escutarPlanetario = function() {
     if (!window.SantuarioApp) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('planetario-global');
+    }
+
+    if (window.offPlanetario) {
+        window.offPlanetario();
+        window.offPlanetario = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -2741,8 +2825,13 @@ window.escutarPlanetario = function() {
         window.quantidadeSupernovas = countSupernovas;
     });
 
-    if (window.SantuarioRuntime && window.offPlanetario) {
-        window.SantuarioRuntime.addCleanup('planetario-global', window.offPlanetario);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('planetario-global', () => {
+            if (window.offPlanetario) {
+                window.offPlanetario();
+                window.offPlanetario = null;
+            }
+        });
     }
 };
 
@@ -2877,10 +2966,16 @@ window.pausarMusicaSincronizada = function() {
 
 window.escutarTocaDiscos = function() {
     if (!window.SantuarioApp) return;
+
+    if (window.offTocaDiscos) {
+        window.offTocaDiscos();
+        window.offTocaDiscos = null;
+    }
+    if (!window.SantuarioApp) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     const refMusica = ref(db, 'estado_musica');
     
-    onValue(refMusica, (snapshot) => {
+    window.offTocaDiscos = onValue(refMusica, (snapshot) => {
         const dados = snapshot.val();
         
         const audio = document.querySelector('#corpo-modal #audio-sincronizado');
@@ -2928,6 +3023,15 @@ window.escutarTocaDiscos = function() {
             if(typeof playAudioJogos === 'function') playAudioJogos();
         }
     });
+
+        if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('tocadiscos', () => {
+            if (window.offTocaDiscos) {
+                window.offTocaDiscos();
+                window.offTocaDiscos = null;
+            }
+        });
+    }
 };
 
 
@@ -2950,80 +3054,112 @@ const PERGUNTAS_ESPELHO = [
 ];
 
 window.escutarEspelhoDaAlma = function() {
-    // 🚨 FALLBACK DE SEGURANÇA PARA O IPHONE DELA: Se o window.MEU_NOME sumir, pega do login!
     const eu = window.MEU_NOME || (window.souJoao ? 'João' : 'Thamiris');
     const parceiro = window.NOME_PARCEIRO || (window.souJoao ? 'Thamiris' : 'João');
 
     if (!window.SantuarioApp || !eu || !parceiro) return;
-    
-    // Pega a data de hoje no fuso horário do celular
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('espelho-global');
+    }
+
+    if (window.offEspelhoDaAlma) {
+        window.offEspelhoDaAlma();
+        window.offEspelhoDaAlma = null;
+    }
+
     const hoje = new Date();
     const stringData = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
-    
-    // Sorteio matemático da pergunta baseado no dia do ano
+
     const inicioAno = new Date(hoje.getFullYear(), 0, 0);
     const diff = hoje - inicioAno;
     const umDia = 1000 * 60 * 60 * 24;
     const diaDoAno = Math.floor(diff / umDia);
     const indicePergunta = diaDoAno % PERGUNTAS_ESPELHO.length;
-    
-    document.getElementById('pergunta-espelho').innerText = `"${PERGUNTAS_ESPELHO[indicePergunta]}"`;
+
+    const perguntaEl = document.getElementById('pergunta-espelho');
+    if (perguntaEl) {
+        perguntaEl.innerText = `"${PERGUNTAS_ESPELHO[indicePergunta]}"`;
+    }
+
     const tagNomeParceiro = document.getElementById('nome-parceiro-espelho');
-    if (tagNomeParceiro) tagNomeParceiro.innerText = `A alma de ${parceiro}`;
-    
+    if (tagNomeParceiro) {
+        tagNomeParceiro.innerText = `A alma de ${parceiro}`;
+    }
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
-    // Ouve especificamente o diretório da data de hoje!
     const refEspelho = ref(db, `espelho_alma/${stringData}`);
-    
-    onValue(refEspelho, (snapshot) => {
+
+    window.offEspelhoDaAlma = onValue(refEspelho, (snapshot) => {
         const dados = snapshot.val() || {};
-        
-        // 🚨 Busca ignorando maiúsculas e minúsculas com segurança
+
         const minhaResposta = dados[eu.toLowerCase()];
         const respostaDela = dados[parceiro.toLowerCase()];
-        
+
         const boxResponder = document.getElementById('estado-espelho-responder');
         const boxAguardando = document.getElementById('estado-espelho-aguardando');
         const boxRevelado = document.getElementById('estado-espelho-revelado');
         const cartaoEspelho = document.getElementById('cartao-espelho-alma');
-        
+
         if (minhaResposta && respostaDela) {
-            // ESTADO 3: OS DOIS RESPONDERAM! A MAGIA ACONTECE.
-            if(boxResponder) boxResponder.classList.add('escondido');
-            if(boxAguardando) boxAguardando.classList.add('escondido');
-            if(boxRevelado) boxRevelado.classList.remove('escondido');
-            
-            document.getElementById('resposta-minha').innerText = minhaResposta;
-            document.getElementById('resposta-dela').innerText = respostaDela;
-            
-            // Efeito visual + Físico se for a primeira vez que quebra o vidro hoje
+            if (boxResponder) boxResponder.classList.add('escondido');
+            if (boxAguardando) boxAguardando.classList.add('escondido');
+            if (boxRevelado) boxRevelado.classList.remove('escondido');
+
+            const respostaMinhaEl = document.getElementById('resposta-minha');
+            const respostaDelaEl = document.getElementById('resposta-dela');
+
+            if (respostaMinhaEl) respostaMinhaEl.innerText = minhaResposta;
+            if (respostaDelaEl) respostaDelaEl.innerText = respostaDela;
+
             if (cartaoEspelho && !cartaoEspelho.classList.contains('efeito-estilhaco')) {
                 cartaoEspelho.classList.add('efeito-estilhaco');
                 if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([100, 50, 200, 50, 300]);
-                    }
-                if (typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff', '#3498db'], particleCount: 150, spread: 120, zIndex: 1000});
+                    navigator.vibrate([100, 50, 200, 50, 300]);
+                }
+                if (typeof confetti === 'function') {
+                    confetti({
+                        colors: ['#D4AF37', '#ffffff', '#3498db'],
+                        particleCount: 150,
+                        spread: 120,
+                        zIndex: 1000
+                    });
+                }
             }
         } else if (minhaResposta && !respostaDela) {
-            // ESTADO 2.A: SÓ EU RESPONDI E ESTOU AGUARDANDO
-            if(boxResponder) boxResponder.classList.add('escondido');
-            if(boxAguardando) boxAguardando.classList.remove('escondido');
-            if(boxRevelado) boxRevelado.classList.add('escondido');
-            document.getElementById('texto-aguardando-espelho').innerText = `A sua verdade foi gravada. Aguardando ${parceiro} responder em Goiânia para que o espelho se estilhace... 🔒`;
+            if (boxResponder) boxResponder.classList.add('escondido');
+            if (boxAguardando) boxAguardando.classList.remove('escondido');
+            if (boxRevelado) boxRevelado.classList.add('escondido');
+
+            const txtAguardando = document.getElementById('texto-aguardando-espelho');
+            if (txtAguardando) {
+                txtAguardando.innerText = `A sua verdade foi gravada. Aguardando ${parceiro} responder em Goiânia para que o espelho se estilhace... 🔒`;
+            }
         } else if (!minhaResposta && respostaDela) {
-            // ESTADO 2.B: SÓ ELA RESPONDEU (A PRESSÃO PSICOLÓGICA!)
-            if(boxResponder) boxResponder.classList.remove('escondido');
-            if(boxAguardando) boxAguardando.classList.remove('escondido');
-            if(boxRevelado) boxRevelado.classList.add('escondido');
-            document.getElementById('texto-aguardando-espelho').innerHTML = `<span style="color: #ff9ff3; font-weight:bold; font-size:1.1rem;">✨ ${parceiro} já respondeu!</span><br>O espelho agora aguarda a sua resposta para ser revelado.`;
+            if (boxResponder) boxResponder.classList.remove('escondido');
+            if (boxAguardando) boxAguardando.classList.remove('escondido');
+            if (boxRevelado) boxRevelado.classList.add('escondido');
+
+            const txtAguardando = document.getElementById('texto-aguardando-espelho');
+            if (txtAguardando) {
+                txtAguardando.innerHTML = `<span style="color: #ff9ff3; font-weight:bold; font-size:1.1rem;">✨ ${parceiro} já respondeu!</span><br>O espelho agora aguarda a sua resposta para ser revelado.`;
+            }
         } else {
-            // ESTADO 1: O DIA COMEÇOU, NINGUÉM RESPONDEU
-            if(boxResponder) boxResponder.classList.remove('escondido');
-            if(boxAguardando) boxAguardando.classList.add('escondido');
-            if(boxRevelado) boxRevelado.classList.add('escondido');
-            if(cartaoEspelho) cartaoEspelho.classList.remove('efeito-estilhaco'); // Reseta o vidro
+            if (boxResponder) boxResponder.classList.remove('escondido');
+            if (boxAguardando) boxAguardando.classList.add('escondido');
+            if (boxRevelado) boxRevelado.classList.add('escondido');
+            if (cartaoEspelho) cartaoEspelho.classList.remove('efeito-estilhaco');
         }
     });
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('espelho-global', () => {
+            if (window.offEspelhoDaAlma) {
+                window.offEspelhoDaAlma();
+                window.offEspelhoDaAlma = null;
+            }
+        });
+    }
 };
 
 window.enviarRespostaEspelho = function() {
@@ -3062,8 +3198,14 @@ window.enviarRespostaEspelho = function() {
 // ==========================================
 window.escutarRotaDestino = function() {
     if (!window.SantuarioApp?.modulos) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('jornada-global');
+    }
+
+    if (window.offRotaDestino) {
+        window.offRotaDestino();
+        window.offRotaDestino = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -3081,8 +3223,13 @@ window.escutarRotaDestino = function() {
         window.ProgressoAlvoJornada = kmTotal / 1300;
     });
 
-    if (window.SantuarioRuntime && window.offRotaDestino) {
-        window.SantuarioRuntime.addCleanup('jornada-global', window.offRotaDestino);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('jornada-global', () => {
+            if (window.offRotaDestino) {
+                window.offRotaDestino();
+                window.offRotaDestino = null;
+            }
+        });
     }
 };
 
@@ -3139,20 +3286,30 @@ window.inicializarEpicentro = function() {
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('epicentro');
     }
+
+    if (window.offEpicentroParceiro) {
+        window.offEpicentroParceiro();
+        window.offEpicentroParceiro = null;
+    }
+
+    if (window.gpsWatcher !== undefined && window.gpsWatcher !== null) {
+        navigator.geolocation.clearWatch(window.gpsWatcher);
+        window.gpsWatcher = null;
+    }
+
     const painelBloqueado = document.getElementById('epicentro-bloqueado');
     const painelDesbloqueado = document.getElementById('epicentro-desbloqueado');
     const txtDistancia = document.getElementById('distancia-epicentro');
     const pontoRadar = document.getElementById('ponto-alvo-radar');
 
-    // Trava Eterna: Se a distância já zerou, o modal fica destrancado como um troféu!
     if (localStorage.getItem('epicentro_destravado') === 'sim') {
-        if(painelBloqueado) painelBloqueado.classList.add('escondido');
-        if(painelDesbloqueado) painelDesbloqueado.classList.remove('escondido');
+        if (painelBloqueado) painelBloqueado.classList.add('escondido');
+        if (painelDesbloqueado) painelDesbloqueado.classList.remove('escondido');
         return;
     }
 
     if (!window.SantuarioApp || !window.MEU_NOME || !window.NOME_PARCEIRO) {
-        if(txtDistancia) txtDistancia.innerText = "Nuvem Offline";
+        if (txtDistancia) txtDistancia.innerText = "Nuvem Offline";
         return;
     }
 
@@ -3165,7 +3322,6 @@ window.inicializarEpicentro = function() {
     let minhaLat = null;
     let minhaLon = null;
 
-    // Fica ouvindo onde ela está na nuvem em tempo real
     window.offEpicentroParceiro = onValue(parceiroGpsRef, (snap) => {
         const dados = snap.val();
         if (dados) {
@@ -3175,11 +3331,6 @@ window.inicializarEpicentro = function() {
         }
     });
 
-    if (window.SantuarioRuntime && window.offEpicentroParceiro) {
-        window.SantuarioRuntime.addCleanup('epicentro', window.offEpicentroParceiro);
-    }
-
-    // Aciona o chip de GPS do celular
     if (navigator.geolocation) {
         window.gpsWatcher = navigator.geolocation.watchPosition((pos) => {
             minhaLat = pos.coords.latitude;
@@ -3187,7 +3338,6 @@ window.inicializarEpicentro = function() {
 
             set(meuGpsRef, { lat: minhaLat, lon: minhaLon, timestamp: Date.now() });
             calcularColisao();
-
         }, () => {
             if (txtDistancia) txtDistancia.innerText = "GPS Recusado";
         }, {
@@ -3195,85 +3345,100 @@ window.inicializarEpicentro = function() {
             maximumAge: 5000,
             timeout: 10000
         });
-
-        if (window.SantuarioRuntime && window.gpsWatcher !== null) {
-            window.SantuarioRuntime.addCleanup('epicentro', () => {
-                if (window.gpsWatcher !== null) {
-                    navigator.geolocation.clearWatch(window.gpsWatcher);
-                    window.gpsWatcher = null;
-                }
-            });
-        }
     } else {
-        if(txtDistancia) txtDistancia.innerText = "Satélite Indisponível";
+        if (txtDistancia) txtDistancia.innerText = "Satélite Indisponível";
+    }
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('epicentro', () => {
+            if (window.offEpicentroParceiro) {
+                window.offEpicentroParceiro();
+                window.offEpicentroParceiro = null;
+            }
+
+            if (window.gpsWatcher !== undefined && window.gpsWatcher !== null) {
+                navigator.geolocation.clearWatch(window.gpsWatcher);
+                window.gpsWatcher = null;
+            }
+        });
     }
 
     function calcularColisao() {
-        // Se falta o GPS de um dos dois, aguarda educadamente
-        if (!parceiroLat || !minhaLat) {
-            if(txtDistancia && !txtDistancia.innerText.includes("KM") && !txtDistancia.innerText.includes("M")) {
+        if (
+            parceiroLat == null || parceiroLon == null ||
+            minhaLat == null || minhaLon == null
+        ) {
+            if (txtDistancia && !txtDistancia.innerText.includes("KM") && !txtDistancia.innerText.includes("M")) {
                 txtDistancia.innerText = "Aguardando Alvo...";
             }
             return;
         }
 
-        // Matemática Esférica de Haversine (Precisão Militar)
-        const R = 6371; 
-        const dLat = (parceiroLat - minhaLat) * (Math.PI/180);
-        const dLon = (parceiroLon - minhaLon) * (Math.PI/180);
-        
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(minhaLat * (Math.PI/180)) * Math.cos(parceiroLat * (Math.PI/180)) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const R = 6371;
+        const dLat = (parceiroLat - minhaLat) * (Math.PI / 180);
+        const dLon = (parceiroLon - minhaLon) * (Math.PI / 180);
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(minhaLat * (Math.PI / 180)) * Math.cos(parceiroLat * (Math.PI / 180)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const distanciaMetros = (R * c) * 1000;
 
-        // Animação do Radar
         if (pontoRadar) {
-            let raioVisual = Math.min(distanciaMetros / 100000, 1) * 45; 
-            let anguloRad = Date.now() / 1000; 
+            let raioVisual = Math.min(distanciaMetros / 100000, 1) * 45;
+            let anguloRad = Date.now() / 1000;
             let posX = 50 + (Math.cos(anguloRad) * raioVisual);
             let posY = 50 + (Math.sin(anguloRad) * raioVisual);
             pontoRadar.style.left = `${posX}%`;
             pontoRadar.style.top = `${posY}%`;
         }
 
-        // 🚨 O GATILHO DA COLISÃO FÍSICA (15 METROS DE DISTÂNCIA)
         if (distanciaMetros <= 15) {
-            if(txtDistancia) txtDistancia.innerText = "0.00 M";
-            // Desliga a antena GPS para economizar bateria instantaneamente
-            if (window.gpsWatcher !== null) navigator.geolocation.clearWatch(window.gpsWatcher);
+            if (txtDistancia) txtDistancia.innerText = "0.00 M";
+
+            if (window.gpsWatcher !== null) {
+                navigator.geolocation.clearWatch(window.gpsWatcher);
+                window.gpsWatcher = null;
+            }
+
             desbloquearEpicentro();
         } else {
-            // Exibe a distância real em tela
             if (distanciaMetros > 1000) {
-                if(txtDistancia) txtDistancia.innerText = (distanciaMetros/1000).toFixed(1) + " KM";
+                if (txtDistancia) txtDistancia.innerText = (distanciaMetros / 1000).toFixed(1) + " KM";
             } else {
-                if(txtDistancia) txtDistancia.innerText = distanciaMetros.toFixed(0) + " M";
+                if (txtDistancia) txtDistancia.innerText = distanciaMetros.toFixed(0) + " M";
             }
         }
     }
 
     function desbloquearEpicentro() {
-        // Grava na memória do celular que o encontro aconteceu
         localStorage.setItem('epicentro_destravado', 'sim');
 
         if (window.SantuarioRuntime) {
             window.SantuarioRuntime.clearModule('epicentro');
         }
-        
-        if(painelBloqueado) painelBloqueado.classList.add('escondido');
-        if(painelDesbloqueado) {
+
+        if (painelBloqueado) painelBloqueado.classList.add('escondido');
+
+        if (painelDesbloqueado) {
             painelDesbloqueado.classList.remove('escondido');
-            
-            // O celular treme e explode em ouro
+
             if (window.Haptics && navigator.vibrate) {
-                        navigator.vibrate([300, 100, 300, 100, 500, 200, 800]);
-                    }
-            if (typeof confetti === 'function') confetti({colors: ['#D4AF37', '#ffffff'], particleCount: 300, spread: 200, gravity: 1.5, zIndex: 10000});
-            
-            // Dá o Play no vídeo automaticamente
+                navigator.vibrate([300, 100, 300, 100, 500, 200, 800]);
+            }
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    colors: ['#D4AF37', '#ffffff'],
+                    particleCount: 300,
+                    spread: 200,
+                    gravity: 1.5,
+                    zIndex: 10000
+                });
+            }
+
             const vid = document.getElementById('video-reencontro');
             if (vid) vid.play().catch(e => console.log('Autoplay bloqueado', e));
         }
@@ -3438,8 +3603,14 @@ function liberarTela() {
 
 window.escutarEstadoSono = function() {
     if (!window.SantuarioApp || !window.NOME_PARCEIRO || !window.MEU_NOME) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('sono-global');
+    }
+
+    if (window.offSonoParceira) {
+        window.offSonoParceira();
+        window.offSonoParceira = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -3452,8 +3623,13 @@ window.escutarEstadoSono = function() {
         atualizarCenaSono3D();
     });
 
-    if (window.SantuarioRuntime && window.offSonoParceira) {
-        window.SantuarioRuntime.addCleanup('sono-global', window.offSonoParceira);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('sono-global', () => {
+            if (window.offSonoParceira) {
+                window.offSonoParceira();
+                window.offSonoParceira = null;
+            }
+        });
     }
 };
 
@@ -3645,8 +3821,47 @@ let listenerSingularidade = null;
 let meuRastro = [];
 let rastroDela = [];
 
+function limparSingularidadeLocal() {
+    if (singularidadeLoop) {
+        cancelAnimationFrame(singularidadeLoop);
+        singularidadeLoop = null;
+    }
+
+    if (listenerSingularidade) {
+        listenerSingularidade();
+        listenerSingularidade = null;
+    }
+
+    const canvas = document.getElementById('canvas-calor');
+    if (canvas) {
+        canvas.onmousedown = null;
+        canvas.onmousemove = null;
+        canvas.onmouseup = null;
+        canvas.onmouseleave = null;
+        canvas.ontouchstart = null;
+        canvas.ontouchmove = null;
+        canvas.ontouchend = null;
+        canvas.ontouchcancel = null;
+    }
+
+    if (window.SantuarioApp && window.SantuarioApp.modulos) {
+        const { db, set, ref } = window.SantuarioApp.modulos;
+        const minhaChave = window.souJoao ? 'joao' : 'thamiris';
+        set(ref(db, `singularidade_ativa/${minhaChave}`), { x: -100, y: -100, ativo: false });
+    }
+
+    meuRastro = [];
+    rastroDela = [];
+}
+
 // Anexa a função diretamente no window para garantir que o HTML sempre a encontre
 window.iniciarToqueFantasma = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('singularidade');
+    }
+
+    limparSingularidadeLocal();
+
     const container = document.getElementById('container-fantasma');
     if (!container) return;
     
@@ -3803,6 +4018,12 @@ window.iniciarToqueFantasma = function() {
     };
     
     desenhar();
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('singularidade', () => {
+            limparSingularidadeLocal();
+        });
+    }
 };
 
 window.fecharToqueFantasma = function() {
@@ -3811,27 +4032,18 @@ window.fecharToqueFantasma = function() {
         container.classList.add('escondido');
         container.style.display = 'none';
     }
+
     document.body.classList.remove('modo-jogo-ativo');
-    
-    // Mata a animação pesada
-    if (singularidadeLoop) cancelAnimationFrame(singularidadeLoop);
-    
-    // Limpa meu dedo no banco
-    if (window.SantuarioApp && window.SantuarioApp.modulos) {
-        const { db, set, ref } = window.SantuarioApp.modulos;
-        const minhaChave = window.souJoao ? 'joao' : 'thamiris';
-        set(ref(db, `singularidade_ativa/${minhaChave}`), { x: -100, y: -100, ativo: false });
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('singularidade');
+    } else {
+        limparSingularidadeLocal();
     }
-    
-    // 🚨 DESCONECTA O OUVINTE! Para o Firebase parar de puxar a sua internet.
-    if (listenerSingularidade) {
-        listenerSingularidade(); 
+
+    if (typeof window.playAudioJogos === 'function') {
+        window.playAudioJogos();
     }
-    
-    meuRastro = [];
-    rastroDela = [];
-    
-    if(typeof window.playAudioJogos === 'function') window.playAudioJogos();
 };
 
 
@@ -3900,8 +4112,14 @@ const TELEFONE_THAMIRIS = "+5562994838837";  // Ex: +55629...
 // 1. O Vigilante do Supremo Tribunal
 window.vigiarMandados = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos || !window.MEU_NOME) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('mandados-global');
+    }
+
+    if (window.offMandados) {
+        window.offMandados();
+        window.offMandados = null;
     }
 
     const { db, ref, onValue } = window.SantuarioApp.modulos;
@@ -3926,8 +4144,13 @@ window.vigiarMandados = function() {
         }
     });
 
-    if (window.SantuarioRuntime && window.offMandados) {
-        window.SantuarioRuntime.addCleanup('mandados-global', window.offMandados);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('mandados-global', () => {
+            if (window.offMandados) {
+                window.offMandados();
+                window.offMandados = null;
+            }
+        });
     }
 };
 
@@ -4164,7 +4387,12 @@ function revelarCartaSecreta(stream) {
 
 // 🚨 1. A NOVA MÁGICA: ÁUDIO GRAVE E FLASH DE LUZ (PARA ENGANAR O iPHONE)
 const somCoracaoGrave = new Audio('./assets/sons/coracao.mp3');
-somCoracaoGrave.volume = 1.0; 
+somCoracaoGrave.volume = 1.0;
+somCoracaoGrave.preload = 'auto';
+
+window.audioAlertaEmergencia = window.audioAlertaEmergencia || new Audio('assets/alerta.mp3');
+window.audioAlertaEmergencia.preload = 'auto';
+
 window.overlayPulsoCoracao = null;
 
 window.dispararEfeitoCoracao = function(elementoCoracao) {
@@ -4214,6 +4442,20 @@ let gravandoEco = false;
 let temposBatidas = [];
 let inicioGravacao = 0;
 let padraoVibracaoParaEnviar = [];
+let radarEcoAtivo = null;
+let listenersRadarEcoLigados = false;
+
+function removerListenersRadarEco() {
+    if (!radarEcoAtivo) {
+        radarEcoAtivo = document.getElementById('radar-tátil');
+    }
+
+    if (!radarEcoAtivo || !listenersRadarEcoLigados) return;
+
+    radarEcoAtivo.removeEventListener('touchstart', registrarBatida);
+    radarEcoAtivo.removeEventListener('mousedown', registrarBatida);
+    listenersRadarEcoLigados = false;
+}
 
 window.abrirSalaDeEco = function() {
     const overlay = document.getElementById('overlay-eco-coracao');
@@ -4234,22 +4476,30 @@ window.abrirSalaDeEco = function() {
 
 window.fecharSalaEco = function() {
     const overlay = document.getElementById('overlay-eco-coracao');
-    if(overlay) overlay.classList.add('takeover-escondido');
+    if (overlay) overlay.classList.add('takeover-escondido');
+
     gravandoEco = false;
+    removerListenersRadarEco();
 };
 
 window.iniciarGravacaoEco = function() {
     gravandoEco = true;
     temposBatidas = [];
     inicioGravacao = Date.now();
-    
+
     document.getElementById('btn-iniciar-eco').classList.add('escondido');
     document.getElementById('btn-parar-eco').classList.remove('escondido');
     document.getElementById('instrucao-eco').innerText = "Gravando... Bata na área central.";
-    
+
     const radar = document.getElementById('radar-tátil');
-    radar.addEventListener('touchstart', registrarBatida, {passive: false});
-    radar.addEventListener('mousedown', registrarBatida);
+    if (!radar) return;
+
+    removerListenersRadarEco();
+
+    radarEcoAtivo = radar;
+    radarEcoAtivo.addEventListener('touchstart', registrarBatida, { passive: false });
+    radarEcoAtivo.addEventListener('mousedown', registrarBatida);
+    listenersRadarEcoLigados = true;
 };
 
 function registrarBatida(e) {
@@ -4272,9 +4522,7 @@ function registrarBatida(e) {
 
 window.pararEEnviarEco = async function() {
     gravandoEco = false;
-    const radar = document.getElementById('radar-tátil');
-    radar.removeEventListener('touchstart', registrarBatida);
-    radar.removeEventListener('mousedown', registrarBatida);
+    removerListenersRadarEco();
 
     if (temposBatidas.length < 2) {
         if(typeof mostrarToast === 'function') mostrarToast("Você precisa bater pelo menos 2 vezes.", "⚠️");
@@ -4570,24 +4818,32 @@ window.gastosBoutique = { 'João': 0, 'Thamiris': 0 };
 
 window.iniciarEconomiaBoutique = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    if (window.offBoutiqueGastos) return;
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    // Escuta em tempo real o que cada um já gastou na loja
-    onValue(ref(db, 'jogos/boutique_gastos'), (snapshot) => {
+    window.offBoutiqueGastos = onValue(ref(db, 'jogos/boutique_gastos'), (snapshot) => {
         if (snapshot.exists()) {
             window.gastosBoutique = snapshot.val();
         } else {
             window.gastosBoutique = { 'João': 0, 'Thamiris': 0 };
         }
         
-        // Se a loja estiver aberta na tela, atualiza o saldo na hora
         const overlay = document.getElementById('overlay-boutique');
-        if(overlay && overlay.style.display === 'flex') {
-            if(typeof renderizarBoutique === 'function') renderizarBoutique();
+        if (overlay && overlay.style.display === 'flex') {
+            if (typeof renderizarBoutique === 'function') renderizarBoutique();
         }
     });
-};
 
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('boutique-economia', () => {
+            if (window.offBoutiqueGastos) {
+                window.offBoutiqueGastos();
+                window.offBoutiqueGastos = null;
+            }
+        });
+    }
+};
 
 
 window.renderizarBoutique = function() { 
@@ -4795,20 +5051,23 @@ window.comprarLootbox = function(preco) {
 // SISTEMA DE CHECKLIST: ACORDOS ÍNTIMOS
 // ==========================================
 window.abrirChecklistBoutique = function() {
-    if(window.Haptics) window.Haptics.toqueLeve();
+    if (window.Haptics) window.Haptics.toqueLeve();
     
-    // 🚨 MENSAGEM NOVA PARA PROVAR QUE O CACHE ATUALIZOU
-    if(typeof mostrarToast === 'function') mostrarToast("Sincronizando Livro de Ouro...", "📖");
+    if (typeof mostrarToast === 'function') mostrarToast("Sincronizando Livro de Ouro...", "📖");
 
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) {
-        if(typeof mostrarToast === 'function') mostrarToast("Erro de conexão com o satélite.", "❌");
+        if (typeof mostrarToast === 'function') mostrarToast("Erro de conexão com o satélite.", "❌");
         return;
     }
     
     const { db, ref, onValue } = window.SantuarioApp.modulos;
+
+    if (window.offChecklistBoutique) {
+        window.offChecklistBoutique();
+        window.offChecklistBoutique = null;
+    }
     
-    // Usamos onValue contínuo. Assim, se a Thamiris cumprir a missão, a sua tela fica verde na mesma hora!
-    onValue(ref(db, 'jogos/boutique_pedidos'), (snapshot) => {
+    window.offChecklistBoutique = onValue(ref(db, 'jogos/boutique_pedidos'), (snapshot) => {
         try {
             const dados = snapshot.exists() ? snapshot.val() : {};
             if (typeof window.renderizarModalChecklist === 'function') {
@@ -4818,6 +5077,15 @@ window.abrirChecklistBoutique = function() {
             console.error("Erro ao renderizar checklist:", erro);
         }
     });
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('checklist-boutique', () => {
+            if (window.offChecklistBoutique) {
+                window.offChecklistBoutique();
+                window.offChecklistBoutique = null;
+            }
+        });
+    }
 };
 
 window.renderizarModalChecklist = function(dados) {
@@ -4851,11 +5119,26 @@ window.renderizarModalChecklist = function(dados) {
             <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">O que eu comprei e ${nomeParceiro} me deve.</p>
             <div>${meusDesejosHtml}</div>
 
-            <button class="btn-acao" onclick="document.getElementById('modal-checklist-boutique').style.display='none'" style="width: 100%; margin-top: 25px; background: #333; color: white;">Fechar Livro 📖</button>
+            <button class="btn-acao" onclick="fecharChecklistBoutique()" style="width: 100%; margin-top: 25px; background: #333; color: white;">Fechar Livro 📖</button>
         </div>
     `;
     modal.style.display = 'flex';
     modal.classList.remove('escondido');
+};
+
+window.fecharChecklistBoutique = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('checklist-boutique');
+    } else if (window.offChecklistBoutique) {
+        window.offChecklistBoutique();
+        window.offChecklistBoutique = null;
+    }
+
+    const modal = document.getElementById('modal-checklist-boutique');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('escondido');
+    }
 };
 
 window.gerarListaAcordos = function(pedidosObj, donoDosPedidos) {
@@ -4981,6 +5264,7 @@ window.forcarAtualizacao = function() {
 // ==========================================
 let typingTimer;
 const TYPING_DELAY = 3000; // Tempo para sumir após parar de digitar
+window.inputPostitTypingLigado = window.inputPostitTypingLigado || false;
 
 window.avisarDigitando = function(estahDigitando) {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
@@ -4995,12 +5279,14 @@ window.avisarDigitando = function(estahDigitando) {
 
 // Listener para o input do Mural de Recados
 const inputPostit = document.getElementById('input-postit');
-if (inputPostit) {
+if (inputPostit && !window.inputPostitTypingLigado) {
     inputPostit.addEventListener('input', () => {
         window.avisarDigitando(true);
         clearTimeout(typingTimer);
         typingTimer = setTimeout(() => window.avisarDigitando(false), TYPING_DELAY);
     });
+
+    window.inputPostitTypingLigado = true;
 }
 
 
@@ -5065,8 +5351,19 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 window.iniciarSensorDePresenca = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('presenca-global');
+    }
+
+    if (window.offPresencaConexao) {
+        window.offPresencaConexao();
+        window.offPresencaConexao = null;
+    }
+
+    if (window.offPresencaParceiro) {
+        window.offPresencaParceiro();
+        window.offPresencaParceiro = null;
     }
 
     const { db, ref, onValue, set, onDisconnect } = window.SantuarioApp.modulos;
@@ -5105,11 +5402,18 @@ window.iniciarSensorDePresenca = function() {
         window.parceiroPresencaAnterior = parceiroOnline;
     });
 
-    if (window.SantuarioRuntime && window.offPresencaConexao) {
-        window.SantuarioRuntime.addCleanup('presenca-global', window.offPresencaConexao);
-    }
-    if (window.SantuarioRuntime && window.offPresencaParceiro) {
-        window.SantuarioRuntime.addCleanup('presenca-global', window.offPresencaParceiro);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('presenca-global', () => {
+            if (window.offPresencaConexao) {
+                window.offPresencaConexao();
+                window.offPresencaConexao = null;
+            }
+
+            if (window.offPresencaParceiro) {
+                window.offPresencaParceiro();
+                window.offPresencaParceiro = null;
+            }
+        });
     }
 };
 
@@ -5178,8 +5482,19 @@ function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
 
 window.iniciarRadarGeofencing = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+
     if (window.SantuarioRuntime) {
         window.SantuarioRuntime.clearModule('radargeo-global');
+    }
+
+    if (window.offRadarGeoParceiro) {
+        window.offRadarGeoParceiro();
+        window.offRadarGeoParceiro = null;
+    }
+
+    if (window.loopRadarGeo) {
+        clearInterval(window.loopRadarGeo);
+        window.loopRadarGeo = null;
     }
 
     const { db, ref, set, onValue } = window.SantuarioApp.modulos;
@@ -5221,7 +5536,7 @@ window.iniciarRadarGeofencing = function() {
     window.offRadarGeoParceiro = onValue(ref(db, `gps/${parceiroId}`), (snapshot) => {
         const gpsParceiro = snapshot.val();
 
-        if (gpsParceiro && minhaUltimaLat && minhaUltimaLon) {
+        if (gpsParceiro && minhaUltimaLat != null && minhaUltimaLon != null) {
             if (Date.now() - gpsParceiro.timestamp > 3600000) return;
 
             const distanciaMetros = calcularDistanciaMetros(
@@ -5253,8 +5568,18 @@ window.iniciarRadarGeofencing = function() {
         }
     });
 
-    if (window.SantuarioRuntime && window.offRadarGeoParceiro) {
-        window.SantuarioRuntime.addCleanup('radargeo-global', window.offRadarGeoParceiro);
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('radargeo-global', () => {
+            if (window.offRadarGeoParceiro) {
+                window.offRadarGeoParceiro();
+                window.offRadarGeoParceiro = null;
+            }
+
+            if (window.loopRadarGeo) {
+                clearInterval(window.loopRadarGeo);
+                window.loopRadarGeo = null;
+            }
+        });
     }
 };
 
@@ -5364,6 +5689,9 @@ window.abrirBoutique = function() {
 };
 
 window.fecharBoutique = function() {
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('boutique-economia');
+    }
     const overlay = document.getElementById('overlay-boutique');
     if (overlay) overlay.style.display = 'none';
     window.gerenciarMusicaVegas('stop');
@@ -5402,15 +5730,15 @@ window.dicionarioInventario = {
 
 window.iniciarOuvinteInventario = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
+    if (window.offInventarioCasal) return;
+
     const { db, ref, onValue } = window.SantuarioApp.modulos;
     
-    // Escuta o nó 'recursos/inventario' em tempo real
-    onValue(ref(db, 'recursos/inventario'), (snapshot) => {
+    window.offInventarioCasal = onValue(ref(db, 'recursos/inventario'), (snapshot) => {
         try {
             const data = snapshot.val() || {};
             let inventarioMudou = false;
             
-            // Verifica se algum item subiu (para mostrar a bolinha vermelha na mochila)
             Object.keys(window.dicionarioInventario).forEach(item => {
                 let novoValor = Number(data[item]) || 0;
                 if (novoValor > (window.inventarioCasal[item] || 0)) inventarioMudou = true;
@@ -5419,16 +5747,26 @@ window.iniciarOuvinteInventario = function() {
 
             window.renderizarInventarioSantuario();
 
-            // Pisca a bolinha vermelha se a Thamiris colher algo e você estiver com a tela fechada
             const alerta = document.getElementById('alerta-novo-item');
             const modal = document.getElementById('modal-inventario-santuario');
             if (inventarioMudou && alerta && modal && modal.classList.contains('escondido')) {
                 alerta.classList.remove('escondido');
-                if (window.Haptics && navigator.vibrate) navigator.vibrate(30); 
+                if (window.Haptics && navigator.vibrate) navigator.vibrate(30);
             }
 
-        } catch (e) { console.error("Erro ao sincronizar inventário:", e); }
+        } catch (e) {
+            console.error("Erro ao sincronizar inventário:", e);
+        }
     });
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('inventario-global', () => {
+            if (window.offInventarioCasal) {
+                window.offInventarioCasal();
+                window.offInventarioCasal = null;
+            }
+        });
+    }
 };
 
 // 🚨 A INJEÇÃO DE INICIALIZAÇÃO INVISÍVEL
@@ -5514,7 +5852,19 @@ window.adicionarItemInventario = async function(chaveItem, quantidadeAdicional) 
     } catch (e) { console.error("Erro ao adicionar item:", e); }
 };
 
-window.iniciarListenersGlobaisUltra = function() {
+window.iniciarListenersGlobaisUltra = function(forcarReinicio = false) {
+    if (forcarReinicio && window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('sono-global');
+        window.SantuarioRuntime.clearModule('jornada-global');
+        window.SantuarioRuntime.clearModule('mandados-global');
+        window.SantuarioRuntime.clearModule('presenca-global');
+        window.SantuarioRuntime.clearModule('radargeo-global');
+        window.SantuarioRuntime.clearModule('eco-global');
+    }
+
+    if (window.listenersGlobaisUltraAtivos && !forcarReinicio) return;
+    window.listenersGlobaisUltraAtivos = true;
+
     if (typeof window.escutarEstadoSono === 'function') window.escutarEstadoSono();
     if (typeof window.escutarRotaDestino === 'function') window.escutarRotaDestino();
     if (typeof window.vigiarMandados === 'function') window.vigiarMandados();
@@ -5524,8 +5874,10 @@ window.iniciarListenersGlobaisUltra = function() {
 };
 
 window.addEventListener('loginSucesso', () => {
+    window.listenersGlobaisUltraAtivos = false;
+
     const timerGlobaisUltra = setTimeout(() => {
-        window.iniciarListenersGlobaisUltra();
+        window.iniciarListenersGlobaisUltra(true);
     }, 1500);
 
     if (window.SantuarioRuntime) {
@@ -5533,7 +5885,7 @@ window.addEventListener('loginSucesso', () => {
     }
 });
 
-if (window.usuarioLogado) {
+if (window.usuarioLogado && !window.listenersGlobaisUltraAtivos) {
     const timerGlobaisUltraJaLogado = setTimeout(() => {
         window.iniciarListenersGlobaisUltra();
     }, 1500);

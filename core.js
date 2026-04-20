@@ -149,6 +149,26 @@ window.SantuarioCrypto = {
 window.SantuarioApp = window.SantuarioApp || {};
 window.SantuarioApp.inicializado = false;
 window.SantuarioApp.modulos = null;
+window.offPostitNotificacoes = null;
+window.offPostitTyping = null;
+window.offPostitsMural = null;
+
+window.desligarListenersPostits = function() {
+    if (window.offPostitNotificacoes) {
+        window.offPostitNotificacoes();
+        window.offPostitNotificacoes = null;
+    }
+
+    if (window.offPostitTyping) {
+        window.offPostitTyping();
+        window.offPostitTyping = null;
+    }
+
+    if (window.offPostitsMural) {
+        window.offPostitsMural();
+        window.offPostitsMural = null;
+    }
+};
 
 window.SantuarioApp.conectar = function() {
     if (!this.inicializado || !this.modulos) return;
@@ -512,10 +532,18 @@ window.escutarPostits = function() {
     if (!window.SantuarioApp || !window.SantuarioApp.modulos) return;
     const { db, ref, onValue } = window.SantuarioApp.modulos;
 
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.clearModule('postits-core');
+    }
+
+    if (typeof window.desligarListenersPostits === 'function') {
+        window.desligarListenersPostits();
+    }
+
     
     // 🚨 1. O OLHEIRO DE NOTIFICAÇÕES (Acende a luz verde no Pulso de Vida)
     const euId = window.souJoao ? 'joao' : 'thamiris';
-    onValue(ref(db, `notificacoes_postit/${euId}`), (snapshot) => {
+    window.offPostitNotificacoes = onValue(ref(db, `notificacoes_postit/${euId}`), (snapshot) => {
         const dados = snapshot.val();
         const notifEl = document.getElementById('notificacao-postit');
         
@@ -538,7 +566,7 @@ window.escutarPostits = function() {
     const parceiroId = window.souJoao ? 'thamiris' : 'joao';
     const nomeParceiro = window.souJoao ? 'Thamiris' : 'João';
     
-    onValue(ref(db, `typing_status/${parceiroId}`), (snapshot) => {
+    window.offPostitTyping = onValue(ref(db, `typing_status/${parceiroId}`), (snapshot) => {
         const status = snapshot.val();
         const container = document.getElementById('typing-status-container');
         const text = document.getElementById('typing-text');
@@ -559,7 +587,7 @@ window.escutarPostits = function() {
     });
 
     // 2. O LEITOR DE POST-ITS (Constrói o mural com as cores e pastas)
-    onValue(ref(db, 'postits'), (snapshot) => {
+    window.offPostitsMural = onValue(ref(db, 'postits'), (snapshot) => {
         const areaAtual = document.getElementById('area-postits');
         const areaArquivo = document.getElementById('conteudo-arquivo-postits');
         if (!areaAtual || !areaArquivo) return;
@@ -635,6 +663,14 @@ window.escutarPostits = function() {
             areaArquivo.innerHTML = htmlArquivoFinal;
         }
     });
+
+    if (window.SantuarioRuntime) {
+        window.SantuarioRuntime.addCleanup('postits-core', () => {
+            if (typeof window.desligarListenersPostits === 'function') {
+                window.desligarListenersPostits();
+            }
+        });
+    }
 };
 
 // ============================================================================

@@ -94,6 +94,10 @@ function configurarNavegacao() {
     });
 }
 
+window.santuarioBootExecutado = window.santuarioBootExecutado || false;
+window.listenerLoginBootRegistrado = window.listenerLoginBootRegistrado || false;
+window.onLoginSucessoBoot = window.onLoginSucessoBoot || null;
+
 // ========== SERVICE WORKER E ATUALIZAÇÕES ==========
 window.toastServiceWorkerMostrado = false;
 
@@ -230,20 +234,20 @@ function bootCritico() {
     const temaSelector = document.getElementById('tema-selector');
 
     if (temaIcon && temaSelector) {
-        temaIcon.addEventListener('click', () => {
+        temaIcon.onclick = () => {
             temaSelector.classList.toggle('escondido');
-        });
+        };
 
         document.querySelectorAll('.btn-tema').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.onclick = () => {
                 temaSelector.classList.add('escondido');
-            });
+            };
         });
     }
 
     const btnVerificar = document.getElementById('btn-verificar-atualizacao');
     if (btnVerificar) {
-        btnVerificar.addEventListener('click', verificarAtualizacao);
+        btnVerificar.onclick = verificarAtualizacao;
     }
 }
 
@@ -298,18 +302,37 @@ function bootSobDemanda() {
         }, 2500));
     }
 
-    window.addEventListener('loginSucesso', () => {
-        if (window.SantuarioApp && typeof window.SantuarioApp.conectar === 'function') {
-            window.SantuarioApp.conectar();
+    if (!window.listenerLoginBootRegistrado) {
+        window.listenerLoginBootRegistrado = true;
+
+        window.onLoginSucessoBoot = () => {
+            if (window.SantuarioApp && typeof window.SantuarioApp.conectar === 'function') {
+                window.SantuarioApp.conectar();
+            }
+        };
+
+        window.addEventListener('loginSucesso', window.onLoginSucessoBoot);
+
+        if (window.SantuarioRuntime) {
+            window.SantuarioRuntime.addCleanup('boot-ui', () => {
+                if (window.onLoginSucessoBoot) {
+                    window.removeEventListener('loginSucesso', window.onLoginSucessoBoot);
+                    window.onLoginSucessoBoot = null;
+                }
+                window.listenerLoginBootRegistrado = false;
+            });
         }
-    });
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    if (window.santuarioBootExecutado) return;
+    window.santuarioBootExecutado = true;
+
     bootCritico();
     bootSecundario();
     bootSobDemanda();
-});
+}, { once: true });
 
 // ==========================================
 // INJEÇÃO LAZY LOAD (MOTOR 3D)

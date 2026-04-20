@@ -102,7 +102,7 @@ function mostrarToastServiceWorkerAtivo() {
     if (typeof mostrarToast !== 'function') return;
 
     window.toastServiceWorkerMostrado = true;
-    mostrarToast('Service Worker ativo! ✨');
+    mostrarToast('Service Worker ativo!', '✨');
 }
 
 function registrarServiceWorker() {

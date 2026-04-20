@@ -102,6 +102,10 @@ function registrarServiceWorker() {
         .then(reg => {
             console.log('Service Worker registrado!', reg);
 
+            if (typeof mostrarToast === 'function') {
+                mostrarToast('✅ Service Worker ativo!');
+            }
+
             reg.addEventListener('updatefound', () => {
                 const novoSW = reg.installing;
                 if (!novoSW) return;

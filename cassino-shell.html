@@ -1,0 +1,163 @@
+<div id="overlay-cassino" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 99999; flex-direction: column; overflow-y: auto; display: none;">
+        
+        <div class="top-bar" style="background: rgba(0,0,0,0.9); border-bottom: 2px solid rgba(212, 175, 55, 0.7); z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; position: sticky; top: 0; animation: ledPulseGold 1.5s infinite;">
+            <div class="top-bar-left" style="display: flex; gap: 5px; align-items: center;">
+                <button class="btn-voltar" onclick="fecharCassino()" style="padding: 6px 12px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 15px; color: #D4AF37;">← Sair do VIP</button>
+            </div>
+            
+            <div class="top-bar-right" style="display: flex; gap: 6px; align-items: center; justify-content: flex-end;">
+                <div class="visor-moedas-global-container" style="padding: 6px 12px; font-size: 1rem; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.3);">
+                    <span class="visor-moedas-global-texto" style="color: #D4AF37;">0</span>
+                    <span style="font-size: 0.9rem;">💰</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; padding: 30px 15px 10px 15px;">
+            <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);">🎰</div>
+            <h2 style="color: #D4AF37; font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6); animation: neonPulseGold 2s infinite;">Cassino do Afeto</h2>
+            <p style="color: rgba(255,255,255,0.6); font-style: italic; font-size: 1rem; margin-top: 5px;">A casa não tem piedade. Boa sorte, amor.</p>
+        </div>
+
+        <div style="padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px;">
+            
+            <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('tigrinho')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e74c3c; box-shadow: 0 0 20px rgba(231, 76, 60, 0.4); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(231, 76, 60, 0.15); border-radius: 15px; border: 1px solid rgba(231, 76, 60, 0.5); flex-shrink: 0;">
+            <img src="assets/icones-cassino/tigre.png" alt="Tigre" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Tigre da Sorte (Fortune)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Ache a Carta da Sorte e leve o Mega Jackpot.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('mines')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(0, 212, 255, 0.1); border-radius: 15px; border: 1px solid rgba(0, 212, 255, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/mines.png" alt="Bomba" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Campo Minado (Mines)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Multiplique a aposta. Desvie das bombas.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-slots" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('slots')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(255, 0, 255, 0.1); border-radius: 15px; border: 1px solid rgba(255, 0, 255, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/slots.png" alt="Slots" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Caça-Níquel (Slots)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Alinhe os símbolos e leve o Jackpot.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-blackjack" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('blackjack')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(0, 255, 0, 0.1); border-radius: 15px; border: 1px solid rgba(0, 255, 0, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/21.png" alt="Cartas" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Blackjack (21)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Derrote a mesa sem estourar 21 pontos.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('crash')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(255, 255, 0, 0.1); border-radius: 15px; border: 1px solid rgba(255, 255, 0, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/crash.png" alt="Foguete" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">O Foguetinho (Crash)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Retire o lucro antes da explosão.</p>
+        </div>
+    </div>
+    
+    <div class="cartao-vidro-mines cartao-mines-crash" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('roleta')" style="display: flex; align-items: center; padding: 15px; gap: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(46, 204, 113, 0.1); border-radius: 15px; border: 1px solid rgba(46, 204, 113, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/roleta_sorte.png" alt="Roleta" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Roleta da Sorte</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Aposte suas cores e números.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('plinko')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(155, 89, 182, 0.1); border-radius: 15px; border: 1px solid rgba(155, 89, 182, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/plinko.png" alt="Plinko" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Plinko</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Solte a bolinha e busque o Jackpot.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('raspadinha')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #bdc3c7; box-shadow: 0 0 20px rgba(189, 195, 199, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(189, 195, 199, 0.1); border-radius: 15px; border: 1px solid rgba(189, 195, 199, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/raspadinha.png" alt="Raspadinha" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Raspadinha VIP</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Raspe a tela e ache 3 símbolos iguais.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('towers')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(0, 212, 255, 0.1); border-radius: 15px; border: 1px solid rgba(0, 212, 255, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/torre.png" alt="Torre" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">A Torre VIP</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Escale os degraus e multiplique o ouro.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('hilo')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #e67e22; box-shadow: 0 0 20px rgba(230, 126, 34, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(230, 126, 34, 0.1); border-radius: 15px; border: 1px solid rgba(230, 126, 34, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/hilo.png" alt="Hi-Lo" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Hi-Lo (Maior / Menor)</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Adivinhe a próxima carta e acumule lucros.</p>
+        </div>
+    </div>
+
+    <div class="cartao-vidro-mines" onclick="if(window.Haptics) window.Haptics.toqueLeve(); abrirMesaCassino('dice')" style="display: flex; align-items: center; padding: 15px; gap: 15px; border: 2px solid #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.3); border-radius: 15px; cursor: pointer; transition: transform 0.2s ease;">
+        <div style="display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; background: rgba(52, 152, 219, 0.1); border-radius: 15px; border: 1px solid rgba(52, 152, 219, 0.3); flex-shrink: 0;">
+            <img src="assets/icones-cassino/dados.png" alt="Dado" style="width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        </div>
+        <div>
+            <h4 style="color: #fff; margin: 0; font-size: 1.2rem; font-family: 'Playfair Display', serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);">Dado de Ouro</h4>
+            <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 0.85rem; margin-top: 3px;">Controle suas chances e multiplicadores.</p>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <div id="mesa-mines" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 5, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;"></div>
+    <div id="mesa-slots" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(30, 10, 10, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: calc(15px + env(safe-area-inset-top));; padding-bottom: env(safe-area-inset-bottom);"></div>
+    <div id="mesa-crash" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 15, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;"></div>
+    <div id="mesa-blackjack" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(20, 50, 30, 0.98), rgba(5, 15, 10, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;"></div>
+    <div id="mesa-roleta" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 5, 10, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none;"></div>
+    <div id="mesa-plinko" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, rgba(30, 10, 40, 0.98), rgba(5, 5, 10, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none; padding-top: calc(15px + env(safe-area-inset-top));"></div>
+    <div id="mesa-raspadinha" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(30, 35, 40, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none; padding-top: calc(15px + env(safe-area-inset-top));"></div>
+    <div id="mesa-towers" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, rgba(10, 20, 30, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom);"></div>
+    <div id="mesa-hilo" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(30, 15, 5, 0.98), rgba(10, 5, 5, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom);"></div>
+    <div id="mesa-dice" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, rgba(10, 15, 30, 0.98), rgba(5, 5, 8, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none; padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom);"></div>
+    <div id="mesa-tigrinho" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(40, 5, 5, 0.98), rgba(15, 0, 0, 1)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; overflow-y: auto; display: none; padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom);"></div>
+
+<div id="overlay-cassino-dois" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top center, #0a1118 0%, #000000 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 99999; flex-direction: column; overflow-y: auto; display: none;"></div>
+<div id="mesa-uno" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2c0b0e 0%, #0a0000 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-duelo21" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2c0b0e 0%, #0a0000 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-dadosmentiroso" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1e0924 0%, #05010a 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-roletarussa" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2e1a06 0%, #0a0500 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-pontevidro" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #012a30 0%, #000a0d 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-desarmebomba" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2b0f12 0%, #0a0104 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-corrida" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2e1808 0%, #0a0500 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-elementos" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #081f14 0%, #020a06 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-cacadiamante" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #011f21 0%, #000a0a 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-sincroniacofre" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a1c20 0%, #050608 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-campominado" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a0b2e 0%, #05010a 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-transmissao" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #140524 0%, #05010a 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+<div id="mesa-reator" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2e1a06 0%, #0a0500 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 999999; flex-direction: column; display: none;"></div>
+
+<div id="overlay-boutique" class="escondido" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top, #1a0f1a, #000000); z-index: 100000; display: none; flex-direction: column; overflow: hidden; font-family: 'Playfair Display', serif;"></div>

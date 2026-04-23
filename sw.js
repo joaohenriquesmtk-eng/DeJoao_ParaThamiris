@@ -3,7 +3,7 @@
 // Sprint 3: Blindagem PWA + iPhone
 // ==========================================
 
-const CACHE_NAME = 'santuario-shell-v1';
+const CACHE_NAME = 'santuario-shell-v3';
 const APP_SHELL = [
     '/',
     '/index.html',
@@ -13,7 +13,11 @@ const APP_SHELL = [
     '/app.js',
     '/script.js',
     '/assets/icons/icon-192.png',
-    '/assets/icons/icon-512.png'
+    '/assets/icons/icon-512.png',
+    '/camuflagem.css',
+    '/camuflagem.js',
+    '/github-pages-404-fake.html',
+    '/silencio-total.js',
 ];
 
 // ------------------------------------------

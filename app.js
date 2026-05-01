@@ -102,8 +102,11 @@ window.onLoginSucessoBoot = window.onLoginSucessoBoot || null;
 window.toastServiceWorkerMostrado = false;
 
 function mostrarToastServiceWorkerAtivo() {
+    if (window.toastServiceWorkerMostrado) return;
+    if (typeof mostrarToast !== 'function') return;
+
     window.toastServiceWorkerMostrado = true;
-    return;
+    mostrarToast('Service Worker ativo!', '✨');
 }
 
 function registrarServiceWorker() {

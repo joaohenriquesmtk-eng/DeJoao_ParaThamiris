@@ -13036,3 +13036,626 @@ button, .cartao-pvp, .slot, .botao-jogo {
     transform: scale(0.9);
     background: rgba(255, 255, 255, 0.2);
 }
+
+
+/* =========================================================
+   MINI FAZENDA 2.5D — FASE 1
+   Camada visual viva, leve e reversível
+========================================================= */
+
+.conteudo-fazenda {
+    position: relative;
+    min-height: 100dvh;
+    padding: 14px 10px 40px;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 18% 10%, rgba(255, 238, 170, 0.18), transparent 24%),
+        linear-gradient(180deg, rgba(42, 128, 78, 0.42) 0%, rgba(18, 64, 42, 0.52) 38%, rgba(8, 30, 22, 0.96) 100%);
+}
+
+/* Mantém todo conteúdo jogável acima do cenário decorativo */
+.conteudo-fazenda > :not(.fazenda-cenario-vivo) {
+    position: relative;
+    z-index: 2;
+}
+
+/* Camada decorativa viva */
+.fazenda-cenario-vivo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 0 0 26px 26px;
+}
+
+/* Luz ambiente dourada */
+.fazenda-cenario-vivo::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background:
+        radial-gradient(circle at 18% 12%, rgba(255, 224, 129, 0.34), transparent 19%),
+        radial-gradient(circle at 84% 22%, rgba(46, 204, 113, 0.12), transparent 22%),
+        radial-gradient(circle at 50% 85%, rgba(212, 175, 55, 0.10), transparent 30%);
+    animation: fazendaLuzRespira 8s ease-in-out infinite alternate;
+}
+
+/* Chuva visual leve quando o JS aplicar classe clima-chuva no overlay */
+#clima-overlay.clima-chuva ~ .conteudo-fazenda .fazenda-cenario-vivo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(115deg, rgba(255,255,255,0.18) 0 1px, transparent 1px 9px);
+    background-size: 16px 22px;
+    opacity: 0.25;
+    animation: fazendaChuvaCai 0.7s linear infinite;
+}
+
+/* Noite mais profunda quando o motor aplicar clima-noite */
+#clima-overlay.clima-noite ~ .conteudo-fazenda .fazenda-cenario-vivo {
+    filter: brightness(0.72) saturate(0.9);
+}
+
+/* Inverno mais frio quando o motor aplicar clima-inverno */
+#clima-overlay.clima-inverno ~ .conteudo-fazenda .fazenda-cenario-vivo {
+    filter: brightness(0.86) saturate(0.72) hue-rotate(8deg);
+}
+
+/* Sol */
+.fazenda-sol-vivo {
+    position: absolute;
+    top: 22px;
+    left: 30px;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, #fff7b0 0%, #f7d66c 42%, rgba(247, 214, 108, 0.0) 70%);
+    box-shadow:
+        0 0 30px rgba(247, 214, 108, 0.42),
+        0 0 80px rgba(247, 214, 108, 0.20);
+    animation: fazendaSolPulsa 6s ease-in-out infinite alternate;
+}
+
+/* Nuvens */
+.nuvem-fazenda {
+    position: absolute;
+    top: 24px;
+    font-size: 2.2rem;
+    opacity: 0.48;
+    filter: blur(0.1px) drop-shadow(0 8px 12px rgba(0,0,0,0.22));
+    animation: fazendaNuvemFlutua 18s linear infinite;
+}
+
+.nuvem-fazenda-1 {
+    left: 22%;
+    animation-duration: 24s;
+}
+
+.nuvem-fazenda-2 {
+    top: 58px;
+    left: 58%;
+    font-size: 1.7rem;
+    opacity: 0.35;
+    animation-duration: 29s;
+}
+
+.nuvem-fazenda-3 {
+    top: 96px;
+    left: 82%;
+    font-size: 1.35rem;
+    opacity: 0.28;
+    animation-duration: 34s;
+}
+
+/* Colinas */
+.fazenda-colina {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50% 50% 0 0;
+}
+
+.fazenda-colina-fundo {
+    top: 96px;
+    width: 118%;
+    height: 190px;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(92, 184, 92, 0.75), transparent 28%),
+        linear-gradient(180deg, rgba(41, 128, 70, 0.92), rgba(21, 86, 51, 0.92));
+    opacity: 0.72;
+}
+
+.fazenda-colina-frente {
+    top: 150px;
+    width: 128%;
+    height: 240px;
+    background:
+        radial-gradient(circle at 70% 38%, rgba(117, 210, 105, 0.38), transparent 24%),
+        linear-gradient(180deg, rgba(32, 120, 62, 0.94), rgba(13, 57, 37, 0.98));
+    box-shadow: 0 -18px 40px rgba(0,0,0,0.10);
+}
+
+/* Decorações do cenário */
+.fazenda-decor {
+    position: absolute;
+    z-index: 1;
+    font-size: 2.4rem;
+    filter: drop-shadow(0 10px 12px rgba(0,0,0,0.42));
+    transform: translateZ(0);
+}
+
+.fazenda-arvore-1 {
+    top: 126px;
+    left: 7%;
+    animation: fazendaArvoreVento 5.5s ease-in-out infinite alternate;
+}
+
+.fazenda-arvore-2 {
+    top: 164px;
+    right: 7%;
+    font-size: 2.1rem;
+    animation: fazendaArvoreVento 6.2s ease-in-out infinite alternate-reverse;
+}
+
+.fazenda-celeiro {
+    top: 118px;
+    left: 50%;
+    font-size: 3rem;
+    transform: translateX(-50%) translateZ(0);
+    animation: fazendaDecorRespira 7s ease-in-out infinite alternate;
+}
+
+.fazenda-moinho {
+    top: 172px;
+    left: 22%;
+    font-size: 2.5rem;
+    animation: fazendaDecorRespira 8s ease-in-out infinite alternate-reverse;
+}
+
+.fazenda-flores {
+    top: 226px;
+    right: 16%;
+    font-size: 1.5rem;
+    opacity: 0.9;
+    animation: fazendaDecorRespira 4s ease-in-out infinite alternate;
+}
+
+/* Área de pastagem mais viva */
+.area-pastagem {
+    position: relative;
+    min-height: 118px;
+    margin: 18px 8px 16px;
+    border-radius: 28px;
+    overflow: visible;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.10), transparent 36%),
+        linear-gradient(180deg, rgba(74, 165, 85, 0.36), rgba(18, 95, 54, 0.68));
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    box-shadow:
+        inset 0 10px 24px rgba(255,255,255,0.04),
+        inset 0 -14px 28px rgba(0,0,0,0.24),
+        0 12px 30px rgba(0,0,0,0.22);
+}
+
+.area-pastagem::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 14px;
+    height: 32px;
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse, rgba(8, 46, 27, 0.58), transparent 68%);
+    opacity: 0.75;
+}
+
+.area-pastagem::after {
+    content: "✦";
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    color: rgba(255, 230, 150, 0.6);
+    font-size: 1rem;
+    animation: fazendaBrilhoSome 3s ease-in-out infinite;
+}
+
+/* Vaca/trator com presença mais orgânica */
+.animatronic-fazenda {
+    position: relative;
+    z-index: 3;
+    filter: drop-shadow(0 12px 12px rgba(0,0,0,0.42));
+    animation: fazendaAnimalRespira 3.8s ease-in-out infinite alternate;
+}
+
+#animal-vaca:not(.escondido) {
+    animation:
+        fazendaAnimalRespira 3.8s ease-in-out infinite alternate,
+        fazendaVacaPasseia 15s ease-in-out infinite alternate;
+}
+
+#maquina-trator:not(.escondido) {
+    animation:
+        fazendaAnimalRespira 4.8s ease-in-out infinite alternate,
+        fazendaTratorPasseia 18s ease-in-out infinite alternate;
+}
+
+.emoji-3d {
+    display: inline-block;
+    transform: translateZ(0);
+    text-shadow: 0 10px 16px rgba(0,0,0,0.35);
+}
+
+/* Grade com sensação de tabuleiro */
+.grade-plantacao {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(92px, 1fr));
+    gap: 18px;
+    padding: 22px 14px 28px;
+    margin: 8px 4px 18px;
+    border-radius: 32px;
+    background:
+        linear-gradient(145deg, rgba(16, 67, 41, 0.72), rgba(7, 38, 27, 0.82)),
+        radial-gradient(circle at 50% 0%, rgba(212,175,55,0.10), transparent 34%);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+    box-shadow:
+        inset 0 12px 30px rgba(255,255,255,0.035),
+        inset 0 -20px 40px rgba(0,0,0,0.32),
+        0 18px 40px rgba(0,0,0,0.34);
+    perspective: 900px;
+}
+
+/* Canteiro com profundidade 2.5D */
+.canteiro-pro {
+    position: relative;
+    min-height: 138px;
+    border-radius: 24px 24px 30px 30px;
+    overflow: visible;
+    background:
+        radial-gradient(ellipse at 50% 28%, rgba(116, 74, 38, 0.95) 0%, rgba(88, 52, 30, 0.92) 52%, rgba(54, 32, 24, 0.96) 100%);
+    border: 1px solid rgba(255, 230, 170, 0.13);
+    box-shadow:
+        inset 0 12px 18px rgba(255,255,255,0.055),
+        inset 0 -18px 22px rgba(0,0,0,0.34),
+        0 13px 0 rgba(50, 30, 19, 0.96),
+        0 22px 24px rgba(0,0,0,0.38);
+    transform: translateZ(0);
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease;
+}
+
+.canteiro-pro::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    right: 11px;
+    top: 28px;
+    height: 64px;
+    border-radius: 50%;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            rgba(112, 67, 34, 0.22) 0 6px,
+            rgba(56, 32, 20, 0.20) 6px 12px
+        ),
+        radial-gradient(ellipse, rgba(132, 83, 42, 0.96), rgba(70, 42, 25, 0.88));
+    box-shadow:
+        inset 0 8px 12px rgba(255,255,255,0.04),
+        inset 0 -8px 12px rgba(0,0,0,0.26);
+    transform: rotate(-2deg);
+}
+
+.canteiro-pro::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: -22px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.46), transparent 68%);
+    z-index: -1;
+}
+
+.canteiro-pro > * {
+    position: relative;
+    z-index: 2;
+}
+
+.canteiro-pro:active {
+    transform: translateY(4px) scale(0.985) translateZ(0);
+    box-shadow:
+        inset 0 12px 18px rgba(255,255,255,0.045),
+        inset 0 -15px 20px rgba(0,0,0,0.32),
+        0 8px 0 rgba(50, 30, 19, 0.96),
+        0 16px 20px rgba(0,0,0,0.34);
+}
+
+/* Medidores menos “formulário”, mais HUD de jogo */
+.medidores-solo {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 9px;
+    display: flex;
+    gap: 4px;
+    z-index: 4;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.26);
+    border: 1px solid rgba(255,255,255,0.055);
+}
+
+.barra-medidor {
+    height: 5px;
+    flex: 1;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.34);
+}
+
+.barra-medidor > div {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.45s ease, background 0.45s ease;
+}
+
+/* Texto do pH vira detalhe de HUD */
+[id^="texto-ph-"] {
+    top: 21px !important;
+    left: 12px !important;
+    font-size: 0.64rem !important;
+    color: rgba(255,255,255,0.72) !important;
+    z-index: 4 !important;
+}
+
+/* Pragas mais visíveis, como evento vivo */
+.alerta-praga {
+    position: absolute;
+    right: 12px;
+    top: 33px;
+    z-index: 5;
+    font-size: 1.7rem;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.55));
+}
+
+/* Planta pronta com destaque de recompensa */
+.canteiro-pro button.btn-acao {
+    border-radius: 999px !important;
+    transform: translateZ(0);
+}
+
+/* Painel de logística mais integrado ao jogo */
+.painel-economia-agricola {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px !important;
+    background:
+        linear-gradient(145deg, rgba(22, 20, 12, 0.88), rgba(8, 8, 8, 0.88)) !important;
+    box-shadow:
+        inset 0 0 18px rgba(212, 175, 55, 0.10),
+        0 16px 36px rgba(0,0,0,0.34) !important;
+}
+
+.painel-economia-agricola::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(212,175,55,0.18), transparent 24%);
+    animation: fazendaLuzRespira 7s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* Loja agrícola com aparência menos plana */
+.loja-agricola-container {
+    position: relative;
+    z-index: 2;
+    border-radius: 24px;
+    background:
+        linear-gradient(145deg, rgba(8, 28, 20, 0.82), rgba(4, 12, 10, 0.90));
+    border: 1px solid rgba(212, 175, 55, 0.16);
+    box-shadow:
+        inset 0 10px 22px rgba(255,255,255,0.035),
+        0 14px 32px rgba(0,0,0,0.28);
+}
+
+/* Abas mais “mobile game” */
+.abas-loja .aba-btn {
+    border-radius: 999px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.24);
+    transform: translateZ(0);
+}
+
+.abas-loja .aba-btn:active {
+    transform: scale(0.96) translateZ(0);
+}
+
+/* Animações leves e baratas */
+@keyframes fazendaLuzRespira {
+    from {
+        opacity: 0.72;
+        transform: scale(1);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1.025);
+    }
+}
+
+@keyframes fazendaSolPulsa {
+    from {
+        transform: scale(0.96);
+        opacity: 0.82;
+    }
+    to {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+
+@keyframes fazendaNuvemFlutua {
+    from {
+        transform: translateX(-14px);
+    }
+    to {
+        transform: translateX(36px);
+    }
+}
+
+@keyframes fazendaChuvaCai {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -16px 22px;
+    }
+}
+
+@keyframes fazendaArvoreVento {
+    from {
+        transform: rotate(-1.5deg) translateY(0);
+    }
+    to {
+        transform: rotate(1.5deg) translateY(2px);
+    }
+}
+
+@keyframes fazendaDecorRespira {
+    from {
+        transform: translateY(0) scale(0.98);
+    }
+    to {
+        transform: translateY(-3px) scale(1.02);
+    }
+}
+
+@keyframes fazendaAnimalRespira {
+    from {
+        filter: drop-shadow(0 10px 10px rgba(0,0,0,0.40));
+    }
+    to {
+        filter: drop-shadow(0 14px 14px rgba(0,0,0,0.54));
+    }
+}
+
+@keyframes fazendaVacaPasseia {
+    from {
+        transform: translateX(-10px);
+    }
+    to {
+        transform: translateX(18px);
+    }
+}
+
+@keyframes fazendaTratorPasseia {
+    from {
+        transform: translateX(16px);
+    }
+    to {
+        transform: translateX(-18px);
+    }
+}
+
+@keyframes fazendaBrilhoSome {
+    0%, 100% {
+        opacity: 0.15;
+        transform: scale(0.9);
+    }
+    50% {
+        opacity: 0.78;
+        transform: scale(1.08);
+    }
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 720px) {
+    .grade-plantacao {
+        grid-template-columns: repeat(3, minmax(82px, 1fr));
+        gap: 14px;
+        padding: 18px 10px 24px;
+    }
+
+    .canteiro-pro {
+        min-height: 126px;
+        border-radius: 20px 20px 26px 26px;
+    }
+
+    .fazenda-celeiro {
+        font-size: 2.5rem;
+    }
+
+    .fazenda-moinho {
+        font-size: 2.1rem;
+    }
+
+    .fazenda-sol-vivo {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+@media (max-width: 480px) {
+    .grade-plantacao {
+        grid-template-columns: repeat(3, minmax(76px, 1fr));
+        gap: 12px;
+    }
+
+    .canteiro-pro {
+        min-height: 118px;
+    }
+
+    .medidores-solo {
+        left: 7px;
+        right: 7px;
+    }
+
+    .fazenda-arvore-1,
+    .fazenda-arvore-2 {
+        opacity: 0.7;
+    }
+}
+
+/* Respeita redução de movimento no aparelho */
+@media (prefers-reduced-motion: reduce) {
+    .fazenda-cenario-vivo *,
+    .fazenda-cenario-vivo::before,
+    .fazenda-cenario-vivo::after,
+    .area-pastagem::after,
+    .animatronic-fazenda,
+    #animal-vaca:not(.escondido),
+    #maquina-trator:not(.escondido) {
+        animation: none !important;
+    }
+}
+
+/* =========================================================
+   CORREÇÃO — Mantém o respiro cênico sem mostrar retângulo
+========================================================= */
+
+/* Quando vaca e trator ainda não existem, a pastagem vira só espaço invisível */
+.area-pastagem:has(#animal-vaca.escondido):has(#maquina-trator.escondido) {
+    min-height: 128px;
+    margin: 18px 8px 16px;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Remove sombra/brilho da pastagem vazia */
+.area-pastagem:has(#animal-vaca.escondido):has(#maquina-trator.escondido)::before,
+.area-pastagem:has(#animal-vaca.escondido):has(#maquina-trator.escondido)::after {
+    display: none;
+}
+
+/* Quando houver vaca ou trator, a pastagem volta com visual completo */
+.area-pastagem:has(#animal-vaca:not(.escondido)),
+.area-pastagem:has(#maquina-trator:not(.escondido)) {
+    min-height: 118px;
+}

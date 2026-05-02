@@ -344,11 +344,25 @@ window.injetarMotor3D = function() {
     script.src = 'graficos3d.js';
     script.id = 'motor-3d-script';
     
-    script.onload = () => {
-        console.log("🚀 GPU Ativada: Motor 3D injetado via Lazy Load!");
-        // Emite um sinal global avisando que o 3D chegou na área
-        window.dispatchEvent(new Event('motor3DPronto'));
-    };
+script.onload = () => {
+    console.log("🚀 GPU Ativada: Motor 3D injetado via Lazy Load!");
+
+    // Emite um sinal global avisando que o 3D chegou na área
+    window.dispatchEvent(new Event('motor3DPronto'));
+
+    // Restaura o Orbe 3D da Sintonia Atmosférica quando o container existir
+    setTimeout(() => {
+        const orbeClima = document.getElementById('orbe-clima-3d');
+
+        if (
+            orbeClima &&
+            typeof window.inicializarOrbeClima === 'function' &&
+            !orbeClima.querySelector('canvas')
+        ) {
+            window.inicializarOrbeClima();
+        }
+    }, 300);
+};
     
     document.body.appendChild(script); // Dispara o download em segundo plano
 };

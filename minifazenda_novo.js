@@ -475,17 +475,29 @@ function escolherRaridadePedido() {
 }
 
 function escolherModeloPedidoPorRaridade(raridade) {
+    const modelosComunsDisponiveis = PEDIDOS_MODELOS.filter(modelo => pedidoDisponivelPorNivel(modelo));
+
     if (raridade === 'comum') {
-        return PEDIDOS_MODELOS[Math.floor(Math.random() * PEDIDOS_MODELOS.length)];
+        const poolComum = modelosComunsDisponiveis.length > 0
+            ? modelosComunsDisponiveis
+            : PEDIDOS_MODELOS;
+
+        return poolComum[Math.floor(Math.random() * poolComum.length)];
     }
 
-    const poolEspecial = PEDIDOS_MODELOS_ESPECIAIS.filter(modelo => modelo.raridade === raridade);
+    const poolEspecial = PEDIDOS_MODELOS_ESPECIAIS
+        .filter(modelo => modelo.raridade === raridade)
+        .filter(modelo => pedidoDisponivelPorNivel(modelo));
 
     if (poolEspecial.length > 0) {
         return poolEspecial[Math.floor(Math.random() * poolEspecial.length)];
     }
 
-    return PEDIDOS_MODELOS[Math.floor(Math.random() * PEDIDOS_MODELOS.length)];
+    const fallback = modelosComunsDisponiveis.length > 0
+        ? modelosComunsDisponiveis
+        : PEDIDOS_MODELOS;
+
+    return fallback[Math.floor(Math.random() * fallback.length)];
 }
 
 function obterBonusProximaEntrega() {
@@ -570,7 +582,8 @@ function normalizarPedidos() {
                 raridade,
                 iconePedido: pedido.iconePedido || config.icone
             };
-        });
+        })
+        .filter(pedido => pedidoDisponivelPorNivel(pedido));
 
     while (fazenda.pedidos.length < 3) {
         fazenda.pedidos.push(gerarNovoPedido());
@@ -728,10 +741,22 @@ function ganharXpFazenda(quantidade, motivo = 'Ação na fazenda') {
     atualizarUIProgressoFazenda();
 
     if (subiuNivel) {
-        const titulo = obterTituloNivelFazenda(fazenda.progresso.nivel);
+        const nivelNovo = fazenda.progresso.nivel;
+        const titulo = obterTituloNivelFazenda(nivelNovo);
+        const novosDesbloqueios = obterDesbloqueiosDoNivel(nivelNovo);
 
         if (typeof mostrarToast === 'function') {
-            mostrarToast(`Nível ${fazenda.progresso.nivel}! ${titulo}`, '⭐');
+            const textoDesbloqueios = novosDesbloqueios.length
+                ? ` Novos desbloqueios: ${novosDesbloqueios.join(', ')}.`
+                : '';
+
+            mostrarToast(`Nível ${nivelNovo}! ${titulo}.${textoDesbloqueios}`, '⭐');
+        }
+
+        atualizarBloqueiosHudFazenda();
+
+        if (window.abaFazendaAtual) {
+            renderizarLoja(window.abaFazendaAtual);
         }
 
         if (typeof confetti === 'function') {
@@ -746,6 +771,142 @@ function ganharXpFazenda(quantidade, motivo = 'Ação na fazenda') {
     } else if (typeof mostrarToast === 'function') {
         mostrarToast(`+${xpGanho} XP — ${motivo}`, '⭐');
     }
+}
+
+// ==========================================
+// DESBLOQUEIOS DA FAZENDA — PROGRESSÃO REAL
+// ==========================================
+const DESBLOQUEIOS_FAZENDA = {
+    abas: {
+        sementes: 1,
+        insumos: 1,
+        silo: 1,
+        pecuaria: 2,
+        producao: 2,
+        pedidos: 3,
+        maquinas: 5
+    },
+
+    sementes: {
+        trigos: 1,
+        cenouras: 1,
+        morangos: 1,
+        girassois: 3,
+        rosas: 4,
+        orquideas: 6
+    },
+
+    pecuaria: {
+        vaca: 2,
+        racao: 2
+    },
+
+    maquinas: {
+        trator: 5,
+        aspersor: 7
+    },
+
+    receitas: {
+        farinha: 2,
+        geleia: 3,
+        pao: 4,
+        buque: 5
+    },
+
+    produtos: {
+        trigos: 1,
+        cenouras: 1,
+        morangos: 1,
+        girassois: 3,
+        rosas: 4,
+        orquideas: 6,
+        leite: 2,
+        farinha: 2,
+        geleia: 3,
+        pao: 4,
+        buque: 5
+    }
+};
+
+function obterNivelFazendaAtual() {
+    const nivel = Number(fazenda?.progresso?.nivel);
+    return Math.max(1, Math.min(Number.isFinite(nivel) ? nivel : 1, NIVEL_MAX_FAZENDA));
+}
+
+function obterNivelMinimoDesbloqueio(tipo, id) {
+    return DESBLOQUEIOS_FAZENDA[tipo]?.[id] || 1;
+}
+
+function estaDesbloqueadoPorNivel(tipo, id) {
+    return obterNivelFazendaAtual() >= obterNivelMinimoDesbloqueio(tipo, id);
+}
+
+function textoBloqueioNivel(tipo, id) {
+    return `Desbloqueia no nível ${obterNivelMinimoDesbloqueio(tipo, id)}`;
+}
+
+function pedidoDisponivelPorNivel(pedidoOuModelo) {
+    const itens = pedidoOuModelo?.itens || {};
+
+    return Object.keys(itens).every(id => {
+        return estaDesbloqueadoPorNivel('produtos', id);
+    });
+}
+
+function obterDesbloqueiosDoNivel(nivel) {
+    const desbloqueios = [];
+
+    Object.entries(DESBLOQUEIOS_FAZENDA.abas).forEach(([id, nivelMin]) => {
+        if (nivelMin === nivel) {
+            const nomes = {
+                pecuaria: 'Animais',
+                producao: 'Produção',
+                pedidos: 'Pedidos',
+                maquinas: 'Máquinas'
+            };
+            desbloqueios.push(nomes[id] || id);
+        }
+    });
+
+    Object.entries(DESBLOQUEIOS_FAZENDA.sementes).forEach(([id, nivelMin]) => {
+        if (nivelMin === nivel) {
+            const item = catSementes.find(s => s.id === id);
+            if (item) desbloqueios.push(item.nome);
+        }
+    });
+
+    Object.entries(DESBLOQUEIOS_FAZENDA.pecuaria).forEach(([id, nivelMin]) => {
+        if (nivelMin === nivel) {
+            const item = catPecuaria.find(p => p.id === id);
+            if (item) desbloqueios.push(item.nome);
+        }
+    });
+
+    Object.entries(DESBLOQUEIOS_FAZENDA.maquinas).forEach(([id, nivelMin]) => {
+        if (nivelMin === nivel) {
+            const item = catMaquinas.find(m => m.id === id);
+            if (item) desbloqueios.push(item.nome);
+        }
+    });
+
+    Object.entries(DESBLOQUEIOS_FAZENDA.receitas).forEach(([id, nivelMin]) => {
+        if (nivelMin === nivel) {
+            const receita = RECEITAS_FABRICA.find(r => r.id === id);
+            if (receita) desbloqueios.push(receita.produtoNome);
+        }
+    });
+
+    return desbloqueios;
+}
+
+function atualizarBloqueiosHudFazenda() {
+    document.querySelectorAll('.hud-fazenda-btn[data-aba]').forEach(botao => {
+        const aba = botao.dataset.aba;
+        const desbloqueado = estaDesbloqueadoPorNivel('abas', aba);
+
+        botao.classList.toggle('hud-fazenda-btn-bloqueado', !desbloqueado);
+        botao.title = desbloqueado ? '' : textoBloqueioNivel('abas', aba);
+    });
 }
 
 const estacoesAno = [
@@ -951,6 +1112,7 @@ function continuarInicializacaoFazenda() {
 
     document.getElementById('fazenda-capital').innerText = window.pontosDoCasal;
     atualizarUIProgressoFazenda();
+    atualizarBloqueiosHudFazenda();
     
     sincronizarTribunal();
     injetarPainelEstacoes(); 
@@ -1397,6 +1559,14 @@ window.iniciarProducaoFabrica = function(receitaId) {
     const receita = obterReceitaFabrica(receitaId);
 
     if (!receita) {
+        if (!estaDesbloqueadoPorNivel('receitas', receita.id)) {
+        if (typeof mostrarToast === 'function') {
+            mostrarToast(textoBloqueioNivel('receitas', receita.id), '🔒');
+        }
+
+        if (window.Haptics) window.Haptics.erro();
+        return;
+    }
         if (typeof mostrarToast === 'function') {
             mostrarToast('Receita não encontrada.', '⚠️');
         }
@@ -1583,6 +1753,15 @@ window.venderLeiteDireto = function() {
 
 // 6. LOJA AVANÇADA COM TARGETING SYSTEM MESTRE
 window.mudarAbaLoja = function(aba) {
+    if (!estaDesbloqueadoPorNivel('abas', aba)) {
+        if (typeof mostrarToast === 'function') {
+            mostrarToast(textoBloqueioNivel('abas', aba), '🔒');
+        }
+
+        if (window.Haptics) window.Haptics.erro();
+        aba = 'sementes';
+    }
+
     window.abaFazendaAtual = aba;
 
     document.querySelectorAll('.aba-btn').forEach(btn => btn.classList.remove('ativa'));
@@ -1635,16 +1814,31 @@ function renderizarLoja(aba = 'sementes') {
     if (aba === 'maquinas') itens = catMaquinas;
     
     itens.forEach(item => {
-        let tagEstacao = item.estacaoIdeal ? `<span style="background:#8e44ad; color:#fff; padding: 2px 5px; border-radius: 3px; font-size: 0.6rem; margin-left: 5px;">Ideal: ${item.estacaoIdeal.toUpperCase()}</span>` : '';
+        const desbloqueado = estaDesbloqueadoPorNivel(aba, item.id);
+        const tagEstacao = item.estacaoIdeal
+            ? `<span style="background:#8e44ad; color:#fff; padding: 2px 5px; border-radius: 3px; font-size: 0.6rem; margin-left: 5px;">Ideal: ${item.estacaoIdeal.toUpperCase()}</span>`
+            : '';
+
+        const tagBloqueio = desbloqueado
+            ? ''
+            : `<span class="tag-bloqueio-nivel">🔒 ${textoBloqueioNivel(aba, item.id)}</span>`;
         
         conteudo.innerHTML += `
-            <div class="item-loja-pro">
+            <div class="item-loja-pro ${desbloqueado ? '' : 'item-loja-bloqueado'}">
                 <div>
                     <span style="font-size: 1.5rem;">${item.icone}</span> 
                     <b>${item.nome}</b> ${tagEstacao}<br>
                     <span style="color: #e74c3c; font-size: 0.8rem; font-weight: bold;">Custo: R$ ${item.preco}</span>
+                    ${tagBloqueio}
                 </div>
-                <button onclick="comprarEAplicar('${aba}', '${item.id}', ${item.preco})" style="background: linear-gradient(180deg, #D4AF37, #b8962e); border: 1px solid #000; color: #000; font-weight: bold; border-radius: 5px; padding: 6px 12px; box-shadow: 0 3px 0 #8a7021; cursor: pointer;">Comprar</button>
+
+                <button 
+                    ${desbloqueado ? '' : 'disabled'} 
+                    onclick="comprarEAplicar('${aba}', '${item.id}', ${item.preco})" 
+                    style="background: linear-gradient(180deg, #D4AF37, #b8962e); border: 1px solid #000; color: #000; font-weight: bold; border-radius: 5px; padding: 6px 12px; box-shadow: 0 3px 0 #8a7021; cursor: pointer;"
+                >
+                    ${desbloqueado ? 'Comprar' : 'Bloqueado'}
+                </button>
             </div>
         `;
     });
@@ -1750,16 +1944,17 @@ function renderizarProducao(conteudo) {
 
         <div class="fabrica-grid">
             ${RECEITAS_FABRICA.map(receita => {
+                const receitaDesbloqueada = estaDesbloqueadoPorNivel('receitas', receita.id);
                 const fabrica = fazenda.fabricas[receita.fabricaId];
                 const emProducao = fabrica && fabrica.produtoId;
                 const pronto = emProducao && Date.now() >= fabrica.prontoEm;
                 const restante = emProducao ? Math.ceil((fabrica.prontoEm - Date.now()) / 1000) : 0;
-                const podeProduzir = temIngredientesFabrica(receita);
+                const podeProduzir = receitaDesbloqueada && temIngredientesFabrica(receita);
 
                 return `
-                    <div class="fabrica-card ${emProducao ? 'fabrica-card-ativa' : ''}">
+                    <div class="fabrica-card ${emProducao ? 'fabrica-card-ativa' : ''} ${receitaDesbloqueada ? '' : 'fabrica-card-bloqueada'}">
                         <div class="fabrica-card-topo">
-                            <div class="fabrica-icone">${receita.iconeFabrica}</div>
+                            <div class="fabrica-icone">${receitaDesbloqueada ? receita.iconeFabrica : '🔒'}</div>
                             <div>
                                 <strong>${receita.fabricaNome}</strong>
                                 <small>${receita.produtoIcone} ${receita.produtoNome}</small>
@@ -1770,7 +1965,15 @@ function renderizarProducao(conteudo) {
                             ${renderizarIngredientesFabrica(receita.ingredientes)}
                         </div>
 
-                        ${emProducao ? `
+                        ${!receitaDesbloqueada ? `
+                            <div class="fabrica-status fabrica-status-bloqueado">
+                                🔒 ${textoBloqueioNivel('receitas', receita.id)}
+                            </div>
+
+                            <button class="fabrica-btn" disabled>
+                                Bloqueado
+                            </button>
+                        ` : emProducao ? `
                             <div 
                                 class="fabrica-status ${pronto ? 'fabrica-status-pronto' : ''}" 
                                 id="status-fabrica-${receita.fabricaId}"
@@ -2028,6 +2231,15 @@ window.trocarPedidoFazenda = function(pedidoId) {
 };
 
 window.comprarEAplicar = function(tipo, idItem, preco) {
+    if (!estaDesbloqueadoPorNivel(tipo, idItem)) {
+        if (typeof mostrarToast === 'function') {
+            mostrarToast(textoBloqueioNivel(tipo, idItem), '🔒');
+        }
+
+        if (window.Haptics) window.Haptics.erro();
+        return;
+    }
+
     if ((window.pontosDoCasal || 0) < preco) {
         if(typeof mostrarToast === 'function') mostrarToast("Capital insuficiente! Venda produtos na Bolsa.", "💸");
         if(window.Haptics) window.Haptics.erro();

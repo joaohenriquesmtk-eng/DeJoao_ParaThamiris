@@ -30,6 +30,114 @@ const catMaquinas = [
     { id: 'aspersor', nome: 'Sistema de Aspersores (Rega Automática)', preco: 2500, icone: '🚿', tipo: 'maquina' }
 ];
 
+// ==========================================
+// SILO DO SANTUÁRIO — BASE ECONÔMICA
+// ==========================================
+const SILO_BASE = {
+    morangos: 0,
+    cenouras: 0,
+    trigos: 0,
+    girassois: 0,
+    rosas: 0,
+    orquideas: 0,
+    leite: 0
+};
+
+const PRECO_VENDA_SILO = {
+    morangos: 90,
+    cenouras: 55,
+    trigos: 40,
+    girassois: 130,
+    rosas: 240,
+    orquideas: 480,
+    leite: 150
+};
+
+function obterInfoProdutoSilo(id) {
+    if (id === 'leite') {
+        return { id: 'leite', nome: 'Leite Fresco', icone: '🥛' };
+    }
+
+    return catSementes.find(item => item.id === id) || {
+        id,
+        nome: id,
+        icone: '📦'
+    };
+}
+
+function normalizarFazenda() {
+    if (!fazenda.silo) fazenda.silo = { ...SILO_BASE };
+
+    Object.keys(SILO_BASE).forEach(chave => {
+        if (typeof fazenda.silo[chave] !== 'number') {
+            fazenda.silo[chave] = 0;
+        }
+    });
+
+    if (typeof fazenda.capacidadeSilo !== 'number') {
+        fazenda.capacidadeSilo = 50;
+    }
+
+    if (!fazenda.mercado) {
+        fazenda.mercado = { tendencia: 'estavel' };
+    }
+
+    if (!fazenda.pecuaria) {
+        fazenda.pecuaria = { vacaComprada: false, vacaFome: 0 };
+    }
+
+    if (!fazenda.maquinas) {
+        fazenda.maquinas = { tratorComprado: false, aspersorComprado: false };
+    }
+
+    if (!fazenda.burocracia) {
+        fazenda.burocracia = { licencaExpansao: false, alvaraDefensivos: false };
+    }
+
+    if (!fazenda.tempo) {
+        fazenda.tempo = { estacaoIndex: 0, diasPassados: 0, ticks: 0 };
+    }
+
+    // Migração: leite antigo passa para o silo novo.
+    if (typeof fazenda.estoqueLeite === 'number' && fazenda.estoqueLeite > 0) {
+        fazenda.silo.leite += fazenda.estoqueLeite;
+        fazenda.estoqueLeite = 0;
+    }
+
+    if (typeof fazenda.estoqueLeite !== 'number') {
+        fazenda.estoqueLeite = 0;
+    }
+}
+
+function obterUsoSilo() {
+    normalizarFazenda();
+
+    return Object.values(fazenda.silo).reduce((total, qtd) => {
+        return total + (Number(qtd) || 0);
+    }, 0);
+}
+
+function obterEspacoLivreSilo() {
+    normalizarFazenda();
+    return Math.max(0, fazenda.capacidadeSilo - obterUsoSilo());
+}
+
+function adicionarAoSilo(id, quantidade) {
+    normalizarFazenda();
+
+    const qtd = Math.max(0, Number(quantidade) || 0);
+    const espacoLivre = obterEspacoLivreSilo();
+    const quantidadeAdicionada = Math.min(qtd, espacoLivre);
+
+    if (!fazenda.silo[id]) fazenda.silo[id] = 0;
+    fazenda.silo[id] += quantidadeAdicionada;
+
+    return {
+        adicionado: quantidadeAdicionada,
+        excedente: qtd - quantidadeAdicionada
+    };
+}
+
 const estacoesAno = [
     { id: 'primavera', nome: 'Primavera 🌸', temp: 'Ameno', bonus: 'cafe' },
     { id: 'verao', nome: 'Verão ☀️', temp: 'Quente', bonus: 'soja' },
@@ -39,7 +147,10 @@ const estacoesAno = [
 
 // 2. A MEMÓRIA DO JOGO
 let fazenda = {
-    estoqueLeite: 0, // Apenas o leite fica armazenado localmente
+    estoqueLeite: 0,
+    silo: { ...SILO_BASE },
+    capacidadeSilo: 50,
+    mercado: { tendencia: 'estavel' },
     terrenos: [
         { id: 1, livre: true, planta: null, ph: 7.0, npk: 100, umidade: 100, praga: null, progresso: 0 },
         { id: 2, livre: true, planta: null, ph: 6.5, npk: 80, umidade: 100, praga: null, progresso: 0 },
@@ -83,6 +194,8 @@ function carregarFazenda() {
     } else {
         fazenda.ultimaAtualizacao = Date.now();
     }
+
+    normalizarFazenda();
 }
 
 // 🚨 A MAGIA DOS GRANDES JOGOS: CÁLCULO DE PROGRESSO OFFLINE (AFK)
@@ -216,6 +329,7 @@ window.iniciarMiniFazenda = function() {
 
 // 🚨 Função auxiliar que desenha a tela SOMENTE APÓS o carregamento da nuvem concluir
 function continuarInicializacaoFazenda() {
+    normalizarFazenda();
     // 🌍 LIGA O SATÉLITE ASSIM QUE A FAZENDA ABRIR
     if(typeof buscarClimaRealFazenda === 'function') buscarClimaRealFazenda();
     
@@ -346,10 +460,11 @@ function motorAgronomico() {
     if (fazenda.pecuaria.vacaComprada) {
         fazenda.pecuaria.vacaFome = Math.min(100, fazenda.pecuaria.vacaFome + (estacaoAtual.id === 'inverno' ? 1.5 : 1));
         if (fazenda.pecuaria.vacaFome < 50 && Math.random() < 0.2) {
-            fazenda.estoqueLeite += 1; // Leite guardado localmente
-            // Atualiza texto do botão de venda
-            const btnVender = document.querySelector('.painel-economia-agricola button');
-            if(btnVender) btnVender.innerText = `Vender ${fazenda.estoqueLeite}L de Leite (+R$ ${fazenda.estoqueLeite * 150})`;
+            const depositoLeite = adicionarAoSilo('leite', 1);
+
+            if (depositoLeite.excedente > 0 && typeof mostrarToast === 'function') {
+                mostrarToast('O silo está cheio. O leite excedente foi perdido.', '🎒');
+            }
         }
         const statusVaca = document.getElementById('status-vaca');
         if (statusVaca) {
@@ -538,13 +653,20 @@ window.colherPlanta = function(index) {
             iconeQualidade = "🥈";
         }
 
-        // 🚨 MÁGICA: Envia a colheita direto para a Mochila Global do Casal
-        if (typeof window.adicionarItemInventario === 'function') {
-            window.adicionarItemInventario(t.planta.id, multiplicadorYield);
+        const espacoLivre = obterEspacoLivreSilo();
+
+        if (espacoLivre < multiplicadorYield) {
+            if (typeof mostrarToast === 'function') {
+                mostrarToast(`Silo cheio! Libere ${multiplicadorYield - espacoLivre} espaço(s) antes de colher.`, '🎒');
+            }
+            if (window.Haptics) window.Haptics.erro();
+            return;
         }
-        
+
+        const deposito = adicionarAoSilo(t.planta.id, multiplicadorYield);
+
         if(typeof mostrarToast === 'function') {
-            mostrarToast(`Colheita ${qualidadeText}! +${multiplicadorYield} ${t.planta.nome} para a Despensa!`, iconeQualidade);
+            mostrarToast(`Colheita ${qualidadeText}! +${deposito.adicionado} ${t.planta.nome} no Silo.`, iconeQualidade);
         }
         if(window.Haptics) window.Haptics.sucesso();
         
@@ -564,29 +686,58 @@ window.colherPlanta = function(index) {
 };
 
 // VENDA DIRETA DO LEITE (Sustento Rápido da Fazenda)
-window.venderLeiteDireto = function() {
-    if (fazenda.estoqueLeite > 0) {
-        const lucroLeite = fazenda.estoqueLeite * 150; // Cada garrafa de leite vale 150 moedas
-        if(typeof atualizarPontosCasal === 'function') atualizarPontosCasal(lucroLeite, `Venda de ${fazenda.estoqueLeite}L de Leite`);
-        if(typeof mostrarToast === 'function') mostrarToast(`Laticínio vendido! +R$ ${lucroLeite}`, "💰");
-        if(window.Haptics) navigator.vibrate([30, 50, 30]);
-        
-        fazenda.estoqueLeite = 0; // Zera o estoque
-        document.getElementById('fazenda-capital').innerText = window.pontosDoCasal;
-        
-        // Atualiza a UI do botão
-        const btnVender = document.querySelector('.painel-economia-agricola button');
-        if(btnVender) btnVender.innerText = `Sem Estoque de Leite`;
-    } else {
-        if(typeof mostrarToast === 'function') mostrarToast(`A Vaca ainda não produziu leite suficiente.`, "⚠️");
-        if(window.Haptics) window.Haptics.erro();
+window.venderItemSilo = function(id, quantidade = 1) {
+    normalizarFazenda();
+
+    const disponivel = fazenda.silo[id] || 0;
+
+    if (disponivel <= 0) {
+        if (typeof mostrarToast === 'function') {
+            mostrarToast('Não há estoque suficiente para vender.', '⚠️');
+        }
+        if (window.Haptics) window.Haptics.erro();
+        return;
     }
+
+    const qtdVenda = quantidade === 'tudo'
+        ? disponivel
+        : Math.min(disponivel, Math.max(1, Number(quantidade) || 1));
+
+    const precoUnitario = PRECO_VENDA_SILO[id] || 10;
+    const lucro = qtdVenda * precoUnitario;
+    const info = obterInfoProdutoSilo(id);
+
+    fazenda.silo[id] -= qtdVenda;
+
+    if (typeof atualizarPontosCasal === 'function') {
+        atualizarPontosCasal(lucro, `Venda de ${qtdVenda}x ${info.nome}`);
+    }
+
+    const capital = document.getElementById('fazenda-capital');
+    if (capital) capital.innerText = window.pontosDoCasal;
+
+    if (typeof mostrarToast === 'function') {
+        mostrarToast(`Venda concluída: ${qtdVenda}x ${info.nome} (+R$ ${lucro})`, '💰');
+    }
+
+    if (window.Haptics) window.Haptics.sucesso();
+
+    salvarFazenda();
+    renderizarLoja('silo');
+};
+
+// Compatibilidade com chamadas antigas
+window.venderLeiteDireto = function() {
+    window.venderItemSilo('leite', 'tudo');
 };
 
 // 6. LOJA AVANÇADA COM TARGETING SYSTEM MESTRE
 window.mudarAbaLoja = function(aba) {
     document.querySelectorAll('.aba-btn').forEach(btn => btn.classList.remove('ativa'));
-    event.target.classList.add('ativa');
+
+    const botao = document.querySelector(`.aba-btn[data-aba="${aba}"]`);
+    if (botao) botao.classList.add('ativa');
+
     renderizarLoja(aba);
 };
 
@@ -594,6 +745,11 @@ function renderizarLoja(aba = 'sementes') {
     const conteudo = document.getElementById('conteudo-loja');
     if (!conteudo) return;
     conteudo.innerHTML = '';
+
+    if (aba === 'silo') {
+    renderizarSilo(conteudo);
+    return;
+    }
 
     let itens = [];
     if (aba === 'sementes') itens = catSementes;
@@ -615,6 +771,62 @@ function renderizarLoja(aba = 'sementes') {
             </div>
         `;
     });
+}
+
+function renderizarSilo(conteudo) {
+    normalizarFazenda();
+
+    const uso = obterUsoSilo();
+    const capacidade = fazenda.capacidadeSilo;
+    const percentual = Math.min(100, Math.round((uso / capacidade) * 100));
+
+    const itensSilo = Object.keys(fazenda.silo)
+        .map(id => {
+            const info = obterInfoProdutoSilo(id);
+            const qtd = fazenda.silo[id] || 0;
+            const preco = PRECO_VENDA_SILO[id] || 10;
+
+            return {
+                id,
+                nome: info.nome,
+                icone: info.icone,
+                qtd,
+                preco
+            };
+        });
+
+    conteudo.innerHTML = `
+        <div class="silo-painel-resumo">
+            <div>
+                <span class="silo-kicker">Armazém da Fazenda</span>
+                <strong>Silo do Santuário</strong>
+            </div>
+            <div class="silo-capacidade">${uso}/${capacidade}</div>
+        </div>
+
+        <div class="silo-barra">
+            <div style="width:${percentual}%"></div>
+        </div>
+
+        <div class="silo-grid">
+            ${itensSilo.map(item => `
+                <div class="silo-card ${item.qtd <= 0 ? 'silo-card-vazio' : ''}">
+                    <div class="silo-card-info">
+                        <span class="silo-card-icone">${item.icone}</span>
+                        <div>
+                            <strong>${item.nome}</strong>
+                            <small>Estoque: ${item.qtd} • R$ ${item.preco}/un.</small>
+                        </div>
+                    </div>
+
+                    <div class="silo-card-acoes">
+                        <button ${item.qtd <= 0 ? 'disabled' : ''} onclick="venderItemSilo('${item.id}', 1)">Vender 1</button>
+                        <button ${item.qtd <= 0 ? 'disabled' : ''} onclick="venderItemSilo('${item.id}', 'tudo')">Tudo</button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 window.comprarEAplicar = function(tipo, idItem, preco) {
@@ -842,7 +1054,8 @@ setInterval(() => {
         sementes: 'Plantio e sementes',
         insumos: 'Manejo agrícola',
         pecuaria: 'Animais e produção',
-        maquinas: 'Máquinas e automação'
+        maquinas: 'Máquinas e automação',
+        silo: 'Silo e estoque'
     };
 
     const mudarAbaOriginal = window.mudarAbaLoja;

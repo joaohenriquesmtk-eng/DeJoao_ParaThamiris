@@ -13851,3 +13851,215 @@ button, .cartao-pvp, .slot, .botao-jogo {
 .painel-economia-agricola {
     display: none !important;
 }
+
+/* =========================================================
+   MINI FAZENDA — FASE 3A
+   Silo / estoque real
+========================================================= */
+
+/* Agora a Central tem 5 operações reais */
+.abas-loja.fazenda-hud-operacoes {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+/* Compacta os botões para caberem bem */
+.hud-fazenda-btn {
+    height: 56px !important;
+}
+
+.hud-fazenda-btn span {
+    font-size: 1.2rem !important;
+}
+
+.hud-fazenda-btn small {
+    font-size: 0.48rem !important;
+}
+
+/* Painel principal do silo */
+.silo-painel-resumo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 18px;
+    background:
+        linear-gradient(145deg, rgba(212,175,55,0.12), rgba(0,0,0,0.24));
+    border: 1px solid rgba(212,175,55,0.22);
+    margin-bottom: 10px;
+}
+
+.silo-kicker {
+    display: block;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: rgba(255,255,255,0.48);
+    font-weight: 900;
+    margin-bottom: 3px;
+}
+
+.silo-painel-resumo strong {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    color: #ffeaa7;
+    font-size: 1rem;
+}
+
+.silo-capacidade {
+    flex-shrink: 0;
+    min-width: 58px;
+    text-align: center;
+    color: #111;
+    background: linear-gradient(145deg, #f4d03f, #c99519);
+    border-radius: 999px;
+    padding: 7px 9px;
+    font-weight: 900;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.28);
+}
+
+/* Barra de capacidade */
+.silo-barra {
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.46);
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 10px;
+}
+
+.silo-barra > div {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #2ecc71, #f1c40f, #e67e22);
+    transition: width 0.35s ease;
+}
+
+/* Lista do silo */
+.silo-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.silo-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.055);
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.20),
+        inset 0 0 10px rgba(255,255,255,0.02);
+}
+
+.silo-card-vazio {
+    opacity: 0.48;
+    filter: grayscale(0.4);
+}
+
+.silo-card-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.silo-card-icone {
+    font-size: 1.55rem;
+    width: 32px;
+    text-align: center;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.36));
+}
+
+.silo-card-info strong {
+    display: block;
+    color: #fff;
+    font-size: 0.9rem;
+    line-height: 1.15;
+}
+
+.silo-card-info small {
+    display: block;
+    color: rgba(255,255,255,0.56);
+    font-size: 0.68rem;
+    margin-top: 3px;
+}
+
+.silo-card-acoes {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.silo-card-acoes button {
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 7px 9px !important;
+    background: linear-gradient(145deg, #f4d03f, #c99519) !important;
+    color: #111 !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 0 rgba(90,67,10,0.9);
+    cursor: pointer;
+}
+
+.silo-card-acoes button:disabled {
+    opacity: 0.42;
+    filter: grayscale(1);
+    pointer-events: none;
+}
+
+.silo-card-acoes button:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(90,67,10,0.9);
+}
+
+/* Paisagem */
+@media (orientation: landscape) {
+    .hud-fazenda-btn {
+        height: 48px !important;
+    }
+
+    .hud-fazenda-btn span {
+        font-size: 1.05rem !important;
+    }
+
+    .hud-fazenda-btn small {
+        font-size: 0.42rem !important;
+    }
+
+    .silo-card {
+        padding: 9px;
+    }
+
+    .silo-card-info strong {
+        font-size: 0.82rem;
+    }
+
+    .silo-card-info small {
+        font-size: 0.62rem;
+    }
+
+    .silo-card-acoes button {
+        padding: 6px 8px !important;
+        font-size: 0.66rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .silo-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .silo-card-acoes {
+        width: 100%;
+    }
+
+    .silo-card-acoes button {
+        flex: 1;
+    }
+}

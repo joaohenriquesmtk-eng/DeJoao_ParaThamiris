@@ -100,26 +100,31 @@
     </div>
 
     <div class="abas-loja fazenda-hud-operacoes">
-        <button class="aba-btn hud-fazenda-btn ativa" onclick="mudarAbaLoja('sementes')">
-            <span>🌱</span>
-            <small>Plantio</small>
-        </button>
+    <button class="aba-btn hud-fazenda-btn ativa" data-aba="sementes" onclick="mudarAbaLoja('sementes')">
+        <span>🌱</span>
+        <small>Plantio</small>
+    </button>
 
-        <button class="aba-btn hud-fazenda-btn" onclick="mudarAbaLoja('insumos')">
-            <span>🧪</span>
-            <small>Manejo</small>
-        </button>
+    <button class="aba-btn hud-fazenda-btn" data-aba="insumos" onclick="mudarAbaLoja('insumos')">
+        <span>🧪</span>
+        <small>Manejo</small>
+    </button>
 
-        <button class="aba-btn hud-fazenda-btn" onclick="mudarAbaLoja('pecuaria')">
-            <span>🐄</span>
-            <small>Animais</small>
-        </button>
+    <button class="aba-btn hud-fazenda-btn" data-aba="pecuaria" onclick="mudarAbaLoja('pecuaria')">
+        <span>🐄</span>
+        <small>Animais</small>
+    </button>
 
-        <button class="aba-btn hud-fazenda-btn" onclick="mudarAbaLoja('maquinas')">
-            <span>🚜</span>
-            <small>Máquinas</small>
-        </button>
-    </div>
+    <button class="aba-btn hud-fazenda-btn" data-aba="maquinas" onclick="mudarAbaLoja('maquinas')">
+        <span>🚜</span>
+        <small>Máquinas</small>
+    </button>
+
+    <button class="aba-btn hud-fazenda-btn" data-aba="silo" onclick="mudarAbaLoja('silo')">
+        <span>🎒</span>
+        <small>Silo</small>
+    </button>
+</div>
 
     <div id="conteudo-loja" class="conteudo-loja-scroll fazenda-hud-conteudo">
         </div>

@@ -48,7 +48,7 @@ window.injetarModuloHTML = function(jogoId) {
 // ============================================================================
 
 window.modulosCarregadosJS = {};
-window.APP_VERSION = window.APP_VERSION || '2026.05.02-minifazenda-hud-fase2';
+window.APP_VERSION = window.APP_VERSION || '2026.05.03-minifazenda-silo-fase3a';
 window.mapaModulosJS = {
     sincronia: 'sincronia',
     tribunal: 'tribunal',

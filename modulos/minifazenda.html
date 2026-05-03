@@ -45,11 +45,9 @@
 
             <div class="fazenda-decor fazenda-arvore fazenda-arvore-1">🌳</div>
             <div class="fazenda-decor fazenda-arvore fazenda-arvore-2">🌲</div>
-            <div class="fazenda-decor fazenda-celeiro">🏡</div>
-            <div class="fazenda-decor fazenda-moinho">🌾</div>
             <div class="fazenda-decor fazenda-flores">🌻 🌷 🌼</div>
         </div>
-        
+
         <div id="instrucoes-fazenda" class="escondido cartao-instrucoes" style="border-left: 5px solid #2ecc71;">
             <h4 style="color: #2ecc71;">🚜 Simulador Agrícola</h4>
             <ul style="font-size: 0.85rem;">
@@ -95,30 +93,36 @@
         <div id="grade-fazenda" class="grade-plantacao">
             </div>
 
-        <div class="painel-economia-agricola" style="display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.6); border: 1px solid #D4AF37; border-radius: 12px; padding: 15px; margin: 15px 0; box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1);">
-            <div style="font-size: 2rem; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(212,175,55,0.5));">🎒</div>
-            <h5 style="color: #D4AF37; margin: 0 0 5px 0; font-family: 'Playfair Display', serif; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">Logística Ativa</h5>
-            <p style="color: #aaa; font-size: 0.8rem; text-align: center; margin: 0; line-height: 1.4;">
-                Todas as colheitas são ensacadas e enviadas instantaneamente para a <b>Despensa do Santuário</b> (Mochila) na tela principal.
-            </p>
-            <div style="width: 100%; height: 1px; background: rgba(212, 175, 55, 0.3); margin: 15px 0;"></div>
-            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <div style="color: #fff; font-size: 0.9rem;">🥛 Produção Leiteira:</div>
-                <button onclick="venderLeiteDireto()" style="background: linear-gradient(145deg, #f1c40f, #f39c12); color: #000; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; box-shadow: 0 3px 10px rgba(241, 196, 15, 0.4); cursor: pointer;">
-                    Vender Leite (+R$ 150)
-                </button>
-            </div>
-        </div>
+        <div id="loja-agricola" class="loja-agricola-container fazenda-hud-container">
+    <div class="fazenda-hud-topo">
+        <span class="fazenda-hud-label">Central da Fazenda</span>
+        <strong id="fazenda-hud-titulo">Plantio e sementes</strong>
+    </div>
 
-        <div id="loja-agricola" class="loja-agricola-container">
-            <div class="abas-loja" style="flex-wrap: wrap;">
-                <button class="aba-btn ativa" onclick="mudarAbaLoja('sementes')">Sementes</button>
-                <button class="aba-btn" onclick="mudarAbaLoja('insumos')">Manejo</button>
-                <button class="aba-btn" onclick="mudarAbaLoja('pecuaria')">Pecuária</button>
-                <button class="aba-btn" onclick="mudarAbaLoja('maquinas')">Máquinas</button>
-            </div>
-            <div id="conteudo-loja" class="conteudo-loja-scroll">
-                </div>
+    <div class="abas-loja fazenda-hud-operacoes">
+        <button class="aba-btn hud-fazenda-btn ativa" onclick="mudarAbaLoja('sementes')">
+            <span>🌱</span>
+            <small>Plantio</small>
+        </button>
+
+        <button class="aba-btn hud-fazenda-btn" onclick="mudarAbaLoja('insumos')">
+            <span>🧪</span>
+            <small>Manejo</small>
+        </button>
+
+        <button class="aba-btn hud-fazenda-btn" onclick="mudarAbaLoja('pecuaria')">
+            <span>🐄</span>
+            <small>Animais</small>
+        </button>
+
+        <button class="aba-btn hud-fazenda-btn" onclick="mudarAbaLoja('maquinas')">
+            <span>🚜</span>
+            <small>Máquinas</small>
+        </button>
+    </div>
+
+    <div id="conteudo-loja" class="conteudo-loja-scroll fazenda-hud-conteudo">
         </div>
+</div>
     </div>
 </div>

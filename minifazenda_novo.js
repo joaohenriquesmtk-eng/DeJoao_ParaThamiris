@@ -829,3 +829,32 @@ window.buscarClimaRealFazenda = async function() {
 setInterval(() => {
     if (typeof buscarClimaRealFazenda === 'function') buscarClimaRealFazenda();
 }, 1800000);
+
+// =========================================================
+// MINI FAZENDA — HUD DE OPERAÇÕES
+// Atualiza o título do painel inferior sem bagunçar a loja
+// =========================================================
+(function configurarHudMiniFazenda() {
+    if (window.hudMiniFazendaConfigurado) return;
+    window.hudMiniFazendaConfigurado = true;
+
+    const nomesAbasFazenda = {
+        sementes: 'Plantio e sementes',
+        insumos: 'Manejo agrícola',
+        pecuaria: 'Animais e produção',
+        maquinas: 'Máquinas e automação'
+    };
+
+    const mudarAbaOriginal = window.mudarAbaLoja;
+
+    window.mudarAbaLoja = function(tipo) {
+        if (typeof mudarAbaOriginal === 'function') {
+            mudarAbaOriginal(tipo);
+        }
+
+        const titulo = document.getElementById('fazenda-hud-titulo');
+        if (titulo) {
+            titulo.innerText = nomesAbasFazenda[tipo] || 'Operações';
+        }
+    };
+})();

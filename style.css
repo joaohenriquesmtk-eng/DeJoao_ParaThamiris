@@ -14063,3 +14063,988 @@ button, .cartao-pvp, .slot, .botao-jogo {
         flex: 1;
     }
 }
+
+/* =========================================================
+   MINI FAZENDA — FASE 3B
+   Melhorias do Silo
+========================================================= */
+
+.silo-upgrade-card {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 18px;
+    background:
+        linear-gradient(145deg, rgba(46,204,113,0.10), rgba(0,0,0,0.22));
+    border: 1px solid rgba(46,204,113,0.20);
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.22),
+        inset 0 0 12px rgba(46,204,113,0.04);
+}
+
+.silo-upgrade-info strong {
+    display: block;
+    color: #ffeaa7;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.98rem;
+}
+
+.silo-upgrade-info small {
+    display: block;
+    color: rgba(255,255,255,0.58);
+    font-size: 0.68rem;
+    margin-top: 3px;
+}
+
+.silo-upgrade-requisitos {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-end;
+}
+
+.silo-upgrade-custo {
+    color: #f1c40f;
+    font-size: 0.74rem;
+    font-weight: 900;
+    background: rgba(0,0,0,0.34);
+    border: 1px solid rgba(212,175,55,0.18);
+    border-radius: 999px;
+    padding: 4px 8px;
+}
+
+.silo-upgrade-lista {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 220px;
+}
+
+.silo-upgrade-requisito-ok,
+.silo-upgrade-requisito-falta {
+    font-size: 0.62rem;
+    font-weight: 900;
+    border-radius: 999px;
+    padding: 3px 6px;
+    border: 1px solid transparent;
+}
+
+.silo-upgrade-requisito-ok {
+    color: #2ecc71;
+    background: rgba(46,204,113,0.10);
+    border-color: rgba(46,204,113,0.22);
+}
+
+.silo-upgrade-requisito-falta {
+    color: #ff7675;
+    background: rgba(231,76,60,0.10);
+    border-color: rgba(231,76,60,0.24);
+}
+
+.silo-upgrade-btn {
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 9px 12px !important;
+    background: linear-gradient(145deg, #2ecc71, #1f9f55) !important;
+    color: #03140a !important;
+    font-size: 0.74rem !important;
+    font-weight: 900 !important;
+    box-shadow: 0 5px 0 rgba(14, 82, 43, 0.95);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.silo-upgrade-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(14, 82, 43, 0.95);
+}
+
+.silo-upgrade-maximo {
+    color: #111;
+    background: linear-gradient(145deg, #f4d03f, #c99519);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.24);
+}
+
+/* Paisagem */
+@media (orientation: landscape) {
+    .silo-upgrade-card {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .silo-upgrade-info strong {
+        font-size: 0.88rem;
+    }
+
+    .silo-upgrade-info small {
+        font-size: 0.62rem;
+    }
+
+    .silo-upgrade-lista {
+        max-width: 180px;
+    }
+
+    .silo-upgrade-btn {
+        padding: 8px 10px !important;
+        font-size: 0.68rem !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .silo-upgrade-card {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .silo-upgrade-requisitos {
+        align-items: flex-start;
+    }
+
+    .silo-upgrade-lista {
+        justify-content: flex-start;
+        max-width: none;
+    }
+
+    .silo-upgrade-btn,
+    .silo-upgrade-maximo {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* =========================================================
+   MINI FAZENDA — FASE 4A
+   Fábricas e produção
+========================================================= */
+
+/* 6 operações: Plantio, Manejo, Animais, Máquinas, Silo, Produção */
+.abas-loja.fazenda-hud-operacoes {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+.hud-fazenda-btn {
+    height: 54px !important;
+}
+
+.hud-fazenda-btn span {
+    font-size: 1.08rem !important;
+}
+
+.hud-fazenda-btn small {
+    font-size: 0.42rem !important;
+}
+
+/* Cabeçalho da produção */
+.fabrica-painel-resumo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px;
+    border-radius: 18px;
+    margin-bottom: 10px;
+    background:
+        linear-gradient(145deg, rgba(212,175,55,0.12), rgba(0,0,0,0.26));
+    border: 1px solid rgba(212,175,55,0.22);
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.22),
+        inset 0 0 12px rgba(212,175,55,0.04);
+}
+
+.fabrica-painel-resumo strong {
+    display: block;
+    color: #ffeaa7;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+}
+
+.fabrica-painel-resumo small {
+    display: block;
+    color: rgba(255,255,255,0.58);
+    font-size: 0.68rem;
+    margin-top: 3px;
+}
+
+.fabrica-selo {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: rgba(0,0,0,0.34);
+    border: 1px solid rgba(212,175,55,0.28);
+    font-size: 1.35rem;
+    box-shadow: inset 0 0 10px rgba(212,175,55,0.08);
+}
+
+/* Cards das fábricas */
+.fabrica-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.fabrica-card {
+    padding: 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.055);
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.20),
+        inset 0 0 10px rgba(255,255,255,0.02);
+}
+
+.fabrica-card-ativa {
+    border-color: rgba(46,204,113,0.28);
+    background:
+        linear-gradient(145deg, rgba(46,204,113,0.09), rgba(255,255,255,0.035));
+}
+
+.fabrica-card-topo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fabrica-icone {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.34);
+    border: 1px solid rgba(212,175,55,0.18);
+    font-size: 1.3rem;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.30));
+}
+
+.fabrica-card-topo strong {
+    display: block;
+    color: #fff;
+    font-size: 0.92rem;
+    line-height: 1.1;
+}
+
+.fabrica-card-topo small {
+    display: block;
+    color: rgba(255,255,255,0.58);
+    font-size: 0.68rem;
+    margin-top: 3px;
+}
+
+/* Ingredientes */
+.fabrica-ingredientes {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+
+.fabrica-ing-ok,
+.fabrica-ing-falta {
+    font-size: 0.64rem;
+    font-weight: 900;
+    border-radius: 999px;
+    padding: 4px 7px;
+    border: 1px solid transparent;
+}
+
+.fabrica-ing-ok {
+    color: #2ecc71;
+    background: rgba(46,204,113,0.10);
+    border-color: rgba(46,204,113,0.22);
+}
+
+.fabrica-ing-falta {
+    color: #ff7675;
+    background: rgba(231,76,60,0.10);
+    border-color: rgba(231,76,60,0.24);
+}
+
+/* Status e botão */
+.fabrica-status {
+    color: rgba(255,255,255,0.62);
+    font-size: 0.72rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.fabrica-status-pronto {
+    color: #2ecc71;
+}
+
+.fabrica-btn {
+    width: 100%;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 9px 12px !important;
+    background: linear-gradient(145deg, #f4d03f, #c99519) !important;
+    color: #111 !important;
+    font-size: 0.76rem !important;
+    font-weight: 900 !important;
+    box-shadow: 0 5px 0 rgba(90,67,10,0.9);
+    cursor: pointer;
+}
+
+.fabrica-btn-pronto {
+    background: linear-gradient(145deg, #2ecc71, #1f9f55) !important;
+    box-shadow: 0 5px 0 rgba(14,82,43,0.95);
+}
+
+.fabrica-btn:disabled {
+    opacity: 0.42;
+    filter: grayscale(1);
+    pointer-events: none;
+}
+
+.fabrica-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(90,67,10,0.9);
+}
+
+/* Retrato: 6 botões viram 3x2, mais limpo */
+@media (max-width: 720px) and (orientation: portrait) {
+    .abas-loja.fazenda-hud-operacoes {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .hud-fazenda-btn {
+        height: 50px !important;
+    }
+
+    .hud-fazenda-btn span {
+        font-size: 1rem !important;
+    }
+
+    .hud-fazenda-btn small {
+        font-size: 0.43rem !important;
+    }
+}
+
+/* Paisagem compacta */
+@media (orientation: landscape) {
+    .hud-fazenda-btn {
+        height: 46px !important;
+    }
+
+    .hud-fazenda-btn span {
+        font-size: 0.98rem !important;
+    }
+
+    .hud-fazenda-btn small {
+        font-size: 0.39rem !important;
+    }
+
+    .fabrica-card {
+        padding: 10px;
+    }
+
+    .fabrica-card-topo strong {
+        font-size: 0.84rem;
+    }
+
+    .fabrica-card-topo small,
+    .fabrica-status {
+        font-size: 0.62rem;
+    }
+}
+
+/* =========================================================
+   MINI FAZENDA — FASE 4B
+   Produção offline + timers vivos
+========================================================= */
+
+.fabrica-tempo-restante {
+    color: #ffeaa7;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.fabrica-card-ativa {
+    position: relative;
+    overflow: hidden;
+}
+
+.fabrica-card-ativa::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            120deg,
+            transparent 0%,
+            rgba(255,255,255,0.035) 40%,
+            rgba(212,175,55,0.08) 50%,
+            transparent 62%
+        );
+    transform: translateX(-120%);
+    animation: fabricaProducaoBrilho 3.6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.fabrica-status-pronto {
+    color: #2ecc71 !important;
+    text-shadow: 0 0 8px rgba(46,204,113,0.22);
+}
+
+.fabrica-btn-pronto {
+    animation: fabricaProntaPulso 1.8s ease-in-out infinite;
+}
+
+@keyframes fabricaProducaoBrilho {
+    0%, 35% {
+        transform: translateX(-120%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    75%, 100% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+@keyframes fabricaProntaPulso {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: translateY(-1px) scale(1.015);
+        filter: brightness(1.12);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fabrica-card-ativa::after,
+    .fabrica-btn-pronto {
+        animation: none !important;
+    }
+}
+
+/* =========================================================
+   MINI FAZENDA — FASE 5A
+   Pedidos e entregas
+========================================================= */
+
+/* 7 operações: Plantio, Manejo, Animais, Máquinas, Silo, Produção, Pedidos */
+.abas-loja.fazenda-hud-operacoes {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+.hud-fazenda-btn {
+    height: 52px !important;
+}
+
+.hud-fazenda-btn span {
+    font-size: 1rem !important;
+}
+
+.hud-fazenda-btn small {
+    font-size: 0.38rem !important;
+}
+
+/* Cabeçalho dos pedidos */
+.pedidos-painel-resumo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px;
+    border-radius: 18px;
+    margin-bottom: 10px;
+    background:
+        linear-gradient(145deg, rgba(212,175,55,0.12), rgba(0,0,0,0.26));
+    border: 1px solid rgba(212,175,55,0.22);
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.22),
+        inset 0 0 12px rgba(212,175,55,0.04);
+}
+
+.pedidos-painel-resumo strong {
+    display: block;
+    color: #ffeaa7;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+}
+
+.pedidos-painel-resumo small {
+    display: block;
+    color: rgba(255,255,255,0.58);
+    font-size: 0.68rem;
+    margin-top: 3px;
+}
+
+.pedidos-selo {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: rgba(0,0,0,0.34);
+    border: 1px solid rgba(212,175,55,0.28);
+    color: #ffeaa7;
+    font-size: 1rem;
+    font-weight: 900;
+    box-shadow: inset 0 0 10px rgba(212,175,55,0.08);
+}
+
+/* Lista de pedidos */
+.pedidos-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.pedido-card {
+    padding: 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.055);
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.20),
+        inset 0 0 10px rgba(255,255,255,0.02);
+}
+
+.pedido-card-pronto {
+    border-color: rgba(46,204,113,0.32);
+    background:
+        linear-gradient(145deg, rgba(46,204,113,0.10), rgba(255,255,255,0.035));
+}
+
+.pedido-card-topo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pedido-avatar {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.34);
+    border: 1px solid rgba(212,175,55,0.18);
+    font-size: 1.25rem;
+}
+
+.pedido-card-topo strong {
+    display: block;
+    color: #fff;
+    font-size: 0.92rem;
+    line-height: 1.1;
+}
+
+.pedido-card-topo small {
+    display: block;
+    color: rgba(255,255,255,0.60);
+    font-size: 0.68rem;
+    line-height: 1.35;
+    margin-top: 3px;
+}
+
+.pedido-itens {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+
+.pedido-item-ok,
+.pedido-item-falta {
+    font-size: 0.64rem;
+    font-weight: 900;
+    border-radius: 999px;
+    padding: 4px 7px;
+    border: 1px solid transparent;
+}
+
+.pedido-item-ok {
+    color: #2ecc71;
+    background: rgba(46,204,113,0.10);
+    border-color: rgba(46,204,113,0.22);
+}
+
+.pedido-item-falta {
+    color: #ff7675;
+    background: rgba(231,76,60,0.10);
+    border-color: rgba(231,76,60,0.24);
+}
+
+.pedido-recompensa {
+    color: rgba(255,255,255,0.72);
+    font-size: 0.72rem;
+    font-weight: 800;
+    margin-bottom: 9px;
+}
+
+.pedido-recompensa b {
+    color: #ffeaa7;
+}
+
+.pedido-acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.pedido-btn {
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 9px 10px !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    cursor: pointer;
+}
+
+.pedido-btn-entregar {
+    background: linear-gradient(145deg, #2ecc71, #1f9f55) !important;
+    color: #03140a !important;
+    box-shadow: 0 5px 0 rgba(14,82,43,0.95);
+}
+
+.pedido-btn-trocar {
+    background: linear-gradient(145deg, #f4d03f, #c99519) !important;
+    color: #111 !important;
+    box-shadow: 0 5px 0 rgba(90,67,10,0.9);
+}
+
+.pedido-btn:disabled {
+    opacity: 0.42;
+    filter: grayscale(1);
+    pointer-events: none;
+}
+
+.pedido-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(90,67,10,0.9);
+}
+
+/* Retrato: 7 botões ficam organizados em grade */
+@media (max-width: 720px) and (orientation: portrait) {
+    .abas-loja.fazenda-hud-operacoes {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    .hud-fazenda-btn {
+        height: 48px !important;
+    }
+
+    .hud-fazenda-btn span {
+        font-size: 0.96rem !important;
+    }
+
+    .hud-fazenda-btn small {
+        font-size: 0.38rem !important;
+    }
+}
+
+/* Paisagem compacta */
+@media (orientation: landscape) {
+    .hud-fazenda-btn {
+        height: 44px !important;
+    }
+
+    .hud-fazenda-btn span {
+        font-size: 0.92rem !important;
+    }
+
+    .hud-fazenda-btn small {
+        font-size: 0.35rem !important;
+    }
+
+    .pedido-card {
+        padding: 10px;
+    }
+
+    .pedido-card-topo strong {
+        font-size: 0.84rem;
+    }
+
+    .pedido-card-topo small,
+    .pedido-recompensa {
+        font-size: 0.62rem;
+    }
+
+    .pedido-btn {
+        font-size: 0.66rem !important;
+        padding: 8px 9px !important;
+    }
+}
+
+/* =========================================================
+   MINI FAZENDA — FASE 5B
+   Pedidos especiais, raridade e sequência
+========================================================= */
+
+.pedido-combo-card {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background:
+        linear-gradient(145deg, rgba(231, 126, 34, 0.15), rgba(0,0,0,0.26));
+    border: 1px solid rgba(241, 196, 15, 0.22);
+    color: #ffeaa7;
+    font-size: 0.74rem;
+    font-weight: 800;
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.20),
+        inset 0 0 12px rgba(241,196,15,0.04);
+}
+
+.pedido-combo-card span {
+    display: block;
+    color: rgba(255,255,255,0.62);
+    font-size: 0.66rem;
+    margin-top: 3px;
+}
+
+.pedido-combo-neutro {
+    color: rgba(255,255,255,0.58);
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.06);
+}
+
+.pedido-linha-titulo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.pedido-raridade {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    border-radius: 999px;
+    padding: 3px 6px;
+    font-size: 0.52rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+}
+
+.pedido-raridade-comum .pedido-raridade,
+.pedido-raridade-comum.pedido-card {
+    border-color: rgba(255,255,255,0.055);
+}
+
+.pedido-raridade-comum {
+    color: rgba(255,255,255,0.66);
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+}
+
+.pedido-raridade-especial {
+    color: #ffeaa7;
+    background: rgba(241,196,15,0.12);
+    border-color: rgba(241,196,15,0.28);
+}
+
+.pedido-raridade-raro {
+    color: #74b9ff;
+    background: rgba(116,185,255,0.12);
+    border-color: rgba(116,185,255,0.28);
+}
+
+.pedido-raridade-romantico {
+    color: #ff9ff3;
+    background: rgba(255,159,243,0.12);
+    border-color: rgba(255,159,243,0.32);
+}
+
+.pedido-card.pedido-raridade-especial {
+    border-color: rgba(241,196,15,0.28);
+    background:
+        linear-gradient(145deg, rgba(241,196,15,0.09), rgba(255,255,255,0.035));
+}
+
+.pedido-card.pedido-raridade-raro {
+    border-color: rgba(116,185,255,0.30);
+    background:
+        linear-gradient(145deg, rgba(116,185,255,0.10), rgba(255,255,255,0.035));
+}
+
+.pedido-card.pedido-raridade-romantico {
+    border-color: rgba(255,159,243,0.32);
+    background:
+        linear-gradient(145deg, rgba(255,159,243,0.10), rgba(255,255,255,0.035));
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.20),
+        0 0 18px rgba(255,159,243,0.08),
+        inset 0 0 10px rgba(255,255,255,0.02);
+}
+
+.pedido-card.pedido-raridade-romantico .pedido-avatar {
+    box-shadow:
+        0 0 14px rgba(255,159,243,0.18),
+        inset 0 0 10px rgba(255,159,243,0.08);
+}
+
+.pedido-card-pronto.pedido-raridade-raro,
+.pedido-card-pronto.pedido-raridade-romantico {
+    animation: pedidoEspecialPronto 2.4s ease-in-out infinite;
+}
+
+.pedido-recompensa span {
+    display: block;
+    color: #2ecc71;
+    font-size: 0.64rem;
+    margin-top: 3px;
+    font-weight: 900;
+}
+
+@keyframes pedidoEspecialPronto {
+    0%, 100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.12);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pedido-card-pronto.pedido-raridade-raro,
+    .pedido-card-pronto.pedido-raridade-romantico {
+        animation: none !important;
+    }
+}
+
+@media (orientation: landscape) {
+    .pedido-combo-card {
+        font-size: 0.66rem;
+        padding: 8px 10px;
+    }
+
+    .pedido-raridade {
+        font-size: 0.46rem;
+        padding: 2px 5px;
+    }
+}
+
+/* =========================================================
+   MINI FAZENDA — FASE 6A
+   XP, nível e progressão
+========================================================= */
+
+.fazenda-xp-hud {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 10px;
+    padding: 10px;
+    border-radius: 18px;
+    background:
+        linear-gradient(145deg, rgba(212,175,55,0.10), rgba(0,0,0,0.26));
+    border: 1px solid rgba(212,175,55,0.18);
+    box-shadow:
+        inset 0 0 12px rgba(212,175,55,0.04),
+        0 8px 16px rgba(0,0,0,0.18);
+}
+
+.fazenda-xp-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.fazenda-xp-info span {
+    color: #ffeaa7;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.fazenda-xp-info small {
+    color: rgba(255,255,255,0.56);
+    font-size: 0.64rem;
+    font-weight: 800;
+    text-align: right;
+}
+
+.fazenda-xp-barra {
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.48);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.fazenda-xp-barra > div {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background:
+        linear-gradient(90deg, #2ecc71, #f1c40f, #d4af37);
+    transition: width 0.35s ease;
+}
+
+.fazenda-xp-texto {
+    margin-top: 5px;
+    color: rgba(255,255,255,0.54);
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.pedido-bonus-nivel-card {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background:
+        linear-gradient(145deg, rgba(212,175,55,0.13), rgba(0,0,0,0.24));
+    border: 1px solid rgba(212,175,55,0.24);
+    color: #ffeaa7;
+    font-size: 0.72rem;
+    font-weight: 800;
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.18),
+        inset 0 0 10px rgba(212,175,55,0.04);
+}
+
+.pedido-bonus-nivel-card b {
+    color: #2ecc71;
+}
+
+@media (orientation: landscape) {
+    .fazenda-xp-hud {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .fazenda-xp-info span {
+        font-size: 0.7rem;
+    }
+
+    .fazenda-xp-info small {
+        font-size: 0.56rem;
+    }
+
+    .fazenda-xp-barra {
+        height: 6px;
+    }
+
+    .fazenda-xp-texto {
+        font-size: 0.52rem;
+    }
+
+    .pedido-bonus-nivel-card {
+        font-size: 0.64rem;
+        padding: 8px 10px;
+    }
+}

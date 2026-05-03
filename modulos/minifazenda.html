@@ -99,6 +99,19 @@
         <strong id="fazenda-hud-titulo">Plantio e sementes</strong>
     </div>
 
+    <div class="fazenda-xp-hud">
+        <div class="fazenda-xp-info">
+            <span>⭐ Nível <b id="fazenda-nivel">1</b></span>
+            <small id="fazenda-titulo-nivel">Aprendiz do Santuário</small>
+        </div>
+
+        <div class="fazenda-xp-barra">
+            <div id="fazenda-xp-preenchimento"></div>
+        </div>
+
+        <div class="fazenda-xp-texto" id="fazenda-xp-texto">0/100 XP</div>
+    </div>
+
     <div class="abas-loja fazenda-hud-operacoes">
     <button class="aba-btn hud-fazenda-btn ativa" data-aba="sementes" onclick="mudarAbaLoja('sementes')">
         <span>🌱</span>
@@ -124,6 +137,17 @@
         <span>🎒</span>
         <small>Silo</small>
     </button>
+
+    <button class="aba-btn hud-fazenda-btn" data-aba="producao" onclick="mudarAbaLoja('producao')">
+        <span>🏭</span>
+        <small>Produção</small>
+    </button>
+
+    <button class="aba-btn hud-fazenda-btn" data-aba="pedidos" onclick="mudarAbaLoja('pedidos')">
+        <span>📦</span>
+        <small>Pedidos</small>
+    </button>
+
 </div>
 
     <div id="conteudo-loja" class="conteudo-loja-scroll fazenda-hud-conteudo">
